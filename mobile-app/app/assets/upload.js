@@ -24,4 +24,12 @@ function Upload() {
 	Ti.API.info("Send");
 }
 
+function registerHandler() {
+	Ti.Network.addEventListener('change', function (e) {
+		if(e.networkType === Ti.Network.NETWORK_WIFI || e.networkType === Ti.Network.NETWORK_LAN) {
+			// Do the uploading here!
+		}
+	});
+}
+
 module.exports = Upload;
