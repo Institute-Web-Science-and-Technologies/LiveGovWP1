@@ -1,5 +1,6 @@
 <Alloy>
 	<Window class="container">
 		<Button id="startCollector" onClick="startCollection">Collect Samples</Button>
+		<Label id="log">LOGGING GOES HERE</Label>
 	</Window>
 </Alloy>

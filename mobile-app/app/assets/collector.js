@@ -1,12 +1,12 @@
 
 // Collector constructor
-// FileName: String -> The fileName, which will be used to log the events
 // wifiTestInterval: Number -> The number of secons we wait to check if wifi is available 
 function Collector ( wifiTestInterval ) {
 	this._wifiInterval = wifiTestInterval || 30;
 	this._file = Ti.Filesystem.createTempFile();
 	this.seperator = ',';
 	this._deviceId = Ti.Platform.id;
+	this.running = false;
 }
 
 
@@ -14,21 +14,34 @@ function Collector ( wifiTestInterval ) {
 Collector.prototype.start = function () {
 	var self = this;
 	
-	var accelerometerCallback = self._createAccCallback();
+	this.running = true;
+	
+	this.accelerometerCallback = this._createAccCallback();
 	
 	// Register the accelerometer callback
-	Ti.Accelerometer.addEventListener('update', accelerometerCallback);
+	Ti.Accelerometer.addEventListener('update', this.accelerometerCallback);
 	if (Ti.Platform.name === 'android'){
 		Ti.Android.currentActivity.addEventListener('pause', function(e) {
-	    	Ti.API.info("removing accelerometer callback on pause");
-	    	Ti.Accelerometer.removeEventListener('update', accelerometerCallback);
-	    });
-	    Ti.Android.currentActivity.addEventListener('resume', function(e) {
-	    	Ti.API.info("adding accelerometer callback on resume");
-	    	Ti.Accelerometer.addEventListener('update', accelerometerCallback);
-	    });
-	}	
-}
+	   	Ti.API.info("removing accelerometer callback on pause");
+	   	Ti.Accelerometer.removeEventListener('update', self.accelerometerCallback);
+	   });
+	   Ti.Android.currentActivity.addEventListener('resume', function(e) {
+	   	Ti.API.info("adding accelerometer callback on resume");
+	   	Ti.Accelerometer.addEventListener('update', self.accelerometerCallback);
+	   });
+	}
+	
+	// Register GPS
+	Ti.Geolocation.accuracy = Ti.Geolocation.ACCURACY_BEST;
+	this.gpsCallback = this._createGPSCallback();
+	Ti.Geolocation.addEventListener('location', this.gpsCallback);
+};
+
+Collector.prototype.stop = function () {
+	this.running = false;
+	Ti.Accelerometer.removeEventListener('update', this.accelerometerCallback);
+	Ti.Geolocation.removeEventListener('update', this.gpsCallback);
+};
 
 Collector.prototype._createAccCallback = function () {
 	var self = this;
@@ -36,20 +49,34 @@ Collector.prototype._createAccCallback = function () {
 		self.log('ACC', [e.x, e.y, e.z]);
 	};
 	return callback;
-}
+};
 
-Collector.prototype.log = function ( sensorId, sensorValues ) {
+Collector.prototype._createGPSCallback = function () {
+	var self = this;
+	
+	var callback = function ( e ) {
+		if(e.success) {
+			self.log('GPS', [e.coords.longitude, e.coords.latitude, e.coords.altitude], e.coords.timestamp);
+		} else {
+			Ti.API.info('GPS Data not successfull');
+		}
+	};
+	return callback;
+};
+
+Collector.prototype.log = function ( sensorId, sensorValues, ts ) {
 	var s = this.seperator;
-	var ts = new Date().getTime();
-	var msg = sensorId + s + ts + s + this._deviceId;
+	if(!ts) {
+		ts = new Date().getTime();
+	}
+	var msg = sensorId + s + ts + s + this._deviceId + s;
 	for(i = 0; i < sensorValues.length; i++) {
 		msg += sensorValues[i];
 		if(i !== sensorValues.length)
 			msg += " ";
 	}
-	//this.file.write(msg, true);
 	Ti.API.info(msg);
-}
+};
 
 
 module.exports = Collector;
