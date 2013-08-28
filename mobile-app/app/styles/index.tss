@@ -6,4 +6,7 @@
 }, 
 "Button": {
 	top: 20
+},
+"#upload": {
+	top: 100
 }

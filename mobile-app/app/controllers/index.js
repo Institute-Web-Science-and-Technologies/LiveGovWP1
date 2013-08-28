@@ -1,10 +1,9 @@
-var Collector = require('collector');
+var Collector = require('collector')
+  , upload = require('upload');
 
-var log = function (msg) {
-	$.log.text = msg;
-};
+$.log.text = Ti.Filesystem.tempDirectory;
 
-var c = new Collector(30, log);
+var c = new Collector(30);
 
 function doClick(e) {  
     alert($.label.text);
@@ -18,6 +17,10 @@ function startCollection () {
 		c.stop();
 		$.startCollector.title = "Collect Samples";
 	}
+}
+
+function doUpload() {
+	upload();
 }
 
 

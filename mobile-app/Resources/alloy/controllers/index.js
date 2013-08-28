@@ -8,6 +8,9 @@ function Controller() {
             $.startCollector.title = "Stop collection";
         }
     }
+    function doUpload() {
+        upload();
+    }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     this.__controllerPath = "index";
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
@@ -28,6 +31,13 @@ function Controller() {
     });
     $.__views.index.add($.__views.startCollector);
     startCollection ? $.__views.startCollector.addEventListener("click", startCollection) : __defers["$.__views.startCollector!click!startCollection"] = true;
+    $.__views.upload = Ti.UI.createButton({
+        top: 100,
+        title: "Upload",
+        id: "upload"
+    });
+    $.__views.index.add($.__views.upload);
+    doUpload ? $.__views.upload.addEventListener("click", doUpload) : __defers["$.__views.upload!click!doUpload"] = true;
     $.__views.log = Ti.UI.createLabel({
         color: "#000",
         text: "LOGGING GOES HERE",
@@ -36,13 +46,12 @@ function Controller() {
     $.__views.index.add($.__views.log);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var Collector = require("collector");
-    var log = function(msg) {
-        $.log.text = msg;
-    };
-    var c = new Collector(30, log);
+    var Collector = require("collector"), upload = require("upload");
+    $.log.text = Ti.Filesystem.tempDirectory;
+    var c = new Collector(30);
     $.index.open();
     __defers["$.__views.startCollector!click!startCollection"] && $.__views.startCollector.addEventListener("click", startCollection);
+    __defers["$.__views.upload!click!doUpload"] && $.__views.upload.addEventListener("click", doUpload);
     _.extend($, exports);
 }
 

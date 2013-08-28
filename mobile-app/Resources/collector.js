@@ -4,6 +4,8 @@ function Collector(wifiTestInterval) {
     this.seperator = ",";
     this._deviceId = Ti.Platform.id;
     this.running = false;
+    this._samples = "";
+    this.writeLog()();
 }
 
 Collector.prototype.start = function() {
@@ -54,7 +56,19 @@ Collector.prototype.log = function(sensorId, sensorValues, ts) {
         msg += sensorValues[i];
         i !== sensorValues.length && (msg += " ");
     }
-    Ti.API.info(msg);
+    this._samples += msg + "\n";
+};
+
+Collector.prototype.writeLog = function() {
+    var self = this;
+    var callback = function() {
+        var file = Ti.Filesystem.getFile(Ti.Filesystem.tempDirectory, "sensor.log");
+        file.write(self._samples, true);
+        Ti.API.info(self._samples);
+        self._samples = "";
+        setTimeout(callback, 100);
+    };
+    return callback;
 };
 
 module.exports = Collector;
