@@ -70,7 +70,9 @@ class MyHandler(BaseHTTPRequestHandler):
 def main():
     try:
         server = HTTPServer(('', PORT), MyHandler)
-        print 'started UploadServlet'
+        print 'Started UploadServlet.'
+        print 'Listening on port ' + PORT
+        print 'Writing to ' + OUT_FILE
         server.serve_forever()
     except KeyboardInterrupt:
         print '^C received, shutting down server'
