@@ -1,13 +1,15 @@
 var Collector = require('collector')
   , upload = require('upload');
 
-$.log.text = Ti.Filesystem.tempDirectory;
+$.log.editable = false;
 
-var c = new Collector(30);
-
-function doClick(e) {  
-    alert($.label.text);
+function log ( msg ) {
+	$.log.value += '\n' + msg;
 }
+
+var c = new Collector(30, log);
+upload(log);
+
 
 function startCollection () {
 	if(!c.running) {

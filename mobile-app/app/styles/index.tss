@@ -5,8 +5,11 @@
 	color: "#000"
 }, 
 "Button": {
-	top: 20
+	top: 5,
+	width: Ti.UI.FILL,
+	margin: 5
 },
-"#upload": {
-	top: 100
+"#log": {
+	top: 75,
+	width: Ti.UI.FILL
 }

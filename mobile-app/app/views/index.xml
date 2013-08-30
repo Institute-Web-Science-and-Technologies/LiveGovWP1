@@ -1,7 +1,6 @@
 <Alloy>
 	<Window class="container">
 		<Button id="startCollector" onClick="startCollection">Collect Samples</Button>
-		<Button id="upload" onClick="doUpload">Upload</Button>
-		<Label id="log">LOGGING GOES HERE</Label>
+		<TextArea id="log" value="" />
 	</Window>
 </Alloy>

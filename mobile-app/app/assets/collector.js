@@ -1,13 +1,14 @@
 
 // Collector constructor
 // wifiTestInterval: Number -> The number of secons we wait to check if wifi is available 
-function Collector ( wifiTestInterval ) {
+function Collector ( wifiTestInterval, log ) {
 	this._wifiInterval = wifiTestInterval || 30;
 	this._file = Ti.Filesystem.createTempFile();
 	this.seperator = ',';
 	this._deviceId = Ti.Platform.id;
 	this.running = false;
 	this._samples = "";
+	this._log = log;
 	(this.writeLog())();
 }
 
@@ -17,6 +18,8 @@ Collector.prototype.start = function () {
 	var self = this;
 	
 	this.running = true;
+	
+	this._log("Start collecting.");
 	
 	this.accelerometerCallback = this._createAccCallback();
 	
@@ -41,8 +44,9 @@ Collector.prototype.start = function () {
 
 Collector.prototype.stop = function () {
 	this.running = false;
+	this._log("Stop collecting.");
 	Ti.Accelerometer.removeEventListener('update', this.accelerometerCallback);
-	Ti.Geolocation.removeEventListener('update', this.gpsCallback);
+	Ti.Geolocation.removeEventListener('location', this.gpsCallback);
 };
 
 Collector.prototype._createAccCallback = function () {
@@ -57,7 +61,7 @@ Collector.prototype._createGPSCallback = function () {
 	var self = this;
 	
 	var callback = function ( e ) {
-		if(e.success) {
+		if(e.success && e.coords) {
 			self.log('GPS', [e.coords.longitude, e.coords.latitude, e.coords.altitude], e.coords.timestamp);
 		} else {
 			Ti.API.info('GPS Data not successfull');
@@ -78,7 +82,6 @@ Collector.prototype.log = function ( sensorId, sensorValues, ts ) {
 			msg += " ";
 	}
 	this._samples += msg + '\n';
-	//Ti.API.info(msg);
 };
 
 Collector.prototype.writeLog = function () {
@@ -86,11 +89,15 @@ Collector.prototype.writeLog = function () {
 	var self = this;
 	
 	var callback = function () {
+		if("" === self._samples) {
+			setTimeout(callback, 1000);
+			return;
+		}
 		var file = Ti.Filesystem.getFile(Ti.Filesystem.tempDirectory, "sensor.log");
 		file.write(self._samples, true);
-		Ti.API.info(self._samples);
+		self._log("Writinig samples to file: " + self._samples.length);
 		self._samples = "";
-		setTimeout(callback, 100);
+		setTimeout(callback, 1000);
 	};
 	
 	return callback;
