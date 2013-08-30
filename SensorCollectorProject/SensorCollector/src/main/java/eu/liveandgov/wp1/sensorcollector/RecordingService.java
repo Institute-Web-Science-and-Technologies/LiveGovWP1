@@ -19,46 +19,27 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Created by hartmann on 8/30/13.
  */
 public class RecordingService extends Service implements SensorEventListener {
+    // Constants
+    private final String LOG_TAG;
 
-    private static String LOG_TAG = this.getClass().getSimpleName();
-
+    // Sensors
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
+    // Buffers
     private BlockingQueue<String> sensorLog = new LinkedBlockingQueue<String>();
+
+    public RecordingService(){
+        LOG_TAG = this.getClass().getSimpleName();
+    }
+
 
     public void onCreate(){
         mSensorManager = (SensorManager) getSystemService(getBaseContext().SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         super.onCreate();
 
-        new Thread(new Runnable() {
-            public void run() {
-                String out = "";
-                while(true) {
-                    // Flush out buffer
-                    out = "";
-
-                    Log.i(LOG_TAG,"Reading " + sensorLog.size() + " elements.");
-
-                    // Fill buffer
-                    while(! sensorLog.isEmpty()) {
-                        out += sensorLog.poll() + "\n";
-                    }
-
-                    // Write to file
-                    // Log.i(this.getClass().getName(), out);
-
-                    // Sleep 1sec
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            }
-        }).start();
+        new Thread(new PersistenceThread(sensorLog)).start();
     }
 
     public IBinder onBind(Intent intent) {
