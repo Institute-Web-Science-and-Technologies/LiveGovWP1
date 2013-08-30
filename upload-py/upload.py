@@ -71,8 +71,8 @@ def main():
     try:
         server = HTTPServer(('', PORT), MyHandler)
         print 'Started UploadServlet.'
-        print 'Listening on port ' + PORT
-        print 'Writing to ' + OUT_FILE
+        print 'Listening on port %d' % PORT
+        print 'Writing to %s' % OUT_FILE
         server.serve_forever()
     except KeyboardInterrupt:
         print '^C received, shutting down server'
