@@ -485,5 +485,7 @@ public class UploadServlet extends HttpServlet {
 		}
 		return deviceInfo;
 	}
-
+	public String getHelloWorld() {
+		return "Hello World";
+	}
 }
