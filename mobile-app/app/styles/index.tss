@@ -10,6 +10,6 @@
 	margin: 5
 },
 "#log": {
-	top: 75,
+	top: 0,
 	width: Ti.UI.FILL
 }

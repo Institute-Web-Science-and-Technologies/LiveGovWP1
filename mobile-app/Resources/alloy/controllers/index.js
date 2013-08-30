@@ -1,6 +1,8 @@
 function Controller() {
     function log(msg) {
-        $.log.value += "\n" + msg;
+        $.log.text.length >= 5e4 && ($.log.text = "Cleared log...");
+        $.log.text += "\n" + msg;
+        $.logScroll.scrollToBottom();
     }
     function startCollection() {
         if (c.running) {
@@ -33,13 +35,20 @@ function Controller() {
     });
     $.__views.index.add($.__views.startCollector);
     startCollection ? $.__views.startCollector.addEventListener("click", startCollection) : __defers["$.__views.startCollector!click!startCollection"] = true;
-    $.__views.log = Ti.UI.createTextArea({
-        top: 75,
+    $.__views.logScroll = Ti.UI.createScrollView({
+        id: "logScroll",
+        top: "75",
+        height: "80%"
+    });
+    $.__views.index.add($.__views.logScroll);
+    $.__views.log = Ti.UI.createLabel({
+        color: "#000",
+        top: 0,
         width: Ti.UI.FILL,
         id: "log",
         value: ""
     });
-    $.__views.index.add($.__views.log);
+    $.__views.logScroll.add($.__views.log);
     exports.destroy = function() {};
     _.extend($, $.__views);
     var Collector = require("collector"), upload = require("upload");

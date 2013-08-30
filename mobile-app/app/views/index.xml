@@ -1,6 +1,8 @@
 <Alloy>
 	<Window class="container">
 		<Button id="startCollector" onClick="startCollection">Collect Samples</Button>
-		<TextArea id="log" value="" />
+		<ScrollView id="logScroll" top="75" height="80%">
+			<Label id="log" value=""></Label>
+		</ScrollView>
 	</Window>
 </Alloy>
