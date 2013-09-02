@@ -1,16 +1,16 @@
 package eu.liveandgov.wp1.backend;
 
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
-
-public class UploadServletTest extends TestCase {
+public class UploadServletTest {
 	@Test
 	public void testPrintHelloWorld() {
 		UploadServlet s = new UploadServlet();
-		Assert.assertEquals(s.getHelloWorld(), "Hello World");
+		assertEquals(s.getHelloWorld(), "Hello World");
  
 	}
+	
 }
