@@ -13,6 +13,10 @@ function Controller() {
             $.startCollector.title = "Stop collection";
         }
     }
+    function sendTag() {
+        var tag = $.tag.value;
+        c.sendTag(tag);
+    }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     this.__controllerPath = "index";
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
@@ -29,16 +33,28 @@ function Controller() {
     $.__views.startCollector = Ti.UI.createButton({
         top: 5,
         width: Ti.UI.FILL,
-        margin: 5,
         title: "Collect Samples",
         id: "startCollector"
     });
     $.__views.index.add($.__views.startCollector);
     startCollection ? $.__views.startCollector.addEventListener("click", startCollection) : __defers["$.__views.startCollector!click!startCollection"] = true;
+    $.__views.tag = Ti.UI.createTextField({
+        top: 145,
+        width: Ti.UI.FILL,
+        id: "tag"
+    });
+    $.__views.index.add($.__views.tag);
+    $.__views.sendTag = Ti.UI.createButton({
+        top: 75,
+        width: Ti.UI.FILL,
+        title: "Send Tag",
+        id: "sendTag"
+    });
+    $.__views.index.add($.__views.sendTag);
+    sendTag ? $.__views.sendTag.addEventListener("click", sendTag) : __defers["$.__views.sendTag!click!sendTag"] = true;
     $.__views.logScroll = Ti.UI.createScrollView({
-        id: "logScroll",
-        top: "75",
-        height: "80%"
+        top: 210,
+        id: "logScroll"
     });
     $.__views.index.add($.__views.logScroll);
     $.__views.log = Ti.UI.createLabel({
@@ -53,10 +69,11 @@ function Controller() {
     _.extend($, $.__views);
     var Collector = require("collector"), upload = require("upload");
     $.log.editable = false;
-    var c = new Collector(30, log);
-    upload(log);
+    var c = new Collector(log);
+    upload(c, log);
     $.index.open();
     __defers["$.__views.startCollector!click!startCollection"] && $.__views.startCollector.addEventListener("click", startCollection);
+    __defers["$.__views.sendTag!click!sendTag"] && $.__views.sendTag.addEventListener("click", sendTag);
     _.extend($, exports);
 }
 

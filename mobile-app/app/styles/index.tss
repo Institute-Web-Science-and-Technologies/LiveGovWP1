@@ -6,10 +6,19 @@
 }, 
 "Button": {
 	top: 5,
-	width: Ti.UI.FILL,
-	margin: 5
+	width: Ti.UI.FILL
+},
+"#sendTag": {
+	top: 75
 },
 "#log": {
 	top: 0,
+	width: Ti.UI.FILL
+},
+"#logScroll": {
+	top: 210
+},
+"#tag": {
+	top: 145,
 	width: Ti.UI.FILL
 }

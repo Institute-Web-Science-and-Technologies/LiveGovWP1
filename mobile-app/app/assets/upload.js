@@ -1,29 +1,30 @@
 var canUpload = false;
 var _log = null;
+var _collector = null;
 
-function Upload() {
-	var uploadURL = "http://141.26.71.84:3001";
+function Upload(fileName) {
+	var uploadURL = "http://dhcp129.uni-koblenz.de:8080/backend/upload";
 	_log("Uploading samples to " + uploadURL);
 	var headers = {
-		'Content-Type': 'multipart/form-data'
+		'id': Ti.Platform.id	
 	};
-	var uploadFile = Ti.Filesystem.getFile(Ti.Filesystem.tempDirectory, "sensor.log");
+	var uploadFile = Ti.Filesystem.getFile(Ti.Filesystem.tempDirectory, fileName);
 	if(! uploadFile.exists() || 0 === uploadFile.size ) {
-		_log("Abort upload. File does not exist.");
+		_log("Abort upload. File " + fileName + " does not exist.");
 		return;
 	}
-	uploadFile.copy(Ti.Filesystem.tempDirectory + "/upload.log");
+	uploadFile.copy(Ti.Filesystem.tempDirectory + "/" + fileName + "upload.log");
 	// Clear the file
 	uploadFile.write("");
-	var uFile = Ti.Filesystem.getFile(Ti.Filesystem.tempDirectory, "upload.log");
+	var uFile = Ti.Filesystem.getFile(Ti.Filesystem.tempDirectory, fileName + "upload.log");
 	_log("Upload samples... Size: " + uFile.size);
 	var content = {
-		'upfile': uFile
+		'upfile': uFile.read()
 	};
 	var xhr = Ti.Network.createHTTPClient({
 		onload: function(e) {
 			Ti.API.info("Done");
-			_log("Upload done.");
+			_log("Upload done. " + fileName);
 		},
 		onerror : function(e) {
         	Ti.API.debug(e.error);
@@ -38,9 +39,9 @@ function Upload() {
 	Ti.API.info("Send");
 }
 
-function registerHandler(log) {
+function registerHandler(collector, log) {
 	_log = log;
-	
+	_collector = collector;
 	_log("Register Wifi Handler");
 	var currentType = Ti.Network.getNetworkType();
 	if(currentType === Ti.Network.NETWORK_WIFI || currentType === Ti.Network.NETWORK_LAN) {
@@ -68,7 +69,8 @@ function doUpload() {
 		_log("Can't upload anymore.");
 		return;
 	}
-	Upload();
+	Upload("sensor.log");
+	Upload("sensor2.log");
 	setTimeout(doUpload, 30000);
 }
 

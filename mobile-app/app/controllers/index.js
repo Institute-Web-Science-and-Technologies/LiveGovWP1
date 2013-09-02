@@ -3,6 +3,11 @@ var Collector = require('collector')
 
 $.log.editable = false;
 
+//var intent = Titanium.Android.createServiceIntent( { action: Ti.Android.ACTION_MAIN, url: 'acc.js' } );
+// Service should run its code every 2 seconds.
+//intent.putExtra('interval', 30);
+//var service = Titanium.Android.createService(intent);
+//service.start();
 
 function log ( msg ) {	
 	// Clear the log if we get more than 50k chars
@@ -13,8 +18,8 @@ function log ( msg ) {
 	$.logScroll.scrollToBottom();
 }
 
-var c = new Collector(30, log);
-upload(log);
+var c = new Collector(log);
+upload(c, log);
 
 function startCollection () {
 	if(!c.running) {
@@ -26,8 +31,13 @@ function startCollection () {
 	}
 }
 
-function doUpload() {
+function doUpload () {
 	upload();
+}
+
+function sendTag () {
+	var tag = $.tag.value;
+	c.sendTag(tag);
 }
 
 

@@ -1,7 +1,9 @@
 <Alloy>
 	<Window class="container">
 		<Button id="startCollector" onClick="startCollection">Collect Samples</Button>
-		<ScrollView id="logScroll" top="75" height="80%">
+		<TextField id="tag"></TextField>
+		<Button id="sendTag" onClick="sendTag">Send Tag</Button>
+		<ScrollView id="logScroll">
 			<Label id="log" value=""></Label>
 		</ScrollView>
 	</Window>

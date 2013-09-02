@@ -1,15 +1,15 @@
 
 // Collector constructor
 // wifiTestInterval: Number -> The number of secons we wait to check if wifi is available 
-function Collector ( wifiTestInterval, log ) {
-	this._wifiInterval = wifiTestInterval || 30;
-	this._file = Ti.Filesystem.createTempFile();
+function Collector ( log ) {
 	this.seperator = ',';
 	this._deviceId = Ti.Platform.id;
 	this.running = false;
 	this._samples = "";
 	this._log = log;
 	(this.writeLog())();
+	this.maxFileSize = 104857600; // 100 MB in bytes
+	this._currentFile = "sensor.log";
 }
 
 
@@ -27,13 +27,15 @@ Collector.prototype.start = function () {
 	Ti.Accelerometer.addEventListener('update', this.accelerometerCallback);
 	if (Ti.Platform.name === 'android'){
 		Ti.Android.currentActivity.addEventListener('pause', function(e) {
-	   	Ti.API.info("removing accelerometer callback on pause");
-	   	Ti.Accelerometer.removeEventListener('update', self.accelerometerCallback);
-	   });
-	   Ti.Android.currentActivity.addEventListener('resume', function(e) {
-	   	Ti.API.info("adding accelerometer callback on resume");
-	   	Ti.Accelerometer.addEventListener('update', self.accelerometerCallback);
-	   });
+	   		Ti.API.info("removing accelerometer callback on pause");
+	   		Ti.Accelerometer.removeEventListener('update', self.accelerometerCallback);
+	 	});
+	 	Ti.Android.currentActivity.addEventListener('resume', function(e) {
+	 		if(self.running) {
+			   	Ti.API.info("adding accelerometer callback on resume");
+			   	Ti.Accelerometer.addEventListener('update', self.accelerometerCallback);
+		   }
+		});
 	}
 	
 	// Register GPS
@@ -62,7 +64,7 @@ Collector.prototype._createGPSCallback = function () {
 	
 	var callback = function ( e ) {
 		if(e.success && e.coords) {
-			self.log('GPS', [e.coords.longitude, e.coords.latitude, e.coords.altitude], e.coords.timestamp);
+			self.log('GPS', [e.coords.latitude, e.coords.longitude, e.coords.altitude], e.coords.timestamp);
 		} else {
 			Ti.API.info('GPS Data not successfull');
 		}
@@ -93,7 +95,14 @@ Collector.prototype.writeLog = function () {
 			setTimeout(callback, 1000);
 			return;
 		}
-		var file = Ti.Filesystem.getFile(Ti.Filesystem.tempDirectory, "sensor.log");
+		var file = Ti.Filesystem.getFile(Ti.Filesystem.tempDirectory, self._currentFile);
+		// Change the file if the current file is bigger than we want
+		if(file.size >= self.maxFileSize) {
+			self._currentFile = self._currentFile === 'sensor.log' ? 'sensor2.log' : 'sensor.log';
+			file = Ti.Filesystem.getFile(Ti.Filesystem.tempDirectory, self._currentFile);
+			file.write('');
+			self._log("File too big. Using file " + self._currentFile);
+		}
 		file.write(self._samples, true);
 		self._log("Writinig samples to file: " + self._samples.length);
 		self._samples = "";
@@ -101,6 +110,11 @@ Collector.prototype.writeLog = function () {
 	};
 	
 	return callback;
+};
+
+Collector.prototype.sendTag = function (tagName) {
+	this._log("Adding Tag: " + tagName);
+	this.log( 'TAG', ['"' + tagName + '"'] );
 };
 
 module.exports = Collector;
