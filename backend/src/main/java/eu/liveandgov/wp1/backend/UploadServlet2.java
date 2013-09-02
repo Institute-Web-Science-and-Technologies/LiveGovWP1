@@ -70,19 +70,15 @@ public class UploadServlet2 extends HttpServlet {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		copyStream(uploadedFileInputStream, baos);
 		
-//		saveToDisk(new ByteArrayInputStream(baos.toByteArray()), request.getHeader("id"));
-		saveToDatabase(new ByteArrayInputStream(baos.toByteArray()));
+		saveToDisk(new ByteArrayInputStream(baos.toByteArray()), request.getHeader("id"));
+//		saveToDatabase(new ByteArrayInputStream(baos.toByteArray()));
 		
 		
 	}
 	
 	private void saveToDisk(InputStream input, String id) throws IOException {
-		Date date = new Date();
-		DateFormat dateformat = DateFormat.getDateInstance(DateFormat.MEDIUM);
-		DateFormat timeformat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
-		String datetimestring = dateformat.format(date) + "_"
-				+ timeformat.format(date);
-		String absoluteFilename = "/tmp/liveandgov/uploads/" + id + "-" + datetimestring;
+		long unixTime = System.currentTimeMillis() / 1000L;
+		String absoluteFilename = "/tmp/liveandgov/uploads/" + id + "_" + unixTime;
 		File outfile = new File(absoluteFilename);
 		OutputStream outstream = new FileOutputStream(outfile);
 		copyStream(input, outstream);
