@@ -23,12 +23,12 @@ public class MainActivity extends Activity {
     }
 
     public void onButtonSamplingOnClick(View v) {
-        Intent intent = new Intent(IntentConstants.ACTION_SAMPLING_ENABLE);
+        Intent intent = new Intent(Constants.ACTION_SAMPLING_ENABLE);
         getApplicationContext().startService(intent);
     }
 
     public void onButtonSamplingOffClick(View v) {
-        Intent intent = new Intent(IntentConstants.ACTION_SAMPLING_DISABLE);
+        Intent intent = new Intent(Constants.ACTION_SAMPLING_DISABLE);
         getApplicationContext().startService(intent);
     }
 

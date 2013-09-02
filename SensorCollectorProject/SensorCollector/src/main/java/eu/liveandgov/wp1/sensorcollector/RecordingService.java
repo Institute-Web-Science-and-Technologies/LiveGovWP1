@@ -9,37 +9,51 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.util.Log;
 
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import de.snipworks.queue.persistentqueue.PersistenceQueue;
 
 /**
  * Created by hartmann on 8/30/13.
  */
 public class RecordingService extends Service implements SensorEventListener {
     // Constants
-    private final String LOG_TAG;
+    public static final String LOG_TAG = "RecordingService";
+    public static String SENSOR_FILENAME = "sensor.log";
 
     // Sensors
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
     // Buffers
-    private BlockingQueue<String> sensorLog = new LinkedBlockingQueue<String>();
-
-    public RecordingService(){
-        LOG_TAG = this.getClass().getSimpleName();
-    }
+    public PersistenceQueue<String> pQ;
 
 
-    public void onCreate(){
+    //
+    // Android Lifecycle
+    //
+
+    public void onCreate() {
         mSensorManager = (SensorManager) getSystemService(getBaseContext().SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        super.onCreate();
 
-        new Thread(new PersistenceThread(sensorLog)).start();
+        try {
+            pQ = new PersistenceQueue<String>(SENSOR_FILENAME);
+        } catch (IOException e){
+            e.printStackTrace();
+            return;
+        }
+
+        // start monitoring thread
+        new Thread( new MonitorThread(this) ).start();
+
+        // start transfer thread
+        new Thread( new TransferThread(this) ).start();
+
+        super.onCreate();
     }
 
     public IBinder onBind(Intent intent) {
@@ -49,10 +63,10 @@ public class RecordingService extends Service implements SensorEventListener {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
 
-        if (action.equals(IntentConstants.ACTION_SAMPLING_ENABLE)) {
+        if (action.equals(Constants.ACTION_SAMPLING_ENABLE)) {
             enableSampling();
         }
-        if (action.equals(IntentConstants.ACTION_SAMPLING_DISABLE)) {
+        if (action.equals(Constants.ACTION_SAMPLING_DISABLE)) {
             disableSampling();
         }
         return 0;
@@ -70,7 +84,21 @@ public class RecordingService extends Service implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        sensorLog.add(String.format("%s,%d,%f %f %f", event.sensor.getName(), event.timestamp, event.values[0], event.values[1], event.values[2]));
+        String logString = "";
+
+        if (event.sensor.getName().equals(mAccelerometer.getName())) {
+            // Accelerometer
+            logString = String.format("ACC,%d,%f %f %f\n", event.timestamp / 1000, event.values[0], event.values[1], event.values[2]);
+        }
+
+        try {
+        // sensorFileWriter.write(logString);
+            pQ.add(logString);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        sensorLog.add();
     }
 
     @Override
