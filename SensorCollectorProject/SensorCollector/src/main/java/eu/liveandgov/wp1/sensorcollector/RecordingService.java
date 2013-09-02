@@ -9,12 +9,9 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.util.Log;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-
-import de.snipworks.queue.persistentqueue.PersistenceQueue;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Created by hartmann on 8/30/13.
@@ -29,7 +26,7 @@ public class RecordingService extends Service implements SensorEventListener {
     private Sensor mAccelerometer;
 
     // Buffers
-    public PersistenceQueue<String> pQ;
+    public Queue<String> pQ;
 
 
     //
@@ -40,9 +37,14 @@ public class RecordingService extends Service implements SensorEventListener {
         mSensorManager = (SensorManager) getSystemService(getBaseContext().SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
+        // InitQ
         try {
-            pQ = new PersistenceQueue<String>(SENSOR_FILENAME);
+//            File sensorLogFile = new File(getBaseContext().getFilesDir(),SENSOR_FILENAME);
+//            pQ = new PersistenceQueue<String>(sensorLogFile.getAbsolutePath());
+//            Log.i(LOG_TAG, "Created persistenceQueue");
+            pQ = new LinkedList<String>();
         } catch (IOException e){
+            Log.e(LOG_TAG, "Error creating persistenceQueue");
             e.printStackTrace();
             return;
         }
