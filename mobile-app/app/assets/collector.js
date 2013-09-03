@@ -25,18 +25,6 @@ Collector.prototype.start = function () {
 	
 	// Register the accelerometer callback
 	Ti.Accelerometer.addEventListener('update', this.accelerometerCallback);
-	if (Ti.Platform.name === 'android'){
-		Ti.Android.currentActivity.addEventListener('pause', function(e) {
-	   		Ti.API.info("removing accelerometer callback on pause");
-	   		Ti.Accelerometer.removeEventListener('update', self.accelerometerCallback);
-	 	});
-	 	Ti.Android.currentActivity.addEventListener('resume', function(e) {
-	 		if(self.running) {
-			   	Ti.API.info("adding accelerometer callback on resume");
-			   	Ti.Accelerometer.addEventListener('update', self.accelerometerCallback);
-		   }
-		});
-	}
 	
 	// Register GPS
 	Ti.Geolocation.accuracy = Ti.Geolocation.ACCURACY_BEST;

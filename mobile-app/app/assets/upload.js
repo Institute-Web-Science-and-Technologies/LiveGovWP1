@@ -3,7 +3,8 @@ var _log = null;
 var _collector = null;
 
 function Upload(fileName) {
-	var uploadURL = "http://dhcp129.uni-koblenz.de:8080/backend/upload";
+	//var uploadURL = "http://dhcp129.uni-koblenz.de:8080/backend/upload";
+	var uploadURL = "http://141.26.71.84:8080/backend/upload";
 	_log("Uploading samples to " + uploadURL);
 	var headers = {
 		'id': Ti.Platform.id	

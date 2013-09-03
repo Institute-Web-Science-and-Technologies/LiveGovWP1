@@ -10,21 +10,10 @@ function Collector(log) {
 }
 
 Collector.prototype.start = function() {
-    var self = this;
     this.running = true;
     this._log("Start collecting.");
     this.accelerometerCallback = this._createAccCallback();
     Ti.Accelerometer.addEventListener("update", this.accelerometerCallback);
-    Ti.Android.currentActivity.addEventListener("pause", function() {
-        Ti.API.info("removing accelerometer callback on pause");
-        Ti.Accelerometer.removeEventListener("update", self.accelerometerCallback);
-    });
-    Ti.Android.currentActivity.addEventListener("resume", function() {
-        if (self.running) {
-            Ti.API.info("adding accelerometer callback on resume");
-            Ti.Accelerometer.addEventListener("update", self.accelerometerCallback);
-        }
-    });
     Ti.Geolocation.accuracy = Ti.Geolocation.ACCURACY_BEST;
     this.gpsCallback = this._createGPSCallback();
     Ti.Geolocation.addEventListener("location", this.gpsCallback);
