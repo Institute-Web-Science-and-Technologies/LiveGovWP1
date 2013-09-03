@@ -40,8 +40,6 @@ public class WindowStreamTest {
 		String testSample = "ACC,1378130329455,ab85d157c5260ebe,-0.3064578175544739 5.746084213256836 7.4316020011901855 ";
 		InputStream is = new ByteArrayInputStream(testSample.getBytes());
 		SensorEventStream sensorEventS = SensorEventStream.processStream(is, null);
-		
-		
 	}
 	
 	/**

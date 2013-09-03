@@ -19,7 +19,7 @@ import eu.liveandgov.wp1.backend.SensorValueObjects.RawSensorValue;
 import eu.liveandgov.wp1.backend.format.Sample;
 import eu.liveandgov.wp1.backend.format.SampleType;
 
-public class SensorEventStream implements Iterator {
+public class SensorEventStream implements Iterator<RawSensorValue>, Iterable<RawSensorValue> {
 
 	private CsvListReader csv;
 	private RawSensorValue next;
@@ -75,15 +75,20 @@ public class SensorEventStream implements Iterator {
 	}
 
 	@Override
-	public Object next() {
-		RawSensorValue n = next;
+	public RawSensorValue next() {
+		if (next == null) { throw new NoSuchElementException(); }
+		RawSensorValue out = next;
 		next = yieldNextSV();
-		if (n == null) { throw new NoSuchElementException(); }
-		return n;
+		return out;
 	}
 
 	@Override
 	public void remove() {
 		next = yieldNextSV();
+	}
+
+	@Override
+	public Iterator iterator() {
+		return this;
 	}
 }
