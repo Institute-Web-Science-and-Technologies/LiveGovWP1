@@ -25,6 +25,14 @@ import eu.liveandgov.wp1.backend.format.Sample;
 
 /**
  * Servlet implementation class UploadServlet2
+ * 
+ * 
+ * Test with:
+ * echo "ACC,1378128012707152,id1241242,0.018311 0.117111 0.32142" | curl localhost:8080/backend/upload -F "upfile=@-"
+ * 
+ * or using the provided test data
+ * cat test-upload-data.txt | curl localhost:8080/backend/upload -F "upfile=@-"
+ * 
  */
 @WebServlet("/upload")
 @MultipartConfig
@@ -75,8 +83,9 @@ public class UploadServlet2 extends HttpServlet {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		copyStream(uploadedFileInputStream, baos);
 		saveToDisk(new ByteArrayInputStream(baos.toByteArray()), request.getHeader("id"));
+		SensorEventStream.processStream(new ByteArrayInputStream(baos.toByteArray()), request.getHeader("id")).dump();
 		
-		SensorEventStream.processStream(new ByteArrayInputStream(baos.toByteArray()), request.getHeader("id"));
+		
 //		saveToDatabase(new ByteArrayInputStream(baos.toByteArray()));
 	}
 	

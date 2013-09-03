@@ -24,7 +24,6 @@ public class SensorEventStream implements Iterator {
 	private CsvListReader csv;
 	private RawSensorValue next;
 	
-	
 	public static SensorEventStream processStream(InputStream is, String id){
 		SensorEventStream SESO = new SensorEventStream();
 		
@@ -33,9 +32,15 @@ public class SensorEventStream implements Iterator {
 		SESO.csv = new CsvListReader(reader,CsvPreference.STANDARD_PREFERENCE);
 		SESO.next = SESO.yieldNextSV();
 		
-		return SESO;				
+		return SESO;
 	}
 
+	public void dump() {
+		while(hasNext()) {
+			System.out.println(next().toString());
+		}
+	}
+	
 	private RawSensorValue yieldNextSV() {
 		// read row
 		List<String> row;
@@ -46,8 +51,13 @@ public class SensorEventStream implements Iterator {
 			e.printStackTrace();
 			return null;
 		}
-
+		
 		if (row == null){
+			return null;
+		}
+		
+		if (row.size() <= 3){
+			System.out.println("Illegeal row revieved: " + row.toString() + " size " + row.size());
 			return null;
 		}
 
@@ -56,12 +66,12 @@ public class SensorEventStream implements Iterator {
 				Long.parseLong(row.get(1)), // timestamp
 				row.get(2),					// id
 				row.get(3)					// value string
-		);		
+		);
 	}
 	
 	@Override
 	public boolean hasNext() {
-		return (next == null);
+		return !(next == null);
 	}
 
 	@Override
