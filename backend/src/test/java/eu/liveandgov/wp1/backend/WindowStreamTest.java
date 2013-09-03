@@ -39,7 +39,7 @@ public class WindowStreamTest {
 	public void processStreamOneElement() {
 		String testSample = "ACC,1378130329455,ab85d157c5260ebe,-0.3064578175544739 5.746084213256836 7.4316020011901855 ";
 		InputStream is = new ByteArrayInputStream(testSample.getBytes());
-		SensorEventStream sensorEventS = SensorEventStream.processStream(is, null);
+		SensorEventStream sensorEventS = SensorEventStream.processStream(is, null);	
 	}
 	
 	/**
@@ -58,11 +58,11 @@ public class WindowStreamTest {
 		testData[3] = new RawSensorValue(SampleType.ACC, 1378130329505L, "ab85d157c5260ebe", "-0.15322890877723694 5.746084213256836 7.508216381072998 ");
 		InputStream is = new ByteArrayInputStream(testSamples.getBytes());
 		SensorEventStream sensorEventS = SensorEventStream.processStream(is, null);
-	}
-	
-	
-	@Test
-	public void processStreamFail() throws IOException {
-		
+		WindowStream ws = new WindowStream(sensorEventS, 3, 1);
+		int windows = 0;
+		for (SampleWindow _ : ws) {
+			windows++;
+		}
+		assertEquals(2, windows);
 	}
 }
