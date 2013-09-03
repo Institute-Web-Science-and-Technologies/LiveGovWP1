@@ -12,15 +12,17 @@ public class Parser {
 
 	public static List<Sample> parse(Reader reader) throws IOException {
 		List<Sample> samples = new LinkedList<Sample>();
-		CsvListReader csv = new CsvListReader(reader,
-				CsvPreference.STANDARD_PREFERENCE);
+		CsvListReader csv = new CsvListReader(reader,CsvPreference.STANDARD_PREFERENCE);
 		List<String> columns;
 		while ((columns = csv.read()) != null) {
+			// fill object with fields from row
 			Sample sample = new Sample();
 			sample.setType(SampleType.valueOf(columns.get(0)));
 			sample.setTimestamp(Long.parseLong(columns.get(1)));
 			sample.setId(columns.get(2));
 			sample.setValue(columns.get(3));
+
+			// write to samples list
 			samples.add(sample);
 		}
 		csv.close();
@@ -29,11 +31,15 @@ public class Parser {
 	
 	public static float[] getAccValues(String s) {
 		String[] stringValues = s.split(" ");
+		if (stringValues.length < 3) {
+			System.out.println("Warning: Cannot parse line " + s);
+			return null;
+		}
+		
 		float[] floatValues = new float[3];
 		for (int i = 0; i < 3; i++) {
 			floatValues[i] = Float.parseFloat(stringValues[i]);
 		}
 		return floatValues;		
 	}
-
 }

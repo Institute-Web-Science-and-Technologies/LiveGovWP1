@@ -39,6 +39,9 @@ import javax.xml.stream.events.XMLEvent;
 
 /**
  * Servlet implementation class UploadServlet
+ * 
+ *              !DEPRECATED!
+ * 
  */
 public class UploadServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

@@ -29,6 +29,8 @@ import eu.liveandgov.wp1.backend.format.Sample;
 @WebServlet("/upload")
 @MultipartConfig
 public class UploadServlet2 extends HttpServlet {
+	public static final String OUT_DIR = "/tmp/liveandgov/uploads/";
+	
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -62,23 +64,25 @@ public class UploadServlet2 extends HttpServlet {
 			return;
 		}
 		if (uploadedFile == null) {
+			// if 'upfile' field not set - return 'Bad Request'
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
 		
 		InputStream uploadedFileInputStream = uploadedFile.getInputStream();
+
+		// copy file to memory in order to make it consumable twice
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		copyStream(uploadedFileInputStream, baos);
-		
 		saveToDisk(new ByteArrayInputStream(baos.toByteArray()), request.getHeader("id"));
+		
+		SensorEventStream.processStream(new ByteArrayInputStream(baos.toByteArray()), request.getHeader("id"));
 //		saveToDatabase(new ByteArrayInputStream(baos.toByteArray()));
-		
-		
 	}
 	
 	private void saveToDisk(InputStream input, String id) throws IOException {
 		long unixTime = System.currentTimeMillis() / 1000L;
-		String absoluteFilename = "/tmp/liveandgov/uploads/" + id + "_" + unixTime;
+		String absoluteFilename = OUT_DIR + id + "_" + unixTime;
 		File outfile = new File(absoluteFilename);
 		OutputStream outstream = new FileOutputStream(outfile);
 		copyStream(input, outstream);
@@ -112,7 +116,6 @@ public class UploadServlet2 extends HttpServlet {
 				break;
 			}
 		}
-		
 	}
 	
 	private void copyStream(InputStream input, OutputStream output)
