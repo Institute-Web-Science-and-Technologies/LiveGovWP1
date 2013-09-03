@@ -61,7 +61,7 @@ public class SensorEventStream implements Iterator {
 	
 	@Override
 	public boolean hasNext() {
-		return (next == null);
+		return !(next == null);
 	}
 
 	@Override
