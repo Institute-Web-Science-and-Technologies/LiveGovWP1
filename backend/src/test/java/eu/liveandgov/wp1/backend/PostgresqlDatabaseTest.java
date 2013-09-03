@@ -75,6 +75,9 @@ public class PostgresqlDatabaseTest {
 				+ " distanceInMeter ------------");
 			/*
 			 *  distance between LAX and NRT (Tokyo/Narita)
+			 *  example for LAX
+			 *  <span class="geo"><span class="latitude">33.942536</span>°
+			 *  <span class="longitude">-118.408075</span>°</span>
 			 */
 			assertEquals(db.distanceInMeter(-118.4079,33.9434,139.733,35.567), 8833954.76996256, 0.0000001);
 	}

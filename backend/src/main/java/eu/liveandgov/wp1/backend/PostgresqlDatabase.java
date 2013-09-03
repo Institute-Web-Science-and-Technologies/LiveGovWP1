@@ -13,7 +13,34 @@ import javax.servlet.UnavailableException;
 
 /**
  * @author chrisschaefer
- *
+ * 
+ * How to install a postgres with postgis extension:
+ * 
+ *       sudo apt-get install postgresql-9.1-postgis;
+ *       sudo -s -u postgres;
+ *       psql;
+ *       CREATE USER myuser WITH PASSWORD 'mypassword';
+ *       CREATE DATABASE geodb;
+ *       \q
+ *       
+ *       ---> on my locale pc worked this:
+ *       psql -d geodb;
+ *       CREATE EXTENSION postgis;
+ *       \q
+ *       exit;
+ *       <---
+ *       ---> on our server worked only this:
+ *       exit;
+ *       sudo -u postgres psql -d geodb -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
+ *       sudo -u postgres psql -d geodb -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
+ *       <---
+ *       
+ *       sudo -s -u postgres;
+ *       psql -d geodb;
+ *       GRANT ALL PRIVILEGES ON DATABASE geodb TO myuser;
+ *       GRANT SELECT ON spatial_ref_sys TO myuser;
+ *		 \q
+ *       exit;
  */
 public class PostgresqlDatabase extends Database {
 	Connection connection = null;
@@ -62,15 +89,13 @@ public class PostgresqlDatabase extends Database {
 	 * @see eu.liveandgov.wp1.backe29,nd.AbstractDatabase#distanceInMeter(double, double, double, double)
 	 */
 	@Override
-	public double distanceInMeter(double lat0, double lon0, double lat1, double lon1) {
+	public double distanceInMeter(double lon0, double lat0, double lon1, double lat1) {
 		try {
-			System.out.println("foo");
 			Statement stmtLink = connection.createStatement();
-			System.out.println("bar");
 			ResultSet rs = stmtLink.executeQuery("SELECT ST_Distance(ST_GeographyFromText('Point("
-					+lat0+ " " + lon0
+					+lon0+ " " + lat0
 					+")'),ST_GeographyFromText('Point("
-					+ lat1 + " " + lon1
+					+ lon1 + " " + lat1
 					+ ")'))");
 			while (rs.next()) {
 				return rs.getDouble(1);
