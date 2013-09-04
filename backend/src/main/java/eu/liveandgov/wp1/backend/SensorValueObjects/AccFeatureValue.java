@@ -1,6 +1,6 @@
 package eu.liveandgov.wp1.backend.SensorValueObjects;
 
-import eu.liveandgov.wp1.backend.SampleWindow;
+import eu.liveandgov.wp1.backend.format.SampleWindow;
 
 public class AccFeatureValue {
 	public long startTime;

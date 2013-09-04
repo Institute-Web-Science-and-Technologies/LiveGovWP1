@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.backend;
+package eu.liveandgov.wp1.backend.Stream;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

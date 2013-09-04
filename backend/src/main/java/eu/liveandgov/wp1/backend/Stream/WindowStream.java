@@ -1,9 +1,10 @@
-package eu.liveandgov.wp1.backend;
+package eu.liveandgov.wp1.backend.Stream;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import eu.liveandgov.wp1.backend.SensorValueObjects.RawSensorValue;
+import eu.liveandgov.wp1.backend.format.SampleWindow;
 import eu.liveandgov.wp1.backend.util.LimitedQueue;
 
 /**

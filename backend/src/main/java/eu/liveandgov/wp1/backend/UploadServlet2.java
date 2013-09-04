@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import eu.liveandgov.wp1.backend.Stream.SensorEventStream;
 import eu.liveandgov.wp1.backend.format.Parser;
 import eu.liveandgov.wp1.backend.format.Sample;
 
