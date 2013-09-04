@@ -8,7 +8,7 @@ import java.util.Queue;
 
 public class SampleWindow<ValueClass extends SensorValue> {
 	// startTime available by getter
-	private LinkedList<ValueClass> vQ = new LinkedList<ValueClass>();
+	protected LinkedList<ValueClass> vQ = new LinkedList<ValueClass>();
 	public int capacity;
 	
 	public SampleWindow(int capacity) {

@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import org.supercsv.io.CsvListReader;
 
 import eu.liveandgov.wp1.backend.SensorValueObjects.AccFeatureValue;
+import eu.liveandgov.wp1.backend.SensorValueObjects.AccSampleWindow;
 import eu.liveandgov.wp1.backend.SensorValueObjects.AccSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.RawSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.SampleWindow;
@@ -27,8 +28,7 @@ public class SensorLoop {
 	
 	public void doLoop() throws IOException {
 		String line = "";
-		SampleWindow<AccSensorValue> sw = new SampleWindow<AccSensorValue>(WINDOW_SIZE);
-		AccWindowArrays awa = new AccWindowArrays(sw);
+		AccSampleWindow sw = new AccSampleWindow(WINDOW_SIZE);
 		
 		int stepCouter = 0;
 		
@@ -51,7 +51,6 @@ public class SensorLoop {
 			sw.add(asv);
 			if (! sw.isFull()) { System.out.println("-> Filling Queue"); continue; }
 			if (! (stepCouter++ % STEP_SIZE == 0)) { System.out.println("-> Stepping"); continue; }
-			awa.update();
 			System.out.println(sw.toString());
 		
 			// sample window is full here
