@@ -12,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.liveandgov.wp1.backend.SensorValueObjects.RawSensorValue;
+import eu.liveandgov.wp1.backend.Stream.SensorEventStream;
 import eu.liveandgov.wp1.backend.format.SampleType;
 
 public class SensorEventStreamTest {

@@ -11,4 +11,8 @@ public class RawSensorValue extends SensorValue {
 		this.id = id;
 		this.value = value;
 	}
+	
+	public String toString(){
+		return String.format("RSV - type:%s ts:%d id:%s val:%s", type, timestamp, id, value);
+	}
 }

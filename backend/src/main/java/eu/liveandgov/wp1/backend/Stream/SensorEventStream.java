@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.backend;
+package eu.liveandgov.wp1.backend.Stream;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -19,11 +19,10 @@ import eu.liveandgov.wp1.backend.SensorValueObjects.RawSensorValue;
 import eu.liveandgov.wp1.backend.format.Sample;
 import eu.liveandgov.wp1.backend.format.SampleType;
 
-public class SensorEventStream implements Iterator {
+public class SensorEventStream implements Iterator<RawSensorValue>, Iterable<RawSensorValue> {
 
 	private CsvListReader csv;
 	private RawSensorValue next;
-	
 	
 	public static SensorEventStream processStream(InputStream is, String id){
 		SensorEventStream SESO = new SensorEventStream();
@@ -33,9 +32,15 @@ public class SensorEventStream implements Iterator {
 		SESO.csv = new CsvListReader(reader,CsvPreference.STANDARD_PREFERENCE);
 		SESO.next = SESO.yieldNextSV();
 		
-		return SESO;				
+		return SESO;
 	}
 
+	public void dump() {
+		while(hasNext()) {
+			System.out.println(next().toString());
+		}
+	}
+	
 	private RawSensorValue yieldNextSV() {
 		// read row
 		List<String> row;
@@ -46,8 +51,13 @@ public class SensorEventStream implements Iterator {
 			e.printStackTrace();
 			return null;
 		}
-
+		
 		if (row == null){
+			return null;
+		}
+		
+		if (row.size() <= 3){
+			System.out.println("Illegeal row revieved: " + row.toString() + " size " + row.size());
 			return null;
 		}
 
@@ -56,7 +66,7 @@ public class SensorEventStream implements Iterator {
 				Long.parseLong(row.get(1)), // timestamp
 				row.get(2),					// id
 				row.get(3)					// value string
-		);		
+		);
 	}
 	
 	@Override
@@ -65,15 +75,20 @@ public class SensorEventStream implements Iterator {
 	}
 
 	@Override
-	public Object next() {
-		RawSensorValue n = next;
+	public RawSensorValue next() {
+		if (next == null) { throw new NoSuchElementException(); }
+		RawSensorValue out = next;
 		next = yieldNextSV();
-		if (n == null) { throw new NoSuchElementException(); }
-		return n;
+		return out;
 	}
 
 	@Override
 	public void remove() {
 		next = yieldNextSV();
+	}
+
+	@Override
+	public Iterator iterator() {
+		return this;
 	}
 }
