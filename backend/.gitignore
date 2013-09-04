@@ -1,3 +1,5 @@
 # Maven
 log/
 target/
+#Mac OS
+.DS_Store
