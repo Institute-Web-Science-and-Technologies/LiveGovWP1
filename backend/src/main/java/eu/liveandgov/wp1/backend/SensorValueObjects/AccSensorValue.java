@@ -25,6 +25,6 @@ public class AccSensorValue extends SensorValue {
 	}
 	
 	public String toString(){
-		return String.format("ASV - type:%s ts:%d id:%s x:%d y:%d z:%d", type, timestamp, id, x,y,z);
+		return String.format("ASV - type:%s ts:%d id:%s x:%f y:%f z:%f", type, timestamp, id, x,y,z);
 	}
 }
