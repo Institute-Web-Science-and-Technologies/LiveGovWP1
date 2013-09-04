@@ -32,22 +32,24 @@ public class SensorLoop {
 		int stepCouter = 0;
 		
 		while( (line = reader.readLine()) != null ){
-			System.out.println(line);
+			System.out.println("<- " + line);
 			
 			RawSensorValue rsv = RawSensorValue.fromString(line); 
 			System.out.println(rsv.toString());
 			
 			// Filter accelerometer values
-			if (rsv.type != SampleType.ACC) continue;
-			System.out.println(rsv.toString());
+			if (rsv.type != SampleType.ACC) {
+				System.out.println("-> Not of type ACC");
+				continue;
+				}
 			
 			AccSensorValue asv = AccSensorValue.fromRSV(rsv);
 			System.out.println(asv.toString());			
 
 			// Fill sample window
 			sw.add(asv);
-			if (! sw.isFull()) continue;
-			if (! (stepCouter++ % STEP_SIZE == 0)) continue;
+			if (! sw.isFull()) { System.out.println("-> Filling Queue"); continue; }
+			if (! (stepCouter++ % STEP_SIZE == 0)) { System.out.println("-> Stepping"); continue; }
 			
 			System.out.println(sw.toString());
 		
