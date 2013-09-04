@@ -42,7 +42,7 @@ public class SensorLoop {
 				System.out.println("-> Not of type ACC");
 				continue;
 				}
-			
+						
 			AccSensorValue asv = AccSensorValue.fromRSV(rsv);
 			System.out.println(asv.toString());			
 
