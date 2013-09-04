@@ -1,25 +1,30 @@
 package eu.liveandgov.wp1.backend.SensorValueObjects;
 
+import eu.liveandgov.wp1.backend.format.SampleType;
+
 public class AccSensorValue extends SensorValue {
-	public final String type = "ACC";
+	public final SampleType type = SampleType.ACC;
 	public float x;
 	public float y;
 	public float z;
 	
-	public static AccSensorValue parse(String s){
-		AccSensorValue o = new AccSensorValue();
+	public static AccSensorValue fromRSV(RawSensorValue rsv){
+		AccSensorValue out = new AccSensorValue();
 		
-		String[] stringValues = s.split(" ");
-		if (stringValues.length < 3) {
-			System.out.println("Warning: Cannot parse line " + s);
-			return null;
-		}
+		out.timestamp = rsv.timestamp;
+		out.id = rsv.id;
+
+		String[] stringValues = rsv.value.split(" ");
+		if (stringValues.length != 3) throw new IllegalArgumentException("Cannot parse value " + rsv.value);
 		
-		o.x = Float.parseFloat(stringValues[0]);
-		o.y = Float.parseFloat(stringValues[1]);
-		o.z = Float.parseFloat(stringValues[2]);
+		out.x = Float.parseFloat(stringValues[0]);
+		out.y = Float.parseFloat(stringValues[1]);
+		out.z = Float.parseFloat(stringValues[2]);
 		
-		return o;
+		return out;
 	}
-		
+	
+	public String toString(){
+		return String.format("ASV - type:%s ts:%d id:%s x:%d y:%d z:%d", type, timestamp, id, x,y,z);
+	}
 }
