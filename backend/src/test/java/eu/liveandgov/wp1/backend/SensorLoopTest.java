@@ -12,7 +12,7 @@ import eu.liveandgov.wp1.backend.sensorLoop.SensorLoop;
 
 public class SensorLoopTest {
 
-	public static final String FILENAME = "/home/hartmann/Desktop/LiveGovWP1/backend/test-upload-data.txt";
+	public static final String FILENAME = "test-upload-data.txt";
 	
 	@Test
 	public void test() throws IOException {

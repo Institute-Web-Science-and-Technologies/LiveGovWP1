@@ -28,6 +28,7 @@ public class SensorLoop {
 	public void doLoop() throws IOException {
 		String line = "";
 		SampleWindow<AccSensorValue> sw = new SampleWindow<AccSensorValue>(WINDOW_SIZE);
+		AccWindowArrays awa = new AccWindowArrays(sw);
 		
 		int stepCouter = 0;
 		
@@ -41,7 +42,7 @@ public class SensorLoop {
 			if (rsv.type != SampleType.ACC) {
 				System.out.println("-> Not of type ACC");
 				continue;
-				}
+			}
 			
 			AccSensorValue asv = AccSensorValue.fromRSV(rsv);
 			System.out.println(asv.toString());			
@@ -50,7 +51,7 @@ public class SensorLoop {
 			sw.add(asv);
 			if (! sw.isFull()) { System.out.println("-> Filling Queue"); continue; }
 			if (! (stepCouter++ % STEP_SIZE == 0)) { System.out.println("-> Stepping"); continue; }
-			
+			awa.update();
 			System.out.println(sw.toString());
 		
 			// sample window is full here
