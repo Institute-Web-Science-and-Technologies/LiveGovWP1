@@ -1,6 +1,5 @@
 package eu.liveandgov.wp1.backend.SensorValueObjects;
 
-
 public class AccFeatureValue {
 	public long startTime;
 	public float xMean;
