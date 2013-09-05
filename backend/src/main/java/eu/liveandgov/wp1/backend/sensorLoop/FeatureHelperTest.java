@@ -13,6 +13,7 @@ public class FeatureHelperTest {
 		
 		assertEquals( 3, FeatureHelper.mean(input), 0.005 );
 		
+		
 		System.out.println(FeatureHelper.var(input));
 
 		input = new float[] { 1,2,3,4,5,6,7,8 };

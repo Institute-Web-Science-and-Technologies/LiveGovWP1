@@ -2,9 +2,6 @@ package eu.liveandgov.wp1.backend.SensorValueObjects;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-
-
 
 public class SampleWindow<ValueClass extends SensorValue> {
 	// startTime available by getter
