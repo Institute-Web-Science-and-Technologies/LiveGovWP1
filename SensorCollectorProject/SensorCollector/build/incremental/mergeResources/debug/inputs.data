@@ -1,0 +1,16 @@
+# incremental data. DO NOT EDIT.
+# format is <lastModified> <length> <SHA-1> <path>
+# Encoding is UTF-8
+1377873961000 211 4e1904afba59d31e5cd6133f6a4c360fa9a5913f /home/hartmann/AndroidStudioProjects/SensorCollectorProject/SensorCollector/src/main/res/values/dimens.xml
+1377873961000 254 25b6404e44acb50c82590049639d4fb5fefbac8e /home/hartmann/AndroidStudioProjects/SensorCollectorProject/SensorCollector/src/main/res/values-sw720dp-land/dimens.xml
+1377875467000 1588 9e8c891bf242a2ceed76a80aa0eaab42e8cf25e4 /home/hartmann/AndroidStudioProjects/SensorCollectorProject/SensorCollector/src/main/res/layout/activity_main.xml
+1377873961000 181 84de2797380184d8b39af6f829afb092fb956173 /home/hartmann/AndroidStudioProjects/SensorCollectorProject/SensorCollector/src/main/res/values-sw600dp/dimens.xml
+1377873961000 680 c76f4caaa7a8dfe9727fa93001b3aee3b22d6716 /home/hartmann/AndroidStudioProjects/SensorCollectorProject/SensorCollector/src/main/res/values/styles.xml
+1377873961000 381 b129b276e01126de5b3b753572ac67cbfc19454c /home/hartmann/AndroidStudioProjects/SensorCollectorProject/SensorCollector/src/main/res/values-v14/styles.xml
+1377873961000 225 3049f87f860afb39be12c417abefd34df8a18794 /home/hartmann/AndroidStudioProjects/SensorCollectorProject/SensorCollector/src/main/res/values/strings.xml
+1377873961000 324 aa1f5f1723de9aee2669dc44a26fbc0ce776d35f /home/hartmann/AndroidStudioProjects/SensorCollectorProject/SensorCollector/src/main/res/values-v11/styles.xml
+1377873961000 639 2b14796068a5ab8e3e84ac1ac62251c29bd20ef8 /home/hartmann/AndroidStudioProjects/SensorCollectorProject/SensorCollector/src/main/res/drawable-mdpi/ic_launcher.png
+1377873961000 987 85767d3aeb52698d23407b205ebd8bdb5aedb986 /home/hartmann/AndroidStudioProjects/SensorCollectorProject/SensorCollector/src/main/res/drawable-hdpi/ic_launcher.png
+1377873961000 1383 2f075567a7e1e608320965fd0e04ec6471a863e7 /home/hartmann/AndroidStudioProjects/SensorCollectorProject/SensorCollector/src/main/res/drawable-xhdpi/ic_launcher.png
+1377873961000 244 045ff451db7cd8e61285502b8c9bbf7405f2078d /home/hartmann/AndroidStudioProjects/SensorCollectorProject/SensorCollector/src/main/res/menu/main.xml
+1377873961000 2144 36c1fd7d41ff0621907ce4bd7a2ccb79ad87a257 /home/hartmann/AndroidStudioProjects/SensorCollectorProject/SensorCollector/src/main/res/drawable-xxhdpi/ic_launcher.png
