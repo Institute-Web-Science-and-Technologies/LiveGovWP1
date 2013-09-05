@@ -118,5 +118,16 @@ public class PostgresqlDatabase extends Database {
 				e.printStackTrace();
 			}
 	}
+	
+	@Override
+	public Statement createStatement() {
+		Statement stmtLink = null;
+		try {
+			return connection.createStatement();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return stmtLink;
+	}
 
 }
