@@ -5,6 +5,10 @@ package eu.liveandgov.wp1.backend;
 
 import static org.junit.Assert.*;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import javax.servlet.UnavailableException;
 
 import org.junit.After;
@@ -39,9 +43,6 @@ public class PostgresqlDatabaseTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		System.out.println("-------- PostgreSQL "
-				+ "JDBC Connection Testing ------------");
- 
 		try {
  
 			Class.forName("org.postgresql.Driver");
@@ -71,8 +72,6 @@ public class PostgresqlDatabaseTest {
 
 	@Test
 	public void distanceInMeter() {
-		System.out.println("-------- PostgreSQL "
-				+ " distanceInMeter ------------");
 			/*
 			 *  distance between LAX and NRT (Tokyo/Narita)
 			 *  example for LAX
@@ -81,5 +80,27 @@ public class PostgresqlDatabaseTest {
 			 */
 			assertEquals(db.distanceInMeter(-118.4079,33.9434,139.733,35.567), 8833954.76996256, 0.0000001);
 	}
+	
+	@Test
+	public void playWithGeoTable() {
+		Statement s = db.createStatement();
+		try {
+			assertEquals(s.execute("DROP TABLE IF EXISTS airports;"), false);
+			assertEquals(s.execute("CREATE TABLE airports (code VARCHAR(3),geog GEOGRAPHY(Point));"), false);
+			assertEquals(s.execute("INSERT INTO airports VALUES ('LAX', 'POINT(-118.4079 33.9434)');"), false);
+			assertEquals(s.execute("INSERT INTO airports VALUES ('NRT', 'POINT(139.733 35.567)');"), false);
+			
+			ResultSet rs = s.executeQuery("SELECT ST_Distance(a1.geog,a2.geog) from airports a1, airports a2 where a1.geog <> a2.geog;");
+			while (rs.next()) {
+				assertEquals(rs.getDouble(1), 8833954.76996256, 0.0000001);
+			}
 
+			assertEquals(s.execute("DROP TABLE airports;"), false);
+			s.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail();
+		}
+
+	}
 }
