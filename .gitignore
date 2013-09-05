@@ -6,3 +6,6 @@
 *.ear
 
 target/
+
+#Mac OS
+.DS_Store

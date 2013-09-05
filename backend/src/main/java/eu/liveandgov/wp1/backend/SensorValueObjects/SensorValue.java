@@ -6,5 +6,4 @@ public class SensorValue {
 	public SampleType type;
 	public long timestamp;
 	public String id;
-
 }

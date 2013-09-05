@@ -8,7 +8,7 @@ import org.junit.Test;
 public class UploadServletTest {
 	@Test
 	public void testPrintHelloWorld() {
-		UploadServlet s = new UploadServlet();
+		OldUploadServlet s = new OldUploadServlet();
 		assertEquals(s.getHelloWorld(), "Hello World");
  
 	}
