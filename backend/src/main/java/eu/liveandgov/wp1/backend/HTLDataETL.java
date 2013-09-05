@@ -30,15 +30,6 @@ public class HTLDataETL {
 	private static final String ROUTEFILE = "/home/chrisschaefer/reittimuoto.dat";
 	private static final String ENCODING = "latin1";
 	
-	int[][] KKJ_ZONE_INFO = {
-			{18, 500000},
-			{21, 1500000},
-			{24, 2500000},
-			{27, 3500000},
-			{30, 4500000},
-			{33, 5500000}
-	};
-	
 
 	public HTLDataETL() throws UnavailableException {
 		db = new PostgresqlDatabase("myuser", "mypassword");
@@ -106,6 +97,7 @@ public class HTLDataETL {
 	
 	public void createTables() throws SQLException {
 		Statement s = db.createStatement();
+		s.execute("DROP TABLE IF EXISTS lineinfo");
 		s.execute("CREATE TABLE IF NOT EXISTS lineinfo"
 				+ "( id VARCHAR(7),"
 				+ "date1 DATE,"
@@ -119,13 +111,15 @@ public class HTLDataETL {
 				+ " lineLengthDir1 INTEGER,"
 				+ " lineLengthDir2 INTEGER,"
 				+ " transportMean INTEGER )");
+		
+		s.execute("DROP TABLE IF EXISTS stops");
 		s.execute("CREATE TABLE IF NOT EXISTS stops"
 				+ "( stopCode INTEGER,"
 				//					+ " x_kkj2 INTEGER,"
 				//					+ " y_kkj2 INTEGER,"
 				//					+ " latitude FLOAT,"
 				//					+ " longitude FLOAT,"
-				+ " lonlat GEOGRAPHY(POINT),"
+				+ " kkj2 GEOMETRY(POINT,2392)," // 2392 == KKJ2 reference system
 				+ " stopName VARCHAR(20),"
 				+ " stopNameSwedish VARCHAR(20),"
 				+ " address VARCHAR(20),"
@@ -142,6 +136,9 @@ public class HTLDataETL {
 				+ " coordMethod VARCHAR(1),"
 				+ " accessibilityClass INTEGER,"
 				+ " note VARCHAR(15) )");
+		s.execute("create index stops_idx on stops using gist (kkj2);");
+		
+		s.execute("DROP TABLE IF EXISTS routes");
 		s.execute("CREATE TABLE IF NOT EXISTS routes"
 				+ "( routeCode VARCHAR(6),"
 				+ " routeDir VARCHAR(1),"
@@ -152,7 +149,8 @@ public class HTLDataETL {
 				+ " stopOrder INTEGER,"
 				//					+ " x INTEGER,"
 				//					+ " y INTEGER,"
-				+ " lonlat GEOGRAPHY(POINT) )");
+				+ " kkj2 GEOMETRY(POINT,2392) )"); // 2392 == KKJ2 reference system
+		s.execute("create index routes_idx on routes using gist (kkj2);");
 
 		s.close();
 	}
@@ -190,17 +188,16 @@ public class HTLDataETL {
 		String result = "";
 		line = line.substring(1);
 		result += line.substring(0, 7).trim(); // StopCode
+		result += delimiter;
+		
+		// attention please, in postgres X and Y are swapped
+		result += "SRID=2392;POINT("
+		+ line.substring(14, 21).trim() /* Y_kkj2 */ + " "
+		+ line.substring(7, 14).trim() /* X_kkj2 */ + ")";
 
 		// ignore
-		line.substring(7, 14).trim(); // X_kkj2
-		line.substring(14, 21).trim(); // Y_kkj2
-
-		result += delimiter;
-
-		String lat = line.substring(21, 29).trim(); // Latitude
-		String lon = line.substring(29, 37).trim(); // Longitude
-
-		result += "Point("+lon+" "+lat+")";
+		// line.substring(21, 29).trim(); // Latitude
+		// line.substring(29, 37).trim(); // Longitude
 
 		result += delimiter;
 		result += line.substring(37, 57).trim(); // StopName
@@ -213,8 +210,10 @@ public class HTLDataETL {
 		result += delimiter;
 		result += line.substring(117, 120).trim(); // PlatformNumber
 
-		line.substring(120, 127).trim(); // X_kkj3
-		line.substring(127, 134).trim(); // Y_kkj3
+		// ignore 
+		// line.substring(120, 127).trim(); // X_kkj3
+		// line.substring(127, 134).trim(); // Y_kkj3
+		
 		result += delimiter;
 		result += line.substring(134, 154).trim(); // StopLocationAreaName
 		result += delimiter;
@@ -260,145 +259,13 @@ public class HTLDataETL {
 		result += delimiter;
 		result += line.substring(31, 35).trim(); // StopOrder
 		result += delimiter;
-		// kkj-2?
-		String x = line.substring(35, 42).trim(); // X
-		String y = line.substring(42, 49).trim(); // Y
-		result += transferKkjToLonLat(x,y);
+	
+		// attention please, in postgres X and Y are swapped
+		result += "SRID=2392;POINT("
+		+ line.substring(42, 49).trim() /* Y_kkj2 */ + " "
+		+ line.substring(35, 42).trim() /* X_kkj2 */ + ")";
+
 		return result;
 	}
-
-	public String transferKkjToLonLat(String kkjX, String kkjY) {
-		double[] lalo = KKJxyToWGS85lalo(Double.valueOf(kkjX), Double.valueOf(kkjY));
-		return String.format(Locale.ENGLISH, "POINT(%.6f %.6f)", lalo[1], lalo[0]);
-	}	  
-
-
-	private double[] KKJxyToWGS85lalo (double x,double y ) {
-		double[] kLaLo = KKJxyToKKJlalo( x, y );
-		double[] wLaLo = KKJlaloToWGS84lalo( kLaLo[0], kLaLo[1] );
-		return wLaLo;
-	}
-
-	private double[] KKJxyToKKJlalo (double x,double y ) {
-		if ( x < y ) {
-			throw new IllegalArgumentException("Wrong coords!");
-		}
-
-		int zone = KKJZone( y );
-
-		double[] LaLo = new double[2];
-
-		double minLa = deg2Rad( 59 );
-		double maxLa = deg2Rad( 70.5 );
-		double minLo = deg2Rad( 18.5 );
-		double maxLo = deg2Rad( 32 );
-
-		for (int i = 0; i < 35; i++) {
-			double deltaLa = maxLa - minLa;
-			double deltaLo = maxLo - minLo;
-
-			LaLo[0] = rad2Deg( minLa + 0.5 * deltaLa );
-			LaLo[1] = rad2Deg( minLo + 0.5 * deltaLo );
-
-			double[] KKJt = KKJlaloToKKJxy ( LaLo, zone );
-
-			if( KKJt[0] < x ) {
-				minLa = minLa + 0.45 * deltaLa;
-			} else {
-				maxLa = minLa + 0.55 * deltaLa;
-			}
-
-			if( KKJt[1] < y ) {
-				minLo = minLo + 0.45 * deltaLo;
-			} else {
-				maxLo = minLo + 0.55 * deltaLo;
-			}
-		};
-
-		double[] out = {
-				LaLo[0],
-				LaLo[1]
-		};
-		return out;
-	}
-
-	private double[] KKJlaloToKKJxy (double laLo[], int zone ) {
-		double lo = deg2Rad( laLo[1] ) - deg2Rad( KKJ_ZONE_INFO[zone][0] );
-
-		double a = 6378388;
-		double f = 1 / 297;
-
-		double b = ( 1.0 - f ) * a;
-		double bb = b * b;
-		double c = ( a / b ) * a;
-		double ee = ( a * a - bb ) / bb;
-		double n = ( a - b ) / ( a + b );
-		double nn = n * n;
-
-		double cosLa = Math.cos( deg2Rad( laLo[0] ) );
-		double NN = ee * cosLa * cosLa;
-
-		double LaF = Math.atan( Math.tan( deg2Rad( laLo[0] ) ) /
-				Math.cos( lo * Math.sqrt( 1 + NN ) ) );
-
-		double cosLaF = Math.cos(LaF);
-		double t = ( Math.tan( lo ) * cosLaF ) / Math.sqrt( 1 + ee * cosLaF * cosLaF );
-
-		double A = a / ( 1 + n );
-		double A1 = A * ( 1 + nn / 4 + nn * nn / 64 );
-		double A2 = A * 1.5 * n * ( 1 - nn / 8 );
-		double A3 = A * 0.9375 * nn * ( 1 - nn / 4 );
-		double A4 = A * 35 / 48 * nn * n;
-
-		double out[] = // P and I
-				{ A1 * LaF -
-			A2 * Math.sin( 2 * LaF ) +
-			A3 * Math.sin( 4 * LaF ) -
-			A4 * Math.sin( 6 * LaF ),
-
-			c * Math.log( t + Math.sqrt( 1 + t * t ) ) + 500000 + zone * 1000000};
-
-
-		return out;
-	}
-
-	private double[] KKJlaloToWGS84lalo (double lat,double lon ) {
-		double dLa = deg2Rad( 0.124867E+01 +
-				-0.269982E+00 * lat +
-				0.191330E+00 * lon +
-				0.356119E-02 * lat * lat +
-				-0.122312E-02 * lat * lon +
-				-0.335514E-03 * lon * lon ) / 3600.0;
-
-		double dLo = deg2Rad( -0.286111E+02 +
-				0.114183E+01 * lat +
-				-0.581428E+00 * lon +
-				-0.152421E-01 * lat * lat +
-				0.118177E-01 * lat * lon +
-				0.826646E-03 * lon * lon ) / 3600.0;
-
-		double[] WGS = {
-				rad2Deg( deg2Rad( lat ) + dLa ), // lat
-				rad2Deg( deg2Rad( lon ) + dLo ) // lon
-		};
-
-		return WGS;
-	}
-
-	private int KKJZone (double y ) {
-		int zone = (int)Math.floor( y / 1000000 );
-		if(zone < 0 || zone > 5)
-			throw new IllegalArgumentException("Zone " + zone + " invalid.");
-		return zone;
-	}
-
-	private double deg2Rad (double deg ) {
-		return deg * (Math.PI / 180);
-	}
-
-	private double rad2Deg (double rad ) {
-		return rad * ( 180 / Math.PI );
-	}
-
 }
 

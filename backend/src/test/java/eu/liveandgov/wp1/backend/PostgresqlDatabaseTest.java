@@ -103,4 +103,20 @@ public class PostgresqlDatabaseTest {
 		}
 
 	}
+	@Test
+	public void kkjToLonLatTest() {
+		Statement s = db.createStatement();
+		try {
+			ResultSet rs = s.executeQuery("SELECT ST_AsText(ST_Transform(ST_GeomFromText('POINT(2553282 6673494)',2392),4326));");
+			while (rs.next()) {
+				assertEquals(rs.getString(1), "POINT(24.9565985407928 60.1696077230336)");
+			}
+			s.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail();
+		}
+
+	}
+	
 }
