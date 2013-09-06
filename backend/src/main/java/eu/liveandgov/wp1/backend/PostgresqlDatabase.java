@@ -16,24 +16,18 @@ import javax.servlet.UnavailableException;
  * 
  * How to install a postgres with postgis extension:
  * 
+ * 		 sudo apt-add-repository ppa:ubuntugis/ppa
+ * 		 sudo apt-get update
  *       sudo apt-get install postgresql-9.1-postgis;
  *       sudo -s -u postgres;
  *       psql;
  *       CREATE USER myuser WITH PASSWORD 'mypassword';
  *       CREATE DATABASE geodb;
  *       \q
- *       
- *       ---> on my locale pc worked this:
  *       psql -d geodb;
  *       CREATE EXTENSION postgis;
  *       \q
  *       exit;
- *       <---
- *       ---> on our server worked only this:
- *       exit;
- *       sudo -u postgres psql -d geodb -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
- *       sudo -u postgres psql -d geodb -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
- *       <---
  *       
  *       sudo -s -u postgres;
  *       psql -d geodb;
