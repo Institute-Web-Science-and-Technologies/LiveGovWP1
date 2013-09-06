@@ -90,7 +90,7 @@ public class PostgresqlDatabaseTest {
 			assertEquals(s.execute("INSERT INTO airports VALUES ('LAX', 'POINT(-118.4079 33.9434)');"), false);
 			assertEquals(s.execute("INSERT INTO airports VALUES ('NRT', 'POINT(139.733 35.567)');"), false);
 			
-			ResultSet rs = s.executeQuery("SELECT ST_Distance(a1.geog,a2.geog) from airports a1, airports a2 where a1.geog <> a2.geog;");
+			ResultSet rs = s.executeQuery("SELECT ST_Distance(a1.geog,a2.geog) from airports a1, airports a2 where a1.code <> a2.code;");
 			while (rs.next()) {
 				assertEquals(rs.getDouble(1), 8833954.76996256, 0.0000001);
 			}
