@@ -21,7 +21,7 @@ public class FeatureHelperTest {
 		input = new float[] { 1,2,3,4,5,6,7,8 };
 
 		for (Complex s : FeatureHelper.FFT(input)){
-			System.out.println(s);
+			System.out.println(s.abs());
 		}
 	}
 
