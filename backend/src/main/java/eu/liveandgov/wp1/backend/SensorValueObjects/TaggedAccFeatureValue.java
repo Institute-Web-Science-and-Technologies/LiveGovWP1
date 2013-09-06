@@ -7,7 +7,7 @@ public class TaggedAccFeatureValue extends AccFeatureValue {
 		super(t);
 	}
 
-	public static TaggedAccFeatureValue fromWindow (SampleWindow<AccSensorValue> window, String tag) {		
+	public static TaggedAccFeatureValue fromWindow (AccSampleWindow window, String tag) {		
 		AccFeatureValue f = AccFeatureValue.fromWindow(window);
 		TaggedAccFeatureValue t = new TaggedAccFeatureValue(f);
 		t.tag = tag;
@@ -15,7 +15,7 @@ public class TaggedAccFeatureValue extends AccFeatureValue {
 	}
 	
 	public String toString() {
-		return String.format("TAFV - t:%s ts:%d xMean:%f var:%f", tag, startTime, xMean, variance);
+		return String.format("TAFV - t:%s ts:%d xMean:%f ", tag, startTime, xMean);
 	}
 	
 	public String toCSV(){
