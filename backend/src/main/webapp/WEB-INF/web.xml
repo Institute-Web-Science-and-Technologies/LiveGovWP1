@@ -11,4 +11,14 @@
     <servlet-name>UploadServlet</servlet-name>
     <url-pattern>/Upload</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>InspectionServlet</display-name>
+    <servlet-name>InspectionServlet</servlet-name>
+    <servlet-class>eu.liveandgov.wp1.backend.InspectionServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>InspectionServlet</servlet-name>
+    <url-pattern>/InspectionServlet</url-pattern>
+  </servlet-mapping>
 </web-app>
