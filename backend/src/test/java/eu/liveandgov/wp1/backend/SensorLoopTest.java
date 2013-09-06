@@ -22,7 +22,6 @@ public class SensorLoopTest {
 		SensorLoop l = new SensorLoop(is);
 		
 		l.doLoop();
-		
 	}
 
 }

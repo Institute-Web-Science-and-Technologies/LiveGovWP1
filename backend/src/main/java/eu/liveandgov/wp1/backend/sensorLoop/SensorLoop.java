@@ -32,7 +32,7 @@ public class SensorLoop {
 		int stepCouter = 0;
 		
 		String currentTag = "none";
-		
+		CSVFileOutput csvOut = new CSVFileOutput("sensor.csv");
 		while( (line = reader.readLine()) != null ){
 			// System.out.println("<- " + line);
 			
