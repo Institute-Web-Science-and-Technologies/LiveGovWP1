@@ -18,8 +18,8 @@ import eu.liveandgov.wp1.backend.format.SampleType;
 public class SensorLoop {
 	private BufferedReader reader;
 	
-	private static final int WINDOW_SIZE = 4;
-	private static final int STEP_SIZE = 2;
+	private static final int WINDOW_SIZE = 90;
+	private static final int STEP_SIZE = 15;
 	
 	public SensorLoop(InputStream is) {
 		reader = new BufferedReader(new InputStreamReader(is));
@@ -33,7 +33,7 @@ public class SensorLoop {
 		
 		String currentTag = "none";
 		CSVFileOutput csvOut = new CSVFileOutput("sensor.csv");
-		while( (line = reader.readLine()) != null ){
+		while( (line = reader.readLine()) != null ) {
 			// System.out.println("<- " + line);
 			
 			RawSensorValue rsv = RawSensorValue.fromString(line); 

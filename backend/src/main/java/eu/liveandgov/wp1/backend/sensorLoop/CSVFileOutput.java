@@ -11,7 +11,7 @@ public class CSVFileOutput {
 	public CSVFileOutput(String filePath) throws FileNotFoundException {
 		old = System.out;
 	    File file  = new File(filePath);
-	    PrintStream printStream = new PrintStream(new FileOutputStream(file));
+	    PrintStream printStream = new PrintStream(new FileOutputStream(file, false));
 	    System.setOut(printStream);
 	}
 	

@@ -18,7 +18,7 @@ public class AccFeatureValue {
 		yMean = v.yMean;
 		zMean =  v.zMean;
 		S2Mean = v.S2Mean;
-		S2Sd = v.S2Mean;
+		S2Sd = v.S2Sd;
 	}
 	
 	public AccFeatureValue() {
