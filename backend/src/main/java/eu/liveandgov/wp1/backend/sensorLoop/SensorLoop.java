@@ -4,10 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.supercsv.io.CsvListReader;
@@ -16,7 +12,7 @@ import eu.liveandgov.wp1.backend.SensorValueObjects.AccFeatureValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.AccSampleWindow;
 import eu.liveandgov.wp1.backend.SensorValueObjects.AccSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.RawSensorValue;
-import eu.liveandgov.wp1.backend.SensorValueObjects.SampleWindow;
+import eu.liveandgov.wp1.backend.SensorValueObjects.TaggedAccFeatureValue;
 import eu.liveandgov.wp1.backend.format.SampleType;
 
 public class SensorLoop {
@@ -61,10 +57,10 @@ public class SensorLoop {
 			sw.add(asv);
 			if (! sw.isFull()) { System.out.println("-> Filling Queue"); continue; }
 			if (! (stepCouter++ % STEP_SIZE == 0)) { System.out.println("-> Stepping"); continue; }
-			System.out.println(sw.toString());
+			//System.out.println(sw.toString());
 			
 			// sample window is full here
-			AccFeatureValue af = AccFeatureValue.fromWindow(sw);
+			TaggedAccFeatureValue af = TaggedAccFeatureValue.fromWindow(sw, currentTag);
 			System.out.println(af.toString());
 		}
 	}
