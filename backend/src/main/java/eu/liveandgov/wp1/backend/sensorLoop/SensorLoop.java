@@ -34,10 +34,11 @@ public class SensorLoop {
 		String currentTag = "none";
 		
 		while( (line = reader.readLine()) != null ){
-			System.out.println("<- " + line);
+			// System.out.println("<- " + line);
 			
 			RawSensorValue rsv = RawSensorValue.fromString(line); 
-			System.out.println(rsv.toString());
+			// System.out.println(rsv.toString());
+
 			// Get tags
 			if(rsv.type == SampleType.TAG) {
 				currentTag = StringUtils.strip(rsv.value, " \"");
@@ -45,23 +46,22 @@ public class SensorLoop {
 			
 			// Filter accelerometer values			
 			if (rsv.type != SampleType.ACC) {
-
-				System.out.println("-> Not of type ACC");
+//				System.out.println("-> Not of type ACC");
 				continue;
 			}
 			
 			AccSensorValue asv = AccSensorValue.fromRSV(rsv);
-			System.out.println(asv.toString());			
+			// System.out.println(asv.toString());			
 			
 			// Fill sample window
 			sw.add(asv);
-			if (! sw.isFull()) { System.out.println("-> Filling Queue"); continue; }
-			if (! (stepCouter++ % STEP_SIZE == 0)) { System.out.println("-> Stepping"); continue; }
+			if (! sw.isFull()) { continue; }
+			if (! (stepCouter++ % STEP_SIZE == 0)) { continue; }
 			//System.out.println(sw.toString());
 			
 			// sample window is full here
 			TaggedAccFeatureValue af = TaggedAccFeatureValue.fromWindow(sw, currentTag);
-			System.out.println(af.toString());
+			System.out.println(af.toCSV());
 		}
 	}
 

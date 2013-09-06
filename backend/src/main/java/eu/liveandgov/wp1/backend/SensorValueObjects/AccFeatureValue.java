@@ -5,8 +5,25 @@ import java.util.List;
 public class AccFeatureValue {
 	public long startTime;
 	public float xMean;
+	public float yMean;
+	public float zMean;
+	public float S2Mean;
+	public float S2Sd;
 	public float variance;
 	
+	public AccFeatureValue(AccFeatureValue v) {
+		startTime = v.startTime;
+		xMean = v.xMean;
+		yMean = v.yMean;
+		zMean =  v.zMean;
+		S2Mean = v.xMean;
+		S2Sd = v.S2Mean;
+		variance = v.variance;
+	}
+	
+	public AccFeatureValue() {
+	}
+
 	public static AccFeatureValue fromWindow(SampleWindow<AccSensorValue> window) {
 		AccFeatureValue o = new AccFeatureValue();
 		o.startTime = window.getStartTime();
