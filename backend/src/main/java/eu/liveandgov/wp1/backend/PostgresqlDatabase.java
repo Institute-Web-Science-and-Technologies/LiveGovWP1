@@ -111,8 +111,6 @@ public class PostgresqlDatabase extends Database {
 		if (connection != null)
 			try {
 				connection.close();
-				System.out.println("-------- PostgreSQL "
-						+ " connection.close(); ------------");
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
