@@ -37,7 +37,7 @@ public class SensorLoop {
 		
 		String currentTag = "none";
 		//CSVFileOutput csvOut = new CSVFileOutput("sensor.csv");
-		PrintWriter writer = new PrintWriter("/srv/liveandgov/classification/classify" + System.currentTimeMillis() / 1000L + ".log", "UTF-8");
+		PrintWriter writer = new PrintWriter("/srv/liveandgov/classification/classify.log", "UTF-8");
 		while( (line = reader.readLine()) != null ) {
 			// System.out.println("<- " + line);
 			
