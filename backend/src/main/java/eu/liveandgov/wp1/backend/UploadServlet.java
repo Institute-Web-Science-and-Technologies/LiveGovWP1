@@ -81,7 +81,7 @@ public class UploadServlet extends HttpServlet {
 		copyStream(uploadedFileInputStream, baos);
 		saveToDisk(new ByteArrayInputStream(baos.toByteArray()), request.getHeader("id"));
 		
-//		saveToDatabase(new ByteArrayInputStream(baos.toByteArray()));
+		// saveToDatabase(new ByteArrayInputStream(baos.toByteArray()));
 	}
 	
 	private void saveToDisk(InputStream input, String id) throws IOException {

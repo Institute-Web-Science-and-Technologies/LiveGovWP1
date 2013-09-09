@@ -19,6 +19,6 @@ public class TaggedAccFeatureValue extends AccFeatureValue {
 	}
 	
 	public String toCSV(){
-		return String.format("%s,%f,%f,%f,%f,%f", tag, S2Mean, S2Sd, xMean, yMean, zMean );
+		return String.format("%f,%f,%f,%f,%f,%s", S2Mean, S2Sd, xMean, yMean, zMean, tag );
 	}
 }
