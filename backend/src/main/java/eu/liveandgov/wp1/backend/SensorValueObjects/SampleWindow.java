@@ -33,5 +33,9 @@ public class SampleWindow<ValueClass extends SensorValue> {
 	public String toString(){
 		return String.format("SW - ts:%d cap:%d size:%d", getStartTime(), capacity, vQ.size());
 	}
+	
+	public void drop() {
+		vQ.clear();
+	}
 		
 }

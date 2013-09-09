@@ -39,9 +39,10 @@ public class SensorLoop {
 			RawSensorValue rsv = RawSensorValue.fromString(line); 
 			// System.out.println(rsv.toString());
 
-			// Get tags
+			// Get tags - also we drop the window here so we don't get overlapping windows.
 			if(rsv.type == SampleType.TAG) {
 				currentTag = StringUtils.strip(rsv.value, " \"");
+				sw.drop();
 			}
 			
 			// Filter accelerometer values			
