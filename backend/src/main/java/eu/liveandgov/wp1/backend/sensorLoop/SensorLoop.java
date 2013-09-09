@@ -1,7 +1,9 @@
 package eu.liveandgov.wp1.backend.sensorLoop;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,7 +39,7 @@ public class SensorLoop {
 		
 		String currentTag = "none";
 		//CSVFileOutput csvOut = new CSVFileOutput("sensor.csv");
-		PrintWriter writer = new PrintWriter("/srv/liveandgov/classification/classify.log", "UTF-8");
+		PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("/srv/liveandgov/classification/classify.log", true)));
 		while( (line = reader.readLine()) != null ) {
 			// System.out.println("<- " + line);
 			
