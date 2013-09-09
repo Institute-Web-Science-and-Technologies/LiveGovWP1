@@ -1,0 +1,3 @@
+total 28
+-rw-rw-r-- 1 hartmann hartmann     0 Sep  9 15:13 contents.txt
+-rw-rw-r-- 1 hartmann hartmann 26950 Aug  8  2011 httpmime-4.1-beta1.jar
