@@ -42,15 +42,24 @@ public class InspectionServlet extends HttpServlet {
 		String[] points = request.getParameterValues("points[]");
 		System.out.println("---");
 		// 'Point(24.95667 60.16946)'
-		
+		String[] pointsLonLat = new String[points.length];
 		try {
-			PreparedStatement knnQuery = db.connection.prepareStatement("select routecode, s1.kkj2 <-> ST_Transform(ST_GeometryFromText(?,4326),2392) as distance from routes s1 order by s1.kkj2 <-> ST_Transform(ST_GeometryFromText(?,4326),2392) asc limit 10;");
+			PreparedStatement knnQuery = db.connection.prepareStatement(""+
+					"select routecode, distance from (" +
+						"select routecode, " +
+						"s1.kkj2 <-> ST_Transform(ST_GeometryFromText(?,4326),2392) as distance " +
+						"from routes s1 " +
+						"order by " +
+						"distance asc limit 10" +
+					") as top10 " +
+					"where distance < 1000");
 			Map<String,Integer> counts = new HashMap<String,Integer>();
-			for (String latLon : points) {
-				String lonLat = "POINT(" + latLon.substring(latLon.indexOf(',')+2, latLon.indexOf(')')) 
-						+ " " +  latLon.substring(7, latLon.indexOf(',')) + ")";
+			for (int i = 0; i < points.length; i++) {
+				String lonLat = "POINT(" + points[i].substring(points[i].indexOf(',')+2, points[i].indexOf(')')) 
+						+ " " +  points[i].substring(7, points[i].indexOf(',')) + ")";
+				pointsLonLat[i] = lonLat;
 				knnQuery.setString(1, lonLat);
-				knnQuery.setString(2, lonLat);
+				//knnQuery.setString(2, lonLat);
 				
 				System.out.println(lonLat);
 				// find nearest route:
@@ -86,23 +95,95 @@ public class InspectionServlet extends HttpServlet {
 			
 			Statement s = db.createStatement();
 			try {
-				ResultSet rs = s.executeQuery("SELECT routecode, routedir, ST_AsGeoJSON(ST_MakeLine(ST_Transform(r.kkj2,4326) ORDER BY stoporder)) as route from routes as r group by routecode, routedir having routecode = '"+routcode+"';");
+				ResultSet rs = s.executeQuery("" +
+						"select * " +
+						"from ( " +
+							"SELECT r.routecode, " +
+							"r.routedir, " +
+							"r.validto, " +
+							"ST_AsGeoJSON(" +
+							      "ST_MakeLine(" +
+							          "ST_Transform(r.kkj2,4326) ORDER BY r.stoporder" +
+							      ")" +
+							") as routePoints " +
+							"from routes as r " +
+							"group by routecode, " +
+							"routedir, " +
+							"validto " +
+							"having routecode = '" +
+							routcode + "' " +
+					    ") as route " +
+					    "order by route.validto desc " +
+					    "limit 2 ");
 				response.setContentType("application/json");
 				PrintWriter out = response.getWriter();
-				String json = "{\"routes\":["; 
+				String json = "{\"routes\":[";
+				String validDate = "";
 				while (rs.next()) {
 					if(json.length() > 11) {
 						json += ",\n";
 					}
 					json += "{";
 					json += "\"routecode\":\""+rs.getString(1)+"\",";
+					validDate = rs.getString(3);
 					json += "\"routedir\":\""+rs.getString(2)+"\",";
-					json += "\"geojson\":"+rs.getString(3);
+					json += "\"geojson\":"+rs.getString(4);
 					json += "}";
 				}
 				json += "]}";
 				out.println(json);
-				System.out.println(json);
+				//System.out.println(json);
+
+				if(pointsLonLat.length > 1) {
+					rs = s.executeQuery(""+
+							"select *  from ( " +
+							"select stoporder, " +
+							"kkj2 <-> ST_Transform(ST_GeometryFromText('"+pointsLonLat[0]+"',4326),2392) as distance " +
+							"from routes " +
+							"where routecode = '"+routcode+"' " +
+							"AND routedir = '1' " +
+							"AND validTo = '"+validDate+"' " +
+							"order by " +
+							"distance asc limit 2" +
+							") as subsel " +
+							"order by subsel.stoporder");
+	
+					rs.next();
+					int stop1 = rs.getInt(1);// +  " " + rs.getString(2) + " " + rs.getString(3));
+					float distance1 =  rs.getFloat(2);
+					System.out.println("s1: " + stop1 + " d1: " + distance1);
+					rs.next();
+					int stop2 =  rs.getInt(1);
+					float distance2 =  rs.getFloat(2);
+					System.out.println("s2: " + stop2 + " d2: " + distance2);
+					
+					rs = s.executeQuery(""+
+							"select stoporder, " +
+							"kkj2 <-> ST_Transform(ST_GeometryFromText('"+pointsLonLat[1]+"',4326),2392) as distance " +
+							"from routes " +
+							"where routecode = '"+routcode+"' " +
+							"AND routedir = '1' " +
+							"AND validTo = '"+validDate+"' " +
+							"AND stoporder in (" + stop1 + ", " + stop2 + ") " +
+							"order by stoporder ");
+					
+					rs.next();
+					float distance3 =  rs.getFloat(2);
+					System.out.println("s3: " + rs.getString(1) + " d3: " + distance3);
+					rs.next();
+					float distance4 =  rs.getFloat(2);
+					System.out.println("s4: " + rs.getString(1) + " d4: " + distance4);
+					
+					if((distance1 > distance3 && distance2 > distance4) 
+					|| (distance1 > distance3 && distance2 < distance3)
+					|| (distance1 < distance3 && distance2 < distance3)) {
+						System.out.println("dir1");
+					}
+					else {
+						System.out.println("dir2");
+					}
+				}
+				
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -113,7 +194,7 @@ public class InspectionServlet extends HttpServlet {
 		}
 
 	}
-
+;
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
