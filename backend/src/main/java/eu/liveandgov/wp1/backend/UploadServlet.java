@@ -9,14 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.util.List;
-
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.annotation.MultipartConfig;
@@ -30,6 +25,8 @@ import eu.liveandgov.wp1.backend.SensorValueObjects.AccSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.GPSSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.RawSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.TagSensorValue;
+import eu.liveandgov.wp1.backend.sensorLoop.SensorLoop;
+
 
 /**
  * Servlet implementation class UploadServlet2
@@ -98,6 +95,15 @@ public class UploadServlet extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		SensorLoop sl = new SensorLoop(new ByteArrayInputStream(baos.toByteArray()));
+		try {
+			sl.doLoop();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 	
 	private void saveToDisk(InputStream input, String id) throws IOException {

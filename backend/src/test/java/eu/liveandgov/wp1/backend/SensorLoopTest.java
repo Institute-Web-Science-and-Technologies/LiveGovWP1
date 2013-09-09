@@ -15,14 +15,13 @@ public class SensorLoopTest {
 	public static final String FILENAME = "test-upload-data.txt";
 	
 	@Test
-	public void test() throws IOException {
+	public void test() throws Exception {
 		
 		InputStream is = new FileInputStream(FILENAME);
 		
 		SensorLoop l = new SensorLoop(is);
 		
 		l.doLoop();
-		
 	}
 
 }

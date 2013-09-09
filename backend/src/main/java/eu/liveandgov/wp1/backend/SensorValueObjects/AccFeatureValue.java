@@ -2,29 +2,46 @@ package eu.liveandgov.wp1.backend.SensorValueObjects;
 
 import java.util.List;
 
+import eu.liveandgov.wp1.backend.sensorLoop.FeatureHelper;
+
 public class AccFeatureValue {
 	public long startTime;
 	public float xMean;
-	public float variance;
+	public float yMean;
+	public float zMean;
+	public float S2Mean;
+	public float S2Sd;
 	
-	public static AccFeatureValue fromWindow(SampleWindow<AccSensorValue> window) {
+	public AccFeatureValue(AccFeatureValue v) {
+		startTime = v.startTime;
+		xMean = v.xMean;
+		yMean = v.yMean;
+		zMean =  v.zMean;
+		S2Mean = v.S2Mean;
+		S2Sd = v.S2Sd;
+	}
+	
+	public AccFeatureValue() {
+	}
+
+	public static AccFeatureValue fromWindow(AccSampleWindow window) {
 		AccFeatureValue o = new AccFeatureValue();
 		o.startTime = window.getStartTime();
 
 		List<AccSensorValue> values =  window.getValues();
 		
-		o.xMean = 0;
-		for(int i=0; i < values.size(); i++)	o.xMean += ((AccSensorValue) values.get(i)).x;
-		o.xMean = o.xMean / values.size();
+		o.xMean = FeatureHelper.mean(window.getX());
+		o.yMean = FeatureHelper.mean(window.getY());
+		o.zMean = FeatureHelper.mean(window.getZ());
 		
-		o.variance = 0;
-		for(int i=0; i < values.size(); i++)	o.variance += Math.pow((((AccSensorValue) values.get(i)).x - o.xMean),2);
-		o.variance = o.variance / values.size();
+		float[] S2 = FeatureHelper.S2(window.getX(), window.getY(), window.getZ()); 
+		o.S2Mean = FeatureHelper.mean(S2);
+		o.S2Sd   = (float) Math.pow(FeatureHelper.var(S2), 0.5 );
 		
 		return o;
 	}
 	
 	public String toString(){
-		return String.format("AFV - ts:%d xMean:%f var:%f", startTime, xMean, variance);
+		return String.format("AFV - ts:%d xMean:%f ", startTime, xMean);
 	}
 }
