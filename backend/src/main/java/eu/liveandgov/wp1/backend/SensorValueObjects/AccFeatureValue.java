@@ -11,6 +11,7 @@ public class AccFeatureValue {
 	public float zMean;
 	public float S2Mean;
 	public float S2Sd;
+	public String deviceId; 
 	
 	public AccFeatureValue(AccFeatureValue v) {
 		startTime = v.startTime;

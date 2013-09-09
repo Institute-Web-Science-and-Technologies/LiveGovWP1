@@ -19,7 +19,7 @@ public class SensorLoopTest {
 		
 		InputStream is = new FileInputStream(FILENAME);
 		
-		SensorLoop l = new SensorLoop(is);
+		SensorLoop l = new SensorLoop(is, "test");
 		
 		l.doLoop();
 	}

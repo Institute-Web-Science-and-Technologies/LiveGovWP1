@@ -23,11 +23,14 @@ import eu.liveandgov.wp1.backend.machineLearning.ActivityRecognition;
 
 public class SensorLoop {
 	private BufferedReader reader;
+	private String deviceId;
 	
 	private static final int WINDOW_SIZE = 90;
 	private static final int STEP_SIZE = 15;
+
 	
-	public SensorLoop(InputStream is) {
+	public SensorLoop(InputStream is, String deviceId) {
+		this.deviceId = deviceId;
 		reader = new BufferedReader(new InputStreamReader(is));
 	}
 	
@@ -69,7 +72,7 @@ public class SensorLoop {
 			
 			// sample window is full here
 			TaggedAccFeatureValue af = TaggedAccFeatureValue.fromWindow(sw, currentTag);
-			writer.println(ActivityRecognition.myClassify(af.toWekaObjArr()));
+			writer.println(af.startTime + " " + deviceId + ": " + ActivityRecognition.myClassify(af.toWekaObjArr()));
 			//System.out.println(af.toCSV());
 		}
 		writer.flush();

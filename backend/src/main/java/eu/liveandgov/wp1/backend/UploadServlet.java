@@ -99,7 +99,7 @@ public class UploadServlet extends HttpServlet {
 
 		}
 
-		SensorLoop sl = new SensorLoop(new ByteArrayInputStream(baos.toByteArray()));
+		SensorLoop sl = new SensorLoop(new ByteArrayInputStream(baos.toByteArray()), request.getHeader("id"));
 		try {
 			sl.doLoop();
 		} catch (Exception e) {
