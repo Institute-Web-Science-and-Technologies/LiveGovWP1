@@ -3,16 +3,6 @@
   <display-name>Archetype Created Web Application</display-name>
   <servlet>
     <description></description>
-    <display-name>UploadServlet</display-name>
-    <servlet-name>UploadServlet</servlet-name>
-    <servlet-class>eu.liveandgov.wp1.backend.UploadServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>UploadServlet</servlet-name>
-    <url-pattern>/Upload</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
     <display-name>InspectionServlet</display-name>
     <servlet-name>InspectionServlet</servlet-name>
     <servlet-class>eu.liveandgov.wp1.backend.InspectionServlet</servlet-class>
