@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import eu.liveandgov.wp1.backend.sensorLoop.SensorLoop;
+
 /**
  * Servlet implementation class UploadServlet2
  * 
@@ -80,7 +82,13 @@ public class UploadServlet extends HttpServlet {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		copyStream(uploadedFileInputStream, baos);
 		saveToDisk(new ByteArrayInputStream(baos.toByteArray()), request.getHeader("id"));
-		
+		SensorLoop sl = new SensorLoop(new ByteArrayInputStream(baos.toByteArray()));
+		try {
+			sl.doLoop();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// saveToDatabase(new ByteArrayInputStream(baos.toByteArray()));
 	}
 	

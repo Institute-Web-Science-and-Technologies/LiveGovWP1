@@ -1,9 +1,12 @@
 package eu.liveandgov.wp1.backend.sensorLoop;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.supercsv.io.CsvListReader;
@@ -14,6 +17,7 @@ import eu.liveandgov.wp1.backend.SensorValueObjects.AccSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.RawSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.TaggedAccFeatureValue;
 import eu.liveandgov.wp1.backend.format.SampleType;
+import eu.liveandgov.wp1.backend.machineLearning.ActivityRecognition;
 
 public class SensorLoop {
 	private BufferedReader reader;
@@ -25,14 +29,15 @@ public class SensorLoop {
 		reader = new BufferedReader(new InputStreamReader(is));
 	}
 	
-	public void doLoop() throws IOException {
+	public void doLoop() throws Exception {
 		String line = "";
 		AccSampleWindow sw = new AccSampleWindow(WINDOW_SIZE);
 		
 		int stepCouter = 0;
 		
 		String currentTag = "none";
-		CSVFileOutput csvOut = new CSVFileOutput("sensor.csv");
+		//CSVFileOutput csvOut = new CSVFileOutput("sensor.csv");
+		PrintWriter writer = new PrintWriter("the-file-name.txt", "UTF-8");
 		while( (line = reader.readLine()) != null ) {
 			// System.out.println("<- " + line);
 			
@@ -62,7 +67,8 @@ public class SensorLoop {
 			
 			// sample window is full here
 			TaggedAccFeatureValue af = TaggedAccFeatureValue.fromWindow(sw, currentTag);
-			System.out.println(af.toCSV());
+			writer.println(ActivityRecognition.myClassify(af.toWekaObjArr()));
+			//System.out.println(af.toCSV());
 		}
 	}
 
