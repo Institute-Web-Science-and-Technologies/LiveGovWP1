@@ -53,28 +53,36 @@ public class PostgresqlDatabase extends Database {
 		Statement stmtLink = null;
 		try {
 			connection = DriverManager.getConnection(
-					"jdbc:postgresql://127.0.0.1:5432/geodb", user,
+					"jdbc:postgresql://127.0.0.1:5432/liveandgov", user,
 					password);
 
 			stmtLink = connection.createStatement();
 
-			String createDevInfoTable = "create table if not exists devinfo ( "
-					+ "uuid integer not null, " + "textuuid text not null, "
-					+ "device text, " + "fingerprint text, " + "id text, "
-					+ "manufacturer text, " + "model text, " + "product text, "
-					+ "androidVersion text, " + "PRIMARY KEY (uuid) )";
+//			String createDevInfoTable = "create table if not exists devinfo ( "
+//					+ "uuid integer not null, " + "textuuid text not null, "
+//					+ "device text, " + "fingerprint text, " + "id text, "
+//					+ "manufacturer text, " + "model text, " + "product text, "
+//					+ "androidVersion text, " + "PRIMARY KEY (uuid) )";
+//
+//			stmtLink.execute(createDevInfoTable);
+//
+//			String createSampleTable = "create table if not exists samples ( "
+//					+ "uuid integer not null, " + "sensorid text not null, "
+//					+ "ts bigint not null, " + "prio integer not null, "
+//					+ "synced integer default null, "
+//					+ "loc text, " // location can be null!
+//					+ "data text not null, " + "dataclass text not null, "
+//					+ "FOREIGN KEY (uuid) REFERENCES devinfo(uuid) )";
+//
+//			stmtLink.execute(createSampleTable);
 
-			stmtLink.execute(createDevInfoTable);
-
-			String createSampleTable = "create table if not exists samples ( "
-					+ "uuid integer not null, " + "sensorid text not null, "
-					+ "ts bigint not null, " + "prio integer not null, "
-					+ "synced integer default null, "
-					+ "loc text, " // location can be null!
-					+ "data text not null, " + "dataclass text not null, "
-					+ "FOREIGN KEY (uuid) REFERENCES devinfo(uuid) )";
-
-			stmtLink.execute(createSampleTable);
+			String createAccelerometerTable = "CREATE TABLE IF NOT EXISTS accelerometer (id VARCHAR(36), ts TIMESTAMP, x FLOAT, y FLOAT, z FLOAT);";
+			String createGPSTable = "CREATE TABLE IF NOT EXISTS gps (id VARCHAR(36), ts TIMESTAMP, lonlat GEOGRAPHY(Point));";
+			String createTagsTable = "CREATE TABLE IF NOT EXISTS tags (id VARCHAR(36), ts TIMESTAMP, tag TEXT);";
+			
+			stmtLink.execute(createAccelerometerTable);
+			stmtLink.execute(createGPSTable);
+			stmtLink.execute(createTagsTable);
 
 		} catch (SQLException e) {
 			throw new UnavailableException(e.getMessage());

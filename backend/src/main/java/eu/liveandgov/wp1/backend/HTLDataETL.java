@@ -91,6 +91,8 @@ public class HTLDataETL {
         copyManager.copyIn("COPY stops FROM STDIN (NULL '')",  new FileReader("/tmp/stops.csv") );
         copyManager.copyIn("COPY routes FROM STDIN (NULL '')",  new FileReader("/tmp/routes.csv") );
         
+        insertValuesInRoutesAsLonLatLinesTable();
+        
 	}
 	
 	
@@ -151,10 +153,40 @@ public class HTLDataETL {
 				//					+ " y INTEGER,"
 				+ " kkj2 GEOMETRY(POINT,2392) )"); // 2392 == KKJ2 reference system
 		s.execute("create index routes_idx on routes using gist (kkj2);");
-
+		
+		s.execute("DROP TABLE IF EXISTS routesAsLonLatLines;");
+		s.execute("CREATE TABLE IF NOT EXISTS routesAsLonLatLines"
+				+ "( routeCode VARCHAR(6),"
+				+ " routeDir VARCHAR(1),"
+				+ " validTo DATE,"
+				+ " lonlatline GEOMETRY(Linestring,4326) );");
 		s.close();
 	}
 
+	public void insertValuesInRoutesAsLonLatLinesTable() throws SQLException {
+		Statement s = db.createStatement();
+		s.execute("INSERT INTO routesAsLonLatLines" +
+				"(" +
+				"routecode," +
+				"routedir," +
+				"validto," +
+				"lonlatline" +
+				")" +
+				"select * from " +
+				"(" +
+					"SELECT r.routecode, r.routedir, r.validto, " +
+					"ST_MakeLine(ST_Transform(r.kkj2,4326) ORDER BY r.stoporder) as routePoints " +
+					"from routes as r " +
+					"group by routecode, routedir, validto" +
+				") as foo " +
+				"natural join " +
+				"(" +
+					"select routecode, routedir, max(validto) as validto " +
+					"from routes group by routecode, routedir" +
+				") as bar");
+		s.execute("create index routesAsLonLatLines_idx on routesAsLonLatLines using gist (lonlatline);");
+	}
+	
 	public String extractLineInfo(String line, String delimiter) {
 		String result = "";
 		line = line.substring(1);

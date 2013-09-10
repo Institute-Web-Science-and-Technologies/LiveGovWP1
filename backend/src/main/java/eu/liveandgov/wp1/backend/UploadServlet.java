@@ -9,14 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.util.List;
-
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.annotation.MultipartConfig;
@@ -30,25 +25,27 @@ import eu.liveandgov.wp1.backend.SensorValueObjects.AccSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.GPSSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.RawSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.TagSensorValue;
+import eu.liveandgov.wp1.backend.sensorLoop.SensorLoop;
+
 
 /**
  * Servlet implementation class UploadServlet2
  * 
  * 
- * Test with:
- * echo "ACC,1378128012707152,id1241242,0.018311 0.117111 0.32142" | curl localhost:8080/backend/upload -F "upfile=@-"
+ * Test with: echo "ACC,1378128012707152,id1241242,0.018311 0.117111 0.32142" |
+ * curl localhost:8080/backend/upload -F "upfile=@-"
  * 
- * or using the provided test data
- * cat test-upload-data.txt | curl localhost:8080/backend/upload -F "upfile=@-"
+ * or using the provided test data cat test-upload-data.txt | curl
+ * localhost:8080/backend/upload -F "upfile=@-"
  * 
  */
 @WebServlet("/upload")
 @MultipartConfig
 public class UploadServlet extends HttpServlet {
 	public static final String OUT_DIR = "/tmp/liveandgov/uploads/";
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -84,22 +81,34 @@ public class UploadServlet extends HttpServlet {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
-		
+
 		InputStream uploadedFileInputStream = uploadedFile.getInputStream();
 
 		// copy file to memory in order to make it consumable twice
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		copyStream(uploadedFileInputStream, baos);
-		saveToDisk(new ByteArrayInputStream(baos.toByteArray()), request.getHeader("id"));
-		
+		saveToDisk(new ByteArrayInputStream(baos.toByteArray()),
+				request.getHeader("id"));
+
 		try {
 			saveToDatabase(new ByteArrayInputStream(baos.toByteArray()));
 		} catch (SQLException e) {
+			for (Throwable throwable : e) {
+				throwable.printStackTrace();
+			}
+
+		}
+
+		SensorLoop sl = new SensorLoop(new ByteArrayInputStream(baos.toByteArray()), request.getHeader("id"));
+		try {
+			sl.doLoop();
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 	}
-	
+
 	private void saveToDisk(InputStream input, String id) throws IOException {
 		long unixTime = System.currentTimeMillis() / 1000L;
 		String absoluteFilename = OUT_DIR + id + "_" + unixTime;
@@ -109,24 +118,29 @@ public class UploadServlet extends HttpServlet {
 		outstream.flush();
 		outstream.close();
 	}
-	
-	private void saveToDatabase(InputStream input) throws IOException, UnavailableException, SQLException {
-		PostgresqlDatabase db = new PostgresqlDatabase("user", "pass");
+
+	private void saveToDatabase(InputStream input) throws IOException,
+			UnavailableException, SQLException {
+		PostgresqlDatabase db = new PostgresqlDatabase("liveandgov",
+				"liveandgov");
 		PreparedStatement psAcc, psGPS, psTag;
 		Timestamp ts;
 		BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-		
-		psAcc = db.connection.prepareStatement("INSERT INTO accelerometer VALUES (?, ?, ?, ?, ?)");
-		psGPS = db.connection.prepareStatement("INSERT INTO gps VALUES (?, ?, ?, ?)");
-		psTag = db.connection.prepareStatement("INSERT INTO tags VALUES (?, ?, ?)");
-		
+
+		psAcc = db.connection
+				.prepareStatement("INSERT INTO accelerometer VALUES (?, ?, ?, ?, ?)");
+		psGPS = db.connection
+				.prepareStatement("INSERT INTO gps VALUES (?, ?, ST_GeomFromText(?,4326))");
+		psTag = db.connection
+				.prepareStatement("INSERT INTO tags VALUES (?, ?, ?)");
+
 		while (reader.ready()) {
 			RawSensorValue rsv = RawSensorValue.fromString(reader.readLine());
 			switch (rsv.type) {
 			case ACC:
 				AccSensorValue asv = AccSensorValue.fromRSV(rsv);
 				psAcc.setString(1, asv.id);
-				ts = new Timestamp(asv.timestamp * 1000L);
+				ts = new Timestamp(asv.timestamp);
 				psAcc.setTimestamp(2, ts);
 				psAcc.setFloat(3, asv.x);
 				psAcc.setFloat(4, asv.y);
@@ -136,17 +150,17 @@ public class UploadServlet extends HttpServlet {
 			case GPS:
 				GPSSensorValue gsv = GPSSensorValue.fromRSV(rsv);
 				psGPS.setString(1, gsv.id);
-				ts = new Timestamp(gsv.timestamp * 1000L);
+				ts = new Timestamp(gsv.timestamp);
 				psGPS.setTimestamp(2, ts);
-				// TODO
-				psGPS.setDouble(3, gsv.latitude);
-				psGPS.setDouble(4, gsv.longitude);
+				psGPS.setString(3, "POINT(" + Double.toString(gsv.longitude)
+						+ ' ' + Double.toString(gsv.latitude) + ")");
+
 				psGPS.addBatch();
 				break;
 			case TAG:
 				TagSensorValue tsv = TagSensorValue.fromRSV(rsv);
 				psTag.setString(1, tsv.id);
-				ts = new Timestamp(tsv.timestamp * 1000L);
+				ts = new Timestamp(tsv.timestamp);
 				psTag.setTimestamp(2, ts);
 				psTag.setString(3, tsv.tag);
 				psTag.addBatch();
@@ -162,7 +176,6 @@ public class UploadServlet extends HttpServlet {
 		psGPS.close();
 		psTag.close();
 	}
-	
 
 	private void copyStream(InputStream input, OutputStream output)
 			throws IOException {

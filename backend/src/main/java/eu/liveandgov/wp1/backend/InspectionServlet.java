@@ -42,13 +42,24 @@ public class InspectionServlet extends HttpServlet {
 		String[] points = request.getParameterValues("points[]");
 		System.out.println("---");
 		// 'Point(24.95667 60.16946)'
-		
+		String[] pointsLonLat = new String[points.length];
 		try {
-			PreparedStatement knnQuery = db.connection.prepareStatement("select routecode, s1.kkj2 <-> ST_Transform(ST_GeometryFromText(?,4326),2392) as distance from routes s1 order by s1.kkj2 <-> ST_Transform(ST_GeometryFromText(?,4326),2392) asc limit 10;");
+			PreparedStatement knnQuery = db.connection.prepareStatement(""+
+					"select routecode, distance from (" +
+						"select routecode, " +
+						"ST_Distance(ST_Line_Interpolate_Point( " +
+						"lonlatline, " +
+						"ST_Line_Locate_Point(lonlatline,ST_GeometryFromText(?,4326)) " +
+						"), ST_GeometryFromText(?,4326)) as distance " +
+						"from routesAsLonLatLines " +
+						"order by " +
+						"distance asc limit 5 " +
+					") as top5;");
 			Map<String,Integer> counts = new HashMap<String,Integer>();
-			for (String latLon : points) {
-				String lonLat = "POINT(" + latLon.substring(latLon.indexOf(',')+2, latLon.indexOf(')')) 
-						+ " " +  latLon.substring(7, latLon.indexOf(',')) + ")";
+			for (int i = 0; i < points.length; i++) {
+				String lonLat = "POINT(" + points[i].substring(points[i].indexOf(',')+2, points[i].indexOf(')')) 
+						+ " " +  points[i].substring(7, points[i].indexOf(',')) + ")";
+				pointsLonLat[i] = lonLat;
 				knnQuery.setString(1, lonLat);
 				knnQuery.setString(2, lonLat);
 				
@@ -84,12 +95,53 @@ public class InspectionServlet extends HttpServlet {
 			System.out.println("route: " +routcode + " " +  max);
 			knnQuery.close();
 			
-			Statement s = db.createStatement();
+
+			
 			try {
-				ResultSet rs = s.executeQuery("SELECT routecode, routedir, ST_AsGeoJSON(ST_MakeLine(ST_Transform(r.kkj2,4326) ORDER BY stoporder)) as route from routes as r group by routecode, routedir having routecode = '"+routcode+"';");
+				Statement s = db.createStatement();
+				ResultSet rs;
+				String routeDir = "1";
+				if(pointsLonLat.length > 1) {
+					
+					rs = s.executeQuery(""+
+							"select ST_Line_Locate_Point(lonlatline,ST_GeometryFromText('"+pointsLonLat[0]+"',4326)), " +
+								   "ST_Line_Locate_Point(lonlatline,ST_GeometryFromText('"+pointsLonLat[pointsLonLat.length-1]+"',4326)) " +
+							"from routesAsLonLatLines " +
+							"where routecode = '"+routcode+"' " +
+							"AND routedir = '1' ");
+
+
+					rs.next();
+					if(rs.getFloat(1) < rs.getFloat(2)) {
+						routeDir = "1";
+						System.out.println("routedir = 1");
+					}
+					else {
+						routeDir = "2";
+						System.out.println("routedir = 2");
+					}
+				}
+				
+				String q = "" +
+						"SELECT routecode, " +
+							"routedir, " +
+							"ST_AsGeoJSON(" +
+							   "lonlatline" +
+							") as routePoints " +
+							"from routesAsLonLatLines " +
+							"where routecode = '" +
+							routcode + "' " +
+									"AND " +
+									"routedir = '" +
+									routeDir +
+									"' ";
+				
+				//System.out.println(q);
+				rs = s.executeQuery(q);
 				response.setContentType("application/json");
 				PrintWriter out = response.getWriter();
-				String json = "{\"routes\":["; 
+				String json = "{\"routes\":[";
+
 				while (rs.next()) {
 					if(json.length() > 11) {
 						json += ",\n";
@@ -102,7 +154,8 @@ public class InspectionServlet extends HttpServlet {
 				}
 				json += "]}";
 				out.println(json);
-				System.out.println(json);
+				//System.out.println(json);
+				
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -113,7 +166,7 @@ public class InspectionServlet extends HttpServlet {
 		}
 
 	}
-
+;
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */

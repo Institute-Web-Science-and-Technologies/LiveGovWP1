@@ -1,9 +1,14 @@
 package eu.liveandgov.wp1.backend.sensorLoop;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.supercsv.io.CsvListReader;
@@ -14,34 +19,40 @@ import eu.liveandgov.wp1.backend.SensorValueObjects.AccSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.RawSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.TaggedAccFeatureValue;
 import eu.liveandgov.wp1.backend.format.SampleType;
+import eu.liveandgov.wp1.backend.machineLearning.ActivityRecognition;
 
 public class SensorLoop {
 	private BufferedReader reader;
+	private String deviceId;
 	
-	private static final int WINDOW_SIZE = 4;
-	private static final int STEP_SIZE = 2;
+	private static final int WINDOW_SIZE = 90;
+	private static final int STEP_SIZE = 15;
+
 	
-	public SensorLoop(InputStream is) {
+	public SensorLoop(InputStream is, String deviceId) {
+		this.deviceId = deviceId;
 		reader = new BufferedReader(new InputStreamReader(is));
 	}
 	
-	public void doLoop() throws IOException {
+	public void doLoop() throws Exception {
 		String line = "";
 		AccSampleWindow sw = new AccSampleWindow(WINDOW_SIZE);
 		
 		int stepCouter = 0;
 		
 		String currentTag = "none";
-		
-		while( (line = reader.readLine()) != null ){
+		//CSVFileOutput csvOut = new CSVFileOutput("sensor.csv");
+		PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("/srv/liveandgov/classification/classify.log", true)));
+		while( (line = reader.readLine()) != null ) {
 			// System.out.println("<- " + line);
 			
 			RawSensorValue rsv = RawSensorValue.fromString(line); 
 			// System.out.println(rsv.toString());
 
-			// Get tags
+			// Get tags - also we drop the window here so we don't get overlapping windows.
 			if(rsv.type == SampleType.TAG) {
 				currentTag = StringUtils.strip(rsv.value, " \"");
+				sw.drop();
 			}
 			
 			// Filter accelerometer values			
@@ -61,8 +72,11 @@ public class SensorLoop {
 			
 			// sample window is full here
 			TaggedAccFeatureValue af = TaggedAccFeatureValue.fromWindow(sw, currentTag);
-			System.out.println(af.toCSV());
+			writer.println(af.startTime + " " + deviceId + ": " + ActivityRecognition.myClassify(af.toWekaObjArr()));
+			//System.out.println(af.toCSV());
 		}
+		writer.flush();
+		writer.close();
 	}
 
 	

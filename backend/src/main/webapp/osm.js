@@ -11,6 +11,7 @@ function updateMap() {
 
 
 function initilize(){
+	// POINT(24.9396 60.17321)
 	map = L.map('map').setView([60.16946,24.95667], 12);
 
 	L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
