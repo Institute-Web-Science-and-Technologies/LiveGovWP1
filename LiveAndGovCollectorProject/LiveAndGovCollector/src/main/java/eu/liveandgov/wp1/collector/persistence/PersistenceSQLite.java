@@ -43,7 +43,14 @@ public class PersistenceSQLite implements PersistenceInterface {
                 lines.add(cursor.getString(0));
             } while (cursor.moveToNext());
         }
+        //TODO: Delete records
         return lines;
     }
+
+    @Override
+    public int getRecordCount() {
+        return database.rawQuery("SELECT COUNT(*) FROM ? ", new String [] { SQLiteHelper.TABLE_NAME} ).getInt(0);
+    }
+
 
 }

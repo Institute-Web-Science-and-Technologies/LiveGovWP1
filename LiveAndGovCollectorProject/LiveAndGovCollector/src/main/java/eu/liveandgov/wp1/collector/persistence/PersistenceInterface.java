@@ -21,4 +21,10 @@ public interface PersistenceInterface {
     List<String> readLines(int n);
 
 
+    /**
+     * Returns the number of currently stored string records.
+     * @return recordCount
+     */
+    int getRecordCount();
+
 }
