@@ -13,7 +13,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION   = 2;
     public static final String TABLE_NAME      = "sensorValues";
     public static final String VALUE_NAME      = "value";
-    public static final String DATABASE_CREATE = "CREATE table " + TABLE_NAME + " (" +
+    public static final String DATABASE_CREATE = "CREATE table " + TABLE_NAME +
                                                   "( " + VALUE_NAME + " text not null );";
 
     public SQLiteHelper(Context context) {
