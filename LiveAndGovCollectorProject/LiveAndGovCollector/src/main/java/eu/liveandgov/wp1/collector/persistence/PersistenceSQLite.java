@@ -9,8 +9,6 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.liveandgov.wp1.collector.persistence.PersistenceInterface;
-
 /**
  * Created by cehlen on 9/12/13.
  */
