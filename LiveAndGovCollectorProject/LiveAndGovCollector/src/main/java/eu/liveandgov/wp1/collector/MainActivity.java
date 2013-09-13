@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.collector;
 
-import android.os.Bundle;
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.Menu;
 
 import eu.liveandgov.wp1.collector.persistence.PersistenceSQLite;
@@ -28,5 +28,6 @@ public class MainActivity extends Activity {
     public void runTests() {
         new PersistenceTester(new PersistenceSQLite(getApplicationContext()));
     }
-    
+
+
 }
