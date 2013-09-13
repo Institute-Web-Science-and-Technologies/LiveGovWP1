@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.IBinder;
 
+import eu.liveandgov.wp1.collector.persistence.MockPersister;
 import eu.liveandgov.wp1.collector.sensor.SensorListener;
 import eu.liveandgov.wp1.collector.transfer.TransferThread;
 
@@ -27,7 +28,7 @@ public class RecordingService extends Service {
     }
 
     private TransferThread initTransferThread() {
-        return new TransferThread((ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE));
+        return new TransferThread((ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE), new MockPersister());
     }
 
     @Override

@@ -20,7 +20,7 @@ import eu.liveandgov.wp1.collector.persistence.PersistenceInterface;
  *
  * Created by hartmann on 9/12/13.
  */
-public class TransferThread implements Runnable {
+public class TransferThread implements TransferInterface {
     private static final String LOG_TAG = "TRANSFER_THREAD";
 
     /*
@@ -133,7 +133,7 @@ public class TransferThread implements Runnable {
     /**
      * Transfers a maximum of MAX_TRANSFER_RECORDS to the server.
      */
-    private void transferData() {
+    public void transferData() {
         prepareData();
 
         // Create a new HttpClient and Post Header
@@ -159,7 +159,7 @@ public class TransferThread implements Runnable {
         }
     }
 
-    private void prepareData() {
+    public void prepareData() {
         if (TransferCache.length() > 0) return;
 
         for (String record: persister.readLines(MAX_TRANSFER_RECORDS)){

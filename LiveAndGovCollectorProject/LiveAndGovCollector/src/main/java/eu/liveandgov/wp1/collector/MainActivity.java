@@ -1,11 +1,14 @@
 package eu.liveandgov.wp1.collector;
 
 import android.app.Activity;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.Menu;
 
+import eu.liveandgov.wp1.collector.persistence.MockPersister;
 import eu.liveandgov.wp1.collector.persistence.PersistenceSQLite;
 import eu.liveandgov.wp1.collector.persistence.PersistenceTester;
+import eu.liveandgov.wp1.collector.transfer.TransferTest;
 
 public class MainActivity extends Activity {
 
@@ -26,8 +29,10 @@ public class MainActivity extends Activity {
     }
 
     public void runTests() {
-        new PersistenceTester(new PersistenceSQLite(getApplicationContext()));
-    }
+        new PersistenceTester(new MockPersister());
+        new TransferTest( (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE));
+
+        }
 
 
 }
