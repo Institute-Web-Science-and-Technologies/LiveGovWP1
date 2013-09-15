@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
 
 import eu.liveandgov.wp1.collector.persistence.MockPersister;
 import eu.liveandgov.wp1.collector.persistence.PersistenceSQLite;
@@ -16,8 +17,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        runTests();
     }
 
 
@@ -28,11 +27,15 @@ public class MainActivity extends Activity {
         return true;
     }
 
-    public void runTests() {
+    public void runTests(View view) {
         new PersistenceTester(new MockPersister());
-        new TransferTest( (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE));
 
-        }
-
-
+        // Need to spawn new thread for network connection.
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                new TransferTest();
+            }
+        }).start();
+    }
 }

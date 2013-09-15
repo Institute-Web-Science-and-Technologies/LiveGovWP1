@@ -28,7 +28,9 @@ public class TransferThread implements TransferInterface {
      */
     public static final int UPDATE_INTERVAL = 1000; // 1 sec in ms
     public static final int INITIAL_WAIT = 1000; // 10000; // 10 sec in ms
-    public static final String UPLOAD_URL = "http://141.26.71.84:8080/backend/upload";
+//    public static final String UPLOAD_URL = "http://141.26.71.84:8080/backend/upload";
+    public static final String UPLOAD_URL = "http://141.26.71.84:3030/";
+    private static final String FIELD_NAME = "upfile";
 
     // Allowed Transfer option
     public static final boolean ENABLE_WIFI = true;
@@ -54,6 +56,12 @@ public class TransferThread implements TransferInterface {
     private ConnectivityManager connManager;
     private NetworkInfo mWifi;
     private NetworkInfo mMobile;
+    private ConnectivityManager connectivityManager;
+
+    /**
+     * For Testing
+     */
+    public TransferThread(){}
 
     /**
      * Constructs transfer thread.
@@ -93,7 +101,14 @@ public class TransferThread implements TransferInterface {
 
                 case STATE_TRANSFER:
                     Log.i(LOG_TAG, "Transferring data");
-                    transferData();
+
+                    fillBuffer();
+
+                    boolean success = transferData(getBufferContent());
+
+                    if (success) { clearBuffer(); }
+                    // else keep buffer content and try again
+
                     STATE = STATE_IDLE;
                     break;
             }
@@ -131,11 +146,14 @@ public class TransferThread implements TransferInterface {
     }
 
     /**
-     * Transfers a maximum of MAX_TRANSFER_RECORDS to the server.
+     * Transfers a the content String to the server as HTTP POST request
+     * with a FORM/MULTIPART body.
+     *
+     * Returns True on success, False on error
+     * @param content
+     * @return successFlag
      */
-    public void transferData() {
-        prepareData();
-
+    public boolean transferData(String content) {
         // Create a new HttpClient and Post Header
         HttpClient httpclient = new DefaultHttpClient();
 
@@ -144,22 +162,24 @@ public class TransferThread implements TransferInterface {
         MultipartEntity mEntity = new MultipartEntity();
 
         try {
-            mEntity.addPart("upfile", new StringBody(TransferCache.toString()));
+            mEntity.addPart(FIELD_NAME, new StringBody(content));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            return false;
         }
 
         httppost.setEntity(mEntity);
 
         try {
             httpclient.execute(httppost);
-            clearData();
         } catch (IOException e) {
-            e.printStackTrace();
+            return false;
         }
+
+        return true;
     }
 
-    public void prepareData() {
+    private void fillBuffer() {
         if (TransferCache.length() > 0) return;
 
         for (String record: persister.readLines(MAX_TRANSFER_RECORDS)){
@@ -167,7 +187,12 @@ public class TransferThread implements TransferInterface {
         }
     }
 
-    private void clearData() {
+    private String getBufferContent(){
+        return TransferCache.toString();
+    }
+
+    private void clearBuffer() {
         TransferCache.delete(0, TransferCache.length());
     }
+
 }
