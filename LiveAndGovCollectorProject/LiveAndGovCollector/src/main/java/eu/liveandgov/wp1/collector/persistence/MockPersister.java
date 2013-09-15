@@ -27,6 +27,10 @@ public class MockPersister implements PersistenceInterface {
         return out;
     }
 
+    public String pull(){
+        return Q.removeFirst();
+    }
+
     @Override
     public int getRecordCount() {
         return Q.size();

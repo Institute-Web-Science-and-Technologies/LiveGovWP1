@@ -31,6 +31,11 @@ public class PersistenceSQLite implements PersistenceInterface {
         }
     }
 
+    @Override
+    public String pull() {
+        return null;
+    }
+
     public List<String> readLines(int n) {
         List<String> lines = new ArrayList<String>();
         String[] cols = new String[] { SQLiteHelper.VALUE_NAME };

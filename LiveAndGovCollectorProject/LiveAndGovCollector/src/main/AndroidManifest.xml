@@ -21,10 +21,13 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name="eu.liveandgov.wp1.collector.RecordingService" />
+        <service android:name="eu.liveandgov.wp1.collector.SimpleRecordingService" />
+        <service android:name="eu.liveandgov.wp1.collector.ZmqRecordingService" />
     </application>
 
 </manifest>

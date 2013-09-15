@@ -13,13 +13,18 @@ public interface PersistenceInterface {
     void save(String value);
 
     /**
+     * Pulls first element out of the queue
+     * @return head
+     */
+    String pull();
+
+    /**
      * Retrieves n Number of lines in a String array. After you got these strings, they will be
      * removed from the persistent storage.
      * @param n Number of sensor events to retrieve
      * @return An arrays of sensor events as strings
      */
     List<String> readLines(int n);
-
 
     /**
      * Returns the number of currently stored string records.

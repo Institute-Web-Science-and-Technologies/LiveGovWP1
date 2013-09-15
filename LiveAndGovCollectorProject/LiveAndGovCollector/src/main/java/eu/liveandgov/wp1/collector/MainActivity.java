@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.collector;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -17,6 +18,10 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Start Recording Service
+        Intent intent = new Intent(this, ZmqRecordingService.class);
+        startService(intent);
     }
 
 
