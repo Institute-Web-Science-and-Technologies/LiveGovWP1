@@ -1,7 +1,7 @@
 
 var markers = [];
 var map;
-
+var routes = L.layerGroup();
 
 
 function updateMap() {
@@ -26,19 +26,20 @@ function initilize(){
 	    markers.push(e.latlng.toString());
 	    $.get("/backend/InspectionServlet", { 'points[]': markers} ).done(
 	    		function (data) {
-	    			var colors = ["#000", "#FFEDA0"];
+	    			routes.clearLayers();
+	    			var colors = ["#FF0000", "#00FF00"];
 	    			for(var r in data.routes){
-	    				L.geoJson(data.routes[r].geojson, {
+	    				routes.addLayer(L.geoJson(data.routes[r].geojson, {
 	    				    style: {
-		    				    "color": colors[parseInt(r)],
+		    				    "color": colors[parseInt(data.routes[r].routedir)-1],
 		    				    "weight": 5,
 		    				    "opacity": 0.65
 		    				}
-	    				}).addTo(map);
-			    			var myLayer = L.geoJson().addTo(map);
-			    			myLayer.addData(data.routes[r].geojson);
-			    			var marker = L.marker([data.routes[r].geojson.coordinates[0][1],data.routes[r].geojson.coordinates[0][0]]).addTo(map);
+	    				}));
+			    			var marker = L.marker([data.routes[r].geojson.coordinates[0][1],data.routes[r].geojson.coordinates[0][0]]);
 			    			marker.bindPopup("<b>routecode: "+data.routes[r].routecode+"</b><br>direction: " + data.routes[r].routedir);
+			    			routes.addLayer(marker);
+			    			routes.addTo(map);
 	    			}
 	    		});
 	});
