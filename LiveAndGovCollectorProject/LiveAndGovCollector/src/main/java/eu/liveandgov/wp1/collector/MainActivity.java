@@ -2,15 +2,12 @@ package eu.liveandgov.wp1.collector;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 
 import eu.liveandgov.wp1.collector.persistence.MockPersister;
-import eu.liveandgov.wp1.collector.persistence.PersistenceSQLite;
 import eu.liveandgov.wp1.collector.persistence.PersistenceTester;
-import eu.liveandgov.wp1.collector.transfer.TransferTest;
 
 public class MainActivity extends Activity {
 
@@ -34,13 +31,5 @@ public class MainActivity extends Activity {
 
     public void runTests(View view) {
         new PersistenceTester(new MockPersister());
-
-        // Need to spawn new thread for network connection.
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                new TransferTest();
-            }
-        }).start();
     }
 }

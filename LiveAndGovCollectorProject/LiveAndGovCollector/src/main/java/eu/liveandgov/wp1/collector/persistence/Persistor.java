@@ -15,18 +15,23 @@ import java.io.ObjectOutputStream;
  */
 public class Persistor {
     private static final String LOG_TAG = "PERS";
-    public Context context;
-    public static int BUFFER_SIZE = 50; // No of recorded strings.
+    public static int BUFFER_SIZE = 5000; // No of recorded strings.
+
+    private final Context context;
 
     private Buffer inBuffer = new Buffer(BUFFER_SIZE);
     private Buffer outBuffer = new Buffer(BUFFER_SIZE);
 
-    public static final int NO_ROT_FILES = 10;
+    public static final int NO_ROT_FILES = 100;
     public static final String PREFIX = "SENSOR_ROT_";
     private int inFileNo = 0;
-    private int outFileNo = NO_ROT_FILES - 1;
+    private int outFileNo = 0;
 
-    public void push(String s){
+    public Persistor(Context context){
+        this.context = context;
+    }
+    
+    public synchronized void push(String s){
         if(!inBuffer.isFull()) {
             inBuffer.push(s);
         } else {
@@ -38,7 +43,7 @@ public class Persistor {
         }
     }
 
-    public String pull(){
+    public synchronized String pull(){
         if( outBuffer.isEmpty() ){
             Log.i(LOG_TAG, "outBuffer empty");
             File of = nextOutFile();
@@ -63,7 +68,6 @@ public class Persistor {
         }
         return null;
     }
-
 
     private File nextOutFile() {
         if ( outFileNo == inFileNo ) return null; // Do not get ahead of inFile
@@ -93,7 +97,7 @@ public class Persistor {
     }
 
     private File getFile(int id){
-        return new File(PREFIX + id);
+        return new File(context.getFilesDir(), PREFIX + id + ".log");
     }
 
 }

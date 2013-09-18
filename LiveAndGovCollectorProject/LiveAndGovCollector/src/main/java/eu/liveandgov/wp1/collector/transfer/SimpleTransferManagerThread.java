@@ -1,7 +1,6 @@
 package eu.liveandgov.wp1.collector.transfer;
 
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.Log;
 
 import eu.liveandgov.wp1.collector.persistence.PersistenceInterface;
@@ -14,7 +13,7 @@ import eu.liveandgov.wp1.collector.persistence.PersistenceInterface;
 public class SimpleTransferManagerThread implements TransferManagerInterface {
     private static final String LOG_TAG = "TRANSFER_THREAD";
 
-    private TransferInterface TE = new TransferZMQ();
+    private TransferInterface TE;
 
     // Persistence
     private PersistenceInterface persister;

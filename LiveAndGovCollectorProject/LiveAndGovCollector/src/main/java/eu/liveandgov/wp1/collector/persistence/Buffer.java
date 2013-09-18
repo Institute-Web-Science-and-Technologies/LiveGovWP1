@@ -3,7 +3,6 @@ package eu.liveandgov.wp1.collector.persistence;
 import android.util.Log;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 /**
@@ -11,47 +10,53 @@ import java.util.NoSuchElementException;
  */
 public class Buffer implements Serializable {
 
-    private int CAPACITY;
-    private ArrayList<String> B;
-    private int position = 0;
-    private ArrayList<String> buffer;
+    private final int capacity;
+    private final String[] buffer;
+    private int supremum = 0;
 
     public Buffer(int capacity){
-        CAPACITY = capacity;
-        B = new ArrayList<String>(CAPACITY);
-        Log.i("FA", "Created Buffer of Capacity " + CAPACITY);
-    }
-
-    public void push(String s) throws IndexOutOfBoundsException {
-        B.set(position, s);
-        position++;
-    }
-
-    public String pull() throws NoSuchElementException {
-        String out = B.get(position);
-        B.set(position, null);
-        position--;
-        return out;
+        Log.i("FA", "Creating Buffer of Capacity " + capacity);
+        this.capacity = capacity;
+        this.buffer   = new String[this.capacity];
     }
 
     public void reset() {
-        B = new ArrayList<String>(CAPACITY);
-        position = 0;
+        for (int i = 0; i< capacity; i++){
+            buffer[i] = null;
+        }
+        supremum = 0;
     }
 
-    public ArrayList<String> getBuffer(){
-        return B;
+    public void push(String s) {
+        // if (!supInRange(supremum)) throw new IllegalStateException("supremum " + supremum + " of " + capacity);
+        if (isFull()) throw new IndexOutOfBoundsException("Buffer Full " + supremum);
+        buffer[supremum] = s;
+        supremum += 1;
+    }
+
+    public String pull() {
+        // if (!supInRange(supremum)) throw new IllegalStateException("supremum " + supremum + " of " + capacity);
+        if (isEmpty()) throw new IndexOutOfBoundsException("Buffer Empty " + supremum);
+        supremum -= 1;
+        String out = buffer[supremum];
+        buffer[supremum] = null;
+        return out;
+    }
+
+
+    public String[] getBuffer(){
+        return buffer;
     }
 
     public boolean isFull() {
-        return position >= CAPACITY;
+        return supremum == capacity;
     }
 
     public boolean isEmpty() {
-        return position == 0;
+        return supremum == 0;
     }
 
-    public void setBuffer(ArrayList<String> buffer) {
-        this.buffer = buffer;
+    private boolean supInRange(int i){
+        return ( (0 >= i) && (i < capacity) );
     }
 }

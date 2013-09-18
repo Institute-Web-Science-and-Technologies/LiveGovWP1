@@ -4,21 +4,16 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 
-import eu.liveandgov.wp1.collector.persistence.MockPersister;
-import eu.liveandgov.wp1.collector.persistence.PersistenceInterface;
+import eu.liveandgov.wp1.collector.persistence.Persistor;
+import eu.liveandgov.wp1.collector.sensor.PersistorZmqThread;
 import eu.liveandgov.wp1.collector.sensor.SensorProducer;
-import eu.liveandgov.wp1.collector.sensor.SensorSink;
-import eu.liveandgov.wp1.collector.transfer.SimpleTransferManagerThread;
-import eu.liveandgov.wp1.collector.transfer.TransferManagerInterface;
+import eu.liveandgov.wp1.collector.transfer.TransferZmqThread;
 
 /**
  * Created by cehlen on 9/12/13.
@@ -65,11 +60,14 @@ public class ZmqRecordingService extends Service implements Runnable {
         SensorProducer ASP = setupSensorProducer(Sensor.TYPE_ACCELEROMETER);
         SensorProducer LSP = setupSensorProducer(Sensor.TYPE_LINEAR_ACCELERATION);
 
-        SensorSink SSK = new SensorSink();
-        SSK.subscribe(ASP);
-        SSK.subscribe(LSP);
+        Persistor P = new Persistor(this);
+        PersistorZmqThread PS = new PersistorZmqThread(P);
+        PS.subscribe(ASP);
+        PS.subscribe(LSP);
 
-        new Thread(SSK).start();
+        new Thread(PS).start();
+
+        new Thread(new TransferZmqThread(P)).start();
 
         Looper.loop();
 
