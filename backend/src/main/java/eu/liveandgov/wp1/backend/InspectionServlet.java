@@ -31,7 +31,7 @@ public class InspectionServlet extends HttpServlet {
      */
     public InspectionServlet() throws UnavailableException {
         super();
-        db = new PostgresqlDatabase("myuser", "mypassword");
+        db = new PostgresqlDatabase("liveandgov", "liveandgov");
         // TODO Auto-generated constructor stub
     }
 
