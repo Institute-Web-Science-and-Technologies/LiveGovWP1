@@ -78,28 +78,23 @@ public class InspectionServlet extends HttpServlet {
 		try {
 			Statement s = db.createStatement();
 			ResultSet rs;
-			String routeDir = "1";
+			String routeDir = "select '1'::VARCHAR(1)";
 			if(pointsLonLat.length > 1) {
-				
-				rs = s.executeQuery(""+
-						"select ST_Line_Locate_Point(lonlatline,ST_GeometryFromText('"+pointsLonLat[0]+"',4326)), " +
-							   "ST_Line_Locate_Point(lonlatline,ST_GeometryFromText('"+pointsLonLat[pointsLonLat.length-1]+"',4326)) " +
-						"from routesAsLonLatLines " +
-						"where routecode = '"+routcode+"' " +
-						"AND routedir = '1' ");
-
-
-				if(rs.next()) {
-					if(rs.getFloat(1) < rs.getFloat(2)) {
-						routeDir = "1";
-						System.out.println("routedir = 1");
-					}
-					else {
-						routeDir = "2";
-						System.out.println("routedir = 2");
-					}
-				}
+				routeDir = ""+
+					"select " +
+						"case " +
+						   "when ST_Line_Locate_Point(lonlatline,ST_GeometryFromText('"+pointsLonLat[0]+"',4326)) " +
+						     " < ST_Line_Locate_Point(lonlatline,ST_GeometryFromText('"+pointsLonLat[pointsLonLat.length-1]+"',4326)) " +
+						   "then '1' " +
+						   "else '2' " +
+						"end " +
+					"from routesAsLonLatLines " +
+					"where routecode = '"+routcode+"' " +
+					"AND routedir = '1' ";
+				rs = s.executeQuery(routeDir);
 			}
+
+			System.out.println(routeDir);
 			
 			q = "SELECT routecode, " +
 						"routedir, " +
@@ -110,12 +105,12 @@ public class InspectionServlet extends HttpServlet {
 						"where routecode = '" +
 						routcode + "' " +
 								"AND " +
-								"routedir = '" +
-								routeDir +
-								"' ";
+								"routedir = (" +
+								routeDir +");";
 			
-			//System.out.println(q);
+			System.out.println(q);
 			rs = s.executeQuery(q);
+			
 			response.setContentType("application/json");
 			PrintWriter out = response.getWriter();
 			String json = "{\"routes\":[";
@@ -133,7 +128,6 @@ public class InspectionServlet extends HttpServlet {
 			json += "]}";
 			out.println(json);
 			//System.out.println(json);
-			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

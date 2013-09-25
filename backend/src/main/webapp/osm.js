@@ -1,5 +1,6 @@
 
 var markers = [];
+var timestamps = [];
 var map;
 var routes = L.layerGroup();
 
@@ -24,7 +25,8 @@ function initilize(){
   map.on('click', function(e){
 	    new L.marker(e.latlng).addTo(map);
 	    markers.push(e.latlng.toString());
-	    $.get("/backend/InspectionServlet", { 'points[]': markers} ).done(
+	    timestamps.push(Date.now());
+	    $.get("/backend/InspectionServlet", { 'points[]': markers, 'ts[]': timestamps } ).done(
 	    		function (data) {
 	    			routes.clearLayers();
 	    			var colors = ["#FF0000", "#00FF00"];
