@@ -32,7 +32,7 @@ public class HTLDataETL {
 	
 
 	public HTLDataETL() throws UnavailableException {
-		db = new PostgresqlDatabase("myuser", "mypassword");
+		db = new PostgresqlDatabase("liveandgov", "liveandgov");
 	}
 
 
