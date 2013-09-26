@@ -39,6 +39,7 @@ public class SensorSinkThread implements Runnable {
         while (true) {
             msg = inSocket.recvStr();
             outSocket.send(msg);
+            Log.i(LOG_TAG,msg);
             MonitorThread.sampleCount += 1;
         }
     }

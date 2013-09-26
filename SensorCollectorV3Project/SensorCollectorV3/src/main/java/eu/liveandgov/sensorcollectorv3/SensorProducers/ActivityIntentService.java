@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3;
+package eu.liveandgov.sensorcollectorv3.SensorProducers;
 
 import android.app.IntentService;
 import android.app.Notification;
@@ -25,10 +25,7 @@ public class ActivityIntentService extends IntentService {
             DetectedActivity mostProbableActiviy = result.getMostProbableActivity();
             int confidence = mostProbableActiviy.getConfidence();
             int activityType = mostProbableActiviy.getType();
-            Notification notification = new Notification.Builder(getApplicationContext())
-                    .setContentTitle("Activity")
-                    .setContentText("Activity: " + activityType + " Confidence: " + confidence)
-                    .build();
+            Log.i("ACTIVITY", "Activity : " + activityType + " Confidence: " + confidence);
         }
     }
 

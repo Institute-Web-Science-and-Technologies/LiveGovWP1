@@ -49,10 +49,10 @@ public class SensorThread implements Runnable {
         }
         new Thread(SK).start();
 
-        // Persistor P = MainActivity.P;
-        // PersistorThread PT = new PersistorThread(P);
-        // PT.connect(SK);
-        // new Thread(PT).start();
+        Persistor P = new FilePersistor(context);
+        PersistorThread PT = new PersistorThread(P);
+        PT.connect(SK);
+        new Thread(PT).start();
 
         Log.i(LOG_TAG, "Sensor Looping");
         Looper.loop();

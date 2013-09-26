@@ -21,7 +21,7 @@ public class MonitorThread implements Runnable {
             String msg = String.format(
                     "Sample count: %d \n" +
                             "File size: %d \n", sampleCount,
-                    MainActivity.P.getFile().length()
+                    MainActivity_OLD.P.getFile().length()
             );
 
             Bundle msgB = new Bundle();

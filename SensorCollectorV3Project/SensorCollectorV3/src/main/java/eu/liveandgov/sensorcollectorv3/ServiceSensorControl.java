@@ -71,7 +71,6 @@ public class ServiceSensorControl extends Service {
         Log.i(LOG_TAG, "Creating ServiceSensorControl }");
 
         // Start sensor thread
-        P = new FilePersistor(this);
         new Thread(new SensorThread(this)).start();
 
         // Start transfer thread

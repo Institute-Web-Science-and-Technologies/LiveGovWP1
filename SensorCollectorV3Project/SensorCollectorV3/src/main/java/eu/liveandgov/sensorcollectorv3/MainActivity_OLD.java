@@ -9,7 +9,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class MainActivity_OLD extends Activity {
     static boolean firstRun = true;
     static TextView logView;
     public static Persistor P;
