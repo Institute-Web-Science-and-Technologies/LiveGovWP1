@@ -4,6 +4,8 @@ import android.util.Log;
 
 import org.jeromq.ZMQ;
 
+import eu.liveandgov.sensorcollectorv3.SensorProducers.Producer;
+
 /**
  * Created by hartmann on 9/22/13.
  */
@@ -25,7 +27,7 @@ public class SensorSinkThread implements Runnable {
 
     public String getOutAddress() { return outAddress; }
 
-    public void subscribe(Producer sensorProducer) {
+    public void subscribeTo(Producer sensorProducer) {
         Log.i(LOG_TAG, "Subsrubing to " + sensorProducer.getAddress());
         inSocket.connect(sensorProducer.getAddress());
     }

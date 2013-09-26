@@ -30,7 +30,7 @@ public class SensorCollectionOptions {
     /**
      * GPS
      */
-    public static  final boolean GPS = false;
+    public static  final boolean REC_GPS = true;
 
     /**
      * Networking Samples
@@ -39,4 +39,9 @@ public class SensorCollectionOptions {
     public static  final boolean GSM = true;    // GSM
     public static  final boolean BLT = true;    // Bluetooth
 
+    /**
+     * Record Activity
+     * using the new Google Activity API
+     */
+    public static final boolean REC_GOOGLE_API = true;
 }

@@ -9,13 +9,6 @@ package eu.liveandgov.sensorcollectorv3.Configuration;
  */
 public class IntentAPI {
     /**
-     * Enable/Disable the collection of sensor samples.
-     * Sensors can be configured in the class {@link SensorCollectionOptions}
-     */
-    public static final String SAMPLING_ENABLE = "eu.liveandgov.sensorcollectorapi.intent.action.SAMPLING_ENABLE";
-    public static final String SAMPLING_DISABLE = "eu.liveandgov.sensorcollectorapi.intent.action.SAMPLING_DISABLE";
-
-    /**
      * Request a status update from the service.
      * Status updates are returned via the RETURN_STATUS intent, and contain the following
      * boolean fields:
@@ -27,15 +20,22 @@ public class IntentAPI {
     public static final String RETURN_STATUS = "eu.liveandgov.sensorcollectorapi.intent.return.STATUS";
 
     /**
-     * Add an annotation sample to the sensor stream.
-     * The annotation is contained in the "tag" field of the intent.
+     * Enable/Disable the collection of sensor samples.
+     * Sensors can be configured in the class {@link SensorCollectionOptions}
      */
-    public static final String ANNOTATE = "eu.liveandgov.sensorcollectorapi.intent.action.ANNOTATE";
+    public static final String SAMPLING_ENABLE = "eu.liveandgov.sensorcollectorapi.intent.action.SAMPLING_ENABLE";
+    public static final String SAMPLING_DISABLE = "eu.liveandgov.sensorcollectorapi.intent.action.SAMPLING_DISABLE";
 
     /**
      * Triggers the data transfer to the server.
      */
     public static final String TRANSFER_SAMPLES = "eu.liveandgov.sensorcollectorapi.intent.action.TRANSFER_SAMPLES";
+
+    /**
+     * Add an annotation sample to the sensor stream.
+     * The annotation is contained in the "tag" field of the intent.
+     */
+    public static final String ANNOTATE = "eu.liveandgov.sensorcollectorapi.intent.action.ANNOTATE";
 
     /**
      * DEPRECATED: Send Log messages to the GUI

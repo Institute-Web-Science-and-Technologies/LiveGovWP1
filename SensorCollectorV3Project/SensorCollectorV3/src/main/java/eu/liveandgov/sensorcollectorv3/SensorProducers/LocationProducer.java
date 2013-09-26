@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3;
+package eu.liveandgov.sensorcollectorv3.SensorProducers;
 
 import android.content.Context;
 import android.location.Location;
@@ -14,6 +14,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
 import org.jeromq.ZMQ;
+
+import eu.liveandgov.sensorcollectorv3.SensorParser;
 
 /**
  *

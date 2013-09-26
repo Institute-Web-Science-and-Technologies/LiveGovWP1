@@ -21,40 +21,22 @@ public class ActivitySensorCollector extends Activity {
     private boolean isTransferring = false;
 
     /* ANDROID LIFECYCLE MANAGEMENT */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_sensor_collector);
         setupIntentListeners();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 
     /* BUTTON HANDLER */
+
     public void onRecordingToggleButtonClick(View view) {
-        if (isRecording) {
+        if (!isRecording) {
             Intent intent = new Intent(IntentAPI.SAMPLING_ENABLE);
             startService(intent);
-        } else {
+        } else { // already recording
             Intent intent = new Intent(IntentAPI.SAMPLING_DISABLE);
             startService(intent);
         }
@@ -64,6 +46,14 @@ public class ActivitySensorCollector extends Activity {
         Intent intent = new Intent(IntentAPI.TRANSFER_SAMPLES);
         getApplicationContext().startService(intent);
     }
+
+    public void onSendButtonClick(View view) {
+        Intent intent = new Intent(IntentAPI.ANNOTATE);
+        intent.putExtra("tag", "My first annotation");
+        getApplicationContext().startService(intent);
+    }
+
+    /* HANDLE RETURN INTENTS */
 
     private void setupIntentListeners() {
         // Setup Broadcast Receiver

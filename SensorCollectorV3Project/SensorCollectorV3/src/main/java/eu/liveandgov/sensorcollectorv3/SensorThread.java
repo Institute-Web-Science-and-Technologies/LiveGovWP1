@@ -3,21 +3,18 @@ package eu.liveandgov.sensorcollectorv3;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.location.Location;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
+import java.util.LinkedList;
+import java.util.List;
 
-import java.io.IOException;
+import eu.liveandgov.sensorcollectorv3.Configuration.SensorCollectionOptions;
+import eu.liveandgov.sensorcollectorv3.SensorProducers.ActivityProducer;
+import eu.liveandgov.sensorcollectorv3.SensorProducers.LocationProducer;
+import eu.liveandgov.sensorcollectorv3.SensorProducers.Producer;
+import eu.liveandgov.sensorcollectorv3.SensorProducers.SensorProducer;
 
 
 /**
@@ -41,35 +38,62 @@ public class SensorThread implements Runnable {
         Looper.prepare();
 
         // Register SensorProducer
-        Log.i(LOG_TAG, "Starting Sensors");
-        SensorProducer ASP = setupSensorProducer(Sensor.TYPE_ACCELEROMETER);
-//        SensorProducer LSP = setupSensorProducer(Sensor.TYPE_LINEAR_ACCELERATION);
-        LocationProducer LP = setupLocationProducer();
-        ActivityProducer AP = new ActivityProducer(nextPort++);
-        AP.setContext(context);
+        Log.i(LOG_TAG, "Starting SensorProducer");
+
+        List<Producer> activeSensors = registerSensors();
+
+        // Connect Sensor Producers to Sensor Sink
         SensorSinkThread SK = new SensorSinkThread();
-
-        SK.subscribe(ASP);
-        SK.subscribe(LP);
-//        SK.subscribe(LSP);
-
-
+        for (Producer p : activeSensors){
+            SK.subscribeTo(p);
+        }
         new Thread(SK).start();
 
-        Persistor P = MainActivity.P;
-        PersistorThread PT = new PersistorThread(P);
-
-        PT.connect(SK);
-
-        new Thread(PT).start();
+        // Persistor P = MainActivity.P;
+        // PersistorThread PT = new PersistorThread(P);
+        // PT.connect(SK);
+        // new Thread(PT).start();
 
         Log.i(LOG_TAG, "Sensor Looping");
         Looper.loop();
     }
 
-    private LocationProducer setupLocationProducer() {
-        LocationProducer LP = new LocationProducer(nextPort++, Looper.myLooper());
+    private List<Producer> registerSensors() {
+        List<Producer> activeSensors = new LinkedList<Producer>();
 
+        if (SensorCollectionOptions.REC_ACC)
+            activeSensors.add( setupSensorProducer(Sensor.TYPE_ACCELEROMETER) );
+        if (SensorCollectionOptions.REC_LIN_ACC)
+            activeSensors.add( setupSensorProducer(Sensor.TYPE_LINEAR_ACCELERATION) );
+        if (SensorCollectionOptions.REC_GRAV)
+           activeSensors.add( setupSensorProducer(Sensor.TYPE_GRAVITY) );
+        if (SensorCollectionOptions.REC_GPS)
+           activeSensors.add( setupLocationProducer() );
+        if (SensorCollectionOptions.REC_GOOGLE_API)
+            activeSensors.add( setupActivityProducer() );
+
+        // Filter Sensors that are not available
+        return removeNullValues(activeSensors);
+    }
+
+    private List<Producer> removeNullValues(List<Producer> activeSensors) {
+        List<Producer> out = new LinkedList<Producer>();
+        for(Producer s: activeSensors){
+            if (s != null) out.add(s);
+        }
+        return out;
+    }
+
+    private ActivityProducer setupActivityProducer() {
+        Log.i(LOG_TAG, "Registering Activity Producer.");
+        ActivityProducer AP = new ActivityProducer(nextPort++);
+        AP.setContext(context);
+        return AP;
+    }
+
+    private LocationProducer setupLocationProducer() {
+        Log.i(LOG_TAG, "Registering Location Producer.");
+        LocationProducer LP = new LocationProducer(nextPort++, Looper.myLooper());
         LP.setContext(this.context);
         return LP;
     }
@@ -82,7 +106,6 @@ public class SensorThread implements Runnable {
         SensorProducer SP = new SensorProducer(nextPort);
         nextPort += 1;
         sensorManager.registerListener(SP, sensor, SensorManager.SENSOR_DELAY_GAME, new Handler());
-
         return  SP;
     }
 

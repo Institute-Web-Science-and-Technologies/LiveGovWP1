@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3;
+package eu.liveandgov.sensorcollectorv3.SensorProducers;
 
 /**
  * Created by cehlen on 9/25/13.

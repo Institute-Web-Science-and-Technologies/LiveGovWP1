@@ -18,7 +18,6 @@ public class MonitorThread implements Runnable {
     @Override
     public void run() {
         while(true) {
-
             String msg = String.format(
                     "Sample count: %d \n" +
                             "File size: %d \n", sampleCount,

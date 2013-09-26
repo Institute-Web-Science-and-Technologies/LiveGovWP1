@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3;
+package eu.liveandgov.sensorcollectorv3.SensorProducers;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -6,6 +6,8 @@ import android.hardware.SensorEventListener;
 import android.util.Log;
 
 import org.jeromq.ZMQ;
+
+import eu.liveandgov.sensorcollectorv3.SensorParser;
 
 /**
  * Created by hartmann on 9/15/13.
