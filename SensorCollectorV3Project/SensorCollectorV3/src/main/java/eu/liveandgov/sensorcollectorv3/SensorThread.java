@@ -3,9 +3,19 @@ package eu.liveandgov.sensorcollectorv3;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 
 import java.io.IOException;
 
@@ -18,6 +28,7 @@ public class SensorThread implements Runnable {
     private final SensorManager sensorManager;
     private int nextPort = 5000;
     private Context context;
+
 
     public SensorThread(Context context) {
         this.context = context;
@@ -32,11 +43,16 @@ public class SensorThread implements Runnable {
         // Register SensorProducer
         Log.i(LOG_TAG, "Starting Sensors");
         SensorProducer ASP = setupSensorProducer(Sensor.TYPE_ACCELEROMETER);
-        SensorProducer LSP = setupSensorProducer(Sensor.TYPE_LINEAR_ACCELERATION);
-
+//        SensorProducer LSP = setupSensorProducer(Sensor.TYPE_LINEAR_ACCELERATION);
+        LocationProducer LP = setupLocationProducer();
+        ActivityProducer AP = new ActivityProducer(nextPort++);
+        AP.setContext(context);
         SensorSinkThread SK = new SensorSinkThread();
+
         SK.subscribe(ASP);
-        SK.subscribe(LSP);
+        SK.subscribe(LP);
+//        SK.subscribe(LSP);
+
 
         new Thread(SK).start();
 
@@ -51,6 +67,13 @@ public class SensorThread implements Runnable {
         Looper.loop();
     }
 
+    private LocationProducer setupLocationProducer() {
+        LocationProducer LP = new LocationProducer(nextPort++, Looper.myLooper());
+
+        LP.setContext(this.context);
+        return LP;
+    }
+
     private SensorProducer setupSensorProducer(int sensorType){
         Sensor sensor = sensorManager.getDefaultSensor(sensorType);
 
@@ -62,4 +85,6 @@ public class SensorThread implements Runnable {
 
         return  SP;
     }
+
+
 }

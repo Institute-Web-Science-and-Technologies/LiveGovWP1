@@ -25,7 +25,7 @@ public class SensorSinkThread implements Runnable {
 
     public String getOutAddress() { return outAddress; }
 
-    public void subscribe(SensorProducer sensorProducer) {
+    public void subscribe(Producer sensorProducer) {
         Log.i(LOG_TAG, "Subsrubing to " + sensorProducer.getAddress());
         inSocket.connect(sensorProducer.getAddress());
     }

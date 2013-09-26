@@ -1,0 +1,100 @@
+package eu.liveandgov.sensorcollectorv3;
+
+import android.content.Context;
+import android.hardware.SensorEvent;
+import android.location.Location;
+import android.os.Bundle;
+import android.os.Looper;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+
+import org.jeromq.ZMQ;
+
+/**
+ * Created by hartmann on 9/15/13.
+ */
+public class LocationProducer extends Producer implements
+        GooglePlayServicesClient.ConnectionCallbacks,
+        GooglePlayServicesClient.OnConnectionFailedListener,
+        LocationListener {
+    private static final String LOG_TAG = "LOCP";
+    ZMQ.Socket s;
+    private SensorParser sensorParser;
+    private LocationClient locationClient;
+    private LocationRequest locationRequest;
+    private Context context;
+    private Looper myLooper;
+
+    public LocationProducer(Integer PORT, Looper myLooper){
+        super(PORT);
+        this.myLooper = myLooper;
+        Log.i(LOG_TAG, "Setting up Socket " + getAddress());
+        s = ZMQ.context().socket(ZMQ.PUB);
+        s.bind(getAddress());
+
+        sensorParser = new SensorParser("my Device ID");
+    }
+
+    public void setContext(Context c) {
+        context = c;
+        init();
+    }
+
+    private void init() {
+        locationClient = new LocationClient(this.context, this, this);
+        locationClient.connect();
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(1000);
+
+        // Google Play Services
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.context);
+        if(ConnectionResult.SUCCESS == resultCode) {
+            Log.d(LOG_TAG, "Google Play Services available.");
+        } else {
+            Log.d(LOG_TAG, "Google Play Services NOT available.");
+        }
+    }
+
+    //@Override
+    //public void onSensorChanged(SensorEvent sensorEvent) {
+        // Log.i(LOG_TAG,"Recieved Sensor Sample " + SensorParser.parse(sensorEvent));
+        // if (inSocket == null) setupConnection();
+        // s.send(sensorParser.parse(sensorEvent));
+    //}
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.d(LOG_TAG, "onConnected");
+        locationClient.requestLocationUpdates(locationRequest, this, myLooper);
+    }
+
+    @Override
+    public void onDisconnected() {
+        Log.d(LOG_TAG, "onDisconnected");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.d(LOG_TAG, "Connection failed!");
+        Log.d(LOG_TAG, "onConnectionFailed");
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        //String msg = "Updated Location: " +
+        //        Double.toString(location.getLatitude()) + ", " +
+        //        Double.toString(location.getLongitude());
+        String locString = sensorParser.parse(location);
+        Log.d(LOG_TAG, locString);
+        s.send(locString);
+    }
+}

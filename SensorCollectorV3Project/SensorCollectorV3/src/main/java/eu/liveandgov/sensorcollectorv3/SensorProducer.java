@@ -10,14 +10,13 @@ import org.jeromq.ZMQ;
 /**
  * Created by hartmann on 9/15/13.
  */
-public class SensorProducer implements SensorEventListener {
+public class SensorProducer extends Producer implements SensorEventListener {
     private static final String LOG_TAG = "SP";
-    public final Integer PORT;
     ZMQ.Socket s;
     private SensorParser sensorParser;
 
     public SensorProducer(Integer PORT){
-        this.PORT = PORT;
+        super(PORT);
         Log.i(LOG_TAG, "Setting up Socket " + getAddress());
         s = ZMQ.context().socket(ZMQ.PUB);
         s.bind(getAddress());
@@ -37,6 +36,7 @@ public class SensorProducer implements SensorEventListener {
         // do nothing
     }
 
+    @Override
     public String getAddress() {
         return "tcp://127.0.0.1:" + PORT;
     }
