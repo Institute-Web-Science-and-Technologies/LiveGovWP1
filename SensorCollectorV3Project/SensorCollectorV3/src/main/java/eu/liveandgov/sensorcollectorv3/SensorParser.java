@@ -8,13 +8,14 @@ import android.location.Location;
  * Created by hartmann on 9/15/13.
  */
 public class SensorParser {
-    private String id;
 
-    public SensorParser(String id){
-        this.id = id;
+    private static String id = "NewID";
+
+    public static void setId(String id){
+        SensorParser.id = id;
     }
 
-    public String parse(SensorEvent event) {
+    public static String parse(SensorEvent event) {
         int sensorType= event.sensor.getType();
         if ( sensorType == Sensor.TYPE_ACCELEROMETER){
             return fillString("ACC", event.timestamp / 1000, id, event.values);
@@ -26,7 +27,7 @@ public class SensorParser {
         return "ERR,,,Unknown sensor " + sensorType;
     }
 
-    public String parse(Location location) {
+    public static String parse(Location location) {
         return fillString("GPS", location.getTime(), id, new double[]{location.getLatitude(), location.getLongitude(), location.getAltitude()});
     }
 

@@ -1,12 +1,10 @@
 package eu.liveandgov.sensorcollectorv3;
 
 import android.content.Context;
-import android.hardware.SensorEvent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -18,6 +16,13 @@ import com.google.android.gms.location.LocationRequest;
 import org.jeromq.ZMQ;
 
 /**
+ *
+ * GUIDE - If com.google.* imports do not resolve:
+ * Need to install GooglePlayServices and GoogleAPI from the Android SDK Manager
+ * Moreover you need to add the GoolgePlayServicesLib.jar file from the
+ * SDK directory manually to the modules directory:
+ * Right Click on Project -> Open Module Settings (F4) -> Edit SDK -> Add path to jar file
+ *
  * Created by hartmann on 9/15/13.
  */
 public class LocationProducer extends Producer implements
@@ -26,7 +31,6 @@ public class LocationProducer extends Producer implements
         LocationListener {
     private static final String LOG_TAG = "LOCP";
     ZMQ.Socket s;
-    private SensorParser sensorParser;
     private LocationClient locationClient;
     private LocationRequest locationRequest;
     private Context context;
@@ -39,7 +43,6 @@ public class LocationProducer extends Producer implements
         s = ZMQ.context().socket(ZMQ.PUB);
         s.bind(getAddress());
 
-        sensorParser = new SensorParser("my Device ID");
     }
 
     public void setContext(Context c) {
@@ -93,7 +96,7 @@ public class LocationProducer extends Producer implements
         //String msg = "Updated Location: " +
         //        Double.toString(location.getLatitude()) + ", " +
         //        Double.toString(location.getLongitude());
-        String locString = sensorParser.parse(location);
+        String locString = SensorParser.parse(location);
         Log.d(LOG_TAG, locString);
         s.send(locString);
     }

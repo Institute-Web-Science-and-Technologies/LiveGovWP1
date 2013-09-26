@@ -13,22 +13,19 @@ import org.jeromq.ZMQ;
 public class SensorProducer extends Producer implements SensorEventListener {
     private static final String LOG_TAG = "SP";
     ZMQ.Socket s;
-    private SensorParser sensorParser;
 
     public SensorProducer(Integer PORT){
         super(PORT);
         Log.i(LOG_TAG, "Setting up Socket " + getAddress());
         s = ZMQ.context().socket(ZMQ.PUB);
         s.bind(getAddress());
-
-        sensorParser = new SensorParser("my Device ID");
     }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         // Log.i(LOG_TAG,"Recieved Sensor Sample " + SensorParser.parse(sensorEvent));
         // if (inSocket == null) setupConnection();
-        s.send(sensorParser.parse(sensorEvent));
+        s.send(SensorParser.parse(sensorEvent));
     }
 
     @Override
