@@ -4,11 +4,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.location.Location;
 
-import eu.liveandgov.sensorcollectorv3.SensorValueObjects.AccSensorValue;
-import eu.liveandgov.sensorcollectorv3.SensorValueObjects.GravSensorValue;
-import eu.liveandgov.sensorcollectorv3.SensorValueObjects.LacSensorValue;
-import eu.liveandgov.sensorcollectorv3.SensorValueObjects.SensorValue;
-
 /**
  * Created by hartmann on 9/15/13.
  */
