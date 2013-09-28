@@ -1,23 +1,23 @@
-package eu.liveandgov.sensorcollectorv3;
+package eu.liveandgov.sensorcollectorv3.ApplicationComponents;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import android.view.Menu;
-import android.view.View;
-import android.widget.TextView;
 
 import eu.liveandgov.sensorcollectorv3.Configuration.IntentAPI;
+import eu.liveandgov.sensorcollectorv3.Persistor;
+import eu.liveandgov.sensorcollectorv3.SensorThread;
+import eu.liveandgov.sensorcollectorv3.TransferThread;
 
 public class ServiceSensorControl extends Service {
     static final String LOG_TAG =  "SCS";
-    static boolean firstRun = true;
+
+    private boolean isRecording = false;
+    private boolean isTransferring = false;
 
     public static Persistor P;
     public static TransferThread T;
@@ -30,35 +30,57 @@ public class ServiceSensorControl extends Service {
         String action = intent.getAction();
         Log.i(LOG_TAG, "Received intent with action " + action);
 
-        if (action.equals(IntentAPI.SAMPLING_ENABLE)) {
-            doEnableSampling();
-        } else if (action.equals(IntentAPI.SAMPLING_DISABLE)) {
-            doStopService();
+        if (action == null) return START_STICKY;
+
+        // Dispatch IntentAPI
+        if (action.equals(IntentAPI.RECORDING_ENABLE)) {
+            doEnableRecording();
+            doSendStatus();
+        } else if (action.equals(IntentAPI.RECORDING_DISABLE)) {
+            doDisableRecording();
+            doSendStatus();
         } else if (action.equals(IntentAPI.TRANSFER_SAMPLES)) {
             doTransferSamples();
+            doSendStatus();
         } else if (action.equals(IntentAPI.ANNOTATE)) {
-            doSendAnnotation();
+            doAnnotate();
         } else if (action.equals(IntentAPI.GET_STATUS)) {
             doSendStatus();
         } else {
             Log.i(LOG_TAG, "Received unknown action " + action);
         }
+
+        doSendLog("Hello LogView");
+
         return START_STICKY;
     }
 
     private void doSendStatus() {
+        Intent intent = new Intent(IntentAPI.RETURN_STATUS);
+        intent.putExtra(IntentAPI.FIELD_SAMPLING, isRecording);
+        intent.putExtra(IntentAPI.FIELD_TRANSFERRING, isTransferring);
+        sendBroadcast(intent);
     }
 
-    private void doSendAnnotation() {
+    private void doSendLog(String message){
+        Intent intent = new Intent(IntentAPI.RETURN_LOG);
+        intent.putExtra(IntentAPI.FIELD_LOG, message);
+        sendBroadcast(intent);
+    }
+
+    private void doAnnotate() {
     }
 
     private void doTransferSamples() {
+        isTransferring = !isTransferring;
     }
 
-    private void doStopService() {
+    private void doDisableRecording() {
+        isRecording = false;
     }
 
-    private void doEnableSampling() {
+    private void doEnableRecording() {
+        isRecording = true;
     }
 
     @Override
@@ -69,6 +91,8 @@ public class ServiceSensorControl extends Service {
     @Override
     public void onCreate(){
         Log.i(LOG_TAG, "Creating ServiceSensorControl }");
+
+        if (true) return;
 
         // Start sensor thread
         new Thread(new SensorThread(this)).start();

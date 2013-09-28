@@ -18,13 +18,16 @@ public class IntentAPI {
      */
     public static final String GET_STATUS = "eu.liveandgov.sensorcollectorapi.intent.action.GET_STATUS";
     public static final String RETURN_STATUS = "eu.liveandgov.sensorcollectorapi.intent.return.STATUS";
+    public static final String FIELD_SAMPLING = "sampling";
+    public static final String FIELD_TRANSFERRING = "transferring";
+
 
     /**
      * Enable/Disable the collection of sensor samples.
      * Sensors can be configured in the class {@link SensorCollectionOptions}
      */
-    public static final String SAMPLING_ENABLE = "eu.liveandgov.sensorcollectorapi.intent.action.SAMPLING_ENABLE";
-    public static final String SAMPLING_DISABLE = "eu.liveandgov.sensorcollectorapi.intent.action.SAMPLING_DISABLE";
+    public static final String RECORDING_ENABLE =  "eu.liveandgov.sensorcollectorapi.intent.action.RECORDING_ENABLE";
+    public static final String RECORDING_DISABLE = "eu.liveandgov.sensorcollectorapi.intent.action.RECORDING_DISABLE";
 
     /**
      * Triggers the data transfer to the server.
@@ -36,6 +39,7 @@ public class IntentAPI {
      * The annotation is contained in the "tag" field of the intent.
      */
     public static final String ANNOTATE = "eu.liveandgov.sensorcollectorapi.intent.action.ANNOTATE";
+    public static final String FIELD_ANNOTATION = "tag";
 
     /**
      * DEPRECATED: Send Log messages to the GUI
@@ -45,6 +49,7 @@ public class IntentAPI {
     public static final String LOGGING_ENABLE = "eu.liveandgov.sensorcollectorapi.intent.action.LOGGING_ENABLE";
     public static final String LOGGING_DISABLE = "eu.liveandgov.sensorcollectorapi.intent.action.LOGGING_DISABLE";
     public static final String RETURN_LOG = "eu.liveandgov.sensorcollectorapi.intent.return.LOG";
+    public static final String FIELD_LOG  = "message";
 
     /**
      * DEPRECATED: Start and Stop the service.
