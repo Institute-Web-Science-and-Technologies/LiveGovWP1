@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.ApplicationComponents;
+package eu.liveandgov.sensorcollectorv3;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -17,7 +17,6 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import eu.liveandgov.sensorcollectorv3.Configuration.IntentAPI;
-import eu.liveandgov.sensorcollectorv3.R;
 
 /**
  * Basic User Interface implementing the IntentAPI

@@ -1,6 +1,8 @@
-package eu.liveandgov.sensorcollectorv3.SensorProducers;
+package eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers;
 
 import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
@@ -15,7 +17,7 @@ import com.google.android.gms.location.LocationRequest;
 
 import org.jeromq.ZMQ;
 
-import eu.liveandgov.sensorcollectorv3.SensorParser;
+import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
 
 /**
  *
@@ -101,5 +103,15 @@ public class LocationProducer extends Producer implements
         String locString = SensorParser.parse(location);
         Log.d(LOG_TAG, locString);
         s.send(locString);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        // DUMMY
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+        // DUMMY
     }
 }

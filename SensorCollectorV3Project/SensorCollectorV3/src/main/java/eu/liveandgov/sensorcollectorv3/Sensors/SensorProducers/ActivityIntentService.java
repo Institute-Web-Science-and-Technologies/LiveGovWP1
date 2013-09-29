@@ -1,7 +1,6 @@
-package eu.liveandgov.sensorcollectorv3.SensorProducers;
+package eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers;
 
 import android.app.IntentService;
-import android.app.Notification;
 import android.content.Intent;
 import android.util.Log;
 

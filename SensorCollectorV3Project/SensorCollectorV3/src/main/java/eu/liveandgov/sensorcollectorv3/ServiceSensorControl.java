@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.ApplicationComponents;
+package eu.liveandgov.sensorcollectorv3;
 
 import android.app.Service;
 import android.content.Intent;
@@ -8,25 +8,45 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import org.jeromq.ZMQ;
+
 import eu.liveandgov.sensorcollectorv3.Configuration.IntentAPI;
-import eu.liveandgov.sensorcollectorv3.Persistor;
-import eu.liveandgov.sensorcollectorv3.SensorThread;
-import eu.liveandgov.sensorcollectorv3.TransferThread;
+import eu.liveandgov.sensorcollectorv3.Persistence.FilePersistor;
+import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
+import eu.liveandgov.sensorcollectorv3.Persistence.PersistorThread;
+import eu.liveandgov.sensorcollectorv3.Sensors.SensorSinkThread;
+import eu.liveandgov.sensorcollectorv3.Sensors.SensorThread;
+import eu.liveandgov.sensorcollectorv3.Transfer.TransferThread;
 
 public class ServiceSensorControl extends Service {
     static final String LOG_TAG =  "SCS";
 
-    private boolean isRecording = false;
-    private boolean isTransferring = false;
+    public static final String SENSOR_SOCKET = "tcp://127.0.0.1:6001";
+    public static final String TRANSFER_SOCKET = "tcp://127.0.0.1:6001";
+    private ZMQ.Socket sensorSocket;
+    private ZMQ.Socket transferSocket;
 
-    public static Persistor P;
-    public static TransferThread T;
+    public boolean isRecording = false;
+    public boolean isTransferring = false;
+
+
+    private static ServiceSensorControl instance;
+
+    public ServiceSensorControl() {
+        super();
+        instance = this;
+    }
 
     /**
      * Handles received intents
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            Log.i(LOG_TAG, "No intent received.");
+            return START_STICKY;
+        }
+
         String action = intent.getAction();
         Log.i(LOG_TAG, "Received intent with action " + action);
 
@@ -77,10 +97,12 @@ public class ServiceSensorControl extends Service {
 
     private void doDisableRecording() {
         isRecording = false;
+        SensorThread.getInstance().unregisterSensors();
     }
 
     private void doEnableRecording() {
         isRecording = true;
+        SensorThread.getInstance().registerSensors();
     }
 
     @Override
@@ -92,25 +114,31 @@ public class ServiceSensorControl extends Service {
     public void onCreate(){
         Log.i(LOG_TAG, "Creating ServiceSensorControl }");
 
-        if (true) return;
+        ZMQ.Context c = ZMQ.context();
 
         // Start sensor thread
-        new Thread(new SensorThread(this)).start();
+        SensorThread.setupInstance(this);
+        SensorThread.getInstance().start();
+
+        // Connect Sensor Producers to Sensor Sink
+        // SensorSinkThread SK = new SensorSinkThread();
+        // new Thread(SK).start();
+
+        // Persistor P = new FilePersistor(this);
+        // PersistorThread PT = new PersistorThread(P);
+        // new Thread(PT).start();
 
         // Start transfer thread
-        T = new TransferThread(P);
-        new Thread(T).start();
+        new Thread(new TransferThread(this)).start();
 
         // Start monitoring thread
-        Handler H = new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(Message inputMessage) {
-                // setText((String) inputMessage.getData().get("msg"));
-            }
-        };
-        // new Thread(new MonitorThread(H)).start();
+        // new Thread(new MonitorThread(messageHandler)).start();
 
         super.onCreate();
+    }
+
+    public ServiceSensorControl getInstance(){
+        return instance;
     }
 
 }

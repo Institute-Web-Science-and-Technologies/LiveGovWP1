@@ -1,8 +1,10 @@
-package eu.liveandgov.sensorcollectorv3.SensorProducers;
+package eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers;
 
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -68,5 +70,15 @@ public class ActivityProducer extends Producer
     public void setContext(Context context) {
         this.context = context;
         init();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        // DUMMY
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+        // DUMMY
     }
 }

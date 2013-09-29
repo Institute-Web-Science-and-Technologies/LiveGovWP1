@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.SensorProducers;
+package eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -7,12 +7,12 @@ import android.util.Log;
 
 import org.jeromq.ZMQ;
 
-import eu.liveandgov.sensorcollectorv3.SensorParser;
+import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
 
 /**
  * Created by hartmann on 9/15/13.
  */
-public class SensorProducer extends Producer implements SensorEventListener {
+public class SensorProducer extends Producer {
     private static final String LOG_TAG = "SP";
     ZMQ.Socket s;
 
@@ -25,7 +25,7 @@ public class SensorProducer extends Producer implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        // Log.i(LOG_TAG,"Recieved Sensor Sample " + SensorParser.parse(sensorEvent));
+        Log.i(LOG_TAG,"Recieved Sensor Sample " + SensorParser.parse(sensorEvent));
         // if (inSocket == null) setupConnection();
         s.send(SensorParser.parse(sensorEvent));
     }

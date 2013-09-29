@@ -1,8 +1,11 @@
-package eu.liveandgov.sensorcollectorv3;
+package eu.liveandgov.sensorcollectorv3.Persistence;
 
 import android.util.Log;
 
 import org.jeromq.ZMQ;
+
+import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
+import eu.liveandgov.sensorcollectorv3.Sensors.SensorSinkThread;
 
 /**
  * Created by hartmann on 9/15/13.

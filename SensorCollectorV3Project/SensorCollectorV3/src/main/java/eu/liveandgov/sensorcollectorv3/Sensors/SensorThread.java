@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3;
+package eu.liveandgov.sensorcollectorv3.Sensors;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -7,60 +7,76 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import eu.liveandgov.sensorcollectorv3.Configuration.SensorCollectionOptions;
-import eu.liveandgov.sensorcollectorv3.SensorProducers.ActivityProducer;
-import eu.liveandgov.sensorcollectorv3.SensorProducers.LocationProducer;
-import eu.liveandgov.sensorcollectorv3.SensorProducers.Producer;
-import eu.liveandgov.sensorcollectorv3.SensorProducers.SensorProducer;
+import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.ActivityProducer;
+import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.LocationProducer;
+import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.Producer;
+import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.SensorProducer;
 
 
 /**
+ * Singleton class that holds the sensor thread.
+ *
+ * This thread is responsible for:
+ * * recieving sensor callbacks
+ * * register / unregister individual sensors
+ *
  * Created by hartmann on 9/22/13.
  */
 public class SensorThread implements Runnable {
     private static final String LOG_TAG = "SensorThread";
-    private final SensorManager sensorManager;
-    private int nextPort = 5000;
+
+    private SensorManager sensorManager;
     private Context context;
+    private int nextPort = 5000;
+    private Set<Producer> activeSensors = new TreeSet<Producer>();
+    private Handler sensorHandler;
 
+    private Thread thread;
 
-    public SensorThread(Context context) {
+    /* Singleton Pattern */
+    private static SensorThread instance;
+
+    // private constructor - cannot be called outside of this class
+    private SensorThread(Context context){
         this.context = context;
         this.sensorManager = (SensorManager)context.getSystemService(context.SENSOR_SERVICE);
+        this.thread = new Thread(this);
     }
 
+    public static void setupInstance(Context context) {
+        instance = new SensorThread(context);
+    }
+
+    public static SensorThread getInstance(){
+        return instance;
+    }
+
+
+    // Runnable
     @Override
     public void run() {
-        // Setup EventLoop for sensor events.
+        Log.i(LOG_TAG, "Starting Sensorloop");
+        // Register SensorProducer
         Looper.prepare();
 
-        // Register SensorProducer
-        Log.i(LOG_TAG, "Starting SensorProducer");
+        // setup message handler
+        sensorHandler = new Handler();
 
-        List<Producer> activeSensors = registerSensors();
-
-        // Connect Sensor Producers to Sensor Sink
-        SensorSinkThread SK = new SensorSinkThread();
-        for (Producer p : activeSensors){
-            SK.subscribeTo(p);
-        }
-        new Thread(SK).start();
-
-        Persistor P = new FilePersistor(context);
-        PersistorThread PT = new PersistorThread(P);
-        PT.connect(SK);
-        new Thread(PT).start();
-
-        Log.i(LOG_TAG, "Sensor Looping");
+        // wait for messages
         Looper.loop();
     }
 
-    private List<Producer> registerSensors() {
-        List<Producer> activeSensors = new LinkedList<Producer>();
 
+    // Start Thread
+    public void start() {
+        thread.start();
+    }
+
+    public void registerSensors() {
         if (SensorCollectionOptions.REC_ACC)
             activeSensors.add( setupSensorProducer(Sensor.TYPE_ACCELEROMETER) );
         if (SensorCollectionOptions.REC_LIN_ACC)
@@ -73,11 +89,19 @@ public class SensorThread implements Runnable {
             activeSensors.add( setupActivityProducer() );
 
         // Filter Sensors that are not available
-        return removeNullValues(activeSensors);
+        activeSensors = removeNullValues(activeSensors);
     }
 
-    private List<Producer> removeNullValues(List<Producer> activeSensors) {
-        List<Producer> out = new LinkedList<Producer>();
+    public void unregisterSensors(){
+        for (Producer p : activeSensors){
+            sensorManager.unregisterListener(p);
+            activeSensors.remove(p);
+        }
+    }
+
+
+    private static Set<Producer> removeNullValues(Set<Producer> activeSensors) {
+        Set<Producer> out = new TreeSet<Producer>();
         for(Producer s: activeSensors){
             if (s != null) out.add(s);
         }
@@ -94,7 +118,7 @@ public class SensorThread implements Runnable {
     private LocationProducer setupLocationProducer() {
         Log.i(LOG_TAG, "Registering Location Producer.");
         LocationProducer LP = new LocationProducer(nextPort++, Looper.myLooper());
-        LP.setContext(this.context);
+        LP.setContext(context);
         return LP;
     }
 
@@ -105,9 +129,7 @@ public class SensorThread implements Runnable {
 
         SensorProducer SP = new SensorProducer(nextPort);
         nextPort += 1;
-        sensorManager.registerListener(SP, sensor, SensorManager.SENSOR_DELAY_GAME, new Handler());
+        sensorManager.registerListener(SP, sensor, SensorManager.SENSOR_DELAY_GAME, sensorHandler);
         return  SP;
     }
-
-
 }

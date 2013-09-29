@@ -1,31 +1,31 @@
-package eu.liveandgov.sensorcollectorv3;
+package eu.liveandgov.sensorcollectorv3.Transfer;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.jeromq.ZMQ;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+
+import eu.liveandgov.sensorcollectorv3.Persistence.FilePersistor;
+import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
 
 /**
  * Created by hartmann on 9/20/13.
  */
 public class TransferThread implements Runnable {
-
     private static final String LOG_TAG = "TT";
     private ZMQ.Socket outSocket;
     private Persistor persistor;
     private boolean flag = false;
 
-    public TransferThread(Persistor P){
+    public TransferThread(Context context){
         outSocket = ZMQ.context().socket(ZMQ.PUSH);
         outSocket.setHWM(1000); // do not buffer messages. Block directly
-        // outSocket.setSendTimeOut(1);
-        persistor = P;
+        persistor = new FilePersistor(context);
     }
 
     public void doTransfer() throws IOException {

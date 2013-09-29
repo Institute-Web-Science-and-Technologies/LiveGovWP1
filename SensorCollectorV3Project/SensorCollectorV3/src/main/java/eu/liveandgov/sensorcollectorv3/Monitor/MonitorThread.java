@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3;
+package eu.liveandgov.sensorcollectorv3.Monitor;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,8 +20,7 @@ public class MonitorThread implements Runnable {
         while(true) {
             String msg = String.format(
                     "Sample count: %d \n" +
-                            "File size: %d \n", sampleCount,
-                    MainActivity_OLD.P.getFile().length()
+                            "File size: %d \n", sampleCount, 1
             );
 
             Bundle msgB = new Bundle();

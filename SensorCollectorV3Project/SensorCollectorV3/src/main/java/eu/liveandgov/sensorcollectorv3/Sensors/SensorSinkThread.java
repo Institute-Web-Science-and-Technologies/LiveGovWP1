@@ -1,10 +1,11 @@
-package eu.liveandgov.sensorcollectorv3;
+package eu.liveandgov.sensorcollectorv3.Sensors;
 
 import android.util.Log;
 
 import org.jeromq.ZMQ;
 
-import eu.liveandgov.sensorcollectorv3.SensorProducers.Producer;
+import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.Producer;
+import eu.liveandgov.sensorcollectorv3.Monitor.MonitorThread;
 
 /**
  * Created by hartmann on 9/22/13.
@@ -39,7 +40,7 @@ public class SensorSinkThread implements Runnable {
         while (true) {
             msg = inSocket.recvStr();
             outSocket.send(msg);
-            Log.i(LOG_TAG,msg);
+            Log.i(LOG_TAG, msg);
             MonitorThread.sampleCount += 1;
         }
     }
