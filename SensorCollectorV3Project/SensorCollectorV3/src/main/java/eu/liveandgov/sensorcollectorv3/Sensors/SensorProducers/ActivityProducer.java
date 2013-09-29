@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -16,9 +17,9 @@ import com.google.android.gms.location.ActivityRecognitionClient;
 /**
  * Created by cehlen on 9/26/13.
  */
-public class ActivityProducer extends Producer
+public class ActivityProducer
         implements
-        GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
+        GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener, SensorEventListener {
 
     public static final String LOG_TAG = "AP";
     private Context context;
@@ -27,7 +28,6 @@ public class ActivityProducer extends Producer
 
 
     public ActivityProducer(Integer PORT) {
-        super(PORT);
     }
 
     private boolean playServicesAvailable() {

@@ -3,6 +3,7 @@ package eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
@@ -29,10 +30,10 @@ import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
  *
  * Created by hartmann on 9/15/13.
  */
-public class LocationProducer extends Producer implements
+public class LocationProducer implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener, SensorEventListener {
     private static final String LOG_TAG = "LOCP";
     ZMQ.Socket s;
     private LocationClient locationClient;
@@ -40,13 +41,8 @@ public class LocationProducer extends Producer implements
     private Context context;
     private Looper myLooper;
 
-    public LocationProducer(Integer PORT, Looper myLooper){
-        super(PORT);
+    public LocationProducer(Looper myLooper){
         this.myLooper = myLooper;
-        Log.i(LOG_TAG, "Setting up Socket " + getAddress());
-        s = ZMQ.context().socket(ZMQ.PUB);
-        s.bind(getAddress());
-
     }
 
     public void setContext(Context c) {

@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import eu.liveandgov.sensorcollectorv3.Monitor.MonitorThread;
+import eu.liveandgov.sensorcollectorv3.Sensors.GlobalContext;
 
 /**
  * Created by hartmann on 9/20/13.
@@ -20,8 +21,8 @@ public class FilePersistor implements Persistor {
     private File logFile;
     private BufferedWriter fileWriter;
 
-    public FilePersistor(Context context) {
-        logFile = new File(context.getFilesDir(), FILENAME);
+    public FilePersistor() {
+        logFile = new File(GlobalContext.context.getFilesDir(), FILENAME);
         openFileWriter();
     }
 
@@ -47,6 +48,15 @@ public class FilePersistor implements Persistor {
     }
 
     @Override
+    public void flush() {
+        try {
+            fileWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public synchronized void blockPush() {
         try {
             fileWriter.close();
@@ -61,7 +71,6 @@ public class FilePersistor implements Persistor {
         openFileWriter();
     }
 
-    @Override
     public File getFile() {
         return logFile;
     }
@@ -83,5 +92,10 @@ public class FilePersistor implements Persistor {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public long getSize() {
+        return logFile.length();
     }
 }

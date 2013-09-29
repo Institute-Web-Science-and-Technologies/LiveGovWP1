@@ -12,6 +12,7 @@ import java.io.IOException;
 
 import eu.liveandgov.sensorcollectorv3.Persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
+import eu.liveandgov.sensorcollectorv3.Persistence.PersistorThread;
 
 /**
  * Created by hartmann on 9/20/13.
@@ -22,17 +23,30 @@ public class TransferThread implements Runnable {
     private Persistor persistor;
     private boolean flag = false;
 
-    public TransferThread(Context context){
-        outSocket = ZMQ.context().socket(ZMQ.PUSH);
-        outSocket.setHWM(1000); // do not buffer messages. Block directly
-        persistor = new FilePersistor(context);
+    private Thread thread;
+    private static TransferThread instance;
+
+    /* Singleton Pattern */
+    private TransferThread(Persistor persistor){
+        this.outSocket = ZMQ.context().socket(ZMQ.PUSH);
+        this.outSocket.setHWM(1000); // do not buffer messages. Block directly
+        this.persistor = persistor;
+        this.thread = new Thread(this);
     }
+
+    public static void setup(){
+        instance = new TransferThread(PersistorThread.getInstance().getPersistor());
+    }
+
+    public static TransferThread getInstance(){
+        return instance;
+    }
+
 
     public void doTransfer() throws IOException {
         Log.i(LOG_TAG, "Starting Transfer");
         persistor.blockPush();
         File out = persistor.getFile();
-
         BufferedReader reader = new BufferedReader(new FileReader(out));
 
         String line;
@@ -99,5 +113,9 @@ public class TransferThread implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void start() {
+        thread.start();
     }
 }

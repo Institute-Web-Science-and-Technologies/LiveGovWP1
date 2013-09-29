@@ -34,7 +34,7 @@
 
         <service
             android:name=".ServiceSensorControl"
-            android:process=":new">
+            android:process="">
             <intent-filter>
                 <action android:name="eu.liveandgov.sensorcollectorapi.intent.action.GET_STATUS"/>
                 <action android:name="eu.liveandgov.sensorcollectorapi.intent.action.RECORDING_ENABLE"/>

@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.Selection;
+import android.text.Spannable;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -42,6 +44,7 @@ public class ActivitySensorCollector extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor_collector);
 
@@ -81,6 +84,18 @@ public class ActivitySensorCollector extends Activity {
 
         requestStatus();
 
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        unregisterListerners();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        registerListerners();
     }
 
     /* BUTTON HANDLER */
@@ -127,12 +142,28 @@ public class ActivitySensorCollector extends Activity {
             }
         };
 
+        registerListerners();
+    }
+
+    private void registerListerners(){
         registerReceiver(universalBroadcastReceiver, new IntentFilter(IntentAPI.RETURN_STATUS));
         registerReceiver(universalBroadcastReceiver, new IntentFilter(IntentAPI.RETURN_LOG));
     }
 
+    private void unregisterListerners(){
+        unregisterReceiver(universalBroadcastReceiver);
+    }
+
+
+
+
     private void updateLog(Intent intent) {
         logTextView.append(intent.getStringExtra(IntentAPI.FIELD_LOG) + "\n");
+
+        // scroll to end
+        logTextView.setSelected(true);
+        Spannable textDisplayed = (Spannable) logTextView.getText();
+        Selection.setSelection(textDisplayed, textDisplayed.length());
     }
 
     private void updateStatus(Intent intent) {
