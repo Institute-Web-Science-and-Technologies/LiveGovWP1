@@ -43,6 +43,7 @@ public class FilePersistor implements Persistor {
         try {
             fileWriter.write(s + "\n");
         } catch (IOException e) {
+            Log.i(LOG_TAG,"Cannot write file.");
             e.printStackTrace();
         }
     }
@@ -52,6 +53,7 @@ public class FilePersistor implements Persistor {
         try {
             fileWriter.flush();
         } catch (IOException e) {
+            Log.i(LOG_TAG,"Cannot flush file.");
             e.printStackTrace();
         }
     }

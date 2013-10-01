@@ -19,7 +19,7 @@ public interface Persistor {
     /**
      * FLush buffers.
      */
-    void flush() throws IOException;
+    void flush();
 
 
     /**

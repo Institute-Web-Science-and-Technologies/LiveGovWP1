@@ -41,7 +41,7 @@ public class MotionSensorHolder implements SensorHolder, SensorEventListener {
     // Sensor Listener
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        Log.i(LOG_TAG,"Recieved Sensor Sample " + SensorParser.parse(sensorEvent));
+        // Log.i(LOG_TAG,"Recieved Sensor Sample " + SensorParser.parse(sensorEvent));
         MessageQueue.push(SensorParser.parse(sensorEvent));
     }
 

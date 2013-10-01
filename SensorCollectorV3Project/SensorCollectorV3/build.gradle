@@ -23,5 +23,6 @@ android {
 }
 
 dependencies {
+    compile files('libs/httpmime-4.1-beta1.jar')
     compile files('libs/jeromq-0.2.0.jar')
 }

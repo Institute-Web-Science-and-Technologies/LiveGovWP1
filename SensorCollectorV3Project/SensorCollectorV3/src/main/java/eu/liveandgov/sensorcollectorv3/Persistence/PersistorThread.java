@@ -4,6 +4,11 @@ import android.util.Log;
 
 import org.jeromq.ZMQ;
 
+import java.io.File;
+import java.io.IOError;
+import java.io.IOException;
+
+import eu.liveandgov.sensorcollectorv3.Sensors.GlobalContext;
 import eu.liveandgov.sensorcollectorv3.Sensors.MessageQueue;
 
 /**
@@ -11,16 +16,18 @@ import eu.liveandgov.sensorcollectorv3.Sensors.MessageQueue;
  */
 public class PersistorThread implements Runnable {
     private static final String LOG_TAG = "P_ZMQ";
+    public static final String STAGE_FILENAME = "sensor.stage.ssf";
 
     private final Persistor persistor;
     private final Thread thread;
-
     private static PersistorThread instance;
+    private final File stageFile;
 
     /* Signleton Pattern */
     private PersistorThread(Persistor persistor){
         this.persistor = persistor;
         this.thread = new Thread(this);
+        this.stageFile = new File(GlobalContext.context.getFilesDir(), STAGE_FILENAME);
     }
 
     public static void setup(Persistor persistor) {
@@ -39,7 +46,6 @@ public class PersistorThread implements Runnable {
         String msg;
         while (true) {
             msg = MessageQueue.blockingPull();
-            Log.i("STORING", msg);
             persistor.push(msg);
         }
     }
@@ -54,5 +60,21 @@ public class PersistorThread implements Runnable {
 
     public Persistor getPersistor() {
         return persistor;
+    }
+
+    public File stageFile() {
+        if (stageFile.exists()) {
+            Log.i(LOG_TAG, "Found staged file.");
+            return stageFile;
+        } else {
+            Log.i(LOG_TAG, "Staging File.");
+            persistor.close();
+            boolean success = persistor.getFile().renameTo(stageFile);
+            if (!success) { Log.i(LOG_TAG, "Cannot stage file."); return null; }
+
+            persistor.reset();
+            persistor.unblockPush();
+        }
+        return stageFile;
     }
 }

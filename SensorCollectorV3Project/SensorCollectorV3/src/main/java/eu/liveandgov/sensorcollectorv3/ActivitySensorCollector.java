@@ -133,7 +133,7 @@ public class ActivitySensorCollector extends Activity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                Log.i(LOG_TAG,"Recieved Broadcast with action " + action);
+                // Log.i(LOG_TAG,"Recieved Broadcast with action " + action);
                 if (action.equals(IntentAPI.RETURN_STATUS)) {
                     updateStatus(intent);
                 } else if (action.equals(IntentAPI.RETURN_LOG)) {
@@ -153,9 +153,6 @@ public class ActivitySensorCollector extends Activity {
     private void unregisterListerners(){
         unregisterReceiver(universalBroadcastReceiver);
     }
-
-
-
 
     private void updateLog(Intent intent) {
         logTextView.append(intent.getStringExtra(IntentAPI.FIELD_LOG) + "\n");

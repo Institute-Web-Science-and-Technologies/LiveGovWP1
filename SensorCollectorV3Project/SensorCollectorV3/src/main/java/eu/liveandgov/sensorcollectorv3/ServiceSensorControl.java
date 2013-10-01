@@ -5,21 +5,23 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
-import java.io.IOException;
-
 import eu.liveandgov.sensorcollectorv3.Configuration.IntentAPI;
 import eu.liveandgov.sensorcollectorv3.Monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.Persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.Persistence.PersistorThread;
 import eu.liveandgov.sensorcollectorv3.Sensors.GlobalContext;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorThread;
-import eu.liveandgov.sensorcollectorv3.Transfer.TransferThread;
+import eu.liveandgov.sensorcollectorv3.Transfer.TransferThreadPost;
+import eu.liveandgov.sensorcollectorv3.Transfer.TransferThreadZMQ;
 
 public class ServiceSensorControl extends Service {
     static final String LOG_TAG =  "SCS";
 
     public boolean isRecording = false;
     public boolean isTransferring = false;
+
+    public ServiceSensorControl() {
+    }
 
     /* ANDROID LIFECYCLE */
     @Override
@@ -36,8 +38,8 @@ public class ServiceSensorControl extends Service {
         PersistorThread.getInstance().start();
 
         // Start transfer thread
-        TransferThread.setup();
-        TransferThread.getInstance().start();
+        TransferThreadZMQ.setup();
+        TransferThreadZMQ.getInstance().start();
 
         // Start monitoring thread
         MonitorThread.getInstance().start();
@@ -92,8 +94,8 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doTransferSamples() {
-        TransferThread.getInstance().trigger();
-        isTransferring = !isTransferring;
+        TransferThreadPost.getInstance().doTransfer();
+        isTransferring = true;
     }
 
     private void doDisableRecording() {
@@ -107,6 +109,8 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doSendStatus() {
+        isTransferring = TransferThreadPost.getInstance().isTransferring();
+
         Intent intent = new Intent(IntentAPI.RETURN_STATUS);
         intent.putExtra(IntentAPI.FIELD_SAMPLING, isRecording);
         intent.putExtra(IntentAPI.FIELD_TRANSFERRING, isTransferring);

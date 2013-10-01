@@ -1,6 +1,5 @@
 package eu.liveandgov.sensorcollectorv3.Transfer;
 
-import android.content.Context;
 import android.util.Log;
 
 import org.jeromq.ZMQ;
@@ -10,24 +9,23 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import eu.liveandgov.sensorcollectorv3.Persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
 import eu.liveandgov.sensorcollectorv3.Persistence.PersistorThread;
 
 /**
  * Created by hartmann on 9/20/13.
  */
-public class TransferThread implements Runnable {
+public class TransferThreadZMQ implements Runnable {
     private static final String LOG_TAG = "TT";
     private ZMQ.Socket outSocket;
     private Persistor persistor;
     private boolean flag = false;
 
     private Thread thread;
-    private static TransferThread instance;
+    private static TransferThreadZMQ instance;
 
     /* Singleton Pattern */
-    private TransferThread(Persistor persistor){
+    private TransferThreadZMQ(Persistor persistor){
         this.outSocket = ZMQ.context().socket(ZMQ.PUSH);
         this.outSocket.setHWM(1000); // do not buffer messages. Block directly
         this.persistor = persistor;
@@ -35,10 +33,10 @@ public class TransferThread implements Runnable {
     }
 
     public static void setup(){
-        instance = new TransferThread(PersistorThread.getInstance().getPersistor());
+        instance = new TransferThreadZMQ(PersistorThread.getInstance().getPersistor());
     }
 
-    public static TransferThread getInstance(){
+    public static TransferThreadZMQ getInstance(){
         return instance;
     }
 
