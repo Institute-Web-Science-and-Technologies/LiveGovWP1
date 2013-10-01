@@ -18,6 +18,8 @@ import com.google.android.gms.location.LocationRequest;
 
 import org.jeromq.ZMQ;
 
+import eu.liveandgov.sensorcollectorv3.Sensors.GlobalContext;
+import eu.liveandgov.sensorcollectorv3.Sensors.MessageQueue;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
 
 /**
@@ -30,84 +32,91 @@ import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
  *
  * Created by hartmann on 9/15/13.
  */
-public class LocationProducer implements
+public class LocationHolder implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener,
-        LocationListener, SensorEventListener {
+        LocationListener, SensorHolder {
+    /*
+    * Change these if you want to change the interval
+    */
+    private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
+    private static final int UPDATE_INTERVAL_IN_SECONDS = 5;
+
+    private static final int MILISECONDS_PER_SECOND = 1000;
+    private static final long UPDATE_INTERVAL = UPDATE_INTERVAL_IN_SECONDS * MILISECONDS_PER_SECOND;
+    private static final long FASTETST_INTERVAL = FASTEST_INTERVAL_IN_SECONDS * MILISECONDS_PER_SECOND;
+
     private static final String LOG_TAG = "LOCP";
-    ZMQ.Socket s;
     private LocationClient locationClient;
     private LocationRequest locationRequest;
-    private Context context;
     private Looper myLooper;
+    private boolean available = false;
+    private boolean connected = false;
+    private boolean startImmediate = false;
 
-    public LocationProducer(Looper myLooper){
+    public LocationHolder(Looper myLooper){
         this.myLooper = myLooper;
-    }
-
-    public void setContext(Context c) {
-        context = c;
         init();
     }
 
     private void init() {
-        locationClient = new LocationClient(this.context, this, this);
+        locationClient = new LocationClient(GlobalContext.context, this, this);
         locationClient.connect();
         locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(5000);
-        locationRequest.setFastestInterval(1000);
+        locationRequest.setInterval(UPDATE_INTERVAL);
+        locationRequest.setFastestInterval(FASTETST_INTERVAL);
 
         // Google Play Services
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.context);
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(GlobalContext.context);
         if(ConnectionResult.SUCCESS == resultCode) {
+            available = true;
             Log.d(LOG_TAG, "Google Play Services available.");
         } else {
+            available = false;
             Log.d(LOG_TAG, "Google Play Services NOT available.");
         }
     }
 
-    //@Override
-    //public void onSensorChanged(SensorEvent sensorEvent) {
-        // Log.i(LOG_TAG,"Recieved Sensor Sample " + SensorParser.parse(sensorEvent));
-        // if (inSocket == null) setupConnection();
-        // s.send(sensorParser.parse(sensorEvent));
-    //}
-
     @Override
     public void onConnected(Bundle bundle) {
-        Log.d(LOG_TAG, "onConnected");
-        locationClient.requestLocationUpdates(locationRequest, this, myLooper);
+        connected = true;
+        if(startImmediate) {
+            locationClient.requestLocationUpdates(locationRequest, this, myLooper);
+        }
     }
 
     @Override
     public void onDisconnected() {
         Log.d(LOG_TAG, "onDisconnected");
+        connected = false;
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.d(LOG_TAG, "Connection failed!");
-        Log.d(LOG_TAG, "onConnectionFailed");
+        available = false;
+        connected = false;
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        //String msg = "Updated Location: " +
-        //        Double.toString(location.getLatitude()) + ", " +
-        //        Double.toString(location.getLongitude());
         String locString = SensorParser.parse(location);
         Log.d(LOG_TAG, locString);
-        s.send(locString);
+        MessageQueue.push(locString);
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
-        // DUMMY
+    public void startRecording() {
+        if(available && connected) {
+            locationClient.requestLocationUpdates(locationRequest, this, myLooper);
+        } else {
+            startImmediate = true;
+        }
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-        // DUMMY
+    public void stopRecording() {
+        locationClient.removeLocationUpdates(this);
+        startImmediate = false;
     }
 }
