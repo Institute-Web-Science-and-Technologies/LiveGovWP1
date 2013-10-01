@@ -66,11 +66,11 @@ public class ActivitySensorCollector extends Activity {
 
         // Setup Annotation Text
         annotationText = (EditText) findViewById(R.id.annotationText);
-        annotationText.setEnabled(false);
+        annotationText.setEnabled(true);
 
         // Setup Send Button
         sendButton = (Button) findViewById(R.id.sendButton);
-        sendButton.setEnabled(false);
+        sendButton.setEnabled(true);
 
         // Setup Log Text View
         logTextView = (TextView) findViewById(R.id.logTextView);
@@ -89,13 +89,13 @@ public class ActivitySensorCollector extends Activity {
     @Override
     public void onPause(){
         super.onPause();
-        unregisterListerners();
+        unregisterListeners();
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        registerListerners();
+        registerListeners();
     }
 
     /* BUTTON HANDLER */
@@ -121,7 +121,7 @@ public class ActivitySensorCollector extends Activity {
     public void onSendButtonClick(View view) {
         Intent intent = new Intent(this, ServiceSensorControl.class);
         intent.setAction(IntentAPI.ANNOTATE);
-        intent.putExtra("tag", "My first annotation");
+        intent.putExtra(IntentAPI.FIELD_ANNOTATION, annotationText.getText().toString());
         startService(intent);
     }
 
@@ -142,15 +142,15 @@ public class ActivitySensorCollector extends Activity {
             }
         };
 
-        registerListerners();
+        registerListeners();
     }
 
-    private void registerListerners(){
+    private void registerListeners(){
         registerReceiver(universalBroadcastReceiver, new IntentFilter(IntentAPI.RETURN_STATUS));
         registerReceiver(universalBroadcastReceiver, new IntentFilter(IntentAPI.RETURN_LOG));
     }
 
-    private void unregisterListerners(){
+    private void unregisterListeners(){
         unregisterReceiver(universalBroadcastReceiver);
     }
 

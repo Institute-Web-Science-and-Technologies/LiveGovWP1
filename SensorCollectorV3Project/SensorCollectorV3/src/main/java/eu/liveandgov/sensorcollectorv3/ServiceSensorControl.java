@@ -12,6 +12,8 @@ import eu.liveandgov.sensorcollectorv3.Monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.Persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.Persistence.PersistorThread;
 import eu.liveandgov.sensorcollectorv3.Sensors.GlobalContext;
+import eu.liveandgov.sensorcollectorv3.Sensors.MessageQueue;
+import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorThread;
 import eu.liveandgov.sensorcollectorv3.Transfer.TransferThread;
 
@@ -23,7 +25,7 @@ public class ServiceSensorControl extends Service {
 
     /* ANDROID LIFECYCLE */
     @Override
-    public void onCreate(){
+    public void onCreate() {
         Log.i(LOG_TAG, "Creating ServiceSensorControl }");
 
         // Setup static variables
@@ -78,7 +80,7 @@ public class ServiceSensorControl extends Service {
             doTransferSamples();
             doSendStatus();
         } else if (action.equals(IntentAPI.ANNOTATE)) {
-            doAnnotate();
+            doAnnotate(intent.getStringExtra(IntentAPI.FIELD_ANNOTATION));
         } else if (action.equals(IntentAPI.GET_STATUS)) {
             doSendStatus();
         } else {
@@ -88,7 +90,9 @@ public class ServiceSensorControl extends Service {
         return START_STICKY;
     }
 
-    private void doAnnotate() {
+    private void doAnnotate(String tag) {
+        String msg = SensorParser.parse(tag);
+        MessageQueue.push(msg);
     }
 
     private void doTransferSamples() {

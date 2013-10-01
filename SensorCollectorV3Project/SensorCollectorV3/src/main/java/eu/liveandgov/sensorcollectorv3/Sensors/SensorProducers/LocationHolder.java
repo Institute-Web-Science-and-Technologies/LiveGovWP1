@@ -107,7 +107,10 @@ public class LocationHolder implements
 
     @Override
     public void startRecording() {
-        if(available && connected) {
+        if(!available) {
+            return;
+        }
+        if(connected) {
             locationClient.requestLocationUpdates(locationRequest, this, myLooper);
         } else {
             startImmediate = true;
@@ -116,6 +119,9 @@ public class LocationHolder implements
 
     @Override
     public void stopRecording() {
+        if(!available) {
+            return;
+        }
         locationClient.removeLocationUpdates(this);
         startImmediate = false;
     }

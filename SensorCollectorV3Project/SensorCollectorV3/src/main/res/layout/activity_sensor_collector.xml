@@ -78,7 +78,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/sendButton"
-                android:ems="10" >
+                android:ems="10"
+                android:editable="true"
+                android:clickable="true"
+                android:enabled="true"
+                android:focusable="true">
             </EditText>
 
             <Button

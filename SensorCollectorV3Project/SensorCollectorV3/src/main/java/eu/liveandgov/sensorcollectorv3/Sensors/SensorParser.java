@@ -43,6 +43,10 @@ public class SensorParser {
                         detectedActivity.getConfidence()});
     }
 
+    public static String parse(String tag) {
+        return String.format("%s,%d,%s,\"%s\"", "TAG", System.currentTimeMillis(), id, tag);
+    }
+
     /**
      * Writes sensor values in SSF format. (cf. project Wiki)
      * @param type of Sensor
