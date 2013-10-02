@@ -155,12 +155,12 @@ public class ActivitySensorCollector extends Activity {
     }
 
     private void updateLog(Intent intent) {
-        logTextView.append(intent.getStringExtra(IntentAPI.FIELD_LOG) + "\n");
+        logTextView.setText(intent.getStringExtra(IntentAPI.FIELD_LOG) + "\n");
 
         // scroll to end
-        logTextView.setSelected(true);
-        Spannable textDisplayed = (Spannable) logTextView.getText();
-        Selection.setSelection(textDisplayed, textDisplayed.length());
+//        logTextView.setSelected(true);
+//        Spannable textDisplayed = (Spannable) logTextView.getText();
+//        Selection.setSelection(textDisplayed, textDisplayed.length());
     }
 
     private void updateStatus(Intent intent) {

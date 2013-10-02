@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.Sensors;
+package eu.liveandgov.sensorcollectorv3.SensorQueue;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -9,36 +9,25 @@ import eu.liveandgov.sensorcollectorv3.Monitor.MonitorThread;
 /**
  * Created by hartmann on 9/29/13.
  */
-public class MessageQueue {
-
+public class LinkedSensorQueue implements SensorQueue {
     public  static final int capacity = 1000;
-    private static int size = 0;
-    public  static final Queue<String> Q = new ConcurrentLinkedQueue<String>();
 
-    /**
-     * Push message m to the queue.
-     * Drop m if the queue is full.
-     *
-     * @param m
-     */
-    public static void push(String m){
+    private int size = 0;
+    public  final Queue<String> Q = new ConcurrentLinkedQueue<String>();
+
+    public void push(String m){
         if (size++ < capacity) {
             Q.add(m);
             MonitorThread.sampleCount++;
         }
     }
 
-    /**
-     * Pull message from queue.
-     * Return null if queue is empty.
-     * @return m
-     */
-    public static String pull(){
+    public String pull(){
         size = Math.max(size - 1, 0);
         return Q.poll();
     }
 
-    public static String blockingPull(){
+    public String blockingPull(){
         String m;
 
         while (true) {
@@ -55,7 +44,12 @@ public class MessageQueue {
         return m;
     }
 
-    public static int getSize() {
+    public int size() {
         return size;
+    }
+
+    @Override
+    public String getStatus() {
+        return "Queue Size: " + Q.size();
     }
 }

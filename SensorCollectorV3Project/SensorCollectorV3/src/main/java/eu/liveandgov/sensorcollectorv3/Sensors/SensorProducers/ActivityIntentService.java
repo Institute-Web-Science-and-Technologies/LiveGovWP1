@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
-import com.google.android.gms.location.DetectedActivity;
 
-import eu.liveandgov.sensorcollectorv3.Sensors.MessageQueue;
+import eu.liveandgov.sensorcollectorv3.GlobalContext;
+import eu.liveandgov.sensorcollectorv3.SensorQueue.SensorQueue;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
 
 /**
@@ -15,13 +15,17 @@ import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
  */
 public class ActivityIntentService extends IntentService {
 
+    private final SensorQueue sensorQueue;
+
     public ActivityIntentService() {
         super("ActivityIntentService");
+        this.sensorQueue = GlobalContext.context.sensorQueue;
     }
 
     public ActivityIntentService(String name) {
         super(name);
         Log.d("AIS", "Constructor");
+        this.sensorQueue = GlobalContext.context.sensorQueue;
     }
 
     @Override
@@ -29,7 +33,7 @@ public class ActivityIntentService extends IntentService {
         Log.d("AIS", "HandleIntent");
         if(ActivityRecognitionResult.hasResult(intent)) {
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
-            MessageQueue.push(SensorParser.parse(result));
+            sensorQueue.push(SensorParser.parse(result));
         }
     }
 
