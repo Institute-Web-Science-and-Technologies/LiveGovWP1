@@ -44,5 +44,5 @@ public class SensorCollectionOptions {
      * Record Activity
      * using the new Google Activity API
      */
-    public static final boolean REC_GOOGLE_API = true;
+    public static final boolean REC_G_ACT = true;
 }

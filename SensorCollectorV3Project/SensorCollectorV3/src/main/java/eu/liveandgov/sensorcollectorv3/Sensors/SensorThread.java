@@ -8,12 +8,12 @@ import android.util.Log;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import eu.liveandgov.sensorcollectorv3.Configuration.SensorCollectionOptions;
+import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.ActivityHolder;
+import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.LocationHolder;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.MotionSensorHolder;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.SensorHolder;
-import eu.liveandgov.sensorcollectorv3.ServiceSensorControl;
 
 
 /**
@@ -75,6 +75,8 @@ public class SensorThread implements Runnable {
         if (SensorCollectionOptions.REC_ACC)     setupMotionSensor(Sensor.TYPE_ACCELEROMETER);
         if (SensorCollectionOptions.REC_LIN_ACC) setupMotionSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         if (SensorCollectionOptions.REC_GRAV)    setupMotionSensor(Sensor.TYPE_GRAVITY );
+        if (SensorCollectionOptions.REC_GPS)     setupLocationUpdate();
+        if (SensorCollectionOptions.REC_G_ACT)   setupActivityUpdate();
 //        if (SensorCollectionOptions.REC_GPS)     activeSensors.add( setupLocationProducer() );
 //        if (SensorCollectionOptions.REC_GOOGLE_API)
 //        activeSensors.add( setupActivityProducer() );
@@ -103,6 +105,18 @@ public class SensorThread implements Runnable {
 
         Log.i(LOG_TAG, "Registering Listener for " + sensor.getName());
         MotionSensorHolder holder = new MotionSensorHolder(sensor,  SensorManager.SENSOR_DELAY_GAME, sensorHandler);
+        activeSensors.add(holder);
+    }
+
+    private void setupLocationUpdate() {
+        Log.i(LOG_TAG, "Registering Listener for GPS");
+        LocationHolder holder = new LocationHolder(Looper.myLooper());
+        activeSensors.add(holder);
+    }
+
+    private void setupActivityUpdate() {
+        Log.i(LOG_TAG, "Registering Listener for ACTIVITY");
+        ActivityHolder holder = new ActivityHolder();
         activeSensors.add(holder);
     }
 }

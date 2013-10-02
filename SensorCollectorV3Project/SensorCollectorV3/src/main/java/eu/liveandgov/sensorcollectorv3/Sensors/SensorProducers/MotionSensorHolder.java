@@ -55,5 +55,4 @@ public class MotionSensorHolder implements SensorHolder, SensorEventListener {
     public String toString(){
         return "SensorHolder for " + sensor.getName();
     }
-
 }

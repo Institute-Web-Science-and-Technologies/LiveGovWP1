@@ -7,13 +7,21 @@ import android.util.Log;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 
+import eu.liveandgov.sensorcollectorv3.Sensors.MessageQueue;
+import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
+
 /**
  * Created by cehlen on 9/26/13.
  */
 public class ActivityIntentService extends IntentService {
 
+    public ActivityIntentService() {
+        super("ActivityIntentService");
+    }
+
     public ActivityIntentService(String name) {
         super(name);
+        Log.d("AIS", "Constructor");
     }
 
     @Override
@@ -21,11 +29,9 @@ public class ActivityIntentService extends IntentService {
         Log.d("AIS", "HandleIntent");
         if(ActivityRecognitionResult.hasResult(intent)) {
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
-            DetectedActivity mostProbableActiviy = result.getMostProbableActivity();
-            int confidence = mostProbableActiviy.getConfidence();
-            int activityType = mostProbableActiviy.getType();
-            Log.i("ACTIVITY", "Activity : " + activityType + " Confidence: " + confidence);
+            MessageQueue.push(SensorParser.parse(result));
         }
     }
+
 
 }
