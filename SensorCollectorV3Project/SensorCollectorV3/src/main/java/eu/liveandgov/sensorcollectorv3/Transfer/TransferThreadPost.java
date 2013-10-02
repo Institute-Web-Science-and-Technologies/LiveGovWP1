@@ -93,5 +93,10 @@ public class TransferThreadPost implements Runnable, TransferManager {
         }
         return true;
     }
+
+    @Override
+    public String getStatus() {
+        return isTransferring() ? "transferring" : "stopped";
+    }
 }
 

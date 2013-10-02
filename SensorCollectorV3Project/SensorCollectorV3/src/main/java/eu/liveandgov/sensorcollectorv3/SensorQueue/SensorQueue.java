@@ -1,9 +1,11 @@
 package eu.liveandgov.sensorcollectorv3.SensorQueue;
 
+import eu.liveandgov.sensorcollectorv3.Monitor.Monitorable;
+
 /**
  * Created by hartmann on 10/2/13.
  */
-public interface SensorQueue {
+public interface SensorQueue extends Monitorable {
     /**
      * Push message m to the queue.
      * Drop m if the queue is full.
@@ -28,9 +30,4 @@ public interface SensorQueue {
      */
     String blockingPull();
 
-
-    /**
-     * Get number of queued items.
-     */
-    int size();
 }

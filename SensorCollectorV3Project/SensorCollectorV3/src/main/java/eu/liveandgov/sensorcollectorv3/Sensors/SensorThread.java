@@ -20,8 +20,7 @@ import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.SensorHolder;
  * Singleton class that holds the sensor thread.
  *
  * This thread is responsible for:
- * * recieving sensor callbacks
- * * startRecording / unregister individual sensors
+ * startRecording / unregister individual sensors
  *
  * Created by hartmann on 9/22/13.
  */
@@ -33,21 +32,38 @@ public class SensorThread implements Runnable {
     private SensorQueue sensorQueue;
     private Thread thread;
 
-    /* Singleton Pattern */
+    /* Private Singleton */
     private static SensorThread instance;
 
-    // private constructor - cannot be called outside of this class
     private SensorThread(SensorQueue sensorQueue){
         this.sensorQueue = sensorQueue;
         this.thread = new Thread(this);
     }
 
-    public static SensorThread getInstance(){
-        return instance;
-    }
-
+    /*  Static Methods */
     public static void setup(SensorQueue sensorQueue){
         instance = new SensorThread(sensorQueue);
+    }
+
+    /**
+     * Starts SensorThread
+     * Configuration obtained from {@link .Configuration.SensorCollectionOptions}
+     * Need to call setup first.
+     */
+    public static void start() {
+        instance.thread.start();
+    }
+
+    public static void stopAllRecording(){
+        for (SensorHolder p : instance.activeSensors){
+            p.stopRecording();
+        }
+    }
+
+    public static void startAllRecording(){
+        for (SensorHolder p : instance.activeSensors){
+            p.startRecording();
+        }
     }
 
 
@@ -68,12 +84,7 @@ public class SensorThread implements Runnable {
     }
 
 
-    // Start Thread
-    public void start() {
-        thread.start();
-    }
-
-    public void setupSensorHolder() {
+    private void setupSensorHolder() {
         if (SensorCollectionOptions.REC_ACC)     setupMotionSensor(Sensor.TYPE_ACCELEROMETER);
         if (SensorCollectionOptions.REC_LIN_ACC) setupMotionSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         if (SensorCollectionOptions.REC_GRAV)    setupMotionSensor(Sensor.TYPE_GRAVITY );
@@ -82,17 +93,6 @@ public class SensorThread implements Runnable {
 //        activeSensors.add( setupActivityProducer() );
     }
 
-    public void stopAllRecording(){
-        for (SensorHolder p : activeSensors){
-            p.stopRecording();
-        }
-    }
-
-    public void startAllRecording(){
-        for (SensorHolder p : activeSensors){
-            p.startRecording();
-        }
-    }
 
     private void setupMotionSensor(int sensorType){
         Sensor sensor = GlobalContext.sensorManager.getDefaultSensor(sensorType);

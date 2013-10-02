@@ -25,6 +25,22 @@ public class FilePersistor implements Persistor {
         openFileWriter();
     }
 
+    @Override
+    public synchronized void push(String s){
+        if (fileWriter == null) {
+            Log.i(LOG_TAG, "Blocked write event");
+            return;
+        }
+
+        try {
+            fileWriter.write(s + "\n");
+        } catch (IOException e) {
+            Log.i(LOG_TAG,"Cannot write file.");
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public boolean exportSamples(File stageFile) {
         boolean del = false;
         boolean ren = false;
@@ -45,28 +61,16 @@ public class FilePersistor implements Persistor {
         return ren && del;
     }
 
-    public long size() {
-        return logFile.length();
+    @Override
+    public String getStatus() {
+        return "File size: " + logFile.length();
     }
+
 
     private void openFileWriter() {
         try {
             fileWriter = new BufferedWriter(new FileWriter(logFile,true));
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public synchronized void push(String s){
-        if (fileWriter == null) {
-            Log.i(LOG_TAG, "Blocked write event");
-            return;
-        }
-
-        try {
-            fileWriter.write(s + "\n");
-        } catch (IOException e) {
-            Log.i(LOG_TAG,"Cannot write file.");
             e.printStackTrace();
         }
     }
@@ -114,4 +118,5 @@ public class FilePersistor implements Persistor {
             e.printStackTrace();
         }
     }
+
 }

@@ -47,4 +47,9 @@ public class LinkedSensorQueue implements SensorQueue {
     public int size() {
         return size;
     }
+
+    @Override
+    public String getStatus() {
+        return "Queue Size: " + Q.size();
+    }
 }
