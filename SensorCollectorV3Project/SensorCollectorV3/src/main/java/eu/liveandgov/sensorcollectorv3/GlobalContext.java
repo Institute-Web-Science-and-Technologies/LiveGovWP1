@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.Sensors;
+package eu.liveandgov.sensorcollectorv3;
 
 import android.content.Context;
 import android.content.Intent;

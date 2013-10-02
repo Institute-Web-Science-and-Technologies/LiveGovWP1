@@ -13,7 +13,8 @@ import java.io.File;
 import java.io.IOException;
 
 import eu.liveandgov.sensorcollectorv3.Configuration.SensorCollectionOptions;
-import eu.liveandgov.sensorcollectorv3.Persistence.PersistorThread;
+import eu.liveandgov.sensorcollectorv3.Connector.ConnectorThread;
+import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
 
 /**
  * Transfer sensor.log file to server.
@@ -24,27 +25,26 @@ import eu.liveandgov.sensorcollectorv3.Persistence.PersistorThread;
  *
  * Created by hartmann on 8/30/13.
  */
-public class TransferThreadPost implements Runnable {
+public class TransferThreadPost implements Runnable, TransferManager {
     public static String LOG_TAG = "TransferThreadPost";
 
     private Thread thread;
 
     private static final String uploadUrl = SensorCollectionOptions.UPLOAD_URL;
 
-    private static TransferThreadPost instance;
+    private Persistor persistor;
 
-    /* Singleton Pattern */
-    private TransferThreadPost() {
+    private File stageFile;
+
+    public TransferThreadPost(Persistor persistor, File stageFile) {
+        this.stageFile = stageFile;
+        this.persistor = persistor;
         thread = new Thread(this);
     };
 
-    public static TransferThreadPost getInstance(){
-        if (instance == null) instance = new TransferThreadPost();
-        return instance;
-    }
 
-    public static void doTransfer(){
-        TransferThreadPost.getInstance().start();
+    public void doTransfer(){
+        start();
     }
 
     public boolean isTransferring() {
@@ -61,8 +61,8 @@ public class TransferThreadPost implements Runnable {
         boolean success;
 
         // get stage file
-        File stageFile = PersistorThread.getInstance().stageFile();
-        if (stageFile == null) { Log.i(LOG_TAG,"Staging failed");  return; }
+        success = persistor.exportSamples(stageFile);
+        if (!success) { Log.i(LOG_TAG,"Staging failed");  return; }
 
         // transfer staged File
         success = transferFile(stageFile);

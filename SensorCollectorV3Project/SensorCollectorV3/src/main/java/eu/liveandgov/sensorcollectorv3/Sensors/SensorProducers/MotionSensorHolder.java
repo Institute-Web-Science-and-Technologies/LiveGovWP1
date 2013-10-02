@@ -4,10 +4,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.os.Handler;
-import android.util.Log;
 
-import eu.liveandgov.sensorcollectorv3.Sensors.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.Sensors.MessageQueue;
+import eu.liveandgov.sensorcollectorv3.GlobalContext;
+import eu.liveandgov.sensorcollectorv3.SensorQueue.LinkedSensorQueue;
+import eu.liveandgov.sensorcollectorv3.SensorQueue.SensorQueue;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
 
 /**
@@ -19,11 +19,13 @@ public class MotionSensorHolder implements SensorHolder, SensorEventListener {
     private final Sensor  sensor;
     private final int     delay;
     private final Handler handler;
+    private final SensorQueue sensorQueue;
 
-    public MotionSensorHolder(Sensor sensor, int delay, Handler handler) {
+    public MotionSensorHolder(SensorQueue sensorQueue, Sensor sensor, int delay, Handler handler) {
         this.sensor = sensor;
         this.delay = delay;
         this.handler = handler;
+        this.sensorQueue = sensorQueue;
     }
 
     // SensorHolder
@@ -42,7 +44,7 @@ public class MotionSensorHolder implements SensorHolder, SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         // Log.i(LOG_TAG,"Recieved Sensor Sample " + SensorParser.parse(sensorEvent));
-        MessageQueue.push(SensorParser.parse(sensorEvent));
+        sensorQueue.push(SensorParser.parse(sensorEvent));
     }
 
     @Override

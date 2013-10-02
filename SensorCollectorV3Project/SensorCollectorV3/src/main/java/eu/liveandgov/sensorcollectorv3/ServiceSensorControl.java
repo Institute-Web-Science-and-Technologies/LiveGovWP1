@@ -5,23 +5,34 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.io.File;
+
 import eu.liveandgov.sensorcollectorv3.Configuration.IntentAPI;
 import eu.liveandgov.sensorcollectorv3.Monitor.MonitorThread;
+import eu.liveandgov.sensorcollectorv3.Connector.ConnectorThread;
 import eu.liveandgov.sensorcollectorv3.Persistence.FilePersistor;
-import eu.liveandgov.sensorcollectorv3.Persistence.PersistorThread;
-import eu.liveandgov.sensorcollectorv3.Sensors.GlobalContext;
+import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
+import eu.liveandgov.sensorcollectorv3.SensorQueue.LinkedSensorQueue;
+import eu.liveandgov.sensorcollectorv3.SensorQueue.SensorQueue;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorThread;
+import eu.liveandgov.sensorcollectorv3.Transfer.TransferManager;
 import eu.liveandgov.sensorcollectorv3.Transfer.TransferThreadPost;
-import eu.liveandgov.sensorcollectorv3.Transfer.TransferThreadZMQ;
 
 public class ServiceSensorControl extends Service {
     static final String LOG_TAG =  "SCS";
+    public static final String STAGE_FILENAME = "sensor.stage.ssf";
+    public static final String SENSOR_FILENAME = "sensor.ssf";
 
     public boolean isRecording = false;
     public boolean isTransferring = false;
 
-    public ServiceSensorControl() {
-    }
+    public ServiceSensorControl() {}
+
+    // Communication Channels
+    SensorQueue sensorQueue;
+    Persistor   persistor;
+
+    TransferManager transferManager;
 
     /* ANDROID LIFECYCLE */
     @Override
@@ -31,17 +42,31 @@ public class ServiceSensorControl extends Service {
         // Setup static variables
         GlobalContext.set(this);
 
+        // setup communication Channels
+        persistor   = new FilePersistor(
+                new File(GlobalContext.context.getFilesDir(), SENSOR_FILENAME));
+
+        sensorQueue = new LinkedSensorQueue();
+
         // Start sensor thread
+        SensorThread.setup(sensorQueue);
         SensorThread.getInstance().start();
 
-        PersistorThread.setup(new FilePersistor());
-        PersistorThread.getInstance().start();
+        // Connect sensorQueue to Persistor
+        ConnectorThread.setup(sensorQueue, persistor);
+        ConnectorThread.getInstance().start();
+
+        // setup sensor manager
+        transferManager = new TransferThreadPost(persistor,
+                new File(GlobalContext.context.getFilesDir(), STAGE_FILENAME));
 
         // Start transfer thread
-        TransferThreadZMQ.setup();
-        TransferThreadZMQ.getInstance().start();
+        // TransferThreadZMQ.setup();
+        // TransferThreadZMQ.getInstance().start();
 
         // Start monitoring thread
+        // MonitorThread.addQueue(sensorQueue)
+        // MonitorThread.addPersistor(persistor)
         MonitorThread.getInstance().start();
 
         super.onCreate();
@@ -94,7 +119,7 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doTransferSamples() {
-        TransferThreadPost.getInstance().doTransfer();
+        transferManager.doTransfer();
         isTransferring = true;
     }
 

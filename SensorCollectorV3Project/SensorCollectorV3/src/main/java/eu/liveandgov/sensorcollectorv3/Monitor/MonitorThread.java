@@ -1,13 +1,8 @@
 package eu.liveandgov.sensorcollectorv3.Monitor;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-
-import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
-import eu.liveandgov.sensorcollectorv3.Persistence.PersistorThread;
-import eu.liveandgov.sensorcollectorv3.Sensors.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.Sensors.MessageQueue;
+import eu.liveandgov.sensorcollectorv3.Connector.ConnectorThread;
+import eu.liveandgov.sensorcollectorv3.GlobalContext;
+import eu.liveandgov.sensorcollectorv3.SensorQueue.LinkedSensorQueue;
 
 /**
  * Created by hartmann on 9/22/13.
@@ -46,8 +41,8 @@ public class MonitorThread implements Runnable {
 
     private String getLogMessage() {
         return "Sample count: " + sampleCount + "\n" +
-               "Queue size:   " + MessageQueue.getSize() + "\n" +
-               "File Size:    " + PersistorThread.getInstance().getSize() + "";
+               "Queue size:   " + LinkedSensorQueue.getSize() + "\n" +
+               "File Size:    " + ConnectorThread.getInstance().getSize() + "";
     }
 
     public void start() {

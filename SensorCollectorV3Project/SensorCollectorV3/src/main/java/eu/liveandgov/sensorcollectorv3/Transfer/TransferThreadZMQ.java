@@ -9,8 +9,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import eu.liveandgov.sensorcollectorv3.Connector.ConnectorThread;
 import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
-import eu.liveandgov.sensorcollectorv3.Persistence.PersistorThread;
 
 /**
  * Created by hartmann on 9/20/13.
@@ -33,7 +33,7 @@ public class TransferThreadZMQ implements Runnable {
     }
 
     public static void setup(){
-        instance = new TransferThreadZMQ(PersistorThread.getInstance().getPersistor());
+        instance = new TransferThreadZMQ(ConnectorThread.getInstance().getPersistor());
     }
 
     public static TransferThreadZMQ getInstance(){

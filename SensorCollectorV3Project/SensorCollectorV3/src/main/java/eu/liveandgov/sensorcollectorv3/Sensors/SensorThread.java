@@ -8,12 +8,12 @@ import android.util.Log;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import eu.liveandgov.sensorcollectorv3.Configuration.SensorCollectionOptions;
+import eu.liveandgov.sensorcollectorv3.GlobalContext;
+import eu.liveandgov.sensorcollectorv3.SensorQueue.SensorQueue;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.MotionSensorHolder;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.SensorHolder;
-import eu.liveandgov.sensorcollectorv3.ServiceSensorControl;
 
 
 /**
@@ -30,22 +30,24 @@ public class SensorThread implements Runnable {
 
     private Set<SensorHolder> activeSensors = new HashSet<SensorHolder>();
     private Handler sensorHandler;
-
+    private SensorQueue sensorQueue;
     private Thread thread;
 
     /* Singleton Pattern */
     private static SensorThread instance;
 
     // private constructor - cannot be called outside of this class
-    private SensorThread(){
+    private SensorThread(SensorQueue sensorQueue){
+        this.sensorQueue = sensorQueue;
         this.thread = new Thread(this);
     }
 
     public static SensorThread getInstance(){
-        if (instance == null) {
-            instance = new SensorThread();
-        }
         return instance;
+    }
+
+    public static void setup(SensorQueue sensorQueue){
+        instance = new SensorThread(sensorQueue);
     }
 
 
@@ -102,7 +104,7 @@ public class SensorThread implements Runnable {
         }
 
         Log.i(LOG_TAG, "Registering Listener for " + sensor.getName());
-        MotionSensorHolder holder = new MotionSensorHolder(sensor,  SensorManager.SENSOR_DELAY_GAME, sensorHandler);
+        MotionSensorHolder holder = new MotionSensorHolder(sensorQueue, sensor,  SensorManager.SENSOR_DELAY_GAME, sensorHandler);
         activeSensors.add(holder);
     }
 }

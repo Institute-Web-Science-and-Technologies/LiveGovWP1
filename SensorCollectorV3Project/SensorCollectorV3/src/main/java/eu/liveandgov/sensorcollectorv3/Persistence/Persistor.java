@@ -15,26 +15,24 @@ public interface Persistor {
      */
     void push(String m);
 
+    /**
+     * Returns space used by persistence object on the SDCard in bytes.
+     * @return size
+     */
+    long size();
 
     /**
-     * FLush buffers.
+     * Flush all buffers and close file handlers.
+     * After this method is called all pushed messages will be dropped.
      */
-    void flush();
-
-
-    /**
-     * Drop all incoming messages
-     */
-    void blockPush();
-
-    /**
-     * Resume accepting incoming messages
-     */
-    void unblockPush();
-    void reset();
     void close();
 
-    long getSize();
-
-    File getFile();
+    /**
+     * Exports all stored samples into a given File in the ssf format.
+     *
+     * Implementations may return null in case, they do not want to export samples.
+     *
+     * @return successFlag
+     */
+    boolean exportSamples(File stageFile);
 }
