@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import eu.liveandgov.sensorcollectorv3.Configuration.SensorCollectionOptions;
+import eu.liveandgov.sensorcollectorv3.GlobalContext;
+import eu.liveandgov.sensorcollectorv3.SensorQueue.SensorQueue;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.ActivityHolder;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.LocationHolder;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.MotionSensorHolder;
@@ -20,8 +22,7 @@ import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.SensorHolder;
  * Singleton class that holds the sensor thread.
  *
  * This thread is responsible for:
- * * recieving sensor callbacks
- * * startRecording / unregister individual sensors
+ * startRecording / unregister individual sensors
  *
  * Created by hartmann on 9/22/13.
  */
@@ -30,22 +31,41 @@ public class SensorThread implements Runnable {
 
     private Set<SensorHolder> activeSensors = new HashSet<SensorHolder>();
     private Handler sensorHandler;
-
+    private SensorQueue sensorQueue;
     private Thread thread;
 
-    /* Singleton Pattern */
+    /* Private Singleton */
     private static SensorThread instance;
 
-    // private constructor - cannot be called outside of this class
-    private SensorThread(){
+    private SensorThread(SensorQueue sensorQueue){
+        this.sensorQueue = sensorQueue;
         this.thread = new Thread(this);
     }
 
-    public static SensorThread getInstance(){
-        if (instance == null) {
-            instance = new SensorThread();
+    /*  Static Methods */
+    public static void setup(SensorQueue sensorQueue){
+        instance = new SensorThread(sensorQueue);
+    }
+
+    /**
+     * Starts SensorThread
+     * Configuration obtained from {@link .Configuration.SensorCollectionOptions}
+     * Need to call setup first.
+     */
+    public static void start() {
+        instance.thread.start();
+    }
+
+    public static void stopAllRecording(){
+        for (SensorHolder p : instance.activeSensors){
+            p.stopRecording();
         }
-        return instance;
+    }
+
+    public static void startAllRecording(){
+        for (SensorHolder p : instance.activeSensors){
+            p.startRecording();
+        }
     }
 
 
@@ -66,33 +86,14 @@ public class SensorThread implements Runnable {
     }
 
 
-    // Start Thread
-    public void start() {
-        thread.start();
-    }
-
-    public void setupSensorHolder() {
+    private void setupSensorHolder() {
         if (SensorCollectionOptions.REC_ACC)     setupMotionSensor(Sensor.TYPE_ACCELEROMETER);
         if (SensorCollectionOptions.REC_LIN_ACC) setupMotionSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         if (SensorCollectionOptions.REC_GRAV)    setupMotionSensor(Sensor.TYPE_GRAVITY );
         if (SensorCollectionOptions.REC_GPS)     setupLocationUpdate();
         if (SensorCollectionOptions.REC_G_ACT)   setupActivityUpdate();
-//        if (SensorCollectionOptions.REC_GPS)     activeSensors.add( setupLocationProducer() );
-//        if (SensorCollectionOptions.REC_GOOGLE_API)
-//        activeSensors.add( setupActivityProducer() );
     }
 
-    public void stopAllRecording(){
-        for (SensorHolder p : activeSensors){
-            p.stopRecording();
-        }
-    }
-
-    public void startAllRecording(){
-        for (SensorHolder p : activeSensors){
-            p.startRecording();
-        }
-    }
 
     private void setupMotionSensor(int sensorType){
         Sensor sensor = GlobalContext.sensorManager.getDefaultSensor(sensorType);
@@ -104,13 +105,13 @@ public class SensorThread implements Runnable {
         }
 
         Log.i(LOG_TAG, "Registering Listener for " + sensor.getName());
-        MotionSensorHolder holder = new MotionSensorHolder(sensor,  SensorManager.SENSOR_DELAY_GAME, sensorHandler);
+        MotionSensorHolder holder = new MotionSensorHolder(sensorQueue, sensor,  SensorManager.SENSOR_DELAY_GAME, sensorHandler);
         activeSensors.add(holder);
     }
 
     private void setupLocationUpdate() {
         Log.i(LOG_TAG, "Registering Listener for GPS");
-        LocationHolder holder = new LocationHolder(Looper.myLooper());
+        LocationHolder holder = new LocationHolder(sensorQueue, Looper.myLooper());
         activeSensors.add(holder);
     }
 

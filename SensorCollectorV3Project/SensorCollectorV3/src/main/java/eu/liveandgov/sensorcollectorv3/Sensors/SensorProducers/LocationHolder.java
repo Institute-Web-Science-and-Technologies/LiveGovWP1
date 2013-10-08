@@ -18,8 +18,8 @@ import com.google.android.gms.location.LocationRequest;
 
 import org.jeromq.ZMQ;
 
-import eu.liveandgov.sensorcollectorv3.Sensors.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.Sensors.MessageQueue;
+import eu.liveandgov.sensorcollectorv3.GlobalContext;
+import eu.liveandgov.sensorcollectorv3.SensorQueue.SensorQueue;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
 
 /**
@@ -54,8 +54,11 @@ public class LocationHolder implements
     private boolean connected = false;
     private boolean startImmediate = false;
 
-    public LocationHolder(Looper myLooper){
+    private final SensorQueue sensorQueue;
+
+    public LocationHolder(SensorQueue sensorQueue, Looper myLooper){
         this.myLooper = myLooper;
+        this.sensorQueue = sensorQueue;
         init();
     }
 
@@ -102,7 +105,7 @@ public class LocationHolder implements
     public void onLocationChanged(Location location) {
         String locString = SensorParser.parse(location);
         Log.d(LOG_TAG, locString);
-        MessageQueue.push(locString);
+        sensorQueue.push(locString);
     }
 
     @Override

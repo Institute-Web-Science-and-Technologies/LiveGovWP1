@@ -133,7 +133,7 @@ public class ActivitySensorCollector extends Activity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                Log.i(LOG_TAG,"Recieved Broadcast with action " + action);
+                // Log.i(LOG_TAG,"Recieved Broadcast with action " + action);
                 if (action.equals(IntentAPI.RETURN_STATUS)) {
                     updateStatus(intent);
                 } else if (action.equals(IntentAPI.RETURN_LOG)) {
@@ -154,16 +154,13 @@ public class ActivitySensorCollector extends Activity {
         unregisterReceiver(universalBroadcastReceiver);
     }
 
-
-
-
     private void updateLog(Intent intent) {
-        logTextView.append(intent.getStringExtra(IntentAPI.FIELD_LOG) + "\n");
+        logTextView.setText(intent.getStringExtra(IntentAPI.FIELD_LOG) + "\n");
 
         // scroll to end
-        logTextView.setSelected(true);
-        Spannable textDisplayed = (Spannable) logTextView.getText();
-        Selection.setSelection(textDisplayed, textDisplayed.length());
+//        logTextView.setSelected(true);
+//        Spannable textDisplayed = (Spannable) logTextView.getText();
+//        Selection.setSelection(textDisplayed, textDisplayed.length());
     }
 
     private void updateStatus(Intent intent) {

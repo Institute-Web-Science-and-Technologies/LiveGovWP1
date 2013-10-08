@@ -8,6 +8,8 @@ import android.provider.Settings;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 
+import eu.liveandgov.sensorcollectorv3.GlobalContext;
+
 /**
  * Created by hartmann on 9/15/13.
  */

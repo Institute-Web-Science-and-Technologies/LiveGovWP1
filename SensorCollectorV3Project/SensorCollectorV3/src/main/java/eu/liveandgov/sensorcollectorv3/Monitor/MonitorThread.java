@@ -1,13 +1,13 @@
 package eu.liveandgov.sensorcollectorv3.Monitor;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
-import eu.liveandgov.sensorcollectorv3.Persistence.PersistorThread;
-import eu.liveandgov.sensorcollectorv3.Sensors.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.Sensors.MessageQueue;
+import eu.liveandgov.sensorcollectorv3.Connector.ConnectorThread;
+import eu.liveandgov.sensorcollectorv3.GlobalContext;
+import eu.liveandgov.sensorcollectorv3.SensorQueue.LinkedSensorQueue;
 
 /**
  * Created by hartmann on 9/22/13.
@@ -18,14 +18,18 @@ public class MonitorThread implements Runnable {
     private static MonitorThread instance;
     private Thread thread;
 
-    /* Singleton Pattern */
-    private MonitorThread(){
+    private Set<MonitorItem> observables = new HashSet<MonitorItem>();
+
+    public MonitorThread(){
         thread = new Thread(this);
     }
 
-    public static MonitorThread getInstance(){
-        if (instance == null) instance = new MonitorThread();
-        return instance;
+    public void registerMonitorable(Monitorable m, String name){
+        observables.add(new MonitorItem(m, name));
+    }
+
+    public void start() {
+        thread.start();
     }
 
     @Override
@@ -33,7 +37,6 @@ public class MonitorThread implements Runnable {
         while(true) {
 
         GlobalContext.sendLog(getLogMessage());
-
 
         // sleep 1 sec.
         try {
@@ -45,12 +48,24 @@ public class MonitorThread implements Runnable {
     }
 
     private String getLogMessage() {
-        return "Sample count: " + sampleCount + "\n" +
-               "Queue size:   " + MessageQueue.getSize() + "\n" +
-               "File Size:    " + PersistorThread.getInstance().getSize() + "";
+        StringBuilder s = new StringBuilder();
+        for (MonitorItem m : observables){
+            s.append(m.render());
+        }
+        return s.toString();
     }
 
-    public void start() {
-        thread.start();
+    private class MonitorItem {
+        public Monitorable monitorable;
+        public String name;
+        public MonitorItem(Monitorable m, String n){
+            this.monitorable = m;
+            this.name = n;
+        }
+
+        public String render() {
+            return name + ": " + monitorable.getStatus() + "\n";
+        }
     }
+
 }

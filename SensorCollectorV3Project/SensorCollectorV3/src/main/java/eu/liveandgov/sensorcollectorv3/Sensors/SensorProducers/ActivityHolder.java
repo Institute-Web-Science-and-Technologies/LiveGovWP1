@@ -14,7 +14,7 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.ActivityRecognitionClient;
 
-import eu.liveandgov.sensorcollectorv3.Sensors.GlobalContext;
+import eu.liveandgov.sensorcollectorv3.GlobalContext;
 
 /**
  * Created by cehlen on 9/26/13.

@@ -1,6 +1,5 @@
 package eu.liveandgov.sensorcollectorv3.Persistence;
 
-import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -9,31 +8,24 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import eu.liveandgov.sensorcollectorv3.Monitor.MonitorThread;
-import eu.liveandgov.sensorcollectorv3.Sensors.GlobalContext;
+import eu.liveandgov.sensorcollectorv3.GlobalContext;
 
 /**
  * Created by hartmann on 9/20/13.
  */
 public class FilePersistor implements Persistor {
-    public static final String LOG_TAG = "FPers";
+    public static final String LOG_TAG = "FP";
     public static final String FILENAME = "sensor.log";
 
     private File logFile;
     private BufferedWriter fileWriter;
 
-    public FilePersistor() {
-        logFile = new File(GlobalContext.context.getFilesDir(), FILENAME);
+    public FilePersistor(File logFile) {
+        this.logFile = logFile;
         openFileWriter();
     }
 
-    private void openFileWriter() {
-        try {
-            fileWriter = new BufferedWriter(new FileWriter(logFile,true));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
+    @Override
     public synchronized void push(String s){
         if (fileWriter == null) {
             Log.i(LOG_TAG, "Blocked write event");
@@ -43,20 +35,56 @@ public class FilePersistor implements Persistor {
         try {
             fileWriter.write(s + "\n");
         } catch (IOException e) {
+            Log.i(LOG_TAG,"Cannot write file.");
             e.printStackTrace();
         }
     }
 
     @Override
-    public void flush() {
+    public boolean exportSamples(File stageFile) {
+        boolean del = false;
+        boolean ren = false;
+
+        if (stageFile.exists()) {
+            Log.i(LOG_TAG, "Found staged file.");
+            del = stageFile.delete();
+        }
+
+        Log.i(LOG_TAG, "Exporting samples.");
+        close();
+
+        ren = logFile.renameTo(stageFile);
+
+        reset();
+        unblockPush();
+
+        return ren && del;
+    }
+
+    @Override
+    public String getStatus() {
+        return "File size: " + logFile.length();
+    }
+
+
+    private void openFileWriter() {
         try {
-            fileWriter.flush();
+            fileWriter = new BufferedWriter(new FileWriter(logFile,true));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    @Override
+
+    public void flush() {
+        try {
+            fileWriter.flush();
+        } catch (IOException e) {
+            Log.i(LOG_TAG,"Cannot flush file.");
+            e.printStackTrace();
+        }
+    }
+
     public synchronized void blockPush() {
         try {
             fileWriter.close();
@@ -66,7 +94,6 @@ public class FilePersistor implements Persistor {
         fileWriter = null;
     }
 
-    @Override
     public synchronized void unblockPush() {
         openFileWriter();
     }
@@ -75,7 +102,6 @@ public class FilePersistor implements Persistor {
         return logFile;
     }
 
-    @Override
     public synchronized void reset() {
         try {
             fileWriter = new BufferedWriter(new FileWriter(logFile));
@@ -85,7 +111,6 @@ public class FilePersistor implements Persistor {
         MonitorThread.sampleCount = 0;
     }
 
-    @Override
     public void close() {
         try {
             fileWriter.close();
@@ -94,8 +119,4 @@ public class FilePersistor implements Persistor {
         }
     }
 
-    @Override
-    public long getSize() {
-        return logFile.length();
-    }
 }
