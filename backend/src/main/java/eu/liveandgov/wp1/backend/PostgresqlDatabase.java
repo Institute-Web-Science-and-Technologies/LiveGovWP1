@@ -79,10 +79,17 @@ public class PostgresqlDatabase extends Database {
 			String createAccelerometerTable = "CREATE TABLE IF NOT EXISTS accelerometer (id VARCHAR(36), ts TIMESTAMP, x FLOAT, y FLOAT, z FLOAT);";
 			String createGPSTable = "CREATE TABLE IF NOT EXISTS gps (id VARCHAR(36), ts TIMESTAMP, lonlat GEOGRAPHY(Point));";
 			String createTagsTable = "CREATE TABLE IF NOT EXISTS tags (id VARCHAR(36), ts TIMESTAMP, tag TEXT);";
+			String createGActivityTable = "CREATE TABLE IF NOT EXISTS google_activity (id VARCHAR(36), ts TIMESTAMP, activity TEXT);";
+			String createLACTable = "CREATE TABLE IF NOT EXISTS linear_acceleration (id VARCHAR(36), ts TIMESTAMP, x FLOAT, y FLOAT, z FLOAT);";
+			String createGravityTable = "CREATE TABLE IF NOT EXISTS gravity (id VARCHAR(36), ts TIMESTAMP, x FLOAT, y FLOAT, z FLOAT);";
+			
 			
 			stmtLink.execute(createAccelerometerTable);
 			stmtLink.execute(createGPSTable);
 			stmtLink.execute(createTagsTable);
+			stmtLink.execute(createGActivityTable);
+			stmtLink.execute(createLACTable);
+			stmtLink.execute(createGravityTable);
 
 		} catch (SQLException e) {
 			throw new UnavailableException(e.getMessage());

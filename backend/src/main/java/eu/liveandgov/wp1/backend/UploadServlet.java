@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.annotation.MultipartConfig;
@@ -23,6 +24,9 @@ import javax.servlet.http.Part;
 
 import eu.liveandgov.wp1.backend.SensorValueObjects.AccSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.GPSSensorValue;
+import eu.liveandgov.wp1.backend.SensorValueObjects.GoogleActivitySensorValue;
+import eu.liveandgov.wp1.backend.SensorValueObjects.GraSensorValue;
+import eu.liveandgov.wp1.backend.SensorValueObjects.LacSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.RawSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.TagSensorValue;
 import eu.liveandgov.wp1.backend.sensorLoop.SensorLoop;
@@ -123,7 +127,7 @@ public class UploadServlet extends HttpServlet {
 			UnavailableException, SQLException {
 		PostgresqlDatabase db = new PostgresqlDatabase("liveandgov",
 				"liveandgov");
-		PreparedStatement psAcc, psGPS, psTag;
+		PreparedStatement psAcc, psGPS, psTag, psAct, psLac, psGra;
 		Timestamp ts;
 		BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
@@ -133,6 +137,12 @@ public class UploadServlet extends HttpServlet {
 				.prepareStatement("INSERT INTO gps VALUES (?, ?, ST_GeomFromText(?,4326))");
 		psTag = db.connection
 				.prepareStatement("INSERT INTO tags VALUES (?, ?, ?)");
+		psAct = db.connection
+				.prepareStatement("INSERT INTO google_activity VALUES (?, ?, ?)");
+		psLac = db.connection
+				.prepareStatement("INSERT INTO linear_acceleration VALUES (?, ?, ?, ?, ?)");
+		psGra = db.connection
+				.prepareStatement("INSERT INTO gravity VALUES (?, ?, ?, ?, ?)");
 
 		while (reader.ready()) {
 			RawSensorValue rsv = RawSensorValue.fromString(reader.readLine());
@@ -165,6 +175,34 @@ public class UploadServlet extends HttpServlet {
 				psTag.setString(3, tsv.tag);
 				psTag.addBatch();
 				break;
+			case ACT:
+				GoogleActivitySensorValue gasv = GoogleActivitySensorValue.fromRSV(rsv);
+				psAct.setString(1, gasv.id);
+				ts = new Timestamp(gasv.timestamp);
+				psAct.setTimestamp(2, ts);
+				psAct.setString(3, gasv.activity);
+				psAct.addBatch();
+				break;
+			case LAC:
+				LacSensorValue lasv = LacSensorValue.fromRSV(rsv);
+				psLac.setString(1, lasv.id);
+				ts = new Timestamp(lasv.timestamp);
+				psLac.setTimestamp(2, ts);
+				psLac.setFloat(3, lasv.x);
+				psLac.setFloat(4, lasv.y);
+				psLac.setFloat(5, lasv.z);
+				psLac.addBatch();
+				break;
+			case GRA:
+				GraSensorValue grasv = GraSensorValue.fromRSV(rsv);
+				psGra.setString(1, grasv.id);
+				ts = new Timestamp(grasv.timestamp);
+				psGra.setTimestamp(2, ts);
+				psGra.setFloat(3, grasv.x);
+				psGra.setFloat(4, grasv.y);
+				psGra.setFloat(5, grasv.z);
+				psGra.addBatch();
+				break;
 			default:
 				break;
 			}
@@ -172,9 +210,15 @@ public class UploadServlet extends HttpServlet {
 		psAcc.executeBatch();
 		psGPS.executeBatch();
 		psTag.executeBatch();
+		psAct.executeBatch();
+		psLac.executeBatch();
+		psGra.executeBatch();
 		psAcc.close();
 		psGPS.close();
 		psTag.close();
+		psAct.close();
+		psLac.close();
+		psGra.close();
 	}
 
 	private void copyStream(InputStream input, OutputStream output)
