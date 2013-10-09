@@ -46,7 +46,7 @@ import eu.liveandgov.wp1.backend.sensorLoop.SensorLoop;
 @WebServlet("/upload")
 @MultipartConfig
 public class UploadServlet extends HttpServlet {
-	public static final String OUT_DIR = "/tmp/liveandgov/uploads/";
+	public static final String OUT_DIR = "/srv/liveandgov/UploadServletRawFiles";
 
 	private static final long serialVersionUID = 1L;
 
