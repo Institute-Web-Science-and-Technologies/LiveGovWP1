@@ -20,8 +20,8 @@ public class GPSSensorValue extends SensorValue {
 			throw new IllegalArgumentException("Cannot parse value "
 					+ rsv.value);
 
-		out.longitude = Double.parseDouble(stringValues[0]);
-		out.latitude = Double.parseDouble(stringValues[1]);
+		out.latitude = Double.parseDouble(stringValues[0]);
+		out.longitude = Double.parseDouble(stringValues[1]);
 		out.altitude = Double.parseDouble(stringValues[2]);
 
 		return out;
