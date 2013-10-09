@@ -32,7 +32,6 @@ block content
         div.column
         div.column
           div.ui.purple.button#showBtn Show
-
   div.ui.tab.segment(data-tab="map")
     div.ui.vertical.segment
       h1.ui.header Map
@@ -40,20 +39,32 @@ block content
   div.ui.tab.segment(data-tab="graphs")
     div.ui.vertical.segment
       h1.ui.header Accelerometer
-      h5.ui.header Showing 
-        span#accLabel
+      div.ui.two.column.grid
+        div.column
+          h5.ui.header Showing 
+            span#accLabel
+        div.column
+          h5.ui.header.metaLabel
       div.ui.purple.button.resetZoom Reset Zoom
       div.plot#accPlot
     div.ui.vertical.segment
       h1.ui.header Linear Acceleration
-      h5.ui.header Showing 
-        span#lacLabel
+      div.ui.two.column.grid
+        div.column
+          h5.ui.header Showing 
+            span#lacLabel
+        div.column
+          h5.ui.header.metaLabel
       div.ui.purple.button.resetZoom Reset Zoom
       div.plot#lacPlot
     div.ui.vertical.segment
       h1.ui.header Gravity
-      h5.ui.header Showing 
-        span#graLabel
+      div.ui.two.column.grid
+        div.column
+          h5.ui.header Showing 
+            span#graLabel
+        div.column
+          h5.ui.header.metaLabel
       div.ui.purple.button.resetZoom Reset Zoom
       div.plot#graPlot
   div.ui.tab.segment(data-tab="tables")

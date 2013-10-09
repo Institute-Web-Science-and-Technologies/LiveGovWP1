@@ -100,6 +100,8 @@
     }).done(function (data) {
       showDataInId("#graPlot", data);
     });
+    var meta = "From: " + Math.floor(ranges.xaxis.from) + " To: " + Math.floor(ranges.xaxis.to);
+    $(".metaLabel").text(meta);
   }
 
   function showAccelerometerForId(id) {
