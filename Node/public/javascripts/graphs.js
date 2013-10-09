@@ -82,6 +82,24 @@
     fplot($(id)[0], plotData, plotOptions);
   }
 
+  function zoom(id, ranges) {
+    $.ajax({
+      url: apiUrl + "/" + id + "/acc?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
+    }).done(function (data) {
+      showDataInId("#accPlot", data);
+    });
+    $.ajax({
+      url: apiUrl + "/" + id + "/lac?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
+    }).done(function (data) {
+      showDataInId("#lacPlot", data);
+    });
+    $.ajax({
+      url: apiUrl + "/" + id + "/gra?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
+    }).done(function (data) {
+      showDataInId("#graPlot", data);
+    });
+  }
+
   function showAccelerometerForId(id) {
     $.ajax({
       url: apiUrl + "/" + id + "/acc"
@@ -89,11 +107,7 @@
       showDataInId("#accPlot", data);
     });
     $("#accPlot").bind('plotselected', function (event, ranges) {
-      $.ajax({
-        url: apiUrl + "/" + id + "/acc?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
-      }).done(function (data) {
-        showDataInId("#accPlot", data);
-      });
+      zoom(id, ranges);
     });
   }
 
@@ -104,11 +118,7 @@
       showDataInId("#lacPlot", data);
     });
     $("#lacPlot").bind('plotselected', function (event, ranges) {
-      $.ajax({
-        url: apiUrl + "/" + id + "/lac?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
-      }).done(function (data) {
-        showDataInId("#lacPlot", data);
-      });
+      zoom(id, ranges);
     });
   }
 
@@ -119,11 +129,7 @@
       showDataInId("#graPlot", data);
     });
     $("#graPlot").bind('plotselected', function (event, ranges) {
-      $.ajax({
-        url: apiUrl + "/" + id + "/gra?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
-      }).done(function (data) {
-        showDataInId("#graPlot", data);
-      });
+      zoom(id, ranges);
     });
   }
   

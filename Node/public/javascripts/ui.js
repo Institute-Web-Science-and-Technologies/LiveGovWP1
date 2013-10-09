@@ -22,6 +22,14 @@ $(function() {
     window.currentDevId = id;
     $('[data-tab="map"]').click();
   });
+
+  $('.resetZoom').click(function (eventObject) {
+    if(!window.currentDevId) return;
+    var id = window.currentDevId;
+    showAccelerometerForId(id);
+    showLinearAccelerationForId(id);
+    showGravityForId(id);
+  });
 });
 
   

@@ -17,12 +17,10 @@ function getById (id, options, callback) {
     if(err) { callback(err); done(); return; }
     var query = 'SELECT ts,ST_AsGeoJSON(lonlat) FROM gps WHERE id=$1 ORDER BY ts';
     var values = [id];
-    console.log(options.limit)
     if(options.limit && options.limit !== 0) {
       query += ' LIMIT $2';
       values.push(options.limit);
     }
-    console.log(query);
     client.query(query, values, function (err, result) {
       done();
       if(err) { callback(err); return; }
