@@ -30,6 +30,7 @@ import eu.liveandgov.wp1.backend.SensorValueObjects.LacSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.RawSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.TagSensorValue;
 import eu.liveandgov.wp1.backend.sensorLoop.SensorLoop;
+import org.postgresql.util.PSQLException;
 
 
 /**
@@ -125,8 +126,7 @@ public class UploadServlet extends HttpServlet {
 
 	private void saveToDatabase(InputStream input) throws IOException,
 			UnavailableException, SQLException {
-		PostgresqlDatabase db = new PostgresqlDatabase("liveandgov",
-				"liveandgov");
+		PostgresqlDatabase db = new PostgresqlDatabase("liveandgov", "liveandgov");
 		PreparedStatement psAcc, psGPS, psTag, psAct, psLac, psGra;
 		Timestamp ts;
 		BufferedReader reader = new BufferedReader(new InputStreamReader(input));
@@ -144,8 +144,18 @@ public class UploadServlet extends HttpServlet {
 		psGra = db.connection
 				.prepareStatement("INSERT INTO gravity VALUES (?, ?, ?, ?, ?)");
 
+        String line;
 		while (reader.ready()) {
-			RawSensorValue rsv = RawSensorValue.fromString(reader.readLine());
+            line = reader.readLine();
+            RawSensorValue rsv;
+            try {
+			    rsv = RawSensorValue.fromString(line);
+            }
+            catch (Exception e) {
+                System.err.println("Error parsing line: " + line);
+                continue;
+            }
+
 			switch (rsv.type) {
 			case ACC:
 				AccSensorValue asv = AccSensorValue.fromRSV(rsv);
@@ -207,6 +217,7 @@ public class UploadServlet extends HttpServlet {
 				break;
 			}
 		}
+
 		psAcc.executeBatch();
 		psGPS.executeBatch();
 		psTag.executeBatch();

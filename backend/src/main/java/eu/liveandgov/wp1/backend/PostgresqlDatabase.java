@@ -52,8 +52,9 @@ public class PostgresqlDatabase extends Database {
 		}
 		Statement stmtLink = null;
 		try {
+
 			connection = DriverManager.getConnection(
-					"jdbc:postgresql://127.0.0.1:5432/liveandgov", user,
+					"jdbc:postgresql://127.0.0.1:5432/liveandgov?autoReconnect=true", user,
 					password);
 
 			stmtLink = connection.createStatement();
@@ -82,8 +83,7 @@ public class PostgresqlDatabase extends Database {
 			String createGActivityTable = "CREATE TABLE IF NOT EXISTS google_activity (id VARCHAR(36), ts TIMESTAMP, activity TEXT);";
 			String createLACTable = "CREATE TABLE IF NOT EXISTS linear_acceleration (id VARCHAR(36), ts TIMESTAMP, x FLOAT, y FLOAT, z FLOAT);";
 			String createGravityTable = "CREATE TABLE IF NOT EXISTS gravity (id VARCHAR(36), ts TIMESTAMP, x FLOAT, y FLOAT, z FLOAT);";
-			
-			
+
 			stmtLink.execute(createAccelerometerTable);
 			stmtLink.execute(createGPSTable);
 			stmtLink.execute(createTagsTable);
@@ -110,7 +110,7 @@ public class PostgresqlDatabase extends Database {
 	public double distanceInMeter(double lon0, double lat0, double lon1, double lat1) {
 		try {
 			Statement stmtLink = connection.createStatement();
-			ResultSet rs = stmtLink.executeQuery("SELECT ST_Distance(ST_GeographyFromText('Point("
+ 			ResultSet rs = stmtLink.executeQuery("SELECT ST_Distance(ST_GeographyFromText('Point("
 					+lon0+ " " + lat0
 					+")'),ST_GeographyFromText('Point("
 					+ lon1 + " " + lat1
