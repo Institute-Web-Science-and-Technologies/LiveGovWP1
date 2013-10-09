@@ -97,7 +97,38 @@
     });
   }
 
+  function showLinearAccelerationForId(id) {
+    $.ajax({
+      url: apiUrl + "/" + id + "/lac"
+    }).done(function (data) {
+      showDataInId("#lacPlot", data);
+    });
+    $("#lacPlot").bind('plotselected', function (event, ranges) {
+      $.ajax({
+        url: apiUrl + "/" + id + "/lac?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
+      }).done(function (data) {
+        showDataInId("#lacPlot", data);
+      });
+    });
+  }
+
+  function showGravityForId(id) {
+    $.ajax({
+      url: apiUrl + "/" + id + "/gra"
+    }).done(function (data) {
+      showDataInId("#graPlot", data);
+    });
+    $("#graPlot").bind('plotselected', function (event, ranges) {
+      $.ajax({
+        url: apiUrl + "/" + id + "/gra?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
+      }).done(function (data) {
+        showDataInId("#graPlot", data);
+      });
+    });
+  }
   
 
   window.showAccelerometerForId = showAccelerometerForId;
+  window.showLinearAccelerationForId = showLinearAccelerationForId;
+  window.showGravityForId = showGravityForId;
 })();

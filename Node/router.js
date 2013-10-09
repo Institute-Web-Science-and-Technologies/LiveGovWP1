@@ -9,6 +9,12 @@ function register (app) {
   app.get('/api/1/:id/acc', apiV1.getAccWindow);
   app.get('/api/1/:id/acc/count', apiV1.getAccCount);
 
+  app.get('/api/1/:id/lac', apiV1.getLacWindow);
+  app.get('/api/1/:id/lac/count', apiV1.getLacCount);
+
+  app.get('/api/1/:id/gra', apiV1.getGraWindow);
+  app.get('/api/1/:id/gra/count', apiV1.getGraCount);
+
   app.get('/api/1/:id/tag', apiV1.getTags);
 }
 

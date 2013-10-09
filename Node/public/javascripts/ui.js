@@ -17,6 +17,9 @@ $(function() {
     lMap.showAllForId(id);
     showTagsForId(id);
     showAccelerometerForId(id);
+    showLinearAccelerationForId(id);
+    showGravityForId(id);
+    window.currentDevId = id;
     $('[data-tab="map"]').click();
   });
 });
