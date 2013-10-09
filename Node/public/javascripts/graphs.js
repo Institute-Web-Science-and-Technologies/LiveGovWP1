@@ -74,6 +74,9 @@
       },
       xaxis: { 
         mode: "time"
+      },
+      selection: {
+        mode: "x"
       }
     };
     fplot($(id)[0], plotData, plotOptions);
@@ -85,7 +88,16 @@
     }).done(function (data) {
       showDataInId("#accPlot", data);
     });
+    $("#accPlot").bind('plotselected', function (event, ranges) {
+      $.ajax({
+        url: apiUrl + "/" + id + "/acc?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
+      }).done(function (data) {
+        showDataInId("#accPlot", data);
+      });
+    });
   }
+
+  
 
   window.showAccelerometerForId = showAccelerometerForId;
 })();

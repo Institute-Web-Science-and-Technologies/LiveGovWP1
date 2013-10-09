@@ -34,22 +34,24 @@ function getWindowsForId (id, options, callback) {
                     ORDER BY w;";
     var limitTime = "";
     if(options.startTime && !options.endTime) {
-      limitTime = "AND ts >= TIMESTAMP $3";
+      limitTime = "AND ts>=$3";
       values.push(options.startTime);
     } else if(!options.startTime && options.endTime) {
-      limitTime = "AND ts <= TIMESTAMP $3";
+      limitTime = "AND ts<=$3";
       values.push(options.endTime);
     } else if(options.startTime && options.endTime) {
-      limitTime = "AND ts BETWEEN TIMESTAMP $3 AND $4";
+      limitTime = "AND ts>=$3 AND ts<=$4";
       values.push(options.startTime);
       values.push(options.endTime);
     }
     query = query.replace("{{LIMIT_TIME}}", limitTime);
+    console.log(query, values);
     client.query(query, values, function (err, result) {
       done();
       if(err) { callback(err); return; }
 
       var data = _.map(result.rows, function (e) {
+        console.log(e.starttime);
         return {
           window: e.w,
           avgX: e.avgx,
@@ -61,9 +63,9 @@ function getWindowsForId (id, options, callback) {
           avgZ: e.avgz,
           minZ: e.minz,
           maxZ: e.maxz,
-          startTime: e.starttime,
-          endTime: e.endtime,
-          midTime: new Date((e.endtime.getTime() + e.starttime.getTime()) / 2)
+          startTime: e.starttime.getTime(),
+          endTime: e.endtime.getTime(),
+          midTime: new Date((e.endtime.getTime() + e.starttime.getTime()) / 2).getTime()
         };
       });
       callback(null, data);
@@ -88,6 +90,10 @@ function getCountForId (id, options, callback) {
       callback(null, {count: result.rows[0].count});
     });
   });
+}
+
+function getById (id, options, callback) {
+  
 }
 
 module.exports = {
