@@ -25,6 +25,8 @@
 
   function showDataInId (id, data) {
     if(!data) { console.log("No data for", id); return; }
+    var labelId = id.replace("Plot", "Label");
+    $(labelId).text(data.length);
     var avgX = [];
     var maxX = [];
     var minX = [];

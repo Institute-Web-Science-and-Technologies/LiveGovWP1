@@ -40,16 +40,21 @@ block content
   div.ui.tab.segment(data-tab="graphs")
     div.ui.vertical.segment
       h1.ui.header Accelerometer
+      h5.ui.header Showing 
+        span#accLabel
       div.ui.purple.button.resetZoom Reset Zoom
       div.plot#accPlot
     div.ui.vertical.segment
       h1.ui.header Linear Acceleration
+      h5.ui.header Showing 
+        span#lacLabel
       div.ui.purple.button.resetZoom Reset Zoom
       div.plot#lacPlot
     div.ui.vertical.segment
       h1.ui.header Gravity
+      h5.ui.header Showing 
+        span#graLabel
       div.ui.purple.button.resetZoom Reset Zoom
-      
       div.plot#graPlot
   div.ui.tab.segment(data-tab="tables")
     div.ui.vertical.segment
