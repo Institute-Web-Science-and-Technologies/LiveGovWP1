@@ -28,8 +28,8 @@ function getById (id, options, callback) {
         var geo = JSON.parse(e.st_asgeojson);
         return { 
           ts: e.ts,
-          lat: geo.coordinates[0],
-          lon: geo.coordinates[1]
+          lon: geo.coordinates[0],
+          lat: geo.coordinates[1]
         }
       });
       callback(null, data);
