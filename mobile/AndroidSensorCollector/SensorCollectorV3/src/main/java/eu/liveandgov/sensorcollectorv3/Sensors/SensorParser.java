@@ -24,14 +24,16 @@ public class SensorParser {
 
     public static String parse(SensorEvent event) {
         int sensorType= event.sensor.getType();
+        // event.timestamp is in ns = 1E-9 sec.
+        long timestamp_ms = (long) (event.timestamp / 1E6);
         if ( sensorType == Sensor.TYPE_ACCELEROMETER){
-            return fillString("ACC", event.timestamp / 1000, id, event.values);
+            return fillString("ACC", timestamp_ms , id, event.values);
         } else if (sensorType == Sensor.TYPE_LINEAR_ACCELERATION){
-            return fillString("LAC", event.timestamp / 1000, id, event.values);
+            return fillString("LAC", timestamp_ms, id, event.values);
         } else if (sensorType == Sensor.TYPE_GRAVITY) {
-            return fillString("GRA", event.timestamp / 1000, id, event.values);
+            return fillString("GRA", timestamp_ms, id, event.values);
         }
-        return "ERR,,,Unknown sensor " + sensorType;
+        return "ERR," + timestamp_ms + ",,Unknown sensor " + sensorType;
     }
 
     public static String parse(Location location) {

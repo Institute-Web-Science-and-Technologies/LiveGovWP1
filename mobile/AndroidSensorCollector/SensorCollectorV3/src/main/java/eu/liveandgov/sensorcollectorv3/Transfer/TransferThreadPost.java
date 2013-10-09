@@ -4,12 +4,16 @@ import android.util.Log;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import eu.liveandgov.sensorcollectorv3.Configuration.SensorCollectionOptions;
@@ -84,9 +88,14 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
             ContentBody fileBody = new FileBody(file, "text/plain");
             mEntity.addPart("upfile", fileBody);
+
             httppost.setEntity(mEntity);
+            httppost.addHeader("CHECKSUM", String.valueOf(file.length()));
 
             httpclient.execute(httppost);
+        } catch (HttpHostConnectException e) {
+            Log.i(LOG_TAG, "Connection Refused");
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
             return false;

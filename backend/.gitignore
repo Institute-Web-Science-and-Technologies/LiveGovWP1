@@ -1,5 +1,7 @@
 # Maven
 log/
 target/
-#Mac OS
+# Mac OS
 .DS_Store
+# IntelliJ
+.idea

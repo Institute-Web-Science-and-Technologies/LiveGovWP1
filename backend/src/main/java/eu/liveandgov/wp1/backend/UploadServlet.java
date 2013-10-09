@@ -99,8 +99,8 @@ public class UploadServlet extends HttpServlet {
         // check file size
         Long size;
         try{
+            size = Long.parseLong(request.getHeader("CHECKSUM"));
 
-            size = Long.parseLong(request.getPart("size").toString());
             if (size == null) { throw new ServletException("No file size supplied"); }
 
             if (! size.equals(baos.size())) {
@@ -114,7 +114,6 @@ public class UploadServlet extends HttpServlet {
             // continue
         }
 
-        baos.size();
 
 		try {
 			saveToDatabase(new ByteArrayInputStream(baos.toByteArray()));

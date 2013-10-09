@@ -51,7 +51,7 @@ public class ServiceSensorControl extends Service {
         GlobalContext.set(this);
 
         // setup communication Channels
-        // persistor   = new FilePersistor(new File(GlobalContext.context.getFilesDir(), SENSOR_FILENAME));
+        persistor   = new FilePersistor(new File(GlobalContext.context.getFilesDir(), SENSOR_FILENAME));
         persistor   = new ZmqStreamer();
         sensorQueue = new LinkedSensorQueue();
 
@@ -146,7 +146,7 @@ public class ServiceSensorControl extends Service {
         isRecording = true;
     }
 
-    private void doSendStatus() {
+    public void doSendStatus() {
         isTransferring = transferManager.isTransferring();
 
         Intent intent = new Intent(IntentAPI.RETURN_STATUS);

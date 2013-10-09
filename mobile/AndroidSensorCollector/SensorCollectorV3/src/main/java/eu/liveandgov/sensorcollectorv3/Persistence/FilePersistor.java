@@ -42,8 +42,8 @@ public class FilePersistor implements Persistor {
 
     @Override
     public boolean exportSamples(File stageFile) {
-        boolean del = false;
-        boolean ren = false;
+        boolean del = true;
+        boolean ren = true;
 
         if (stageFile.exists()) {
             Log.i(LOG_TAG, "Found staged file.");
@@ -56,7 +56,7 @@ public class FilePersistor implements Persistor {
         ren = logFile.renameTo(stageFile);
 
         reset();
-        unblockPush();
+        openFileWriter();
 
         return ren && del;
     }
@@ -66,40 +66,12 @@ public class FilePersistor implements Persistor {
         return "File size: " + logFile.length();
     }
 
-
     private void openFileWriter() {
         try {
             fileWriter = new BufferedWriter(new FileWriter(logFile,true));
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-
-    public void flush() {
-        try {
-            fileWriter.flush();
-        } catch (IOException e) {
-            Log.i(LOG_TAG,"Cannot flush file.");
-            e.printStackTrace();
-        }
-    }
-
-    public synchronized void blockPush() {
-        try {
-            fileWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        fileWriter = null;
-    }
-
-    public synchronized void unblockPush() {
-        openFileWriter();
-    }
-
-    public File getFile() {
-        return logFile;
     }
 
     public synchronized void reset() {

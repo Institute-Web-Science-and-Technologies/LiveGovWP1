@@ -82,8 +82,7 @@ public class ActivitySensorCollector extends Activity {
 
         setupIntentListeners();
 
-        requestStatus();
-
+        runStatusLoop();
     }
 
     @Override
@@ -164,13 +163,15 @@ public class ActivitySensorCollector extends Activity {
     }
 
     private void updateStatus(Intent intent) {
-        isRecording = intent.getBooleanExtra(IntentAPI.FIELD_SAMPLING, isRecording);
-        isTransferring = intent.getBooleanExtra(IntentAPI.FIELD_TRANSFERRING, isTransferring);
+        isRecording = intent.getBooleanExtra(IntentAPI.FIELD_SAMPLING, isRecording /* = default value */ );
+        isTransferring = intent.getBooleanExtra(IntentAPI.FIELD_TRANSFERRING, isTransferring );
 
         if (isRecording) {
             recordingProgressBar.setVisibility(View.VISIBLE);
+            recordingToggleButton.setChecked(true);
         } else {
             recordingProgressBar.setVisibility(View.INVISIBLE);
+            recordingToggleButton.setChecked(false);
         }
 
         if (isTransferring) {
@@ -185,4 +186,23 @@ public class ActivitySensorCollector extends Activity {
         requestIntent.setAction(IntentAPI.GET_STATUS);
         startService(requestIntent);
     }
+
+    private void runStatusLoop() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    requestStatus();
+
+                    // wait 1 sec.
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
+
 }

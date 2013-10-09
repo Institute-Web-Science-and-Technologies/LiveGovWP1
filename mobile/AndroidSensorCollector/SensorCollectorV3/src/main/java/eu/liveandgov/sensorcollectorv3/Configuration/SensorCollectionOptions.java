@@ -9,8 +9,8 @@ public class SensorCollectionOptions {
      */
     public static String REMOTE_HOST = "141.26.71.84"; // LG Server
     public static String UPLOAD_ZMQ_SOCKET = "tcp://" + REMOTE_HOST + ":5555";
-//    public static String UPLOAD_URL = "http://" + REMOTE_HOST + "/backend/Upload";
-    public static String UPLOAD_URL = "http://" + REMOTE_HOST + ":6000/";
+    public static String UPLOAD_URL = "http://" + REMOTE_HOST + ":8080/backend/upload";
+//     public static String UPLOAD_URL = "http://" + REMOTE_HOST + ":6000/";
 
     /**
      * Accelerometer Sensor
