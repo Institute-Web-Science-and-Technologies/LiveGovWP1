@@ -118,7 +118,8 @@ public class UploadServlet extends HttpServlet {
 
         long checksumComputed = getChecksum(savedFile);
 
-        System.out.println("ChecksumProvided");
+        System.out.println("ChecksumProvided: " + checksumProvided);
+        System.out.println("ChecksumComputed: " + checksumComputed);
 
         if (checksumProvided != checksumComputed )  {
             throw new IllegalArgumentException("Checksum error. Provided " + checksumProvided +
