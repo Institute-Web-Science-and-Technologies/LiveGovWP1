@@ -45,7 +45,7 @@ import eu.liveandgov.wp1.backend.SensorValueObjects.TagSensorValue;
 @WebServlet("/upload")
 @MultipartConfig
 public class UploadServlet extends HttpServlet {
-	public static final String OUT_DIR = "/srv/liveandgov/UploadServletRawFiles";
+	public static final String OUT_DIR = "/srv/liveandgov/UploadServletRawFiles/";
 
 	private static final long serialVersionUID = 1L;
 
@@ -145,8 +145,7 @@ public class UploadServlet extends HttpServlet {
     }
 
     private File saveToDisk(InputStream input, String fileName) throws IOException {
-		String absoluteFilename = OUT_DIR + fileName;
-		File outfile = new File(absoluteFilename);
+		File outfile = new File(OUT_DIR, fileName);
 		OutputStream outstream = new FileOutputStream(outfile);
 		copyStream(input, outstream);
 		outstream.flush();
