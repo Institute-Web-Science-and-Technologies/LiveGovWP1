@@ -82,6 +82,7 @@ public class UploadServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
+
 		if (uploadedFile == null) {
 			// if 'upfile' field not set - return 'Bad Request'
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -96,23 +97,24 @@ public class UploadServlet extends HttpServlet {
 		saveToDisk(new ByteArrayInputStream(baos.toByteArray()),
                 request.getHeader("id"));
 
-        // check file size
-        Long size;
-        try{
-            size = Long.parseLong(request.getHeader("CHECKSUM"));
-
-            if (size == null) { throw new ServletException("No file size supplied"); }
-
-            if (! size.equals(baos.size())) {
-                response.setHeader("ERROR","Filesize does not match:" + size + " vs. " + baos.size() );
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
-                }
-
-            } catch (ServletException e) {
-            System.out.println("No file-size supplied.");
-            // continue
-        }
+//        // check file size
+//        Long size;
+//        try{
+//            size = Long.parseLong(request.getHeader("CHECKSUM"));
+//
+//            if (size == null) { throw new ServletException("No file size supplied"); }
+//
+//            if (! size.equals(baos.size())) {
+//                response.setHeader("ERROR","Filesize does not match:" + size + " vs. " + baos.size() );
+//                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+//                System.err.println("Wrong file size!");
+//                return;
+//                }
+//
+//            } catch (ServletException e) {
+//            System.out.println("No file-size supplied.");
+//            // continue
+//        }
 
 
 		try {
