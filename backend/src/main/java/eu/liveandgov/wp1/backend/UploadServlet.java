@@ -65,7 +65,6 @@ public class UploadServlet extends HttpServlet {
 
         response.getWriter().write("<h1>Live+Gov UploadServlet.</h1> <p>Please upload file via POST.</p>");
         response.setStatus(HttpServletResponse.SC_OK);
-
 	}
 
 	/**
@@ -86,7 +85,7 @@ public class UploadServlet extends HttpServlet {
 
             // write data to disk
             long unixTime = System.currentTimeMillis() / 1000L;
-            String fileName = request.getHeader("id") + "_" + unixTime;
+            String fileName = request.getHeader("ID") + "_" + unixTime;
             File savedFile = saveToDisk(new ByteArrayInputStream(baos.toByteArray()), fileName );
 
             // Validation
@@ -94,7 +93,7 @@ public class UploadServlet extends HttpServlet {
 
             // save data to db
 			saveToDatabase(new ByteArrayInputStream(baos.toByteArray()));
-
+            
         } catch (IOException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -124,6 +123,8 @@ public class UploadServlet extends HttpServlet {
         if (checksumProvided != checksumComputed )  {
             throw new IllegalArgumentException("Checksum error. Provided " + checksumProvided +
                 " but computed " + checksumComputed );
+        } else {
+            System.out.println("Checksum test passed");
         }
     }
 
