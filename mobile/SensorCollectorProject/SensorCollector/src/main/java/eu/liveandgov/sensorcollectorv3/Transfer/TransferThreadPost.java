@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import eu.liveandgov.sensorcollectorv3.Configuration.SensorCollectionOptions;
 import eu.liveandgov.sensorcollectorv3.Connector.ConnectorThread;
+import eu.liveandgov.sensorcollectorv3.GlobalContext;
 import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
 
 /**
@@ -88,9 +89,10 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
             ContentBody fileBody = new FileBody(file);
             mEntity.addPart("upfile", fileBody);
-
             httppost.setEntity(mEntity);
+
             httppost.addHeader("CHECKSUM", String.valueOf(file.length()));
+            httppost.addHeader("ID", GlobalContext.androidId );
 
             httpclient.execute(httppost);
         } catch (HttpHostConnectException e) {
