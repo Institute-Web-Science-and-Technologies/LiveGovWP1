@@ -86,7 +86,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
             HttpPost        httppost =      new HttpPost(uploadUrl);
             MultipartEntity mEntity =       new MultipartEntity();
 
-            ContentBody fileBody = new FileBody(file, "text/plain");
+            ContentBody fileBody = new FileBody(file);
             mEntity.addPart("upfile", fileBody);
 
             httppost.setEntity(mEntity);

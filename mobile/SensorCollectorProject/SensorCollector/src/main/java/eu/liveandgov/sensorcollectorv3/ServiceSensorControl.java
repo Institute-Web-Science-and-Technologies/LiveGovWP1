@@ -10,6 +10,7 @@ import java.io.File;
 import eu.liveandgov.sensorcollectorv3.Configuration.IntentAPI;
 import eu.liveandgov.sensorcollectorv3.Connector.ConnectorThread;
 import eu.liveandgov.sensorcollectorv3.Monitor.MonitorThread;
+import eu.liveandgov.sensorcollectorv3.Persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
 import eu.liveandgov.sensorcollectorv3.Persistence.ZmqStreamer;
 import eu.liveandgov.sensorcollectorv3.SensorQueue.LinkedSensorQueue;
@@ -52,7 +53,7 @@ public class ServiceSensorControl extends Service {
 
         // setup communication Channels
         persistor   = new FilePersistor(new File(GlobalContext.context.getFilesDir(), SENSOR_FILENAME));
-        persistor   = new ZmqStreamer();
+        // persistor   = new ZmqStreamer();
         sensorQueue = new LinkedSensorQueue();
 
         // Start sensor thread
