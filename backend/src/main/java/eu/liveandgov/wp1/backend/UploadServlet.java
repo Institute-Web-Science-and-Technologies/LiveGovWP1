@@ -29,8 +29,6 @@ import eu.liveandgov.wp1.backend.SensorValueObjects.GraSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.LacSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.RawSensorValue;
 import eu.liveandgov.wp1.backend.SensorValueObjects.TagSensorValue;
-import eu.liveandgov.wp1.backend.sensorLoop.SensorLoop;
-import org.postgresql.util.PSQLException;
 
 
 /**
@@ -60,93 +58,103 @@ public class UploadServlet extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * Return simple HTML response.
 	 */
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		response.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
+
+        response.getWriter().write("<h1>Live+Gov UploadServlet.</h1> <p>Please upload file via POST.</p>");
+        response.setStatus(HttpServletResponse.SC_OK);
+
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	 * Receive sensor data in .ssf format:
+     * - write data to disk
+     * - write data to db
+     * - check if data is written to disk? -> Send response.
+     */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+        try {
 
-		Part uploadedFile = null;
-		try {
-            uploadedFile = request.getPart("upfile");
-		} catch (ServletException e) {
+            // get input stream from MultiPart Form part
+	    	InputStream uploadedFileInputStream = getInputStreamFromRequest(request, "upfile");
+
+    		// copy file to memory in order to make it consumable twice
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		copyStream(uploadedFileInputStream, baos);
+
+            // write data to disk
+            long unixTime = System.currentTimeMillis() / 1000L;
+            String fileName = request.getHeader("id") + "_" + unixTime;
+            File savedFile = saveToDisk(new ByteArrayInputStream(baos.toByteArray()), fileName );
+
+            // Validation
+            checkFile(request, savedFile);
+
+            // save data to db
+			saveToDatabase(new ByteArrayInputStream(baos.toByteArray()));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+        } catch (IllegalArgumentException e) {
+            // raised if validation Failed
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
+        }
+        return;
+    }
+
+    private void checkFile(HttpServletRequest request, File savedFile) throws IllegalArgumentException, IOException {
+        long checksumProvided;
+
+        try {
+            checksumProvided = Long.parseLong(request.getHeader("CHECKSUM"));
+        } catch (NumberFormatException e){
+            System.err.println("CHECKSUM not  provided.");
+            return; // pass check
         }
 
-		if (uploadedFile == null) {
-			// if 'upfile' field not set - return 'Bad Request'
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return;
-		}
+        long checksumComputed = getChecksum(savedFile);
 
-		InputStream uploadedFileInputStream = uploadedFile.getInputStream();
+        System.out.println("ChecksumProvided");
 
-		// copy file to memory in order to make it consumable twice
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		copyStream(uploadedFileInputStream, baos);
-		saveToDisk(new ByteArrayInputStream(baos.toByteArray()),
-                request.getHeader("id"));
+        if (checksumProvided != checksumComputed )  {
+            throw new IllegalArgumentException("Checksum error. Provided " + checksumProvided +
+                " but computed " + checksumComputed );
+        }
+    }
 
-//        // check file size
-//        Long size;
-//        try{
-//            size = Long.parseLong(request.getHeader("CHECKSUM"));
-//
-//            if (size == null) { throw new ServletException("No file size supplied"); }
-//
-//            if (! size.equals(baos.size())) {
-//                response.setHeader("ERROR","Filesize does not match:" + size + " vs. " + baos.size() );
-//                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//                System.err.println("Wrong file size!");
-//                return;
-//                }
-//
-//            } catch (ServletException e) {
-//            System.out.println("No file-size supplied.");
-//            // continue
-//        }
+    private long getChecksum(File savedFile) {
+        return savedFile.length();
+    }
 
+    private InputStream getInputStreamFromRequest(HttpServletRequest request,
+                                                  String partName) throws IOException {
 
-		try {
-			saveToDatabase(new ByteArrayInputStream(baos.toByteArray()));
-		} catch (SQLException e) {
-			for (Throwable throwable : e) {
-				throwable.printStackTrace();
-			}
-		}
+        try {
+            Part uploadedFile = null;
+            InputStream out = null;
+            uploadedFile = request.getPart(partName);
+            return uploadedFile.getInputStream();
+        } catch (ServletException e){
+            throw new IOException(e);
+        }
+    }
 
-		SensorLoop sl = new SensorLoop(new ByteArrayInputStream(baos.toByteArray()), request.getHeader("id"));
-		try {
-			sl.doLoop();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	private void saveToDisk(InputStream input, String id) throws IOException {
-		long unixTime = System.currentTimeMillis() / 1000L;
-		String absoluteFilename = OUT_DIR + id + "_" + unixTime;
+    private File saveToDisk(InputStream input, String fileName) throws IOException {
+		String absoluteFilename = OUT_DIR + fileName;
 		File outfile = new File(absoluteFilename);
 		OutputStream outstream = new FileOutputStream(outfile);
 		copyStream(input, outstream);
 		outstream.flush();
 		outstream.close();
+        return outfile;
 	}
 
-	private void saveToDatabase(InputStream input) throws IOException,
-			UnavailableException, SQLException {
+	private void saveToDatabase(InputStream input) throws IOException {
+        try {
 		PostgresqlDatabase db = new PostgresqlDatabase("liveandgov", "liveandgov");
 		PreparedStatement psAcc, psGPS, psTag, psAct, psLac, psGra;
 		Timestamp ts;
@@ -251,6 +259,13 @@ public class UploadServlet extends HttpServlet {
 		psAct.close();
 		psLac.close();
 		psGra.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new IOException(e);
+        } catch (UnavailableException e) {
+            e.printStackTrace();
+            throw new IOException(e);
+        }
 	}
 
 	private void copyStream(InputStream input, OutputStream output)
