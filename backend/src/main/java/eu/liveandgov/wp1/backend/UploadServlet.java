@@ -93,16 +93,19 @@ public class UploadServlet extends HttpServlet {
 
             // save data to db
 			saveToDatabase(new ByteArrayInputStream(baos.toByteArray()));
-            
+
         } catch (IOException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
+            return;
         } catch (IllegalArgumentException e) {
             // raised if validation Failed
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
-        return;
+
+        // everything went fine
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     private void checkFile(HttpServletRequest request, File savedFile) throws IllegalArgumentException, IOException {
