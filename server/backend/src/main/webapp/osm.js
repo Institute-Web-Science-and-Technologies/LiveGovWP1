@@ -1,6 +1,4 @@
 
-var markers = [];
-var timestamps = [];
 var map;
 var routes = L.layerGroup();
 
@@ -22,12 +20,23 @@ function initilize(){
 
 
   map.on('dragend', this.updateMap, this);
-  map.on('click', function(e){
-	    new L.marker(e.latlng).addTo(map);
-	    markers.push(e.latlng.toString());
-	    timestamps.push(Date.now());
-	    $.get("/backend/InspectionServlet", { 'points[]': markers, 'ts[]': timestamps } ).done(
-	    		function (data) {
+  $("#uncheckall").click(function(){$('input:checkbox').removeAttr('checked');});
+  $("input:checkbox").click( function(){
+	  var postData = "";
+	    $( "tr:has(input:checked) td:nth-child(2)" ).each(function( index ) {
+	      var latlon = new L.LatLng( $( this ).text(), $( this ).next().text());
+		  console.log( latlon.toString());
+		  new L.marker(latlon).addTo(map);
+		  postData += latlon.lat + ",";
+		  postData += latlon.lng + ",";
+		  postData += $(this).next().next().text() + ",";
+		  postData += $(this).next().next().next().text() + "\n";
+		  });
+	    
+	    $.ajax({type:"POST",
+	    	url:"/backend/ServiceLineDetection",
+	    	data: postData,
+	    	success: function (data) {
 	    			routes.clearLayers();
 	    			var colors = ["#FF0000", "#00FF00"];
 	    			for(var r in data.routes){
@@ -43,6 +52,8 @@ function initilize(){
 			    			routes.addLayer(marker);
 			    			routes.addTo(map);
 	    			}
-	    		});
+	    		},
+	    		dataType:"json"
+	    });
 	});
 }

@@ -62,7 +62,7 @@ public class PostgresqlDatabase extends Database {
 		try {
 
 			connection = DriverManager.getConnection(
-					"jdbc:postgresql://127.0.0.1:5432/liveandgov?autoReconnect=true", user,
+					"jdbc:postgresql://127.0.0.1:5432/gtfsdb?autoReconnect=true", user,
 					password);
 
 			stmtLink = connection.createStatement();
