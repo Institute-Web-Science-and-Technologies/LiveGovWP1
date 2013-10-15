@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.annotation.WebServlet;
@@ -20,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ServiceLineDetection extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	PostgresqlDatabase db;
-	
+	ArrayList<LatLonTsDayTuple> coordinates;
 
 	/**
 	 * @throws UnavailableException
@@ -45,113 +47,92 @@ public class ServiceLineDetection extends HttpServlet {
 	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		  String line = null;
+		coordinates = new ArrayList<LatLonTsDayTuple>();  
+		String line = null;
 		  try {
 		    BufferedReader reader = request.getReader();
 
 			while ((line = reader.readLine()) != null) {
-			    LatLonTsDayTuple tup = new LatLonTsDayTuple(line);
+				coordinates.add(new LatLonTsDayTuple(line));
 			}
 		  } catch (Exception e) { 
 			  e.getMessage();
         }
-//		String[] points = request.getParameterValues("points[]");
-//		System.out.println("---");
-//		// 'Point(24.95667 60.16946)'
-//		String[] pointsLonLat = new String[points.length];
-//		
-//		for (int i = 0; i < points.length; i++) {
-//			String lonLat = "POINT(" + points[i].substring(points[i].indexOf(',')+2, points[i].indexOf(')')) 
-//					+ " " +  points[i].substring(7, points[i].indexOf(',')) + ")";
-//			pointsLonLat[i] = lonLat;
-//			System.out.println(lonLat);
-//		}
-//
-//
-//		String routcode = "";
-//		String q = "Select routecode, routedir, count(*) from (";
-//
-//		for (int i = 0; i < points.length; i++) {
-//			q += i>0?" UNION ALL ":"";
-//			q += "(SELECT routecode, routedir, " +
-//					"ST_Distance(lonlatline," +
-//						"ST_GeometryFromText('POINT(" + points[i].substring(points[i].indexOf(',')+2, points[i].indexOf(')')) 
-//						+ " " +  points[i].substring(7, points[i].indexOf(',')) + ")',4326)" +
-//					") as d FROM routesAsLonLatLines " +
-//					"order by d limit 5)";
-//		}
-//		q += ") as subsel where d < 0.001 group by routecode, routedir order by count(*) desc"; // 0.001° ~ 100m
-//		try {
-//		Statement knn3Query = db.connection.createStatement();
-//		ResultSet rs = knn3Query.executeQuery(q);
-//		System.out.println(q);
-//		if(rs.next()) {
-//			routcode = rs.getString(1);
-//			System.out.println("\"routecode\":\""+rs.getString(1)+"\",\"routedir\":\""+rs.getString(2)+"\"");		
-//		}
-//		while (rs.next()) {
-//			System.out.println("\"routecode\":\""+rs.getString(1)+"\",\"routedir\":\""+rs.getString(2)+"\"");
-//		}
-//		//System.out.println(json);
-//		
-//		} catch (SQLException e) {
-//				e.printStackTrace();
-//		}
-//		try {
-//			Statement s = db.createStatement();
-//			ResultSet rs;
-//			String routeDir = "select '1'::VARCHAR(1)";
-//			if(pointsLonLat.length > 1) {
-//				routeDir = ""+
-//					"select " +
-//						"case " +
-//						   "when ST_Line_Locate_Point(lonlatline,ST_GeometryFromText('"+pointsLonLat[0]+"',4326)) " +
-//						     " < ST_Line_Locate_Point(lonlatline,ST_GeometryFromText('"+pointsLonLat[pointsLonLat.length-1]+"',4326)) " +
-//						   "then '1' " +
-//						   "else '2' " +
-//						"end " +
-//					"from routesAsLonLatLines " +
-//					"where routecode = '"+routcode+"' " +
-//					"AND routedir = '1' ";
-//				rs = s.executeQuery(routeDir);
-//			}
-//
-//			System.out.println(routeDir);
-//			
-//			q = "SELECT routecode, " +
-//						"routedir, " +
-//						"ST_AsGeoJSON(" +
-//						   "lonlatline" +
-//						") as routePoints " +
-//						"from routesAsLonLatLines " +
-//						"where routecode = '" +
-//						routcode + "' " +
-//								"AND " +
-//								"routedir = (" +
-//								routeDir +");";
-//			
-//			System.out.println(q);
-//			rs = s.executeQuery(q);
-//			
-//			response.setContentType("application/json");
-//			PrintWriter out = response.getWriter();
-//			String json = "{\"routes\":[";
-//
-//			while (rs.next()) {
-//				if(json.length() > 11) {
-//					json += ",\n";
-//				}
-//				json += "{";
-//				json += "\"routecode\":\""+rs.getString(1)+"\",";
-//				json += "\"routedir\":\""+rs.getString(2)+"\",";
-//				json += "\"geojson\":"+rs.getString(3);
-//				json += "}";
-//			}
-//			json += "]}";
-//			out.println(json);
-//			//System.out.println(json);
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
+  String routcodeSelect = ""
+	+ "SELECT suball.route_id, \n"
+	+ "       suball.shape_id, \n"
+	+ "       suball.trip_id, \n"
+	+ "       Sum(cnt) AS score \n"
+	+ "FROM   (";
+  
+  for (int i = 0; i < coordinates.size(); i++) {
+	  
+	  String p = coordinates.get(i).getLonLatPoint();
+	  String betweenTimeClause = coordinates.get(i).getBetweenTimeClause(10);
+	  String d = coordinates.get(i).getISO8601Date();
+	  String day = coordinates.get(i).getWeekdayName();
+
+
+	  routcodeSelect += i>0?"        UNION ALL \n        ":"";
+	  routcodeSelect += ""
+					+ "(SELECT trips.route_id, \n"
+					+ "                trips.shape_id, \n"
+					+ "                trips.trip_id, \n"
+					+ "                Count(*) AS cnt \n"
+					+ "         FROM   trips, \n"
+					+ "                stop_times, \n"
+					+ "                stops, \n"
+					+ "                calendar \n"
+					+ "         WHERE  trips.route_id IN (SELECT route_id \n"
+					+ "                                   FROM   routes \n"
+					+ "                                   WHERE  St_distance(geom, St_geometryfromtext('"+p+"', 4326)) \n"
+					+ "                                          = ( \n"
+					+ "                                          SELECT Min(St_distance(geom, St_geometryfromtext('"+p+"',4326))) \n"
+					+ "                                          FROM   routes)) \n"
+					+ "                AND trips.trip_id = stop_times.trip_id \n"
+					+ "                AND stop_times.arrival_time BETWEEN "+betweenTimeClause+" \n"
+					+ "                AND stops.stop_id = stop_times.stop_id \n"
+					+ "                AND St_distance(stops.geom, St_geometryfromtext('"+p+"', 4326)) < 0.01 \n"
+					+ "                AND calendar.service_id = trips.service_id \n"
+					+ "                AND calendar."+day+" \n"
+					+ "             -- AND DATE '"+d+"' BETWEEN calendar.start_date AND calendar.end_date \n"
+					+ "         GROUP  BY trips.route_id, \n"
+					+ "                   trips.trip_id, \n"
+					+ "                   trips.shape_id) \n";
+  }
+  routcodeSelect += ") AS suball \n"
+	  + "GROUP  BY suball.route_id, \n"
+	  + "          suball.trip_id, \n"
+	  + "          suball.shape_id \n"
+	  + "ORDER  BY score DESC "
+	  + "LIMIT 10;";
+  System.out.println(routcodeSelect);
+
+
+	try {
+		Statement stm = db.connection.createStatement();
+		ResultSet rs = stm.executeQuery(routcodeSelect);
+		
+		response.setContentType("application/json");
+	PrintWriter out = response.getWriter();
+	String json = "{\"routes\":[";
+
+	while (rs.next()) {
+		if(json.length() > 11) {
+			json += ",\n";
+		}
+		json += "{";
+		json += "\"route_id\":\""+rs.getString(1)+"\",";
+		json += "\"shape_id\":\""+rs.getString(2)+"\",";
+		json += "\"trip_id\":\""+rs.getString(3)+"\",";
+		json += "\"score\":"+rs.getInt(4);
+		json += "}";
 	}
+	json += "]}";
+		out.println(json);
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+  }
 }

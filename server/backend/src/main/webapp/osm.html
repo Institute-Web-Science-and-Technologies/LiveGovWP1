@@ -16,11 +16,14 @@
 <script src="osm.js"></script>
 </head>
   <body>
-	  <div id="map" style="width: 1000px; height: 600px; position: relative;"></div>
-    <div id="cat" style="width: 300px; height: 600px; position: absolute;left:1020px;top:10px;"></div>
+	  <div id="map" style="width: 700px; height: 600px; position: relative;"></div>
+    <div style="width: 300px; position: fixed;left:720px;top:10px;">
+    	<table  border="1" id="response"></table>
+    	<div id="timing"></div>
+    </div>
     <div id="clusteringOnOff" style="position: relative; padding:10px;"></div>
 	  <table border="1">
-	        <tr><th><div id="uncheckall">all</div></th><th class="lat">Lat</th><th class="lon">Lon</th><th>Timestamp</th><th>Day</th><th>Route</th><th>Means of Transport</th></tr>
+	        <tr><th><div id="uncheckall">all</div></th><th class="lat">Lat</th><th class="lon">Lon</th><th>Timestamp</th><th>Day</th><th>Route</th><th>Service</th></tr>
 			<tr><td><input type="checkbox"></td><td class="lat">60.1652805</td><td class="lon">24.95296666</td><td>2013-09-23 20:06:36</td><td>Mon</td><td>1002</td><td>tram</td></tr>
 			<tr><td><input type="checkbox"></td><td class="lat">60.20072924</td><td class="lon">24.94461316</td><td>2013-09-23 20:06:40</td><td>Mon</td><td>1002</td><td>tram</td></tr>
 			<tr><td><input type="checkbox"></td><td class="lat">60.19868155</td><td class="lon">24.94683101</td><td>2013-09-23 20:06:45</td><td>Mon</td><td>1002</td><td>tram</td></tr>
