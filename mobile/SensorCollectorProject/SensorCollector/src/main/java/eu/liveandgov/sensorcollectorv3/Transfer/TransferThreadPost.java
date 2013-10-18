@@ -2,6 +2,8 @@ package eu.liveandgov.sensorcollectorv3.Transfer;
 
 import android.util.Log;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
@@ -18,6 +20,7 @@ import java.io.IOException;
 
 import eu.liveandgov.sensorcollectorv3.Configuration.SensorCollectionOptions;
 import eu.liveandgov.sensorcollectorv3.Connector.ConnectorThread;
+import eu.liveandgov.sensorcollectorv3.GlobalContext;
 import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
 
 /**
@@ -88,14 +91,21 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
             ContentBody fileBody = new FileBody(file);
             mEntity.addPart("upfile", fileBody);
-
             httppost.setEntity(mEntity);
-            httppost.addHeader("CHECKSUM", String.valueOf(file.length()));
 
-            httpclient.execute(httppost);
+            httppost.addHeader("CHECKSUM", String.valueOf(file.length()));
+            httppost.addHeader("ID", GlobalContext.androidId );
+
+            HttpResponse response = httpclient.execute(httppost);
+            if(response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                Log.i(LOG_TAG, "Upload failed");
+                return false;
+            }
+
         } catch (HttpHostConnectException e) {
             Log.i(LOG_TAG, "Connection Refused");
             e.printStackTrace();
+            return false;
         } catch (IOException e) {
             e.printStackTrace();
             return false;
