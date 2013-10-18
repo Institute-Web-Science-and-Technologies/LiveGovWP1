@@ -1,0 +1,24 @@
+How to import a GTFS dump into our postgres
+-------------------------------------------
+What is the General Transit Feed Specification (GTFS)?
+see: https://developers.google.com/transit/gtfs/
+
+
+1) download the python script "gtfsdb" from http://code.google.com/p/gtfsdb/
+2) add the unknown routetype 109 to gtfsdb/gtfsdb/data/route_type.txt 
+	i.e. 109,"HSL special type",""
+3) install gtfsdb (incl. geoalchemy und psycopg2) and copy the app.ini in the installation dir
+    i.e sudo easy_install psycopg2
+        sudo easy_install .
+        sudo cp app.ini /usr/local/lib/python2.7/dist-packages/gtfsdb-0.1.1-py2.7.egg
+4) download the gtfs dump from HSL http://api.reittiopas.fi/data/google_transit.zip
+    (you need HSL credentials) 
+5) create a new database called gtfsdb with postgis extension
+6) gtfsdb-load --database_url postgresql://user:pass@host/gtfsdb --is_geospatial google_transit.zip 
+7) log in to database
+    psql -h localhost -U user -d gtfsdb
+8) convert the arrival_time column from varchar to integer
+    alter table stop_times alter column arrival_time type integer using regexp_replace(arrival_time, ':', '', 'g')::integer;
+    (arrival_time is always equal to departure_time, therefore we only use arrival_time)
+9) create an index on the arrival_time column
+    create index arrival_time_idx on stop_times (arrival_time);
