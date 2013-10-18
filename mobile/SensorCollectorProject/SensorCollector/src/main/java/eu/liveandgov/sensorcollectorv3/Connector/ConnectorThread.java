@@ -3,6 +3,8 @@ package eu.liveandgov.sensorcollectorv3.Connector;
 import android.util.Log;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
 import eu.liveandgov.sensorcollectorv3.Monitor.Monitorable;
@@ -16,15 +18,16 @@ public class ConnectorThread implements Runnable, Monitorable {
     private static final String LOG_TAG = "ConnectorThread";
 
     private final SensorQueue sensorQueue;
-    private final Persistor persistor;
     private final Thread thread;
+
+    private List<Consumer> consumerList;
 
     private long count = 0;
 
-    public ConnectorThread(SensorQueue sensorQueue, Persistor persistor){
+    public ConnectorThread(SensorQueue sensorQueue){
         this.sensorQueue = sensorQueue;
-        this.persistor = persistor;
         this.thread = new Thread(this);
+        this.consumerList = new ArrayList<Consumer>();
     }
 
     @Override
@@ -33,7 +36,9 @@ public class ConnectorThread implements Runnable, Monitorable {
         String msg;
         while (true) {
             msg = sensorQueue.blockingPull();
-            persistor.push(msg);
+            for(Consumer c : consumerList) {
+                c.push(msg);
+            }
             count++;
         }
     }
@@ -49,6 +54,10 @@ public class ConnectorThread implements Runnable, Monitorable {
      */
     public String getStatus(){
         return "Throughput: " + count;
+    }
+
+    public void addConsumer(Consumer c) {
+        consumerList.add(c);
     }
 
 }
