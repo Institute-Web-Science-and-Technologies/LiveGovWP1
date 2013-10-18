@@ -41,7 +41,15 @@ public class PostgresqlDatabase extends Database {
 	
 	public PostgresqlDatabase(String user, String password) throws UnavailableException {
 		try {
-			 
+			// problem:
+			// exception when run it in eclipse+m2+tomcat7: path!java.lang.ClassNotFoundException: org.postgresql.Driver...
+			// solution:
+			// right click on Project 
+			//  -> Properties 
+			//  -> Deployment Assembly 
+			//  -> Add 
+			//  -> Java Build Path Entries 
+			//  -> Maven Dependencies
 			Class.forName("org.postgresql.Driver");
  
 		} catch (ClassNotFoundException e) {
@@ -54,7 +62,7 @@ public class PostgresqlDatabase extends Database {
 		try {
 
 			connection = DriverManager.getConnection(
-					"jdbc:postgresql://127.0.0.1:5432/liveandgov?autoReconnect=true", user,
+					"jdbc:postgresql://127.0.0.1:5432/gtfsdb?autoReconnect=true", user,
 					password);
 
 			stmtLink = connection.createStatement();
