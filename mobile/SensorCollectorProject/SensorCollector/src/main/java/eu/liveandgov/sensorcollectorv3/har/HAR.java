@@ -9,12 +9,33 @@ import eu.liveandgov.sensorcollectorv3.Connector.Consumer;
  */
 public class HAR implements Consumer {
     private static final String LOG_TAG = "HAR";
+    private TimedQueue queue;
+    private long windowSize;
+    private long overlap;
+    private long windowStart = -1;
+    private long windowEnd = -1;
 
+    public HAR(long windowSize, long overlap) {
+        this.windowSize = windowSize;
+        this.overlap = overlap;
 
+        queue = new TimedQueue(windowSize);
+    }
 
     @Override
     public void push(String m) {
-        
+        long time = getTimeFromValue(m);
+        // Check if we want to get the window
+        if(time > windowEnd) {
+            String[] window = queue.toArray();
+        }
+        queue.push(time, m);
+        if(windowStart < 0) {
+            windowStart = time;
+            windowEnd = time + windowSize;
+        }
+
+
     }
 
 

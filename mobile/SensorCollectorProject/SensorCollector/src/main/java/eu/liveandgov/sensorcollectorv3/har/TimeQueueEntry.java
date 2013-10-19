@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * Created by cehlen on 10/18/13.
  */
-public class TimeQueueEntry {
+public class TimeQueueEntry<V> {
     public long time;
-    public String value;
+    public V value;
 }
