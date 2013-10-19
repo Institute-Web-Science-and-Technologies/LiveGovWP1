@@ -2,6 +2,8 @@ package eu.liveandgov.sensorcollectorv3.har;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+
 import eu.liveandgov.sensorcollectorv3.connector.Consumer;
 import eu.liveandgov.sensorcollectorv3.connector.Producer;
 import eu.liveandgov.sensorcollectorv3.sensors.MotionSensorValue;
@@ -48,23 +50,23 @@ public class WindowProducer extends Producer<Window> implements Consumer<MotionS
         Log.i(LOG_TAG, "New Window!");
         Window w = new Window();
 
-        MotionSensorValue[] values = queue.toArray();
-        w.x = new float[values.length];
-        w.y = new float[values.length];
-        w.z = new float[values.length];
+        ArrayList<MotionSensorValue> values = queue.toArrayList();
+        w.x = new float[values.size()];
+        w.y = new float[values.size()];
+        w.z = new float[values.size()];
 
-        for(int i = 0; i < values.length; i++) {
+        for(int i = 0; i < values.size(); i++) {
             // Get meta info from first element
             if(i == 0) {
-                w.startTime = values[0].time;
-                w.id = values[0].id;
-                w.type = values[0].type;
+                w.startTime = values.get(0).time;
+                w.id = values.get(0).id;
+                w.type = values.get(0).type;
             }
 
-            w.endTime = values[i].time;
-            w.x[i] = values[i].x;
-            w.y[i] = values[i].y;
-            w.z[i] = values[i].z;
+            w.endTime = values.get(i).time;
+            w.x[i] = values.get(i).x;
+            w.y[i] = values.get(i).y;
+            w.z[i] = values.get(i).z;
         }
 
         // Push the Window!

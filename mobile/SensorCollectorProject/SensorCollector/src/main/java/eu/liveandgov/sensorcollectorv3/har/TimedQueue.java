@@ -1,6 +1,7 @@
 package eu.liveandgov.sensorcollectorv3.har;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -31,13 +32,12 @@ public class TimedQueue<V> {
     }
 
 
-    public V[] toArray() {
-        V[] rslt = (V[]) new Object[queue.size()];
-        int pos = 0;
-        for(TimeQueueEntry entry : queue) {
-            rslt[pos++] = (V) entry.value;
+    public ArrayList<V> toArrayList() {
+        ArrayList<V> list = new ArrayList<V>();
+        for(TimeQueueEntry e : queue) {
+            list.add((V)e.value);
         }
-        return rslt;
+        return list;
     }
 
     /**
@@ -46,7 +46,7 @@ public class TimedQueue<V> {
      */
     private void limitToSize(long time) {
         long minTime = time - size;
-        while(queue.peek()!=null && queue.peek().time < minTime) {
+        while(queue.peek()!=null && queue.peek().time <= minTime) {
             queue.poll();
         }
     }

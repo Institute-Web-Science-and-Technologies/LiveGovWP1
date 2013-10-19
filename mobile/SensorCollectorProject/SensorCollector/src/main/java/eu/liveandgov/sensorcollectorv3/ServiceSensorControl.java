@@ -89,7 +89,7 @@ public class ServiceSensorControl extends Service {
         // Connect sensorQueue to Persistor
         connectorThread = new ConnectorThread(sensorQueue);
         connectorThread.addConsumer(persistor);
-        //connectorThread.addConsumer(filter);
+        connectorThread.addConsumer(filter);
         connectorThread.start();
 
         // setup sensor manager
