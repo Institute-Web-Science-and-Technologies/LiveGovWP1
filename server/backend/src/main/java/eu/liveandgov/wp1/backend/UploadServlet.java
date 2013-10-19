@@ -150,4 +150,14 @@ public class UploadServlet extends HttpServlet {
 		outstream.close();
         return outfile;
 	}
+
+	private void copyStream(InputStream input, OutputStream output)
+			throws IOException {
+		byte[] buffer = new byte[1024];
+		int bytesRead;
+		while ((bytesRead = input.read(buffer)) != -1) {
+			output.write(buffer, 0, bytesRead);
+		}
+	}
+
 }
