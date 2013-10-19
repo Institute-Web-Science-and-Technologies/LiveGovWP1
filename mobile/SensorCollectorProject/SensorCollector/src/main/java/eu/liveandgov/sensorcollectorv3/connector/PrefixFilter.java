@@ -12,8 +12,7 @@ public class PrefixFilter extends Producer<String> implements Consumer<String> {
     private static final String LOG_TAG = "PrefixFilter";
     private List<String> filterList;
 
-    public PrefixFilter(Consumer<String> c) {
-        this.setConsumer(c);
+    public PrefixFilter() {
         this.filterList = new ArrayList<String>();
     }
 
