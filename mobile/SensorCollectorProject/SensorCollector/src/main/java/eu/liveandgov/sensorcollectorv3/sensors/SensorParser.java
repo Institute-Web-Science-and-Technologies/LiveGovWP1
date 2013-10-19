@@ -22,6 +22,24 @@ public class SensorParser {
         SensorParser.id = id;
     }
 
+    public static MotionSensorValue parseEvent(String event) {
+        MotionSensorValue newEvent = new MotionSensorValue();
+
+        // Meta data
+        String[] temp = event.split(",");
+        newEvent.type = temp[0];
+        newEvent.time = Long.parseLong(temp[1]);
+        newEvent.id = temp[2];
+
+        // Values
+        String[] values = temp[3].split(" ");
+        newEvent.x = Float.parseFloat(values[0]);
+        newEvent.y = Float.parseFloat(values[1]);
+        newEvent.z = Float.parseFloat(values[2]);
+
+        return newEvent;
+    }
+
     public static String parse(SensorEvent event) {
         int sensorType= event.sensor.getType();
         // event.timestamp is in ns = 1E-9 sec.

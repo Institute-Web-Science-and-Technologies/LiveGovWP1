@@ -8,13 +8,12 @@ import java.util.List;
 /**
  * Created by cehlen on 10/18/13.
  */
-public class PrefixFilter implements Consumer<String> {
+public class PrefixFilter extends Producer<String> implements Consumer<String> {
     private static final String LOG_TAG = "PrefixFilter";
     private List<String> filterList;
-    private Consumer consumer;
 
-    public PrefixFilter(Consumer c) {
-        this.consumer = c;
+    public PrefixFilter(Consumer<String> c) {
+        this.setConsumer(c);
         this.filterList = new ArrayList<String>();
     }
 
@@ -25,9 +24,7 @@ public class PrefixFilter implements Consumer<String> {
     @Override
     public void push(String m) {
         for(String filter : filterList) {
-            Log.i(LOG_TAG, "Filter " + filter + " MSG: " + m);
             if(m.startsWith(filter)) {
-
                 consumer.push(m);
             }
         }

@@ -58,10 +58,10 @@ public class ServiceSensorControl extends Service {
         sensorQueue = new LinkedSensorQueue();
 
         // HAR
-        HAR har = new HAR();
+        //HAR har = new HAR();
         // HAR filter
-        PrefixFilter filter = new PrefixFilter(har);
-        filter.addFilter("ACC");
+        //PrefixFilter filter = new PrefixFilter(har);
+        //filter.addFilter("ACC");
 
 
         // Start sensor thread
@@ -71,7 +71,7 @@ public class ServiceSensorControl extends Service {
         // Connect sensorQueue to Persistor
         connectorThread = new ConnectorThread(sensorQueue);
         connectorThread.addConsumer(persistor);
-        connectorThread.addConsumer(filter);
+        //connectorThread.addConsumer(filter);
         connectorThread.start();
 
         // setup sensor manager

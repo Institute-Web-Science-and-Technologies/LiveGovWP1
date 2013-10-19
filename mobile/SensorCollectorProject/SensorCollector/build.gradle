@@ -28,4 +28,5 @@ dependencies {
     compile 'org.apache.httpcomponents:httpmime:4.0-beta1'
     compile 'org.jeromq:jeromq:0.2.0'
     compile 'junit:junit:3.8'
+    compile 'org.apache.commons:commons-math3:3.2'
 }
