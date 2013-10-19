@@ -37,7 +37,7 @@ import javax.servlet.UnavailableException;
  *       exit;
  */
 public class PostgresqlDatabase extends Database {
-	Connection connection = null;
+	public Connection connection = null;
 	
 	public PostgresqlDatabase(String user, String password) throws UnavailableException {
 		try {
