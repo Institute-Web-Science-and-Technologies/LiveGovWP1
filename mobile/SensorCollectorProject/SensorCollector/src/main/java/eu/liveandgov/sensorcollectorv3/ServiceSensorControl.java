@@ -95,9 +95,6 @@ public class ServiceSensorControl extends Service {
         // setup sensor manager
         transferManager = new TransferThreadPost(persistor, new File(GlobalContext.context.getFilesDir(), STAGE_FILENAME));
 
-        // Start transfer thread
-        // TransferThreadZMQ.setup();
-        // TransferThreadZMQ.getInstance().start();
 
         // Start monitoring thread
         // MonitorThread.addQueue(sensorQueue)
