@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.Persistence;
+package eu.liveandgov.sensorcollectorv3.persistence;
 
 import android.util.Log;
 
@@ -7,8 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import eu.liveandgov.sensorcollectorv3.Monitor.MonitorThread;
-import eu.liveandgov.sensorcollectorv3.GlobalContext;
+import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 
 /**
  * Created by hartmann on 9/20/13.

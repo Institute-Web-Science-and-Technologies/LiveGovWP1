@@ -1,14 +1,11 @@
-package eu.liveandgov.sensorcollectorv3.Connector;
+package eu.liveandgov.sensorcollectorv3.connector;
 
 import android.util.Log;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.liveandgov.sensorcollectorv3.GlobalContext;
 import eu.liveandgov.sensorcollectorv3.Monitor.Monitorable;
-import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
 import eu.liveandgov.sensorcollectorv3.SensorQueue.SensorQueue;
 
 /**

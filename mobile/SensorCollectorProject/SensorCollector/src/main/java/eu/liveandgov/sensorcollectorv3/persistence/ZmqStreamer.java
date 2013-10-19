@@ -1,10 +1,10 @@
-package eu.liveandgov.sensorcollectorv3.Persistence;
+package eu.liveandgov.sensorcollectorv3.persistence;
 
 import org.jeromq.ZMQ;
 
 import java.io.File;
 
-import eu.liveandgov.sensorcollectorv3.Configuration.SensorCollectionOptions;
+import eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions;
 
 /**
  * Created by hartmann on 10/2/13.

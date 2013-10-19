@@ -1,6 +1,6 @@
-package eu.liveandgov.sensorcollectorv3.Transfer;
+package eu.liveandgov.sensorcollectorv3.transfer;
 
-import eu.liveandgov.sensorcollectorv3.Monitor.Monitorable;
+import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
 
 /**
  * Created by hartmann on 10/2/13.

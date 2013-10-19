@@ -1,10 +1,9 @@
-package eu.liveandgov.sensorcollectorv3.SensorQueue;
+package eu.liveandgov.sensorcollectorv3.sensor_queue;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
-import eu.liveandgov.sensorcollectorv3.Monitor.MonitorThread;
+import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 
 /**
  * Created by hartmann on 9/29/13.

@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.Sensors;
+package eu.liveandgov.sensorcollectorv3.sensors;
 
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -9,13 +9,13 @@ import android.util.Log;
 import java.util.HashSet;
 import java.util.Set;
 
-import eu.liveandgov.sensorcollectorv3.Configuration.SensorCollectionOptions;
+import eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions;
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.SensorQueue.SensorQueue;
-import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.ActivityHolder;
-import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.LocationHolder;
-import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.MotionSensorHolder;
-import eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers.SensorHolder;
+import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorProducers.ActivityHolder;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorProducers.LocationHolder;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorProducers.MotionSensorHolder;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorProducers.SensorHolder;
 
 
 /**

@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.Transfer;
+package eu.liveandgov.sensorcollectorv3.transfer;
 
 import android.util.Log;
 
@@ -10,18 +10,14 @@ import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import eu.liveandgov.sensorcollectorv3.Configuration.SensorCollectionOptions;
-import eu.liveandgov.sensorcollectorv3.Connector.ConnectorThread;
+import eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions;
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
+import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
 
 /**
  * Transfer sensor.log file to server.

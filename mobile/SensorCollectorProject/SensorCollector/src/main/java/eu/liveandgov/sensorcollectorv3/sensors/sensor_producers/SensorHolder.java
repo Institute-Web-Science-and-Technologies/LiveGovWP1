@@ -1,7 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers;
-
-import android.hardware.Sensor;
-import android.os.Handler;
+package eu.liveandgov.sensorcollectorv3.sensors.sensor_producers;
 
 /**
  * Created by hartmann on 9/29/13.

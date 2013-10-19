@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.Configuration;
+package eu.liveandgov.sensorcollectorv3.configuration;
 
 /**
  * Created by hartmann on 9/26/13.

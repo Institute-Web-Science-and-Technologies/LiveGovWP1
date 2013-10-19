@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.Sensors;
+package eu.liveandgov.sensorcollectorv3.sensors;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;

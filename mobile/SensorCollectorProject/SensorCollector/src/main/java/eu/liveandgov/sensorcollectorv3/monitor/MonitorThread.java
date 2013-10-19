@@ -1,18 +1,9 @@
-package eu.liveandgov.sensorcollectorv3.Monitor;
-
-import android.provider.Settings;
+package eu.liveandgov.sensorcollectorv3.monitor;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
-import javax.microedition.khronos.opengles.GL;
-
-import eu.liveandgov.sensorcollectorv3.Connector.ConnectorThread;
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.SensorQueue.LinkedSensorQueue;
-import eu.liveandgov.sensorcollectorv3.ServiceSensorControl;
 
 /**
  * Created by hartmann on 9/22/13.

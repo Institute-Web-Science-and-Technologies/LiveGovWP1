@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.Connector;
+package eu.liveandgov.sensorcollectorv3.connector;
 
 import android.util.Log;
 

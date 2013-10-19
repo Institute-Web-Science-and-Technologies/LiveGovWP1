@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers;
+package eu.liveandgov.sensorcollectorv3.sensors.sensor_producers;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -6,9 +6,8 @@ import android.hardware.SensorEventListener;
 import android.os.Handler;
 
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.SensorQueue.LinkedSensorQueue;
-import eu.liveandgov.sensorcollectorv3.SensorQueue.SensorQueue;
-import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
+import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorParser;
 
 /**
  * Created by hartmann on 9/15/13.

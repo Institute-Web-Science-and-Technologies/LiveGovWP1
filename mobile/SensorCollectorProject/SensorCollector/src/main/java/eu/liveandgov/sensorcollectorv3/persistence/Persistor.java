@@ -1,10 +1,9 @@
-package eu.liveandgov.sensorcollectorv3.Persistence;
+package eu.liveandgov.sensorcollectorv3.persistence;
 
 import java.io.File;
-import java.io.IOException;
 
-import eu.liveandgov.sensorcollectorv3.Connector.Consumer;
-import eu.liveandgov.sensorcollectorv3.Monitor.Monitorable;
+import eu.liveandgov.sensorcollectorv3.connector.Consumer;
+import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
 
 /**
  * Created by hartmann on 9/20/13.

@@ -1,11 +1,7 @@
-package eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers;
+package eu.liveandgov.sensorcollectorv3.sensors.sensor_producers;
 
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.os.Bundle;
 import android.util.Log;
 

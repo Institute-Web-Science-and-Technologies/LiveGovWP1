@@ -1,9 +1,5 @@
-package eu.liveandgov.sensorcollectorv3.Sensors.SensorProducers;
+package eu.liveandgov.sensorcollectorv3.sensors.sensor_producers;
 
-import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
@@ -16,11 +12,9 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
-import org.jeromq.ZMQ;
-
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.SensorQueue.SensorQueue;
-import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
+import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorParser;
 
 /**
  *

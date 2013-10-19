@@ -1,6 +1,6 @@
-package eu.liveandgov.sensorcollectorv3.SensorQueue;
+package eu.liveandgov.sensorcollectorv3.sensor_queue;
 
-import eu.liveandgov.sensorcollectorv3.Monitor.Monitorable;
+import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
 
 /**
  * Created by hartmann on 10/2/13.
