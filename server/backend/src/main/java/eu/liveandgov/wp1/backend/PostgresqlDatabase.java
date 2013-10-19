@@ -39,7 +39,7 @@ import javax.servlet.UnavailableException;
 public class PostgresqlDatabase extends Database {
 	public Connection connection = null;
 	
-	public PostgresqlDatabase(String user, String password) throws UnavailableException {
+	public PostgresqlDatabase(String user, String password) {
 		try {
 			// problem:
 			// exception when run it in eclipse+m2+tomcat7: path!java.lang.ClassNotFoundException: org.postgresql.Driver...
@@ -100,7 +100,7 @@ public class PostgresqlDatabase extends Database {
 			stmtLink.execute(createGravityTable);
 
 		} catch (SQLException e) {
-			throw new UnavailableException(e.getMessage());
+			// throw new UnavailableException(e.getMessage());
 		} finally {
 			
 			try {

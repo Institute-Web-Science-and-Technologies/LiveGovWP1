@@ -4,7 +4,7 @@ import eu.liveandgov.wp1.backend.PostgresqlDatabase;
 import eu.liveandgov.wp1.backend.SensorValueObjects.*;
 import org.jeromq.ZMQ;
 
-import javax.servlet.UnavailableException;
+// import javax.servlet.UnavailableException;
 import java.io.*;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  * To change this template use File | Settings | File Templates.
  */
 public class DbIngestThread implements Runnable {
-    public static final String OUT_DIR = "/srv/liveandgov/UploadServletRawFiles/";
+    public static final String IMPORT_DIR = "/srv/liveandgov/UploadServletRawFiles/";
 
     public static final String ZMQ_PORT = "50101";
     public static final String ZMQ_ADDRESS = "tcp://*:"+ZMQ_PORT;
@@ -27,8 +27,9 @@ public class DbIngestThread implements Runnable {
     PrintStream LOG = System.out;
     ZMQ.Socket controlSocket;
 
-    public void main(String[] args) {
-        run();
+    public static void main(String[] args) {
+        DbIngestThread instance = new DbIngestThread();
+        instance.run();
     }
 
     public void run(){
@@ -53,9 +54,6 @@ public class DbIngestThread implements Runnable {
             } catch (SQLException e) {
                 LOG.println("Error writing to database.");
                 e.printStackTrace();
-            } catch (UnavailableException e) {
-                LOG.println("DB Connection unavailable");
-                e.printStackTrace();
             } catch (IOException e) {
                 LOG.println("Error writing to database.");
                 e.printStackTrace();
@@ -63,7 +61,7 @@ public class DbIngestThread implements Runnable {
         }
     }
 
-    private void saveToDatabase(InputStream input) throws IOException, UnavailableException, SQLException {
+    private void saveToDatabase(InputStream input) throws IOException, SQLException {
         PostgresqlDatabase db = new PostgresqlDatabase("liveandgov", "liveandgov");
 
         PreparedStatement psAcc, psGPS, psTag, psAct, psLac, psGra;
