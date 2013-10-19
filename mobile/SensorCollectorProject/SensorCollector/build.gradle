@@ -27,4 +27,5 @@ dependencies {
     compile 'com.google.android.gms:play-services:3.1.36'
     compile 'org.apache.httpcomponents:httpmime:4.0-beta1'
     compile 'org.jeromq:jeromq:0.2.0'
+    compile 'org.apache.commons:commons-math3:3.2'
 }

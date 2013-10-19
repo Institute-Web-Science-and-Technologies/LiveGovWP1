@@ -27,7 +27,7 @@ public class HAR implements Consumer<String> {
         long time = getTimeFromValue(m);
         // Check if we want to get the window
         if(time > windowEnd) {
-            String[] window = queue.toArray();
+            //String[] window = queue.toArray();
         }
         queue.push(time, m);
         if(windowStart < 0) {
