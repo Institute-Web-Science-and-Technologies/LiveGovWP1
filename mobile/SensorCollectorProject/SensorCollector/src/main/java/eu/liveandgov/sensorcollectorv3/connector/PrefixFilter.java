@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by cehlen on 10/18/13.
  */
-public class PrefixFilter implements Consumer {
+public class PrefixFilter implements Consumer<String> {
     private static final String LOG_TAG = "PrefixFilter";
     private List<String> filterList;
     private Consumer consumer;

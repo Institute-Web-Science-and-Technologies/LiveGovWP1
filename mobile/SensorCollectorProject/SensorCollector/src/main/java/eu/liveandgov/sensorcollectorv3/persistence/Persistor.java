@@ -8,7 +8,7 @@ import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
 /**
  * Created by hartmann on 9/20/13.
  */
-public interface Persistor extends Monitorable, Consumer {
+public interface Persistor extends Monitorable, Consumer<String> {
     /**
      * Persist message m to storage unless blockPush() was called in
      * which case all messages are dropped.

@@ -2,12 +2,12 @@ package eu.liveandgov.sensorcollectorv3.har;
 
 import android.util.Log;
 
-import eu.liveandgov.sensorcollectorv3.Connector.Consumer;
+import eu.liveandgov.sensorcollectorv3.connector.Consumer;
 
 /**
  * Created by cehlen on 10/18/13.
  */
-public class HAR implements Consumer {
+public class HAR implements Consumer<String> {
     private static final String LOG_TAG = "HAR";
     private TimedQueue queue;
     private long windowSize;

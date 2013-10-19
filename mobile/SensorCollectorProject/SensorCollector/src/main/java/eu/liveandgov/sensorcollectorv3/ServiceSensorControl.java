@@ -7,19 +7,18 @@ import android.util.Log;
 
 import java.io.File;
 
-import eu.liveandgov.sensorcollectorv3.Configuration.IntentAPI;
-import eu.liveandgov.sensorcollectorv3.Connector.ConnectorThread;
-import eu.liveandgov.sensorcollectorv3.Connector.PrefixFilter;
-import eu.liveandgov.sensorcollectorv3.Monitor.MonitorThread;
-import eu.liveandgov.sensorcollectorv3.Persistence.FilePersistor;
-import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
-import eu.liveandgov.sensorcollectorv3.Persistence.ZmqStreamer;
-import eu.liveandgov.sensorcollectorv3.SensorQueue.LinkedSensorQueue;
-import eu.liveandgov.sensorcollectorv3.SensorQueue.SensorQueue;
-import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
-import eu.liveandgov.sensorcollectorv3.Sensors.SensorThread;
-import eu.liveandgov.sensorcollectorv3.Transfer.TransferManager;
-import eu.liveandgov.sensorcollectorv3.Transfer.TransferThreadPost;
+import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
+import eu.liveandgov.sensorcollectorv3.connector.ConnectorThread;
+import eu.liveandgov.sensorcollectorv3.connector.PrefixFilter;
+import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
+import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
+import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
+import eu.liveandgov.sensorcollectorv3.sensor_queue.LinkedSensorQueue;
+import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorParser;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorThread;
+import eu.liveandgov.sensorcollectorv3.transfer.TransferManager;
+import eu.liveandgov.sensorcollectorv3.transfer.TransferThreadPost;
 import eu.liveandgov.sensorcollectorv3.har.HAR;
 
 public class ServiceSensorControl extends Service {
