@@ -9,12 +9,17 @@ import java.io.File;
 
 import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
 import eu.liveandgov.sensorcollectorv3.connector.ConnectorThread;
+import eu.liveandgov.sensorcollectorv3.connector.MotionSensorValueProducer;
 import eu.liveandgov.sensorcollectorv3.connector.PrefixFilter;
+import eu.liveandgov.sensorcollectorv3.har.ClassifyProducer;
+import eu.liveandgov.sensorcollectorv3.har.FeatureProducer;
+import eu.liveandgov.sensorcollectorv3.har.WindowProducer;
 import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
 import eu.liveandgov.sensorcollectorv3.sensor_queue.LinkedSensorQueue;
 import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.sensors.MotionSensorValue;
 import eu.liveandgov.sensorcollectorv3.sensors.SensorParser;
 import eu.liveandgov.sensorcollectorv3.sensors.SensorThread;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferManager;
@@ -57,12 +62,25 @@ public class ServiceSensorControl extends Service {
         // persistor   = new ZmqStreamer();
         sensorQueue = new LinkedSensorQueue();
 
-        // HAR
-        //HAR har = new HAR();
         // HAR filter
-        //PrefixFilter filter = new PrefixFilter(har);
-        //filter.addFilter("ACC");
+        PrefixFilter filter = new PrefixFilter();
+        filter.addFilter("ACC");
 
+        // Parser
+        MotionSensorValueProducer parseProd = new MotionSensorValueProducer();
+        filter.setConsumer(parseProd);
+
+        // Window
+        WindowProducer windowProducer = new WindowProducer(5000, 1000);
+        parseProd.setConsumer(windowProducer);
+
+        // Feature
+        FeatureProducer featureProducer = new FeatureProducer();
+        windowProducer.setConsumer(featureProducer);
+
+        // Classify
+        ClassifyProducer classifyProducer = new ClassifyProducer();
+        featureProducer.setConsumer(classifyProducer);
 
         // Start sensor thread
         SensorThread.setup(sensorQueue);

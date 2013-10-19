@@ -1,5 +1,7 @@
 package eu.liveandgov.sensorcollectorv3.har;
 
+import android.util.Log;
+
 import eu.liveandgov.sensorcollectorv3.connector.Consumer;
 import eu.liveandgov.sensorcollectorv3.connector.Producer;
 import eu.liveandgov.sensorcollectorv3.sensors.MotionSensorValue;
@@ -9,6 +11,8 @@ import eu.liveandgov.sensorcollectorv3.sensors.Window;
  * Created by cehlen on 10/19/13.
  */
 public class WindowProducer extends Producer<Window> implements Consumer<MotionSensorValue> {
+    private static String LOG_TAG = "WND_PROD";
+
 
     private TimedQueue<MotionSensorValue> queue;
     private long windowSize;
@@ -41,6 +45,7 @@ public class WindowProducer extends Producer<Window> implements Consumer<MotionS
     }
 
     private void createNewWindow() {
+        Log.i(LOG_TAG, "New Window!");
         Window w = new Window();
 
         MotionSensorValue[] values = queue.toArray();
