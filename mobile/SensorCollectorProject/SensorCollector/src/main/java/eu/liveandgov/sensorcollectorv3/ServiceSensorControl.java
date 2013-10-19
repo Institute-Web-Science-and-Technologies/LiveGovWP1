@@ -9,6 +9,7 @@ import java.io.File;
 
 import eu.liveandgov.sensorcollectorv3.Configuration.IntentAPI;
 import eu.liveandgov.sensorcollectorv3.Connector.ConnectorThread;
+import eu.liveandgov.sensorcollectorv3.Connector.PrefixFilter;
 import eu.liveandgov.sensorcollectorv3.Monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.Persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
@@ -19,6 +20,7 @@ import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
 import eu.liveandgov.sensorcollectorv3.Sensors.SensorThread;
 import eu.liveandgov.sensorcollectorv3.Transfer.TransferManager;
 import eu.liveandgov.sensorcollectorv3.Transfer.TransferThreadPost;
+import eu.liveandgov.sensorcollectorv3.har.HAR;
 
 public class ServiceSensorControl extends Service {
     static final String LOG_TAG =  "SCS";
@@ -56,6 +58,13 @@ public class ServiceSensorControl extends Service {
         // persistor   = new ZmqStreamer();
         sensorQueue = new LinkedSensorQueue();
 
+        // HAR
+        HAR har = new HAR();
+        // HAR filter
+        PrefixFilter filter = new PrefixFilter(har);
+        filter.addFilter("ACC");
+
+
         // Start sensor thread
         SensorThread.setup(sensorQueue);
         SensorThread.start();
@@ -63,6 +72,7 @@ public class ServiceSensorControl extends Service {
         // Connect sensorQueue to Persistor
         connectorThread = new ConnectorThread(sensorQueue);
         connectorThread.addConsumer(persistor);
+        connectorThread.addConsumer(filter);
         connectorThread.start();
 
         // setup sensor manager
