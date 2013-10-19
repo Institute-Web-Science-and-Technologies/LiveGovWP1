@@ -79,20 +79,14 @@ public class UploadServlet extends HttpServlet {
             // get input stream from MultiPart Form part
 	    	InputStream uploadedFileInputStream = getInputStreamFromRequest(request, "upfile");
 
-    		// copy file to memory in order to make it consumable twice
-    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    		copyStream(uploadedFileInputStream, baos);
-
             // write data to disk
             long unixTime = System.currentTimeMillis() / 1000L;
             String fileName = request.getHeader("ID") + "_" + unixTime;
-            File savedFile = saveToDisk(new ByteArrayInputStream(baos.toByteArray()), fileName );
+            File savedFile = saveToDisk(uploadedFileInputStream, fileName );
 
             // Validation
             checkFile(request, savedFile);
 
-            // save data to db
-			saveToDatabase(new ByteArrayInputStream(baos.toByteArray()));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -156,129 +150,4 @@ public class UploadServlet extends HttpServlet {
 		outstream.close();
         return outfile;
 	}
-
-	private void saveToDatabase(InputStream input) throws IOException {
-        try {
-		PostgresqlDatabase db = new PostgresqlDatabase("liveandgov", "liveandgov");
-		PreparedStatement psAcc, psGPS, psTag, psAct, psLac, psGra;
-		Timestamp ts;
-		BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-
-		psAcc = db.connection
-				.prepareStatement("INSERT INTO accelerometer VALUES (?, ?, ?, ?, ?)");
-		psGPS = db.connection
-				.prepareStatement("INSERT INTO gps VALUES (?, ?, ST_GeomFromText(?,4326))");
-		psTag = db.connection
-				.prepareStatement("INSERT INTO tags VALUES (?, ?, ?)");
-		psAct = db.connection
-				.prepareStatement("INSERT INTO google_activity VALUES (?, ?, ?)");
-		psLac = db.connection
-				.prepareStatement("INSERT INTO linear_acceleration VALUES (?, ?, ?, ?, ?)");
-		psGra = db.connection
-				.prepareStatement("INSERT INTO gravity VALUES (?, ?, ?, ?, ?)");
-
-        String line;
-		while (reader.ready()) {
-            line = reader.readLine();
-            RawSensorValue rsv;
-            try {
-			    rsv = RawSensorValue.fromString(line);
-            }
-            catch (Exception e) {
-                System.err.println("Error parsing line: " + line);
-                continue;
-            }
-
-			switch (rsv.type) {
-			case ACC:
-				AccSensorValue asv = AccSensorValue.fromRSV(rsv);
-				psAcc.setString(1, asv.id);
-				ts = new Timestamp(asv.timestamp);
-				psAcc.setTimestamp(2, ts);
-				psAcc.setFloat(3, asv.x);
-				psAcc.setFloat(4, asv.y);
-				psAcc.setFloat(5, asv.z);
-				psAcc.addBatch();
-				break;
-			case GPS:
-				GPSSensorValue gsv = GPSSensorValue.fromRSV(rsv);
-				psGPS.setString(1, gsv.id);
-				ts = new Timestamp(gsv.timestamp);
-				psGPS.setTimestamp(2, ts);
-				psGPS.setString(3, "POINT(" + Double.toString(gsv.longitude)
-						+ ' ' + Double.toString(gsv.latitude) + ")");
-
-				psGPS.addBatch();
-				break;
-			case TAG:
-				TagSensorValue tsv = TagSensorValue.fromRSV(rsv);
-				psTag.setString(1, tsv.id);
-				ts = new Timestamp(tsv.timestamp);
-				psTag.setTimestamp(2, ts);
-				psTag.setString(3, tsv.tag);
-				psTag.addBatch();
-				break;
-			case ACT:
-				GoogleActivitySensorValue gasv = GoogleActivitySensorValue.fromRSV(rsv);
-				psAct.setString(1, gasv.id);
-				ts = new Timestamp(gasv.timestamp);
-				psAct.setTimestamp(2, ts);
-				psAct.setString(3, gasv.activity);
-				psAct.addBatch();
-				break;
-			case LAC:
-				LacSensorValue lasv = LacSensorValue.fromRSV(rsv);
-				psLac.setString(1, lasv.id);
-				ts = new Timestamp(lasv.timestamp);
-				psLac.setTimestamp(2, ts);
-				psLac.setFloat(3, lasv.x);
-				psLac.setFloat(4, lasv.y);
-				psLac.setFloat(5, lasv.z);
-				psLac.addBatch();
-				break;
-			case GRA:
-				GraSensorValue grasv = GraSensorValue.fromRSV(rsv);
-				psGra.setString(1, grasv.id);
-				ts = new Timestamp(grasv.timestamp);
-				psGra.setTimestamp(2, ts);
-				psGra.setFloat(3, grasv.x);
-				psGra.setFloat(4, grasv.y);
-				psGra.setFloat(5, grasv.z);
-				psGra.addBatch();
-				break;
-			default:
-				break;
-			}
-		}
-
-		psAcc.executeBatch();
-		psGPS.executeBatch();
-		psTag.executeBatch();
-		psAct.executeBatch();
-		psLac.executeBatch();
-		psGra.executeBatch();
-		psAcc.close();
-		psGPS.close();
-		psTag.close();
-		psAct.close();
-		psLac.close();
-		psGra.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new IOException(e);
-        } catch (UnavailableException e) {
-            e.printStackTrace();
-            throw new IOException(e);
-        }
-	}
-
-	private void copyStream(InputStream input, OutputStream output)
-			throws IOException {
-		byte[] buffer = new byte[1024];
-		int bytesRead;
-		while ((bytesRead = input.read(buffer)) != -1) {
-			output.write(buffer, 0, bytesRead);
-		}
-	}
-
 }
