@@ -12,11 +12,8 @@ import java.sql.Timestamp;
 import java.util.logging.Logger;
 
 /**
- * Created with IntelliJ IDEA.
  * User: hartmann
  * Date: 10/19/13
- * Time: 4:09 PM
- * To change this template use File | Settings | File Templates.
  */
 public class DbIngestThread implements Runnable {
     public static final String IMPORT_DIR = "/srv/liveandgov/UploadServletRawFiles/";
@@ -41,7 +38,7 @@ public class DbIngestThread implements Runnable {
         while (true) {
             try {
                 message = controlSocket.recvStr();
-                LOG.println("Receivced message:" + message);
+                LOG.println("Received message:" + message);
 
                 if (message.equals("STOP")) { break; }
 
@@ -56,6 +53,9 @@ public class DbIngestThread implements Runnable {
                 e.printStackTrace();
             } catch (IOException e) {
                 LOG.println("Error writing to database.");
+                e.printStackTrace();
+            } catch (Exception e) {
+                LOG.println("Something (else) went wrong.");
                 e.printStackTrace();
             }
         }

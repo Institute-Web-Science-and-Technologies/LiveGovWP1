@@ -33,28 +33,25 @@ import eu.liveandgov.wp1.backend.SensorValueObjects.TagSensorValue;
 
 /**
  * Servlet implementation class UploadServlet2
- * 
- * 
+ *
+ *
  * Test with: echo "ACC,1378128012707152,id1241242,0.018311 0.117111 0.32142" |
  * curl localhost:8080/backend/upload -F "upfile=@-"
- * 
+ *
  * or using the provided test data cat test-upload-data.txt | curl
  * localhost:8080/backend/upload -F "upfile=@-"
- * 
+ *
  */
 @WebServlet("/upload")
 @MultipartConfig
 public class UploadServlet extends HttpServlet {
-	public static final String OUT_DIR = "/srv/liveandgov/UploadServletRawFiles/";
-
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public UploadServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -62,7 +59,6 @@ public class UploadServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-
         response.getWriter().write("<h1>Live+Gov UploadServlet.</h1> <p>Please upload file via POST.</p>");
         response.setStatus(HttpServletResponse.SC_OK);
 	}
@@ -70,12 +66,10 @@ public class UploadServlet extends HttpServlet {
 	/**
 	 * Receive sensor data in .ssf format:
      * - write data to disk
-     * - write data to db
      * - check if data is written to disk? -> Send response.
      */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         try {
-
             // get input stream from MultiPart Form part
 	    	InputStream uploadedFileInputStream = getInputStreamFromRequest(request, "upfile");
 
@@ -87,19 +81,16 @@ public class UploadServlet extends HttpServlet {
             // Validation
             checkFile(request, savedFile);
 
+            // everything went fine
+            response.setStatus(HttpServletResponse.SC_OK);
 
         } catch (IOException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
         } catch (IllegalArgumentException e) {
             // raised if validation Failed
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
         }
-
-        // everything went fine
-        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     private void checkFile(HttpServletRequest request, File savedFile) throws IllegalArgumentException, IOException {
@@ -131,7 +122,6 @@ public class UploadServlet extends HttpServlet {
 
     private InputStream getInputStreamFromRequest(HttpServletRequest request,
                                                   String partName) throws IOException {
-
         try {
             Part uploadedFile = null;
             InputStream out = null;
@@ -143,18 +133,24 @@ public class UploadServlet extends HttpServlet {
     }
 
     private File saveToDisk(InputStream input, String fileName) throws IOException {
-		File outfile = new File(OUT_DIR, fileName);
+		File outfile = new File(Configuration.OUT_DIR, fileName);
 		OutputStream outstream = new FileOutputStream(outfile);
-		copyStream(input, outstream);
-		outstream.flush();
-		outstream.close();
+        try {
+    		copyStream(input, outstream);
+        } finally {
+            input.close();
+            outstream.flush();
+            outstream.close();
+        }
         return outfile;
 	}
 
-	private void copyStream(InputStream input, OutputStream output)
-			throws IOException {
-		byte[] buffer = new byte[1024];
+	private void copyStream(InputStream input, OutputStream output)	throws IOException {
+        // http://stackoverflow.com/questions/43157/easy-way-to-write-contents-of-a-java-inputstream-to-an-outputstream/43168#43168
+        final int BUF_SIZE = 1024*100;
+		byte[] buffer = new byte[BUF_SIZE];
 		int bytesRead;
+
 		while ((bytesRead = input.read(buffer)) != -1) {
 			output.write(buffer, 0, bytesRead);
 		}
