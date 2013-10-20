@@ -18,8 +18,8 @@ fh = StringIO(EXAMPLE_CONTENTS)
 def ValidRequest():
     print "Testing: Valid Request"
     v_req = requests.post(SERVLET_URL, files = {"upfile" : fh}, headers = {'ID' : 'TEST'})
-    if (v_req.status_code == 200):
-        print "OK: Status Code 200"
+    if (v_req.status_code == 202):
+        print "OK: Status Code 202: Accepted"
     else:
         print "ERROR: Status Code:" + str(v_req.status_code)
         return;
