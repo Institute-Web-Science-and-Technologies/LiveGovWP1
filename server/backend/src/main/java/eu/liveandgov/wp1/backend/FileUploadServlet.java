@@ -34,6 +34,20 @@ public class FileUploadServlet extends HttpServlet {
     private static final Logger LOG = Logger.getLogger(FileUploadServlet.class);
 
     @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        PrintWriter writer = resp.getWriter();
+        writer.write(
+                "<html>" +
+                "<h1>Upload Servlet</h1>" +
+                "<form action=\"\" enctype=\"multipart/form-data\" method=\"post\">" +
+                "Upload File: <input type=\"file\" name=\"upfile\" size=\"40\">" +
+                "<input type=\"submit\" value=\"Submit\">" +
+                "</form>" +
+                "</html>"
+                );
+    }
+
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         // Retrieve Upfile
