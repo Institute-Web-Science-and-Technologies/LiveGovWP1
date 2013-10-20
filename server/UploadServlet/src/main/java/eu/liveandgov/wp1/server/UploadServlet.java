@@ -3,13 +3,17 @@ package eu.liveandgov.wp1.server;
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.SimpleLayout;
+import org.jeromq.ZMQ;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.MalformedURLException;
 
 import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.io.IOUtils.copy;
@@ -32,6 +36,8 @@ public class UploadServlet extends HttpServlet {
     static final String OUT_DIR = Configuration.OUT_DIR;
     private static final String FIELD_NAME_UPFILE = "upfile";
     private static final Logger LOG = Logger.getLogger(UploadServlet.class);
+    private static final String ATT_ZMQ_SOC = "ZMQ_SOCKET";
+    public static final String ZMQ_SOCKET = "tcp://localhost:50111";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -49,6 +55,7 @@ public class UploadServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        LOG.info("Incoming POST request from " + req.getRemoteAddr());
 
         // Retrieve Upfile
         InputStream fileStream = getFormFieldStream(req, FIELD_NAME_UPFILE);
@@ -80,7 +87,21 @@ public class UploadServlet extends HttpServlet {
                 "Destination:"+ outFile.getAbsolutePath() + "\n" +
                 "Bytes written:" + bytesWritten
         );
-        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+
+        // Notify Peers using Messaging
+        notifyPeers(outFile);
+    }
+
+    private void notifyPeers(File outFile) {
+        SafeZmqSocket s = (SafeZmqSocket) getServletContext().getAttribute(ATT_ZMQ_SOC);
+        if (s == null) {
+            // Lazy initialization
+            s = new SafeZmqSocket(ZMQ.PUB);
+            s.bind(ZMQ_SOCKET);
+            getServletContext().setAttribute(ATT_ZMQ_SOC, s);
+        }
+        s.send(outFile.getAbsolutePath());
     }
 
     /**
