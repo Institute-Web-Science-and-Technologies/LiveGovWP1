@@ -47,10 +47,10 @@ def ValidRequest():
 def NoUpfile():
     print "Testing: Request without upfile"
     req = requests.post(SERVLET_URL, headers = {'ID' : 'TEST'})
-    if (v_req.status_code == 400):
+    if (req.status_code == 400):
         print "OK: Reveived Status Code 400: Bad request."
     else:
-        print "ERROR: Invalid status code: " + str(v_req.status_code)
+        print "ERROR: Invalid status code: " + str(req.status_code)
 
 ValidRequest()
 
