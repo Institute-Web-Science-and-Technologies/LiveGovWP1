@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
-
 /**
  * Created by hartmann on 9/20/13.
  */
@@ -22,13 +20,13 @@ public class FilePersistor implements Persistor {
 
     public FilePersistor(File logFile) {
         this.logFile = logFile;
-        openLogFile();
+        openLogFileAppend();
     }
 
     @Override
     public synchronized void push(String s) {
         if (fileWriter == null) {
-            Log.i(LOG_TAG, "Blocked write event");
+            Log.v(LOG_TAG, "Blocked write event");
             return;
         }
 
@@ -36,9 +34,8 @@ public class FilePersistor implements Persistor {
             fileWriter.write(s + "\n");
             sampleCount ++;
         } catch (IOException e) {
-            Log.i(LOG_TAG,"Cannot write file.");
+            Log.e(LOG_TAG,"Cannot write file.");
             e.printStackTrace();
-            return;
         }
     }
 
@@ -47,7 +44,6 @@ public class FilePersistor implements Persistor {
         boolean suc = true;
 
         Log.i(LOG_TAG, "Exporting samples.");
-
         if (stageFile.exists()) { Log.e(LOG_TAG, "Stage file exists."); return false; }
 
         suc = closeLogFile();
@@ -56,9 +52,10 @@ public class FilePersistor implements Persistor {
         suc = logFile.renameTo(stageFile);
         if (!suc) { Log.e(LOG_TAG, "Renaming failed."); return false; }
 
-        deleteLogFile();
-        openLogFile();
+        suc = openLogFileOverwrite();
+        if (!suc) { Log.e(LOG_TAG, "Opening new Log File failed."); return false; }
 
+        sampleCount = 0;
         return true;
     }
 
@@ -67,19 +64,24 @@ public class FilePersistor implements Persistor {
         return "File size: " + logFile.length()/1024 + "kb. Samples written: " + sampleCount;
     }
 
-    private void openLogFile() {
+    private boolean openLogFileAppend() {
         try {
             fileWriter = new BufferedWriter(new FileWriter(logFile,true));
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Opening LogFile failed");
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
-    private void deleteLogFile() {
-        boolean suc = logFile.delete();
-        if (!suc) {Log.e(LOG_TAG, "Deleting LogFile failed"); return; }
-        sampleCount = 0;
+    private boolean openLogFileOverwrite() {
+        try {
+            fileWriter = new BufferedWriter(new FileWriter(logFile,false));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     private boolean closeLogFile() {

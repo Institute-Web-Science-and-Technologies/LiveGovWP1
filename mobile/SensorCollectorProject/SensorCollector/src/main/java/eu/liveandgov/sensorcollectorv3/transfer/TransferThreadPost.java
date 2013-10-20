@@ -97,8 +97,9 @@ public class TransferThreadPost implements Runnable, TransferManager {
             httppost.addHeader("ID", GlobalContext.androidId );
 
             HttpResponse response = httpclient.execute(httppost);
-            if(response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                Log.i(LOG_TAG, "Upload failed");
+            int status = response.getStatusLine().getStatusCode();
+            if(status != HttpStatus.SC_ACCEPTED) {
+                Log.i(LOG_TAG, "Upload failed w/ Status Code:" + status);
                 return false;
             }
 
@@ -115,7 +116,8 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
     @Override
     public String getStatus() {
-        return isTransferring() ? "transferring" : "stopped";
+        return "StageFile: " + stageFile.length()/1024 + "kb. " +
+               (isTransferring() ? "transferring" : "waiting");
     }
 }
 

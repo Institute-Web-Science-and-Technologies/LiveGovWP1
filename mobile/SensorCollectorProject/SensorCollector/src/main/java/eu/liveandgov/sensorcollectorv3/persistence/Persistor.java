@@ -10,15 +10,6 @@ import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
  */
 public interface Persistor extends Monitorable, Consumer<String> {
     /**
-     * Persist message m to storage unless blockPush() was called in
-     * which case all messages are dropped.
-     * Buffering inside the Persistor is allowed.
-     * @param m
-     */
-    //void push(String m);
-
-
-    /**
      * Exports all stored samples into a given File in the ssf format.
      *
      * Implementations may return null in case, they do not want to export samples.
