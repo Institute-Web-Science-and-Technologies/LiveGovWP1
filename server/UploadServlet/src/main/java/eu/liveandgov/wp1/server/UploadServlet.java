@@ -4,7 +4,6 @@ import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.jeromq.ZMQ;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
