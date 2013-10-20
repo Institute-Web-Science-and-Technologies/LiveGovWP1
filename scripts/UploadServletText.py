@@ -24,15 +24,19 @@ def ValidRequest():
         print "ERROR: Status Code:" + str(v_req.status_code)
         return;
 
-    resp = v_req.text
-    file_name = (resp.split("\n")[1]).split(":")[1]
-    print "OK: Wrote to file: " + file_name;
+    try:
+        resp = v_req.text
+        file_name = (resp.split("\n")[1]).split(":")[1]
+        print "OK: Wrote to file: " + file_name;
+    except IndexError:
+        print "ERROR: Cannot parse reponse text. Have you edited the UploadServlet.java?"
+        return
 
     try:
         nfh = open(file_name)
         CONTENTS  = nfh.read()
     except IOError:
-        print "ERROR: Cannot open file"
+        print "ERROR: Cannot open file. This is expected if this script is not run on the server."
         return
 
     if (CONTENTS == EXAMPLE_CONTENTS):
