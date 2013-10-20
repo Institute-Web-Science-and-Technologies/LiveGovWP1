@@ -64,8 +64,12 @@ public class TransferThreadPost implements Runnable, TransferManager {
         boolean success;
 
         // get stage file
-        success = persistor.exportSamples(stageFile);
-        if (!success) { Log.i(LOG_TAG,"Staging failed");  return; }
+        if (stageFile.exists()){
+            Log.i(LOG_TAG, "Found old stage file.");
+        } else {
+            success = persistor.exportSamples(stageFile);
+            if (!success) { Log.i(LOG_TAG,"Staging failed");  return; }
+        }
 
         // transfer staged File
         success = transferFile(stageFile);

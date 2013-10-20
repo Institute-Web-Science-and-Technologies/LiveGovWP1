@@ -17,7 +17,6 @@ public class LinkedSensorQueue implements SensorQueue {
     public void push(String m){
         if (size++ < capacity) {
             Q.add(m);
-            MonitorThread.sampleCount++;
         }
     }
 
