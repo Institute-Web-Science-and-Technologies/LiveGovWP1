@@ -4,6 +4,7 @@ import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.jeromq.ZMQ;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,12 +19,11 @@ import static org.apache.commons.io.IOUtils.copy;
  * Implementation of a sensor data UploadServlet based on {@link org.apache.commons.fileupload}
  * see <a href="http://commons.apache.org/proper/commons-fileupload/">website.</a>
  * <p/>
- * Listens to POST request with a form/multipart field named 'upfile' and writes it to the file system.
- * <p/>
  * Test with
  * <pre>{@code echo "FILE CONTENTS" | curl localhost:8080/server/upload -F "upfile=@-"}</pre>
  * or
  * <pre>{@code cat test-upload-data.txt | curl localhost:8080/server/upload -F "upfile=@-"}</pre>
+ * also a python test script is provided in the /scripts/ folder.
  *
  * User: hartmann
  * Date: 10/19/13
@@ -32,7 +32,12 @@ public class UploadServlet extends HttpServlet {
     static final String OUT_DIR = "/srv/liveandgov/UploadServletRawFiles/";
     private static final String FIELD_NAME_UPFILE = "upfile";
     private static final Logger LOG = Logger.getLogger(UploadServlet.class);
+    private static final String BROKER_ADDRESS = DbIngestThread.ZMQ_ADDRESS;
 
+    /**
+     * Handle GET REQUEST
+     * Show a simple HTML Upload form to test the servlet.
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         PrintWriter writer = resp.getWriter();
@@ -47,6 +52,11 @@ public class UploadServlet extends HttpServlet {
                 );
     }
 
+    /**
+     * Handle POST REQUEST
+     * Take form/multi-part attachment with name 'upfile' and write it to the file system.
+     * Retuns Status 202 if everything went ok.
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         LOG.info("Incoming POST request from " + req.getRemoteAddr());
@@ -82,6 +92,9 @@ public class UploadServlet extends HttpServlet {
                 "Bytes written:" + bytesWritten
         );
         resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+
+        // NotifyPeers
+        notifyBroker(outFile.getAbsolutePath());
     }
 
     /**
@@ -153,4 +166,21 @@ public class UploadServlet extends HttpServlet {
         }
         return null;
     }
+
+    /**
+     * Sends a ZMQ Message to a specified broker, informing it about the arrival of a new file.
+     *
+     * @param message
+     */
+    private void notifyBroker(String message) {
+        LOG.info("Sending ZMQ Message " + message);
+        // need to create new context for each request, since this many threads are used by servlet engine.
+        // for a discussion of performance issues see:
+        // http://stackoverflow.com/questions/16659577/zeromq-multithreading-create-sockets-on-demand-or-use-sockets-object-pool
+        ZMQ.Socket s = ZMQ.context().socket(ZMQ.PUB);
+        s.connect(BROKER_ADDRESS);
+        s.send(message);
+        s.close();
+    }
+
 }
