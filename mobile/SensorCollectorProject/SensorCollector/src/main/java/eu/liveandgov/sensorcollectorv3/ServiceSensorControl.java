@@ -56,6 +56,9 @@ public class ServiceSensorControl extends Service {
         // Setup static variables
         GlobalContext.set(this);
 
+        // Setup sensor thread
+        SensorThread.setup(sensorQueue);
+
         // setup communication Channels
         sensorQueue = new LinkedSensorQueue();
 
@@ -83,7 +86,6 @@ public class ServiceSensorControl extends Service {
         m.start();
 
         // Start sensor thread
-        SensorThread.setup(sensorQueue);
         SensorThread.start();
 
         super.onCreate();

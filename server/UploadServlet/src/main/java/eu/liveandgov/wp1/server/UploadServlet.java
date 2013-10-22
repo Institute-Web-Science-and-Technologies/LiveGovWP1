@@ -1,5 +1,7 @@
 package eu.liveandgov.wp1.server;
 
+import eu.liveandgov.wp1.server.db_helper.BatchInserter;
+import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
@@ -11,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.sql.SQLException;
 
 import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.io.IOUtils.copy;
@@ -31,8 +34,8 @@ import static org.apache.commons.io.IOUtils.copy;
 public class UploadServlet extends HttpServlet {
     static final String OUT_DIR = "/srv/liveandgov/UploadServletRawFiles/";
     private static final String FIELD_NAME_UPFILE = "upfile";
-    private static final Logger LOG = Logger.getLogger(UploadServlet.class);
-    private static final String BROKER_ADDRESS = DbIngestThread.ZMQ_ADDRESS;
+    private static final Logger Log = Logger.getLogger(UploadServlet.class);
+    private static final String BROKER_ADDRESS = "tcp://127.0.0.1:50111";
 
     /**
      * Handle GET REQUEST
@@ -59,13 +62,13 @@ public class UploadServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        LOG.info("Incoming POST request from " + req.getRemoteAddr());
+        Log.info("Incoming POST request from " + req.getRemoteAddr());
 
         // Retrieve Upfile
         InputStream fileStream = getFormFieldStream(req, FIELD_NAME_UPFILE);
 
         if (fileStream == null) {
-            LOG.error("Field not found: " + FIELD_NAME_UPFILE);
+            Log.error("Field not found: " + FIELD_NAME_UPFILE);
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
@@ -78,13 +81,13 @@ public class UploadServlet extends HttpServlet {
         try {
             bytesWritten = writeStreamToFile(fileStream, outFile);
         } catch (IOException e) {
-            LOG.error("Error writing output file.");
+            Log.error("Error writing output file.");
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
         // Success
-        LOG.info("Received file " + fileName + " of length " + bytesWritten);
+        Log.info("Received file " + fileName + " of length " + bytesWritten);
         resp.getWriter().write(
                 // Output will be parsed by test script.
                 "Status:Success.\n" +
@@ -92,6 +95,18 @@ public class UploadServlet extends HttpServlet {
                 "Bytes written:" + bytesWritten
         );
         resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+
+        // Insert directly to database
+        Log.info("Writing file into database.");
+        try {
+            BatchInserter.batchInsertFile(new PostgresqlDatabase(), outFile);
+        } catch (SQLException e) {
+            Log.info("Error writing db.",e);
+            e.printStackTrace();
+        } catch (IOException e) {
+            Log.info("Error reading file" + outFile.getAbsolutePath());
+            e.printStackTrace();
+        }
 
         // NotifyPeers
         notifyBroker(outFile.getAbsolutePath());
@@ -139,7 +154,7 @@ public class UploadServlet extends HttpServlet {
             // Check that we have a file upload request
             boolean isMultipart = ServletFileUpload.isMultipartContent(req);
             if (!isMultipart) {
-                LOG.error("Received non-multipart POST request");
+                Log.error("Received non-multipart POST request");
                 return null;
             }
 
@@ -154,15 +169,15 @@ public class UploadServlet extends HttpServlet {
                 String name = item.getFieldName();
 
                 if (!name.equals(FIELD_NAME_UPFILE)) {
-                    LOG.info("Found unknown field " + name);
+                    Log.info("Found unknown field " + name);
                     continue;
                 }
                 return item.openStream();
             }
         } catch (FileUploadException e) {
-            LOG.error("Error parsing the upfile", e);
+            Log.error("Error parsing the upfile", e);
         } catch (IOException e) {
-            LOG.error("Network error while parsing file.", e);
+            Log.error("Network error while parsing file.", e);
         }
         return null;
     }
@@ -173,11 +188,15 @@ public class UploadServlet extends HttpServlet {
      * @param message
      */
     private void notifyBroker(String message) {
-        LOG.info("Sending ZMQ Message " + message);
+        Log.info("Sending ZMQ Message " + message + " to " + BROKER_ADDRESS);
         // need to create new context for each request, since this many threads are used by servlet engine.
         // for a discussion of performance issues see:
         // http://stackoverflow.com/questions/16659577/zeromq-multithreading-create-sockets-on-demand-or-use-sockets-object-pool
-        ZMQ.Socket s = ZMQ.context().socket(ZMQ.PUB);
+        //
+        // Surprisingly, this does not work with the PUB/SUB pattern, since the first few messages are
+        // always dropped while the connection is being setup:
+        // http://zguide.zeromq.org/page:all#Getting-the-Message-Out
+        ZMQ.Socket s = ZMQ.context().socket(ZMQ.PUSH);
         s.connect(BROKER_ADDRESS);
         s.send(message);
         s.close();

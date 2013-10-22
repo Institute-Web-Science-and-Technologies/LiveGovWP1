@@ -3,11 +3,14 @@
  */
 package eu.liveandgov.wp1.server.db_helper;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.sql.*;
+
+import eu.liveandgov.wp1.server.sensor_helper.SensorValueFactory;
+import eu.liveandgov.wp1.server.sensor_helper.SensorValueInterface;
 import org.postgresql.Driver;
 
 /**
@@ -37,9 +40,13 @@ import org.postgresql.Driver;
  */
 public class PostgresqlDatabase {
 
+    public static final String DB_NAME = "liveandgov";
+    public static final String DB_USER = "liveandgov";
+    public static final String DB_PASS = "liveandgov";
+
     public Connection connection = null;
 	
-	public PostgresqlDatabase(String user, String password) {
+	public PostgresqlDatabase() {
         try {
        		// problem:
          	// exception when run it in eclipse+m2+tomcat7: path!java.lang.ClassNotFoundException: org.postgresql.Driver...
@@ -60,7 +67,7 @@ public class PostgresqlDatabase {
 
 		Statement stmtLink = null;
 		try {
-			connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/gtfsdb?autoReconnect=true",user,password);
+			connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/"+ DB_NAME +"?autoReconnect=true", DB_USER, DB_PASS);
 
 			stmtLink = connection.createStatement();
 
@@ -100,7 +107,7 @@ public class PostgresqlDatabase {
 				e.printStackTrace();
 			}
 	}
-	
+
 	public Statement createStatement() {
 		Statement stmtLink = null;
 		try {
