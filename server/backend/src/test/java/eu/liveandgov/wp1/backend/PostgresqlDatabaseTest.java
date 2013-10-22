@@ -55,7 +55,12 @@ public class PostgresqlDatabaseTest {
 			fail();
  
 		}
-        db = new PostgresqlDatabase("liveandgov", "liveandgov");
+		try {
+			db = new PostgresqlDatabase("liveandgov", "liveandgov");
+		} catch (UnavailableException e) {
+			e.printStackTrace();
+			fail();
+		}
 	}
 
 	/**
