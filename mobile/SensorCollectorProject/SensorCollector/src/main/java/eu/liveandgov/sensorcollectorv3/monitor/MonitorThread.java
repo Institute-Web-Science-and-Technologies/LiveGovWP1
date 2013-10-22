@@ -9,8 +9,6 @@ import eu.liveandgov.sensorcollectorv3.GlobalContext;
  * Created by hartmann on 9/22/13.
  */
 public class MonitorThread implements Runnable {
-    public static long sampleCount = 0;
-
     private static MonitorThread instance;
     private Thread thread;
 

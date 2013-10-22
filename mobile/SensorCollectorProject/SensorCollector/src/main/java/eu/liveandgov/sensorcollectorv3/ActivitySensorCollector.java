@@ -6,10 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.text.Selection;
-import android.text.Spannable;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -18,7 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import eu.liveandgov.sensorcollectorv3.Configuration.IntentAPI;
+import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
 
 /**
  * Basic User Interface implementing the IntentAPI

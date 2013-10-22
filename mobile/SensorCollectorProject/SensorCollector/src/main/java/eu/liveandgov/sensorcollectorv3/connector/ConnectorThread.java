@@ -5,8 +5,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.liveandgov.sensorcollectorv3.Monitor.Monitorable;
-import eu.liveandgov.sensorcollectorv3.SensorQueue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
+import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
 
 /**
  * Created by hartmann on 9/15/13.
@@ -17,14 +17,14 @@ public class ConnectorThread implements Runnable, Monitorable {
     private final SensorQueue sensorQueue;
     private final Thread thread;
 
-    private List<Consumer> consumerList;
+    private List<Consumer<String>> consumerList;
 
     private long count = 0;
 
     public ConnectorThread(SensorQueue sensorQueue){
         this.sensorQueue = sensorQueue;
         this.thread = new Thread(this);
-        this.consumerList = new ArrayList<Consumer>();
+        this.consumerList = new ArrayList<Consumer<String>>();
     }
 
     @Override

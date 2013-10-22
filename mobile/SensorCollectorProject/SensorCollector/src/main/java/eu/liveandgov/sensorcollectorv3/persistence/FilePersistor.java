@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
-
 /**
  * Created by hartmann on 9/20/13.
  */
@@ -18,76 +16,82 @@ public class FilePersistor implements Persistor {
 
     private File logFile;
     private BufferedWriter fileWriter;
+    private long sampleCount = 0L;
 
     public FilePersistor(File logFile) {
         this.logFile = logFile;
-        openFileWriter();
+        openLogFileAppend();
     }
 
     @Override
-    public synchronized void push(String s){
+    public synchronized void push(String s) {
         if (fileWriter == null) {
-            Log.i(LOG_TAG, "Blocked write event");
+            Log.v(LOG_TAG, "Blocked write event");
             return;
         }
 
         try {
             fileWriter.write(s + "\n");
+            sampleCount ++;
         } catch (IOException e) {
-            Log.i(LOG_TAG,"Cannot write file.");
+            Log.e(LOG_TAG,"Cannot write file.");
             e.printStackTrace();
         }
     }
 
     @Override
     public boolean exportSamples(File stageFile) {
-        boolean del = true;
-        boolean ren = true;
-
-        if (stageFile.exists()) {
-            Log.i(LOG_TAG, "Found staged file.");
-            del = stageFile.delete();
-        }
+        boolean suc = true;
 
         Log.i(LOG_TAG, "Exporting samples.");
-        close();
+        if (stageFile.exists()) { Log.e(LOG_TAG, "Stage file exists."); return false; }
 
-        ren = logFile.renameTo(stageFile);
+        suc = closeLogFile();
+        if (!suc) { Log.e(LOG_TAG, "Cosing LogFile failed."); return false; }
 
-        reset();
-        openFileWriter();
+        suc = logFile.renameTo(stageFile);
+        if (!suc) { Log.e(LOG_TAG, "Renaming failed."); return false; }
 
-        return ren && del;
+        suc = openLogFileOverwrite();
+        if (!suc) { Log.e(LOG_TAG, "Opening new Log File failed."); return false; }
+
+        sampleCount = 0;
+        return true;
     }
 
     @Override
     public String getStatus() {
-        return "File size: " + logFile.length();
+        return "File size: " + logFile.length()/1024 + "kb. Samples written: " + sampleCount;
     }
 
-    private void openFileWriter() {
+    private boolean openLogFileAppend() {
         try {
             fileWriter = new BufferedWriter(new FileWriter(logFile,true));
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
-    public synchronized void reset() {
+    private boolean openLogFileOverwrite() {
         try {
-            fileWriter = new BufferedWriter(new FileWriter(logFile));
+            fileWriter = new BufferedWriter(new FileWriter(logFile,false));
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
-        MonitorThread.sampleCount = 0;
+        return true;
     }
 
-    public void close() {
+    private boolean closeLogFile() {
         try {
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
+        fileWriter = null;
+        return true;
     }
-
 }

@@ -1,0 +1,17 @@
+<!DOCTYPE web-app PUBLIC
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+    <display-name>Live+Gov WP1 UploadServlet</display-name>
+    <servlet>
+        <servlet-name>UploadServlet</servlet-name>
+        <display-name>UploadServlet</display-name>
+        <description>Takes POST request as input and stores them on the file system.</description>
+        <servlet-class>eu.liveandgov.wp1.server.UploadServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UploadServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>
