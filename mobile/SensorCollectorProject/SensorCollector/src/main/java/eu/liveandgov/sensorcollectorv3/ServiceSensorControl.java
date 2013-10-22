@@ -7,18 +7,20 @@ import android.util.Log;
 
 import java.io.File;
 
-import eu.liveandgov.sensorcollectorv3.Configuration.IntentAPI;
-import eu.liveandgov.sensorcollectorv3.Connector.ConnectorThread;
-import eu.liveandgov.sensorcollectorv3.Monitor.MonitorThread;
-import eu.liveandgov.sensorcollectorv3.Persistence.FilePersistor;
-import eu.liveandgov.sensorcollectorv3.Persistence.Persistor;
-import eu.liveandgov.sensorcollectorv3.Persistence.ZmqStreamer;
-import eu.liveandgov.sensorcollectorv3.SensorQueue.LinkedSensorQueue;
-import eu.liveandgov.sensorcollectorv3.SensorQueue.SensorQueue;
-import eu.liveandgov.sensorcollectorv3.Sensors.SensorParser;
-import eu.liveandgov.sensorcollectorv3.Sensors.SensorThread;
-import eu.liveandgov.sensorcollectorv3.Transfer.TransferManager;
-import eu.liveandgov.sensorcollectorv3.Transfer.TransferThreadPost;
+import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
+import eu.liveandgov.sensorcollectorv3.connector.ConnectorThread;
+import eu.liveandgov.sensorcollectorv3.connector.Consumer;
+import eu.liveandgov.sensorcollectorv3.har.HarPipeline;
+import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
+import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
+import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
+import eu.liveandgov.sensorcollectorv3.persistence.ZmqStreamer;
+import eu.liveandgov.sensorcollectorv3.sensor_queue.LinkedSensorQueue;
+import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorParser;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorThread;
+import eu.liveandgov.sensorcollectorv3.transfer.TransferManager;
+import eu.liveandgov.sensorcollectorv3.transfer.TransferThreadPost;
 
 public class ServiceSensorControl extends Service {
     static final String LOG_TAG =  "SCS";
@@ -38,6 +40,9 @@ public class ServiceSensorControl extends Service {
     // Communication Channels
     public SensorQueue sensorQueue;
     public Persistor persistor;
+    public Consumer<String> streamer;
+    public Consumer<String> harPipeline;
+
 
 
     public ServiceSensorControl context;
@@ -51,36 +56,37 @@ public class ServiceSensorControl extends Service {
         // Setup static variables
         GlobalContext.set(this);
 
+        // Setup sensor thread
+        SensorThread.setup(sensorQueue);
+
         // setup communication Channels
-        persistor   = new FilePersistor(new File(GlobalContext.context.getFilesDir(), SENSOR_FILENAME));
-        // persistor   = new ZmqStreamer();
         sensorQueue = new LinkedSensorQueue();
 
-        // Start sensor thread
-        SensorThread.setup(sensorQueue);
-        SensorThread.start();
+        // construct Consumer
+        persistor   = new FilePersistor(new File(GlobalContext.context.getFilesDir(), SENSOR_FILENAME));
+        streamer    = new ZmqStreamer();
+        harPipeline = new HarPipeline();
 
         // Connect sensorQueue to Persistor
         connectorThread = new ConnectorThread(sensorQueue);
         connectorThread.addConsumer(persistor);
+        // connectorThread.addConsumer(streamer);
+        // connectorThread.addConsumer(harPipeline);
         connectorThread.start();
 
         // setup sensor manager
         transferManager = new TransferThreadPost(persistor, new File(GlobalContext.context.getFilesDir(), STAGE_FILENAME));
 
-        // Start transfer thread
-        // TransferThreadZMQ.setup();
-        // TransferThreadZMQ.getInstance().start();
-
         // Start monitoring thread
-        // MonitorThread.addQueue(sensorQueue)
-        // MonitorThread.addPersistor(persistor)
         MonitorThread m = new MonitorThread();
         m.registerMonitorable(connectorThread, "SampleCount");
         m.registerMonitorable(persistor, "Persitor");
         m.registerMonitorable(transferManager, "Transfer");
         m.registerMonitorable(sensorQueue, "Queue");
         m.start();
+
+        // Start sensor thread
+        SensorThread.start();
 
         super.onCreate();
     }
@@ -103,7 +109,7 @@ public class ServiceSensorControl extends Service {
         }
 
         String action = intent.getAction();
-        Log.i(LOG_TAG, "Received intent with action " + action);
+        // Log.i(LOG_TAG, "Received intent with action " + action);
 
         if (action == null) return START_STICKY;
 

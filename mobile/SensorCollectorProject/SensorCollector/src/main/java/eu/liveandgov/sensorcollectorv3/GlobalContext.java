@@ -1,11 +1,10 @@
 package eu.liveandgov.sensorcollectorv3;
 
-import android.content.Context;
 import android.content.Intent;
 import android.hardware.SensorManager;
 import android.provider.Settings;
 
-import eu.liveandgov.sensorcollectorv3.Configuration.IntentAPI;
+import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
 
 /**
  * Created by hartmann on 9/29/13.
