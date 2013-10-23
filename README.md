@@ -8,3 +8,7 @@ For more information consult:
 * Readme files in subdirectories for deployment information
 * [Presentation about Sensor Collector](http://heinrichhartmann.github.io/LiveGovWP1/) by Christoph Ehlen
 
+URLs:
+* [Data Inspection Front End](http://141.26.71.84:3000/)
+* [Legacy Inspection Front End](http://mobile-sensing.west.uni-koblenz.de:3000/)
+* [Legacy Sensor Collector](http://mobile-sensing.west.uni-koblenz.de/)
