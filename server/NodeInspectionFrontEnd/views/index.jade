@@ -1,0 +1,78 @@
+extends layout
+
+block content
+  div.ui.purple.main.menu
+    a.active.item(data-tab="settings") Settings
+    a.item(data-tab="map") Map
+    a.item(data-tab="graphs") Graphs
+    a.item(data-tab="tables") Tables
+  div.ui.active.tab.segment(data-tab="settings")
+    div.ui.three.column.grid
+      div.row
+        div.column
+          div.ui.floating.fluid.selection.dropdown#devId
+            div.text Device
+            i.dropdown.icon
+            div.menu
+              each device in devices
+                div.item(data-value=device.devId)= device.devId + " GPS Count:" + device.gpsCount
+        div.column
+          div.ui.floating.fluid.selection.dropdown
+            div.text Routes
+            i.dropdown.icon
+            div.menu
+        div.column
+          div.ui.floating.fluid.selection.dropdown
+            div.text Service Lines
+            i.dropdown.icon
+            div.menu
+              each sl in serviceLines
+                div.item(data-value=sl.id)= sl.id + " " + sl.linename + " " + sl.type
+      div.row
+        div.column
+        div.column
+          div.ui.purple.button#showBtn Show
+  div.ui.tab.segment(data-tab="map")
+    div.ui.vertical.segment
+      h1.ui.header Map
+      div.plot#domMap  
+  div.ui.tab.segment(data-tab="graphs")
+    div.ui.vertical.segment
+      h1.ui.header Accelerometer
+      div.ui.two.column.grid
+        div.column
+          h5.ui.header Showing 
+            span#accLabel
+        div.column
+          h5.ui.header.metaLabel
+      div.ui.purple.button.resetZoom Reset Zoom
+      div.plot#accPlot
+    div.ui.vertical.segment
+      h1.ui.header Linear Acceleration
+      div.ui.two.column.grid
+        div.column
+          h5.ui.header Showing 
+            span#lacLabel
+        div.column
+          h5.ui.header.metaLabel
+      div.ui.purple.button.resetZoom Reset Zoom
+      div.plot#lacPlot
+    div.ui.vertical.segment
+      h1.ui.header Gravity
+      div.ui.two.column.grid
+        div.column
+          h5.ui.header Showing 
+            span#graLabel
+        div.column
+          h5.ui.header.metaLabel
+      div.ui.purple.button.resetZoom Reset Zoom
+      div.plot#graPlot
+  div.ui.tab.segment(data-tab="tables")
+    div.ui.vertical.segment
+      h1.ui.header Tags
+      table.ui.celled.purple.inverted.two.column.table.segment#tags
+        thead
+          tr
+            th Timestamp
+            th Tag
+        tbody
