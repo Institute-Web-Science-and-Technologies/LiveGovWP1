@@ -34,8 +34,6 @@ public class HAR implements Consumer<String> {
             windowStart = time;
             windowEnd = time + windowSize;
         }
-
-
     }
 
 

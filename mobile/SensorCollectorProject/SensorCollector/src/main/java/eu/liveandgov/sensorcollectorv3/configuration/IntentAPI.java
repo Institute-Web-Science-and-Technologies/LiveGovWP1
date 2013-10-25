@@ -11,16 +11,18 @@ public class IntentAPI {
     /**
      * Request a status update from the service.
      * Status updates are returned via the RETURN_STATUS intent, and contain the following
-     * boolean fields:
-     * "sampling"     - true if the service is recording samples
-     * "transferring" - true if the service is transfering data to the server
-     * "running"      - true if the service is running [DEPRECATED: Always True??]
+     * fields:
+     * "sampling"     (bool)    true if the service is recording samples
+     * "transferring" (bool)    true if the service is transfering data to the server
+     * "har"          (bool)    true if HAR service is running
+     * "UserId"       (String)  contains the external ID set using the SET_USER_ID intent.
      */
     public static final String GET_STATUS = "eu.liveandgov.sensorcollectorapi.intent.action.GET_STATUS";
     public static final String RETURN_STATUS = "eu.liveandgov.sensorcollectorapi.intent.return.STATUS";
     public static final String FIELD_SAMPLING = "sampling";
     public static final String FIELD_TRANSFERRING = "transferring";
-
+    public static final String FIELD_HAR = "har";
+    public static final String FIELD_ID = "id";
 
     /**
      * Enable/Disable the collection of sensor samples.
@@ -42,6 +44,41 @@ public class IntentAPI {
     public static final String FIELD_ANNOTATION = "tag";
 
     /**
+     * TODO: Set User ID
+     *
+     * This intent allows to set a user-id, which will be transferred to the backend service.
+     * Using this id the records can be linked to users registered in the service center.
+     */
+    public static final String SET_USER_ID = "eu.liveandgov.sensorcollectorapi.intent.action.ANNOTATE";
+    public static final String FIELD_USER_ID = "id";
+
+    /**
+     * TODO: Human Activity Recognition
+     *
+     * The monitoring of activities begins when START_HAR intent is received.
+     * It can be stopped using STOP_HAR. When a new activity is recognized the
+     * service sends out a RETURN_ACTIVITY intent, which contains the name of the activity
+     * in the "activity" field. A list of supported activities can be found in the file
+     * {@link eu.liveandgov.sensorcollectorv3.har.Activities}
+     *
+     */
+    public static final String START_HAR = "eu.liveandgov.sensorminingapi.intent.action.START_HAR";
+    public static final String STOP_HAR = "eu.liveandgov.sensorminingapi.intent.action.STOP_HAR";
+    public static final String RETURN_ACTIVITY = "eu.liveandgov.sensorcollectorapi.intent.return.ACTIVITY";
+    public static final String FIELD_ACTIVITY = "activity";
+
+    /**
+     * TODO: Get latest GPS samples
+     *
+     * Returns the last captured GPS samples, for use in the Service Line Detection service.
+     */
+    public static final String GET_GPS = "eu.liveandgov.sensorminingapi.intent.action.GET_GPS";
+    public static final String FIELD_COUNT = "count";
+    public static final String RETURN_GPS = "eu.liveandgov.sensorminingapi.intent.action.GET_GPS";
+    public static final String ENTRIES = "entries";
+
+
+    /**
      * DEPRECATED: Send Log messages to the GUI
      *
      * The {@code RETURN_LOG} intent contains a "message" field.
@@ -50,16 +87,5 @@ public class IntentAPI {
     public static final String LOGGING_DISABLE = "eu.liveandgov.sensorcollectorapi.intent.action.LOGGING_DISABLE";
     public static final String RETURN_LOG = "eu.liveandgov.sensorcollectorapi.intent.return.LOG";
     public static final String FIELD_LOG  = "message";
-
-    /**
-     * DEPRECATED: Start and Stop the service.
-     *
-     * This intents should be removed if possible.
-     * The service needs to be running after the sampling has finished in order for the
-     * Transfer to work.
-     */
-    public static final String SERVICE_START = "eu.liveandgov.sensorcollectorapi.intent.action.SERVICE_START";
-    public static final String SERVICE_STOP = "eu.liveandgov.sensorcollectorapi.intent.action.SERVICE_STOP";
-
 
 }

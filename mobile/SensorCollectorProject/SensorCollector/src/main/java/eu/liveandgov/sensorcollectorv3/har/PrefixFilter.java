@@ -1,9 +1,12 @@
-package eu.liveandgov.sensorcollectorv3.connector;
+package eu.liveandgov.sensorcollectorv3.har;
 
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import eu.liveandgov.sensorcollectorv3.connector.Consumer;
+import eu.liveandgov.sensorcollectorv3.connector.Producer;
 
 /**
  * Created by cehlen on 10/18/13.

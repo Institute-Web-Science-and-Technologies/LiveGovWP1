@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -19,6 +20,9 @@ import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
 
 /**
  * Basic User Interface implementing the IntentAPI
+ *
+ * REMARK:
+ * Register intent API handlers in registerListeners() method.
  *
  * Created by hartmann on 9/26/13.
  */
@@ -134,6 +138,8 @@ public class ActivitySensorCollector extends Activity {
                     updateStatus(intent);
                 } else if (action.equals(IntentAPI.RETURN_LOG)) {
                     updateLog(intent);
+                } else if (action.equals(IntentAPI.RETURN_ACTIVITY)) {
+                    Log.i(LOG_TAG, "HAR:" + intent.getStringExtra(IntentAPI.FIELD_ACTIVITY));
                 }
             }
         };
@@ -144,6 +150,7 @@ public class ActivitySensorCollector extends Activity {
     private void registerListeners(){
         registerReceiver(universalBroadcastReceiver, new IntentFilter(IntentAPI.RETURN_STATUS));
         registerReceiver(universalBroadcastReceiver, new IntentFilter(IntentAPI.RETURN_LOG));
+        registerReceiver(universalBroadcastReceiver, new IntentFilter(IntentAPI.RETURN_ACTIVITY));
     }
 
     private void unregisterListeners(){

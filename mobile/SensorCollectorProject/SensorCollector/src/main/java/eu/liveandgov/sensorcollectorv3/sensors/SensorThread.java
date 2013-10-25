@@ -24,6 +24,8 @@ import eu.liveandgov.sensorcollectorv3.sensors.sensor_producers.SensorHolder;
  * This thread is responsible for:
  * startRecording / unregister individual sensors
  *
+ * The singleton property makes is easy to start/stop recording via static method calls.
+ *
  * Created by hartmann on 9/22/13.
  */
 public class SensorThread implements Runnable {

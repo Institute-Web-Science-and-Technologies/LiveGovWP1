@@ -1,5 +1,7 @@
-package eu.liveandgov.sensorcollectorv3.connector;
+package eu.liveandgov.sensorcollectorv3.har;
 
+import eu.liveandgov.sensorcollectorv3.connector.Consumer;
+import eu.liveandgov.sensorcollectorv3.connector.Producer;
 import eu.liveandgov.sensorcollectorv3.sensors.SensorParser;
 import eu.liveandgov.sensorcollectorv3.sensors.MotionSensorValue;
 

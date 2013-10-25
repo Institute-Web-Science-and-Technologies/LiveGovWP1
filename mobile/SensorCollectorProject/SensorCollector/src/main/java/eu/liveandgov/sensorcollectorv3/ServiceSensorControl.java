@@ -10,7 +10,10 @@ import java.io.File;
 import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
 import eu.liveandgov.sensorcollectorv3.connector.ConnectorThread;
 import eu.liveandgov.sensorcollectorv3.connector.Consumer;
+import eu.liveandgov.sensorcollectorv3.connector.IntentEmitter;
+import eu.liveandgov.sensorcollectorv3.connector.Pipeline;
 import eu.liveandgov.sensorcollectorv3.har.HarPipeline;
+import eu.liveandgov.sensorcollectorv3.mock_classes.MockHandler;
 import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
@@ -23,30 +26,33 @@ import eu.liveandgov.sensorcollectorv3.transfer.TransferManager;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferThreadPost;
 
 public class ServiceSensorControl extends Service {
+    // CONSTANTS
     static final String LOG_TAG =  "SCS";
-    public static final String STAGE_FILENAME = "sensor.stage.ssf";
     public static final String SENSOR_FILENAME = "sensor.ssf";
+    public static final String STAGE_FILENAME = "sensor.stage.ssf";
 
+    // REMARK:
+    // Need to put initialization to onCreate, since FilesDir is not avaialble
+    // from a static context.
+
+    // STATUS FLAGS
     public boolean isRecording = false;
     public boolean isTransferring = false;
 
-    public ServiceSensorControl() {}
-
-    // Thread objects
-    // Rem: SensorThread is static
-    public ConnectorThread connectorThread;
-    public TransferManager transferManager;
-
-    // Communication Channels
+    // COMMUNICATION CHANNELS
     public SensorQueue sensorQueue;
     public Persistor persistor;
     public Consumer<String> streamer;
-    public Consumer<String> harPipeline;
+    public Pipeline<String, String> harPipeline;
 
+    // THREADS
+    public ConnectorThread connectorThread;
+    public TransferManager transferManager;
+    public MonitorThread monitorThread;
+    // Rem: Also SensorThread belongs here, but it is realized via static methods
 
-
-    public ServiceSensorControl context;
-
+    /* CONSTRUCTOR */
+    public ServiceSensorControl() {}
 
     /* ANDROID LIFECYCLE */
     @Override
@@ -56,37 +62,42 @@ public class ServiceSensorControl extends Service {
         // Setup static variables
         GlobalContext.set(this);
 
-        // Setup sensor thread
-        SensorThread.setup(sensorQueue);
+        // INITIALIZATIONS
+        final File sensorFile = new File(getFilesDir(), SENSOR_FILENAME);
+        final File stageFile  = new File(getFilesDir(), STAGE_FILENAME);
 
-        // setup communication Channels
+        // INIT COMMUNICATION CHANNELS
         sensorQueue = new LinkedSensorQueue();
-
-        // construct Consumer
-        persistor   = new FilePersistor(new File(GlobalContext.context.getFilesDir(), SENSOR_FILENAME));
+        persistor   = new FilePersistor(sensorFile);
         streamer    = new ZmqStreamer();
         harPipeline = new HarPipeline();
 
-        // Connect sensorQueue to Persistor
+        // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
+        transferManager = new TransferThreadPost(persistor, stageFile);
+        monitorThread   = new MonitorThread();
+
+        // Setup sensor thread
+        SensorThread.setup(sensorQueue);
+
+        // Connect sensorQueue to Consumers
         connectorThread.addConsumer(persistor);
         // connectorThread.addConsumer(streamer);
-        // connectorThread.addConsumer(harPipeline);
-        connectorThread.start();
+        connectorThread.addConsumer(harPipeline);
 
-        // setup sensor manager
-        transferManager = new TransferThreadPost(persistor, new File(GlobalContext.context.getFilesDir(), STAGE_FILENAME));
+        // Publish HAR results as intent
+        harPipeline.setConsumer(new IntentEmitter(IntentAPI.RETURN_ACTIVITY, IntentAPI.FIELD_ACTIVITY));
 
-        // Start monitoring thread
-        MonitorThread m = new MonitorThread();
-        m.registerMonitorable(connectorThread, "SampleCount");
-        m.registerMonitorable(persistor, "Persitor");
-        m.registerMonitorable(transferManager, "Transfer");
-        m.registerMonitorable(sensorQueue, "Queue");
-        m.start();
+        // Setup monitoring thread
+        monitorThread.registerMonitorable(connectorThread, "SampleCount");
+        monitorThread.registerMonitorable(persistor, "Persitor");
+        monitorThread.registerMonitorable(transferManager, "Transfer");
+        monitorThread.registerMonitorable(sensorQueue, "Queue");
 
-        // Start sensor thread
+        // Start threads
         SensorThread.start();
+        connectorThread.start();
+        monitorThread.start();
 
         super.onCreate();
     }
@@ -127,6 +138,12 @@ public class ServiceSensorControl extends Service {
             doAnnotate(intent.getStringExtra(IntentAPI.FIELD_ANNOTATION));
         } else if (action.equals(IntentAPI.GET_STATUS)) {
             doSendStatus();
+        } else if (action.equals(IntentAPI.START_HAR)) {
+            MockHandler.doStartHAR();
+        } else if (action.equals(IntentAPI.STOP_HAR)) {
+            MockHandler.doStopHAR();
+        } else if (action.equals(IntentAPI.SET_USER_ID)) {
+            MockHandler.doSetId(intent);
         } else {
             Log.i(LOG_TAG, "Received unknown action " + action);
         }

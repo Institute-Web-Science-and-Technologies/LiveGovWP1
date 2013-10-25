@@ -52,9 +52,9 @@ public class ActivityRecognition {
         double p = Double.NaN;
         p = ActivityRecognition.N2cf889c825(i);
         if(p == 0.0) {
-            return "walking";
+            return Activities.WALKING;
         } else {
-            return "running";
+            return Activities.RUNNING;
         }
     }
 }

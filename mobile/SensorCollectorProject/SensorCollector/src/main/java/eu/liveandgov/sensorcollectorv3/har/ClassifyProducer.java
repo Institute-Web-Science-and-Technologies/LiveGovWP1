@@ -15,8 +15,10 @@ public class ClassifyProducer extends Producer<String> implements Consumer<Featu
         try {
             String activity = ActivityRecognition.myClassify(m.toWekaObjArr());
             Log.i("HAR_CLASS", activity);
+            consumer.push(activity);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }
