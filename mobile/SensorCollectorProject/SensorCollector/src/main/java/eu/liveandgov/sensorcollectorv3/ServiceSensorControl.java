@@ -17,7 +17,6 @@ import eu.liveandgov.sensorcollectorv3.human_activity_recognition.HarPipeline;
 import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
-import eu.liveandgov.sensorcollectorv3.streaming.ZmqStreamer;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.LinkedSensorQueue;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.sensorcollectorv3.sensors.SensorSerializer;
@@ -37,14 +36,12 @@ public class ServiceSensorControl extends Service {
 
     // STATUS FLAGS
     public boolean isRecording = false;
-    public boolean isStreaming = false;
     public boolean isHAR = false;
     public String userId = "";
 
     // COMMUNICATION CHANNELS
     public SensorQueue sensorQueue;
     public Persistor persistor;
-    public Consumer<String> streamer;
     public Pipeline<String, String> harPipeline;
 
     // THREADS
@@ -71,7 +68,6 @@ public class ServiceSensorControl extends Service {
         // INIT COMMUNICATION CHANNELS
         sensorQueue = new LinkedSensorQueue();
         persistor   = new FilePersistor(sensorFile);
-        streamer    = new ZmqStreamer();
         harPipeline = new HarPipeline();
 
         // INIT THREADS
@@ -143,10 +139,6 @@ public class ServiceSensorControl extends Service {
             doStartHAR();
         } else if (action.equals(IntentAPI.ACTION_STOP_HAR)) {
             doStopHAR();
-        } else if (action.equals(ExtendedIntentAPI.START_STREAMING)) {
-            doStartStreaming();
-        } else if (action.equals(ExtendedIntentAPI.STOP_STREAMING)) {
-            doStopStreaming();
         } else if (action.equals(IntentAPI.ACTION_SET_ID)) {
             doSetId(intent.getStringExtra(IntentAPI.FIELD_USER_ID));
         } else {
@@ -167,19 +159,6 @@ public class ServiceSensorControl extends Service {
         connectorThread.removeConsumer(harPipeline);
         connectorThread.addConsumer(harPipeline);
     }
-
-    private void doStopStreaming() {
-        isStreaming = false;
-        connectorThread.removeConsumer(streamer);
-    }
-
-    private void doStartStreaming() {
-        isStreaming = true;
-        // make sure we do not add the consumer twice
-        connectorThread.removeConsumer(streamer);
-        connectorThread.addConsumer(streamer);
-    }
-
 
     private void doSetId(String id) {
         Log.i(LOG_TAG, "Set id to:" + id);
@@ -215,7 +194,6 @@ public class ServiceSensorControl extends Service {
         intent.putExtra(IntentAPI.FIELD_SAMPLES_STORED,
                 persistor.hasSamples() | transferManager.hasStagedSamples()
         );
-        intent.putExtra(ExtendedIntentAPI.FIELD_STREAMING, isStreaming);
         intent.putExtra(IntentAPI.FIELD_HAR, isHAR);
         intent.putExtra(IntentAPI.FIELD_USER_ID, userId);
         sendBroadcast(intent);
