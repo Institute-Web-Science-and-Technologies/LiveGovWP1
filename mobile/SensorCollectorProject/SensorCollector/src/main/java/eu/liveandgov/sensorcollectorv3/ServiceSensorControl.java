@@ -17,6 +17,7 @@ import eu.liveandgov.sensorcollectorv3.human_activity_recognition.HarPipeline;
 import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
+import eu.liveandgov.sensorcollectorv3.persistence.ZipFilePersistor;
 import eu.liveandgov.sensorcollectorv3.streaming.ZmqStreamer;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.LinkedSensorQueue;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
