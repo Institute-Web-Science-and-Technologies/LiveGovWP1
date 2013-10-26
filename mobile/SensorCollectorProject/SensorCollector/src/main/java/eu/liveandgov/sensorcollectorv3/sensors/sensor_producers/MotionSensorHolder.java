@@ -6,8 +6,8 @@ import android.hardware.SensorEventListener;
 import android.os.Handler;
 
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
-import eu.liveandgov.sensorcollectorv3.sensors.SensorParser;
+import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorSerializer;
 
 /**
  * Created by hartmann on 9/15/13.
@@ -43,8 +43,8 @@ public class MotionSensorHolder implements SensorHolder, SensorEventListener {
     // Sensor Listener
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        // Log.i(LOG_TAG,"Recieved Sensor Sample " + SensorParser.parse(sensorEvent));
-        sensorQueue.push(SensorParser.parse(sensorEvent));
+        // Log.i(LOG_TAG,"Recieved Sensor Sample " + SensorSerializer.parse(sensorEvent));
+        sensorQueue.push(SensorSerializer.parse(sensorEvent));
     }
 
     @Override

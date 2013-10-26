@@ -6,6 +6,12 @@ import java.util.Set;
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
 
 /**
+ * Monitors objects that implement the {@link eu.liveandgov.sensorcollectorv3.monitor.Monitorable}
+ * interface.
+ *
+ * Each object is periodically polled for status updates. These updates are distributed
+ * using the GlobalContext.sendLog(String) method.
+ *
  * Created by hartmann on 9/22/13.
  */
 public class MonitorThread implements Runnable {

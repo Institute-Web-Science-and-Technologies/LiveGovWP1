@@ -8,6 +8,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
+ * Persistor class that writes samples into a log file.
+ *
  * Created by hartmann on 9/20/13.
  */
 public class FilePersistor implements Persistor {
@@ -57,6 +59,11 @@ public class FilePersistor implements Persistor {
 
         sampleCount = 0;
         return true;
+    }
+
+    @Override
+    public boolean hasSamples() {
+        return logFile.length() > 0;
     }
 
     @Override

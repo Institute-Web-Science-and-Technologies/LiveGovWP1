@@ -20,7 +20,7 @@ import eu.liveandgov.sensorcollectorv3.GlobalContext;
 import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
 
 /**
- * Transfer sensor.log file to server.
+ * Transfer sensor.log file to server using HTTP/POST request
  *
  * Use:
  * * .setup()      - setup instance
@@ -45,19 +45,27 @@ public class TransferThreadPost implements Runnable, TransferManager {
         thread = new Thread(this);
     };
 
-
+    @Override
     public void doTransfer(){
-        start();
+        if (thread.isAlive()) { Log.i(LOG_TAG, "Already running."); return; }
+        if (thread.getState() == Thread.State.TERMINATED) thread = new Thread(this);
+        thread.start();
     }
 
+    @Override
     public boolean isTransferring() {
         return thread.isAlive();
     }
 
-    public void start(){
-        if (thread.isAlive()) { Log.i(LOG_TAG, "Already running."); return; }
-        if (thread.getState() == Thread.State.TERMINATED) thread = new Thread(this);
-        thread.start();
+    @Override
+    public boolean hasStagedSamples() {
+        return stageFile.length() > 0;
+    }
+
+    @Override
+    public String getStatus() {
+        return "StageFile: " + stageFile.length()/1024 + "kb. " +
+               (isTransferring() ? "transferring" : "waiting");
     }
 
     public void run() {
@@ -114,10 +122,6 @@ public class TransferThreadPost implements Runnable, TransferManager {
         return true;
     }
 
-    @Override
-    public String getStatus() {
-        return "StageFile: " + stageFile.length()/1024 + "kb. " +
-               (isTransferring() ? "transferring" : "waiting");
-    }
+
 }
 
