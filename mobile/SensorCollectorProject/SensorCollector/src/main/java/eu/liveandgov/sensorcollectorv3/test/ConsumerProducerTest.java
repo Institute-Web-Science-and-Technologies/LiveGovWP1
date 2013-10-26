@@ -1,11 +1,9 @@
 package eu.liveandgov.sensorcollectorv3.test;
 
-import android.test.ActivityTestCase;
-
 import junit.framework.TestCase;
 
-import eu.liveandgov.sensorcollectorv3.connector.Consumer;
-import eu.liveandgov.sensorcollectorv3.connector.Producer;
+import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
+import eu.liveandgov.sensorcollectorv3.connectors.Producer;
 
 /**
  * Created by hartmann on 10/19/13.

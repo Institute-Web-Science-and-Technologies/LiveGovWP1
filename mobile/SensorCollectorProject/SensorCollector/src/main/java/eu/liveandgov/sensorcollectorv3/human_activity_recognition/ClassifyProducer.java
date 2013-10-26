@@ -1,14 +1,14 @@
-package eu.liveandgov.sensorcollectorv3.har;
+package eu.liveandgov.sensorcollectorv3.human_activity_recognition;
 
 import android.util.Log;
 
-import eu.liveandgov.sensorcollectorv3.connector.Consumer;
-import eu.liveandgov.sensorcollectorv3.connector.Producer;
+import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
+import eu.liveandgov.sensorcollectorv3.connectors.Producer;
 
 /**
  * Created by cehlen on 10/19/13.
  */
-public class ClassifyProducer extends Producer<String> implements Consumer<FeatureVector> {
+class ClassifyProducer extends Producer<String> implements Consumer<FeatureVector> {
 
     @Override
     public void push(FeatureVector m) {

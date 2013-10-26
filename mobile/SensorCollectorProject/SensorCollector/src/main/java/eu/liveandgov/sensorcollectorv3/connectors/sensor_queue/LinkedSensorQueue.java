@@ -1,11 +1,13 @@
-package eu.liveandgov.sensorcollectorv3.sensor_queue;
+package eu.liveandgov.sensorcollectorv3.connectors.sensor_queue;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
-
 /**
+ * Simple queue class of a fixed maximal capacity.
+ * If the capacity is reached further messages are dropped.
+ * The class provides a blockinPull() method, that blocks until new messages are available.
+ *
  * Created by hartmann on 9/29/13.
  */
 public class LinkedSensorQueue implements SensorQueue {
@@ -14,17 +16,24 @@ public class LinkedSensorQueue implements SensorQueue {
     private int size = 0;
     public  final Queue<String> Q = new ConcurrentLinkedQueue<String>();
 
+    /**
+     * Push message to the queue.
+     * Drop message if queue is full.
+     * @param m
+     */
+    @Override
     public void push(String m){
         if (size++ < capacity) {
             Q.add(m);
         }
     }
 
-    public String pull(){
+    private String pull(){
         size = Math.max(size - 1, 0);
         return Q.poll();
     }
 
+    @Override
     public String blockingPull(){
         String m;
 
@@ -40,10 +49,6 @@ public class LinkedSensorQueue implements SensorQueue {
             }
         }
         return m;
-    }
-
-    public int size() {
-        return size;
     }
 
     @Override

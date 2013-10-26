@@ -11,7 +11,7 @@ import java.util.Set;
 
 import eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions;
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.sensorcollectorv3.sensors.sensor_producers.ActivityHolder;
 import eu.liveandgov.sensorcollectorv3.sensors.sensor_producers.LocationHolder;
 import eu.liveandgov.sensorcollectorv3.sensors.sensor_producers.MotionSensorHolder;

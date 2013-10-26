@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.har;
+package eu.liveandgov.sensorcollectorv3.human_activity_recognition;
 
 /**
  * Created by cehlen on 10/19/13.

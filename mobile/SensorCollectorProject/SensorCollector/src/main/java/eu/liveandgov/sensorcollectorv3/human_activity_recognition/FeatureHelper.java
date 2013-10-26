@@ -1,7 +1,9 @@
-package eu.liveandgov.sensorcollectorv3.har;
+package eu.liveandgov.sensorcollectorv3.human_activity_recognition;
 
 /**
- * Created by cehlen on 10/19/13.
+ * Utility class that contains feature calculation methods.
+ *
+ * Created by hartmann
  */
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;

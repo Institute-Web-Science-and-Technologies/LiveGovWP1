@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.connector;
+package eu.liveandgov.sensorcollectorv3.connectors;
 
 /**
  * Producer objects register a consumer, that provided a push method.

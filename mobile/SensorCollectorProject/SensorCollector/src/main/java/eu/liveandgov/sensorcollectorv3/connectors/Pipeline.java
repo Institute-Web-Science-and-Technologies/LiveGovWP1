@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.connector;
+package eu.liveandgov.sensorcollectorv3.connectors;
 
 /**
  * Abstract class providing Producer and Consumer methods

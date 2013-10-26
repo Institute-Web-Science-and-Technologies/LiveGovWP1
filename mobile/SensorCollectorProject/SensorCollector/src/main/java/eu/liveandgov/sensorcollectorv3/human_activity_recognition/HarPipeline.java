@@ -1,10 +1,12 @@
-package eu.liveandgov.sensorcollectorv3.har;
+package eu.liveandgov.sensorcollectorv3.human_activity_recognition;
 
-import eu.liveandgov.sensorcollectorv3.connector.Consumer;
-import eu.liveandgov.sensorcollectorv3.connector.Pipeline;
-import eu.liveandgov.sensorcollectorv3.connector.Producer;
+import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
+import eu.liveandgov.sensorcollectorv3.connectors.Pipeline;
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.PrefixFilter;
 
 /**
+ * Pipeline class that consumes accelerometer values and produces an activity stream.
+ *
  * Created by hartmann on 10/20/13.
  */
 public class HarPipeline extends Pipeline<String,String> {

@@ -9,19 +9,18 @@ import java.io.File;
 
 import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
 import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
-import eu.liveandgov.sensorcollectorv3.connector.ConnectorThread;
-import eu.liveandgov.sensorcollectorv3.connector.Consumer;
-import eu.liveandgov.sensorcollectorv3.connector.IntentEmitter;
-import eu.liveandgov.sensorcollectorv3.connector.Pipeline;
-import eu.liveandgov.sensorcollectorv3.har.HarPipeline;
-import eu.liveandgov.sensorcollectorv3.mock_classes.MockHandler;
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.ConnectorThread;
+import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.IntentEmitter;
+import eu.liveandgov.sensorcollectorv3.connectors.Pipeline;
+import eu.liveandgov.sensorcollectorv3.human_activity_recognition.HarPipeline;
 import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
-import eu.liveandgov.sensorcollectorv3.persistence.ZmqStreamer;
-import eu.liveandgov.sensorcollectorv3.sensor_queue.LinkedSensorQueue;
-import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
-import eu.liveandgov.sensorcollectorv3.sensors.SensorParser;
+import eu.liveandgov.sensorcollectorv3.streaming.ZmqStreamer;
+import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.LinkedSensorQueue;
+import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorSerializer;
 import eu.liveandgov.sensorcollectorv3.sensors.SensorThread;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferManager;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferThreadPost;
@@ -38,7 +37,6 @@ public class ServiceSensorControl extends Service {
 
     // STATUS FLAGS
     public boolean isRecording = false;
-    public boolean isTransferring = false;
     public boolean isStreaming = false;
     public boolean isHAR = false;
     public String userId = "";
@@ -128,28 +126,28 @@ public class ServiceSensorControl extends Service {
         if (action == null) return START_STICKY;
 
         // Dispatch IntentAPI
-        if (action.equals(IntentAPI.RECORDING_ENABLE)) {
+        if (action.equals(IntentAPI.ACTION_RECORDING_ENABLE)) {
             doEnableRecording();
             doSendStatus();
         } else if (action.equals(IntentAPI.RECORDING_DISABLE)) {
             doDisableRecording();
             doSendStatus();
-        } else if (action.equals(IntentAPI.TRANSFER_SAMPLES)) {
+        } else if (action.equals(IntentAPI.ACTION_TRANSFER_SAMPLES)) {
             doTransferSamples();
             doSendStatus();
-        } else if (action.equals(IntentAPI.ANNOTATE)) {
+        } else if (action.equals(IntentAPI.ACTION_ANNOTATE)) {
             doAnnotate(intent.getStringExtra(IntentAPI.FIELD_ANNOTATION));
-        } else if (action.equals(IntentAPI.GET_STATUS)) {
+        } else if (action.equals(IntentAPI.ACTION_GET_STATUS)) {
             doSendStatus();
-        } else if (action.equals(IntentAPI.START_HAR)) {
+        } else if (action.equals(IntentAPI.ACTION_START_HAR)) {
             doStartHAR();
-        } else if (action.equals(IntentAPI.STOP_HAR)) {
+        } else if (action.equals(IntentAPI.ACTION_STOP_HAR)) {
             doStopHAR();
         } else if (action.equals(ExtendedIntentAPI.START_STREAMING)) {
             doStartStreaming();
         } else if (action.equals(ExtendedIntentAPI.STOP_STREAMING)) {
             doStopStreaming();
-        } else if (action.equals(IntentAPI.SET_USER_ID)) {
+        } else if (action.equals(IntentAPI.ACTION_SET_ID)) {
             doSetId(intent.getStringExtra(IntentAPI.FIELD_USER_ID));
         } else {
             Log.i(LOG_TAG, "Received unknown action " + action);
@@ -191,13 +189,12 @@ public class ServiceSensorControl extends Service {
 
     private void doAnnotate(String tag) {
         Log.i(LOG_TAG, "Adding annotation:" + tag);
-        String msg = SensorParser.parse(tag);
+        String msg = SensorSerializer.parse(tag);
         sensorQueue.push(msg);
     }
 
     private void doTransferSamples() {
         transferManager.doTransfer();
-        isTransferring = true;
     }
 
     private void doDisableRecording() {
@@ -211,11 +208,13 @@ public class ServiceSensorControl extends Service {
     }
 
     public void doSendStatus() {
-        isTransferring = transferManager.isTransferring();
-
         Intent intent = new Intent(IntentAPI.RETURN_STATUS);
         intent.putExtra(IntentAPI.FIELD_SAMPLING, isRecording);
-        intent.putExtra(IntentAPI.FIELD_TRANSFERRING, isTransferring);
+        intent.putExtra(IntentAPI.FIELD_TRANSFERRING,
+                transferManager.isTransferring());
+        intent.putExtra(IntentAPI.FIELD_SAMPLES_STORED,
+                persistor.hasSamples() | transferManager.hasStagedSamples()
+        );
         intent.putExtra(ExtendedIntentAPI.FIELD_STREAMING, isStreaming);
         intent.putExtra(IntentAPI.FIELD_HAR, isHAR);
         intent.putExtra(IntentAPI.FIELD_USER_ID, userId);

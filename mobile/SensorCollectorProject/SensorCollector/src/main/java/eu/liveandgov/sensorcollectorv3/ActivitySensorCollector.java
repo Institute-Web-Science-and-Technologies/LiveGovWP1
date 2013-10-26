@@ -16,8 +16,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
-import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
+import static eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI.*;
+import static eu.liveandgov.sensorcollectorv3.configuration.IntentAPI.*;
 
 /**
  * Basic User Interface implementing the IntentAPI
@@ -49,7 +49,7 @@ public class ActivitySensorCollector extends Activity {
     private EditText        idText;
     private Button          idButton;
     private ToggleButton    streamButton;
-
+    private ToggleButton    harButton;
 
 
     /* ANDROID LIFECYCLE MANAGEMENT */
@@ -99,8 +99,13 @@ public class ActivitySensorCollector extends Activity {
         idButton = (Button) findViewById(R.id.idButton);
         idButton.setEnabled(true);
 
+        // Setup Stream Button
         streamButton = (ToggleButton) findViewById(R.id.streamButton);
         streamButton.setEnabled(true);
+
+        // Setup harButton
+        harButton = (ToggleButton) findViewById(R.id.harButton);
+        harButton.setEnabled(true);
 
         // Prevent keyboard automatically popping up
         getWindow().setSoftInputMode(
@@ -128,44 +133,44 @@ public class ActivitySensorCollector extends Activity {
     public void onRecordingToggleButtonClick(View view) {
         if (!isRecording) {
             Intent intent = new Intent(this, ServiceSensorControl.class);
-            intent.setAction(IntentAPI.RECORDING_ENABLE);
+            intent.setAction(ACTION_RECORDING_ENABLE);
             startService(intent);
         } else { // already recording
             Intent intent = new Intent(this, ServiceSensorControl.class);
-            intent.setAction(IntentAPI.RECORDING_DISABLE);
+            intent.setAction(RECORDING_DISABLE);
             startService(intent);
         }
     }
 
     public void onTransferButtonClick(View view) {
         Intent intent = new Intent(this, ServiceSensorControl.class);
-        intent.setAction(IntentAPI.TRANSFER_SAMPLES);
+        intent.setAction(ACTION_TRANSFER_SAMPLES);
         startService(intent);
     }
 
     public void onSendButtonClick(View view) {
         Intent intent = new Intent(this, ServiceSensorControl.class);
-        intent.setAction(IntentAPI.ANNOTATE);
-        intent.putExtra(IntentAPI.FIELD_ANNOTATION, annotationText.getText().toString());
+        intent.setAction(ACTION_ANNOTATE);
+        intent.putExtra(FIELD_ANNOTATION, annotationText.getText().toString());
         startService(intent);
     }
 
 
     public void onIdButtonClick(View view) {
         Intent intent = new Intent(this, ServiceSensorControl.class);
-        intent.setAction(IntentAPI.SET_USER_ID);
-        intent.putExtra(IntentAPI.FIELD_ID, idText.getText().toString());
+        intent.setAction(ACTION_SET_ID);
+        intent.putExtra(FIELD_ID, idText.getText().toString());
         startService(intent);
     }
 
     public void onStreamButtonClick(View view){
         if (!isStreaming) {
             Intent intent = new Intent(this, ServiceSensorControl.class);
-            intent.setAction(ExtendedIntentAPI.START_STREAMING);
+            intent.setAction(START_STREAMING);
             startService(intent);
         } else { // already recording
             Intent intent = new Intent(this, ServiceSensorControl.class);
-            intent.setAction(ExtendedIntentAPI.STOP_STREAMING);
+            intent.setAction(STOP_STREAMING);
             startService(intent);
         }
     }
@@ -173,11 +178,11 @@ public class ActivitySensorCollector extends Activity {
     public void onHarButtonClick(View view){
         if (!isHAR) {
             Intent intent = new Intent(this, ServiceSensorControl.class);
-            intent.setAction(IntentAPI.START_HAR);
+            intent.setAction(ACTION_START_HAR);
             startService(intent);
         } else { // already recording
             Intent intent = new Intent(this, ServiceSensorControl.class);
-            intent.setAction(IntentAPI.STOP_HAR);
+            intent.setAction(ACTION_STOP_HAR);
             startService(intent);
         }
     }
@@ -190,32 +195,40 @@ public class ActivitySensorCollector extends Activity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
+                if (action == null) return; // if no action is provided.
+
                 // Log.i(LOG_TAG,"Recieved Broadcast with action " + action);
-                if (action.equals(IntentAPI.RETURN_STATUS)) {
+
+                // DISPATCHER
+                if (action.equals(RETURN_STATUS)) {
                     updateStatus(intent);
-                } else if (action.equals(IntentAPI.RETURN_LOG)) {
+                } else if (action.equals(RETURN_ACTIVITY)) {
+                    updateActivity(intent.getStringExtra(FIELD_ACTIVITY));
+                } else if (action.equals(RETURN_LOG)) {
                     updateLog(intent);
-                } else if (action.equals(IntentAPI.RETURN_ACTIVITY)) {
-                    updateActivity(intent.getStringExtra(IntentAPI.FIELD_ACTIVITY));
                 }
             }
         };
 
+        // Register Broadcast Listerners.
         registerListeners();
     }
 
-    private void registerListeners(){
-        registerReceiver(universalBroadcastReceiver, new IntentFilter(IntentAPI.RETURN_STATUS));
-        registerReceiver(universalBroadcastReceiver, new IntentFilter(IntentAPI.RETURN_LOG));
-        registerReceiver(universalBroadcastReceiver, new IntentFilter(IntentAPI.RETURN_ACTIVITY));
+
+    // REMARK: called onResume
+    private void registerListeners() {
+        registerReceiver(universalBroadcastReceiver, new IntentFilter(RETURN_STATUS));
+        registerReceiver(universalBroadcastReceiver, new IntentFilter(RETURN_ACTIVITY));
+        registerReceiver(universalBroadcastReceiver, new IntentFilter(RETURN_LOG));
     }
 
+    // REMARK: called onPause
     private void unregisterListeners(){
         unregisterReceiver(universalBroadcastReceiver);
     }
 
     private void updateLog(Intent intent) {
-        logTextView.setText(intent.getStringExtra(IntentAPI.FIELD_LOG) + "\n");
+        logTextView.setText(intent.getStringExtra(FIELD_MESSAGE) + "\n");
 
         // scroll to end
 //        logTextView.setSelected(true);
@@ -227,13 +240,20 @@ public class ActivitySensorCollector extends Activity {
         activityView.setText(activityName);
     }
 
+    private void requestStatus() {
+        Intent requestIntent = new Intent(this, ServiceSensorControl.class);
+        requestIntent.setAction(ACTION_GET_STATUS);
+        startService(requestIntent);
+    }
 
     private void updateStatus(Intent intent) {
-        isRecording = intent.getBooleanExtra(IntentAPI.FIELD_SAMPLING, isRecording /* = default value */ );
-        isTransferring = intent.getBooleanExtra(IntentAPI.FIELD_TRANSFERRING, isTransferring );
-        isStreaming = intent.getBooleanExtra(ExtendedIntentAPI.FIELD_STREAMING, isStreaming );
-        isHAR = intent.getBooleanExtra(IntentAPI.FIELD_HAR, isHAR);
+        // Update Flags
+        isRecording = intent.getBooleanExtra(FIELD_SAMPLING, false );
+        isTransferring = intent.getBooleanExtra(FIELD_TRANSFERRING, false );
+        isStreaming = intent.getBooleanExtra(FIELD_STREAMING, false );
+        isHAR = intent.getBooleanExtra(FIELD_HAR, false );
 
+        // Update Buttons
         if (isRecording) {
             recordingProgressBar.setVisibility(View.VISIBLE);
             recordingToggleButton.setChecked(true);
@@ -243,10 +263,8 @@ public class ActivitySensorCollector extends Activity {
         }
 
         if (isTransferring) {
-            // transferProgressBar.setVisibility(View.VISIBLE);
             transferProgressBar.setIndeterminate(true);
         } else {
-            // transferProgressBar.setVisibility(View.INVISIBLE);
             transferProgressBar.setIndeterminate(false);
         }
 
@@ -256,15 +274,29 @@ public class ActivitySensorCollector extends Activity {
             streamButton.setChecked(false);
         }
 
+        if (isHAR) {
+            harButton.setChecked(true);
+        } else {
+            harButton.setChecked(false);
+        }
+
+        logStatus(intent);
     }
 
-    private void requestStatus() {
-        Intent requestIntent = new Intent(this, ServiceSensorControl.class);
-        requestIntent.setAction(IntentAPI.GET_STATUS);
-        startService(requestIntent);
+    private void logStatus(Intent intent) {
+        Log.i("STATUS", "SAMPLING:       " + intent.getBooleanExtra(FIELD_SAMPLING, false));
+        Log.i("STATUS", "TRANSFERRING:   " + intent.getBooleanExtra(FIELD_TRANSFERRING, false));
+        Log.i("STATUS", "SAMPLES_STORED: " + intent.getBooleanExtra(FIELD_SAMPLES_STORED,false));
+        Log.i("STATUS", "HAR:            " + intent.getBooleanExtra(FIELD_HAR,false));
+        Log.i("STATUS", "ID:             " + intent.getStringExtra(FIELD_ID));
     }
 
+    /**
+     * Spawn new thread that request status updates in regular intervals.
+     */
     private void runStatusLoop() {
+        final int INTERVAL = 5000; // in ms;
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -273,7 +305,7 @@ public class ActivitySensorCollector extends Activity {
 
                     // wait 1 sec.
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(INTERVAL);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

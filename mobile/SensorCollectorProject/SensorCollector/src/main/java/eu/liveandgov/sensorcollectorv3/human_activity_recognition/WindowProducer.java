@@ -1,18 +1,18 @@
-package eu.liveandgov.sensorcollectorv3.har;
+package eu.liveandgov.sensorcollectorv3.human_activity_recognition;
 
 import android.util.Log;
 
 import java.util.ArrayList;
 
-import eu.liveandgov.sensorcollectorv3.connector.Consumer;
-import eu.liveandgov.sensorcollectorv3.connector.Producer;
+import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
+import eu.liveandgov.sensorcollectorv3.connectors.Producer;
 import eu.liveandgov.sensorcollectorv3.sensors.MotionSensorValue;
 import eu.liveandgov.sensorcollectorv3.sensors.Window;
 
 /**
  * Created by cehlen on 10/19/13.
  */
-public class WindowProducer extends Producer<Window> implements Consumer<MotionSensorValue> {
+class WindowProducer extends Producer<Window> implements Consumer<MotionSensorValue> {
     private static String LOG_TAG = "WND_PROD";
 
 

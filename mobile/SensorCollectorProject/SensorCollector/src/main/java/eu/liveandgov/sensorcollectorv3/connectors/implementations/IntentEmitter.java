@@ -1,10 +1,9 @@
-package eu.liveandgov.sensorcollectorv3.connector;
+package eu.liveandgov.sensorcollectorv3.connectors.implementations;
 
 import android.content.Intent;
-import android.util.Log;
 
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
+import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
 
 /**
  * Consumer that sends out received messages as broadcast intents.
