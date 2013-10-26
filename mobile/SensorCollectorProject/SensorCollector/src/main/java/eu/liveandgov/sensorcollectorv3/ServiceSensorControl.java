@@ -7,6 +7,7 @@ import android.util.Log;
 
 import java.io.File;
 
+import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
 import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
 import eu.liveandgov.sensorcollectorv3.connector.ConnectorThread;
 import eu.liveandgov.sensorcollectorv3.connector.Consumer;
@@ -38,6 +39,9 @@ public class ServiceSensorControl extends Service {
     // STATUS FLAGS
     public boolean isRecording = false;
     public boolean isTransferring = false;
+    public boolean isStreaming = false;
+    public boolean isHAR = false;
+    public String userId = "";
 
     // COMMUNICATION CHANNELS
     public SensorQueue sensorQueue;
@@ -82,8 +86,7 @@ public class ServiceSensorControl extends Service {
 
         // Connect sensorQueue to Consumers
         connectorThread.addConsumer(persistor);
-        // connectorThread.addConsumer(streamer);
-        connectorThread.addConsumer(harPipeline);
+        // streamer and harPipeline are added in the methods below
 
         // Publish HAR results as intent
         harPipeline.setConsumer(new IntentEmitter(IntentAPI.RETURN_ACTIVITY, IntentAPI.FIELD_ACTIVITY));
@@ -120,7 +123,7 @@ public class ServiceSensorControl extends Service {
         }
 
         String action = intent.getAction();
-        // Log.i(LOG_TAG, "Received intent with action " + action);
+        Log.i(LOG_TAG, "Received intent with action " + action);
 
         if (action == null) return START_STICKY;
 
@@ -139,11 +142,15 @@ public class ServiceSensorControl extends Service {
         } else if (action.equals(IntentAPI.GET_STATUS)) {
             doSendStatus();
         } else if (action.equals(IntentAPI.START_HAR)) {
-            MockHandler.doStartHAR();
+            doStartHAR();
         } else if (action.equals(IntentAPI.STOP_HAR)) {
-            MockHandler.doStopHAR();
+            doStopHAR();
+        } else if (action.equals(ExtendedIntentAPI.START_STREAMING)) {
+            doStartStreaming();
+        } else if (action.equals(ExtendedIntentAPI.STOP_STREAMING)) {
+            doStopStreaming();
         } else if (action.equals(IntentAPI.SET_USER_ID)) {
-            MockHandler.doSetId(intent);
+            doSetId(intent.getStringExtra(IntentAPI.FIELD_USER_ID));
         } else {
             Log.i(LOG_TAG, "Received unknown action " + action);
         }
@@ -151,7 +158,39 @@ public class ServiceSensorControl extends Service {
         return START_STICKY;
     }
 
+    private void doStopHAR() {
+        isHAR = false;
+        connectorThread.removeConsumer(harPipeline);
+    }
+
+    private void doStartHAR() {
+        isHAR = true;
+        // make sure we do not add the consumer twice
+        connectorThread.removeConsumer(harPipeline);
+        connectorThread.addConsumer(harPipeline);
+    }
+
+    private void doStopStreaming() {
+        isStreaming = false;
+        connectorThread.removeConsumer(streamer);
+    }
+
+    private void doStartStreaming() {
+        isStreaming = true;
+        // make sure we do not add the consumer twice
+        connectorThread.removeConsumer(streamer);
+        connectorThread.addConsumer(streamer);
+    }
+
+
+    private void doSetId(String id) {
+        Log.i(LOG_TAG, "Set id to:" + id);
+        userId = id;
+        doAnnotate("USER_ID=" + id);
+    }
+
     private void doAnnotate(String tag) {
+        Log.i(LOG_TAG, "Adding annotation:" + tag);
         String msg = SensorParser.parse(tag);
         sensorQueue.push(msg);
     }
@@ -177,6 +216,9 @@ public class ServiceSensorControl extends Service {
         Intent intent = new Intent(IntentAPI.RETURN_STATUS);
         intent.putExtra(IntentAPI.FIELD_SAMPLING, isRecording);
         intent.putExtra(IntentAPI.FIELD_TRANSFERRING, isTransferring);
+        intent.putExtra(ExtendedIntentAPI.FIELD_STREAMING, isStreaming);
+        intent.putExtra(IntentAPI.FIELD_HAR, isHAR);
+        intent.putExtra(IntentAPI.FIELD_USER_ID, userId);
         sendBroadcast(intent);
     }
 

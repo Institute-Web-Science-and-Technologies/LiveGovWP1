@@ -27,7 +27,7 @@
                 android:onClick="onRecordingToggleButtonClick"
                 android:text="ToggleButton"
                 android:textOff="Start Recording"
-                android:textOn="Stop Recording and Transfer Data" />
+                android:textOn="Stop Recording" />
 
             <ProgressBar
                 android:id="@+id/recordingProgressBar"
@@ -38,28 +38,46 @@
                 android:indeterminate="false" />
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/RelativeLayout1"
+        <Button
+            android:id="@+id/transferButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:onClick="onTransferButtonClick"
+            android:text="Transfer samples" />
 
-            <Button
-                android:id="@+id/transferButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@+id/transferProgressBar"
-                android:onClick="onTransferButtonClick"
-                android:text="Transfer samples" />
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/transferProgress"
+            android:max="100"
+            android:indeterminate="true" />
 
-            <ProgressBar
-                android:id="@+id/transferProgressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:indeterminate="false" />
+            <ToggleButton
+                android:id="@+id/streamButton"
+                android:layout_height="fill_parent"
+                android:onClick="onStreamButtonClick"
+                android:text="Streaming"
+                android:checked="false"
+                android:textOff="Start Streaming"
+                android:textOn="Stop Streaming"
+                android:layout_weight="0.23"
+                android:layout_width="match_parent" />
 
-        </RelativeLayout>
+
+        <ToggleButton
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="New ToggleButton"
+            android:id="@+id/hatButton"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/ActivityText"
+            android:checked="false"
+            android:textOff="Start HAR"
+            android:textOn="Stop HAR"
+            android:layout_gravity="center"
+            android:onClick="onHarButtonClick" />
 
         <TextView
             android:id="@+id/textView1"
@@ -94,6 +112,51 @@
                 android:onClick="onSendButtonClick"
                 android:text="Send" />
         </RelativeLayout>
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ID"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <RelativeLayout
+            android:id="@+id/RelativeLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <EditText
+                android:id="@+id/idText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/idButton"
+                android:ems="10"
+                android:editable="true"
+                android:clickable="true"
+                android:enabled="true"
+                android:focusable="true">
+            </EditText>
+
+            <Button
+                android:id="@+id/idButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:onClick="onIdButtonClick"
+                android:text="Set" />
+        </RelativeLayout>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="ACTIVITY"
+            android:id="@+id/ActivityText"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="center" />
 
         <TextView
             android:id="@+id/logTextView"

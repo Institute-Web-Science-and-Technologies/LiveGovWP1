@@ -49,7 +49,7 @@ public class IntentAPI {
      * This intent allows to set a user-id, which will be transferred to the backend service.
      * Using this id the records can be linked to users registered in the service center.
      */
-    public static final String SET_USER_ID = "eu.liveandgov.sensorcollectorapi.intent.action.ANNOTATE";
+    public static final String SET_USER_ID = "eu.liveandgov.sensorcollectorapi.intent.action.SET_USER_ID";
     public static final String FIELD_USER_ID = "id";
 
     /**

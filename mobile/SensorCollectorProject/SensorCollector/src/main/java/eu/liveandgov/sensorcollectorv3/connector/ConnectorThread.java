@@ -57,4 +57,9 @@ public class ConnectorThread implements Runnable, Monitorable {
         consumerList.add(c);
     }
 
+    public boolean removeConsumer(Consumer c){
+        return consumerList.remove(c);
+    }
+
+
 }

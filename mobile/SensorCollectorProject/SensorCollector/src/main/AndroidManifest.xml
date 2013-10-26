@@ -39,6 +39,9 @@
                 <action android:name="eu.liveandgov.sensorcollectorapi.intent.action.RECORDING_DISABLE"/>
                 <action android:name="eu.liveandgov.sensorcollectorapi.intent.action.TRANSFER_SAMPLES"/>
                 <action android:name="eu.liveandgov.sensorcollectorapi.intent.action.ANNOTATE"/>
+                <action android:name="eu.liveandgov.sensorcollectorapi.intent.action.SET_USER_ID"/>
+                <action android:name="eu.liveandgov.sensorminingapi.intent.action.START_STREAMING"/>
+                <action android:name="eu.liveandgov.sensorminingapi.intent.action.STOP_STREAMING"/>
             </intent-filter>
         </service>
 

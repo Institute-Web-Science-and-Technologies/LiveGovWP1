@@ -25,7 +25,7 @@ public class IntentEmitter implements Consumer<String> {
 
     @Override
     public void push(String m) {
-        Log.i("EM", "Sending out intent action:" + action + " - field:" + field);
+        // Log.i("EM", "Sending out intent action:" + action + " - field:" + field);
         Intent intent = new Intent(action);
         intent.putExtra(field, m);
         GlobalContext.context.sendBroadcast(intent);
