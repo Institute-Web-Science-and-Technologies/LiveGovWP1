@@ -1,14 +1,17 @@
-package eu.liveandgov.sensorcollectorv3.connector;
+package eu.liveandgov.sensorcollectorv3.connectors.implementations;
 
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
 import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
-import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
 
 /**
+ * Thread that actively polls a blocking queue and sends samples to a list of consumers.
+ *
  * Created by hartmann on 9/15/13.
  */
 public class ConnectorThread implements Runnable, Monitorable {
@@ -56,5 +59,10 @@ public class ConnectorThread implements Runnable, Monitorable {
     public void addConsumer(Consumer c) {
         consumerList.add(c);
     }
+
+    public boolean removeConsumer(Consumer c){
+        return consumerList.remove(c);
+    }
+
 
 }

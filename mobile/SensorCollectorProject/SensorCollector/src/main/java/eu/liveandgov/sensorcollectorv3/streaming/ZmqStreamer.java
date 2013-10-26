@@ -1,15 +1,17 @@
-package eu.liveandgov.sensorcollectorv3.persistence;
+package eu.liveandgov.sensorcollectorv3.streaming;
 
 import org.jeromq.ZMQ;
 
-import java.io.File;
-
 import eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions;
+import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
+import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
 
 /**
+ * String-Consumer that sends samples to a remote server using ZMQ message queue system.
+ *
  * Created by hartmann on 10/2/13.
  */
-public class ZmqStreamer implements Persistor {
+public class ZmqStreamer implements Monitorable, Consumer<String> {
     public final static String LOG_TAG = "ZMQStreamer";
 
     private final ZMQ.Socket socket;
@@ -29,11 +31,6 @@ public class ZmqStreamer implements Persistor {
             isConnected = true;
         }
         socket.send(m);
-    }
-
-    @Override
-    public boolean exportSamples(File stageFile) {
-        return false;
     }
 
     @Override

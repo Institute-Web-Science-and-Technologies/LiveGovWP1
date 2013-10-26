@@ -11,7 +11,7 @@ import java.util.Set;
 
 import eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions;
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.sensorcollectorv3.sensors.sensor_producers.ActivityHolder;
 import eu.liveandgov.sensorcollectorv3.sensors.sensor_producers.LocationHolder;
 import eu.liveandgov.sensorcollectorv3.sensors.sensor_producers.MotionSensorHolder;
@@ -23,6 +23,8 @@ import eu.liveandgov.sensorcollectorv3.sensors.sensor_producers.SensorHolder;
  *
  * This thread is responsible for:
  * startRecording / unregister individual sensors
+ *
+ * The singleton property makes is easy to start/stop recording via static method calls.
  *
  * Created by hartmann on 9/22/13.
  */

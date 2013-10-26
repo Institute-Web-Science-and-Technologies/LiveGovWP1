@@ -1,14 +1,18 @@
-package eu.liveandgov.sensorcollectorv3.connector;
-
-import android.util.Log;
+package eu.liveandgov.sensorcollectorv3.connectors.implementations;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.liveandgov.sensorcollectorv3.connectors.Pipeline;
+
 /**
+ * Pipeline class, that filters String messages by Prefix.
+ *
+ * Only messages are passed, that have one of the provided prefixes.
+ *
  * Created by cehlen on 10/18/13.
  */
-public class PrefixFilter extends Producer<String> implements Consumer<String> {
+public class PrefixFilter extends Pipeline<String, String> {
     private static final String LOG_TAG = "PrefixFilter";
     private List<String> filterList;
 

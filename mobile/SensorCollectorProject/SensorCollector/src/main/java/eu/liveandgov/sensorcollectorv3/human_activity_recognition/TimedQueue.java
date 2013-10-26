@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.har;
+package eu.liveandgov.sensorcollectorv3.human_activity_recognition;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -15,7 +15,7 @@ import java.util.Queue;
  *  Contents of Queue:            + + + + + +
  *  Removed samples:        + +
  *
- * Created by cehlen on 10/18/13.
+ * Created by cehlen, hartmann on 10/18/13.
  */
 public class TimedQueue<V> {
     private final long duration;

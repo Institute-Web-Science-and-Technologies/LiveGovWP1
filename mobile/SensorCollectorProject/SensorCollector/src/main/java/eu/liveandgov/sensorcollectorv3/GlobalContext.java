@@ -4,9 +4,12 @@ import android.content.Intent;
 import android.hardware.SensorManager;
 import android.provider.Settings;
 
+import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
 import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
 
 /**
+ * Convenience class that makes various context attributes accessible from a static context.
+ *
  * Created by hartmann on 9/29/13.
  */
 public class GlobalContext {
@@ -22,8 +25,8 @@ public class GlobalContext {
     }
 
     public static void sendLog(String message){
-        Intent intent = new Intent(IntentAPI.RETURN_LOG);
-        intent.putExtra(IntentAPI.FIELD_LOG, message);
+        Intent intent = new Intent(ExtendedIntentAPI.RETURN_LOG);
+        intent.putExtra(ExtendedIntentAPI.FIELD_MESSAGE, message);
         context.sendBroadcast(intent);
     }
 }

@@ -7,8 +7,8 @@ import android.util.Log;
 import com.google.android.gms.location.ActivityRecognitionResult;
 
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
-import eu.liveandgov.sensorcollectorv3.sensors.SensorParser;
+import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorSerializer;
 
 /**
  * Created by cehlen on 9/26/13.
@@ -33,7 +33,7 @@ public class ActivityIntentService extends IntentService {
         Log.d("AIS", "HandleIntent");
         if(ActivityRecognitionResult.hasResult(intent)) {
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
-            sensorQueue.push(SensorParser.parse(result));
+            sensorQueue.push(SensorSerializer.parse(result));
         }
     }
 

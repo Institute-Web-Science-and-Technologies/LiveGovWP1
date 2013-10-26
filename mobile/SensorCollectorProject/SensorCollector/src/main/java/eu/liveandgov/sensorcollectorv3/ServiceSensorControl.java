@@ -7,46 +7,54 @@ import android.util.Log;
 
 import java.io.File;
 
+import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
 import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
-import eu.liveandgov.sensorcollectorv3.connector.ConnectorThread;
-import eu.liveandgov.sensorcollectorv3.connector.Consumer;
-import eu.liveandgov.sensorcollectorv3.har.HarPipeline;
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.ConnectorThread;
+import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.IntentEmitter;
+import eu.liveandgov.sensorcollectorv3.connectors.Pipeline;
+import eu.liveandgov.sensorcollectorv3.human_activity_recognition.HarPipeline;
 import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
-import eu.liveandgov.sensorcollectorv3.persistence.ZmqStreamer;
-import eu.liveandgov.sensorcollectorv3.sensor_queue.LinkedSensorQueue;
-import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
-import eu.liveandgov.sensorcollectorv3.sensors.SensorParser;
+import eu.liveandgov.sensorcollectorv3.streaming.ZmqStreamer;
+import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.LinkedSensorQueue;
+import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorSerializer;
 import eu.liveandgov.sensorcollectorv3.sensors.SensorThread;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferManager;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferThreadPost;
 
 public class ServiceSensorControl extends Service {
+    // CONSTANTS
     static final String LOG_TAG =  "SCS";
-    public static final String STAGE_FILENAME = "sensor.stage.ssf";
     public static final String SENSOR_FILENAME = "sensor.ssf";
+    public static final String STAGE_FILENAME = "sensor.stage.ssf";
 
+    // REMARK:
+    // Need to put initialization to onCreate, since FilesDir is not avaialble
+    // from a static context.
+
+    // STATUS FLAGS
     public boolean isRecording = false;
-    public boolean isTransferring = false;
+    public boolean isStreaming = false;
+    public boolean isHAR = false;
+    public String userId = "";
 
-    public ServiceSensorControl() {}
-
-    // Thread objects
-    // Rem: SensorThread is static
-    public ConnectorThread connectorThread;
-    public TransferManager transferManager;
-
-    // Communication Channels
+    // COMMUNICATION CHANNELS
     public SensorQueue sensorQueue;
     public Persistor persistor;
     public Consumer<String> streamer;
-    public Consumer<String> harPipeline;
+    public Pipeline<String, String> harPipeline;
 
+    // THREADS
+    public ConnectorThread connectorThread;
+    public TransferManager transferManager;
+    public MonitorThread monitorThread;
+    // Rem: Also SensorThread belongs here, but it is realized via static methods
 
-
-    public ServiceSensorControl context;
-
+    /* CONSTRUCTOR */
+    public ServiceSensorControl() {}
 
     /* ANDROID LIFECYCLE */
     @Override
@@ -56,37 +64,41 @@ public class ServiceSensorControl extends Service {
         // Setup static variables
         GlobalContext.set(this);
 
-        // Setup sensor thread
-        SensorThread.setup(sensorQueue);
+        // INITIALIZATIONS
+        final File sensorFile = new File(getFilesDir(), SENSOR_FILENAME);
+        final File stageFile  = new File(getFilesDir(), STAGE_FILENAME);
 
-        // setup communication Channels
+        // INIT COMMUNICATION CHANNELS
         sensorQueue = new LinkedSensorQueue();
-
-        // construct Consumer
-        persistor   = new FilePersistor(new File(GlobalContext.context.getFilesDir(), SENSOR_FILENAME));
+        persistor   = new FilePersistor(sensorFile);
         streamer    = new ZmqStreamer();
         harPipeline = new HarPipeline();
 
-        // Connect sensorQueue to Persistor
+        // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
+        transferManager = new TransferThreadPost(persistor, stageFile);
+        monitorThread   = new MonitorThread();
+
+        // Setup sensor thread
+        SensorThread.setup(sensorQueue);
+
+        // Connect sensorQueue to Consumers
         connectorThread.addConsumer(persistor);
-        // connectorThread.addConsumer(streamer);
-        // connectorThread.addConsumer(harPipeline);
-        connectorThread.start();
+        // streamer and harPipeline are added in the methods below
 
-        // setup sensor manager
-        transferManager = new TransferThreadPost(persistor, new File(GlobalContext.context.getFilesDir(), STAGE_FILENAME));
+        // Publish HAR results as intent
+        harPipeline.setConsumer(new IntentEmitter(IntentAPI.RETURN_ACTIVITY, IntentAPI.FIELD_ACTIVITY));
 
-        // Start monitoring thread
-        MonitorThread m = new MonitorThread();
-        m.registerMonitorable(connectorThread, "SampleCount");
-        m.registerMonitorable(persistor, "Persitor");
-        m.registerMonitorable(transferManager, "Transfer");
-        m.registerMonitorable(sensorQueue, "Queue");
-        m.start();
+        // Setup monitoring thread
+        monitorThread.registerMonitorable(connectorThread, "SampleCount");
+        monitorThread.registerMonitorable(persistor, "Persitor");
+        monitorThread.registerMonitorable(transferManager, "Transfer");
+        monitorThread.registerMonitorable(sensorQueue, "Queue");
 
-        // Start sensor thread
+        // Start threads
         SensorThread.start();
+        connectorThread.start();
+        monitorThread.start();
 
         super.onCreate();
     }
@@ -109,24 +121,34 @@ public class ServiceSensorControl extends Service {
         }
 
         String action = intent.getAction();
-        // Log.i(LOG_TAG, "Received intent with action " + action);
+        Log.i(LOG_TAG, "Received intent with action " + action);
 
         if (action == null) return START_STICKY;
 
         // Dispatch IntentAPI
-        if (action.equals(IntentAPI.RECORDING_ENABLE)) {
+        if (action.equals(IntentAPI.ACTION_RECORDING_ENABLE)) {
             doEnableRecording();
             doSendStatus();
         } else if (action.equals(IntentAPI.RECORDING_DISABLE)) {
             doDisableRecording();
             doSendStatus();
-        } else if (action.equals(IntentAPI.TRANSFER_SAMPLES)) {
+        } else if (action.equals(IntentAPI.ACTION_TRANSFER_SAMPLES)) {
             doTransferSamples();
             doSendStatus();
-        } else if (action.equals(IntentAPI.ANNOTATE)) {
+        } else if (action.equals(IntentAPI.ACTION_ANNOTATE)) {
             doAnnotate(intent.getStringExtra(IntentAPI.FIELD_ANNOTATION));
-        } else if (action.equals(IntentAPI.GET_STATUS)) {
+        } else if (action.equals(IntentAPI.ACTION_GET_STATUS)) {
             doSendStatus();
+        } else if (action.equals(IntentAPI.ACTION_START_HAR)) {
+            doStartHAR();
+        } else if (action.equals(IntentAPI.ACTION_STOP_HAR)) {
+            doStopHAR();
+        } else if (action.equals(ExtendedIntentAPI.START_STREAMING)) {
+            doStartStreaming();
+        } else if (action.equals(ExtendedIntentAPI.STOP_STREAMING)) {
+            doStopStreaming();
+        } else if (action.equals(IntentAPI.ACTION_SET_ID)) {
+            doSetId(intent.getStringExtra(IntentAPI.FIELD_USER_ID));
         } else {
             Log.i(LOG_TAG, "Received unknown action " + action);
         }
@@ -134,14 +156,45 @@ public class ServiceSensorControl extends Service {
         return START_STICKY;
     }
 
+    private void doStopHAR() {
+        isHAR = false;
+        connectorThread.removeConsumer(harPipeline);
+    }
+
+    private void doStartHAR() {
+        isHAR = true;
+        // make sure we do not add the consumer twice
+        connectorThread.removeConsumer(harPipeline);
+        connectorThread.addConsumer(harPipeline);
+    }
+
+    private void doStopStreaming() {
+        isStreaming = false;
+        connectorThread.removeConsumer(streamer);
+    }
+
+    private void doStartStreaming() {
+        isStreaming = true;
+        // make sure we do not add the consumer twice
+        connectorThread.removeConsumer(streamer);
+        connectorThread.addConsumer(streamer);
+    }
+
+
+    private void doSetId(String id) {
+        Log.i(LOG_TAG, "Set id to:" + id);
+        userId = id;
+        doAnnotate("USER_ID=" + id);
+    }
+
     private void doAnnotate(String tag) {
-        String msg = SensorParser.parse(tag);
+        Log.i(LOG_TAG, "Adding annotation:" + tag);
+        String msg = SensorSerializer.parse(tag);
         sensorQueue.push(msg);
     }
 
     private void doTransferSamples() {
         transferManager.doTransfer();
-        isTransferring = true;
     }
 
     private void doDisableRecording() {
@@ -155,11 +208,16 @@ public class ServiceSensorControl extends Service {
     }
 
     public void doSendStatus() {
-        isTransferring = transferManager.isTransferring();
-
         Intent intent = new Intent(IntentAPI.RETURN_STATUS);
         intent.putExtra(IntentAPI.FIELD_SAMPLING, isRecording);
-        intent.putExtra(IntentAPI.FIELD_TRANSFERRING, isTransferring);
+        intent.putExtra(IntentAPI.FIELD_TRANSFERRING,
+                transferManager.isTransferring());
+        intent.putExtra(IntentAPI.FIELD_SAMPLES_STORED,
+                persistor.hasSamples() | transferManager.hasStagedSamples()
+        );
+        intent.putExtra(ExtendedIntentAPI.FIELD_STREAMING, isStreaming);
+        intent.putExtra(IntentAPI.FIELD_HAR, isHAR);
+        intent.putExtra(IntentAPI.FIELD_USER_ID, userId);
         sendBroadcast(intent);
     }
 

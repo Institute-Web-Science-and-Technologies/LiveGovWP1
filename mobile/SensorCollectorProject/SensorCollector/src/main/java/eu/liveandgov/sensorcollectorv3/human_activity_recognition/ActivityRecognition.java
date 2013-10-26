@@ -1,9 +1,9 @@
-package eu.liveandgov.sensorcollectorv3.har;
+package eu.liveandgov.sensorcollectorv3.human_activity_recognition;
 
 /**
  * Created by cehlen on 10/19/13.
  */
-public class ActivityRecognition {
+class ActivityRecognition {
 
     public static double classify(Object[] i) throws Exception {
 
@@ -52,9 +52,9 @@ public class ActivityRecognition {
         double p = Double.NaN;
         p = ActivityRecognition.N2cf889c825(i);
         if(p == 0.0) {
-            return "walking";
+            return Activities.WALKING;
         } else {
-            return "running";
+            return Activities.RUNNING;
         }
     }
 }

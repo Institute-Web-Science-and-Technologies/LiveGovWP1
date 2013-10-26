@@ -13,8 +13,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.sensor_queue.SensorQueue;
-import eu.liveandgov.sensorcollectorv3.sensors.SensorParser;
+import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.sensors.SensorSerializer;
 
 /**
  *
@@ -97,7 +97,7 @@ public class LocationHolder implements
 
     @Override
     public void onLocationChanged(Location location) {
-        String locString = SensorParser.parse(location);
+        String locString = SensorSerializer.parse(location);
         Log.d(LOG_TAG, locString);
         sensorQueue.push(locString);
     }

@@ -11,15 +11,17 @@ import com.google.android.gms.location.DetectedActivity;
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
 
 /**
+ * Converts sensor events into the ssf Format.
+ *
  * Created by hartmann on 9/15/13.
  */
-public class SensorParser {
+public class SensorSerializer {
 
     private static String id = Settings.Secure.getString(GlobalContext.context.getContentResolver(),
             Settings.Secure.ANDROID_ID);
 
     public static void setId(String id){
-        SensorParser.id = id;
+        SensorSerializer.id = id;
     }
 
     public static MotionSensorValue parseEvent(String event) {
