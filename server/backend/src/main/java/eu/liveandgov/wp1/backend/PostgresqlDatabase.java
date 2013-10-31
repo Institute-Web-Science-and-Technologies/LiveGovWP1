@@ -59,10 +59,11 @@ public class PostgresqlDatabase extends Database {
 			e.printStackTrace();
 		}
 		Statement stmtLink = null;
+		String dbAddress = "jdbc:postgresql://localhost/liveandgov?autoReconnect=true";
 		try {
 
 			connection = DriverManager.getConnection(
-					"jdbc:postgresql://127.0.0.1:5432/gtfsdb?autoReconnect=true", user,
+					dbAddress, user,
 					password);
 
 			stmtLink = connection.createStatement();
@@ -100,6 +101,9 @@ public class PostgresqlDatabase extends Database {
 			stmtLink.execute(createGravityTable);
 
 		} catch (SQLException e) {
+			System.out.println("dbAdress: " + dbAddress);
+			System.out.println("user: " + user);
+			System.out.println("password: " + password);
 			throw new UnavailableException(e.getMessage());
 		} finally {
 			
