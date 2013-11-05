@@ -102,6 +102,10 @@
     });
     var meta = "From: " + Math.floor(ranges.xaxis.from) + " To: " + Math.floor(ranges.xaxis.to);
     $(".metaLabel").text(meta);
+    window.currentWindow = {
+      min: ranges.xaxis.from,
+      max: ranges.xaxis.to
+    };
   }
 
   function showAccelerometerForId(id) {

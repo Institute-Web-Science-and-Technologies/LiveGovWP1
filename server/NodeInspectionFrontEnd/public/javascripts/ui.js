@@ -30,6 +30,14 @@ $(function() {
     showLinearAccelerationForId(id);
     showGravityForId(id);
   });
+
+  $('.saveWindow').click(function (eventObject) {
+    if(!window.currentDevId) return;
+    if(!window.currentWindow || !window.currentWindow.min || !window.currentWindow.max) return;
+    var startDate = new Date(window.currentWindow.min + 7200000);
+    var endDate = new Date(window.currentWindow.max + 7200000);
+    alert("INSERT INTO raw_training_data (type, ts, x, y, z, tag) SELECT 'acc' AS type,ts,x,y,z, 'test' as tag FROM accelerometer WHERE id='"+window.currentDevId+"' AND ts>=TIMESTAMP '"+startDate+"' AND ts<=TIMESTAMP '"+endDate+"';");
+  });
 });
 
   
