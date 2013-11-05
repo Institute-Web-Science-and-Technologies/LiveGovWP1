@@ -59,7 +59,7 @@ public class PostgresqlDatabase extends Database {
 			e.printStackTrace();
 		}
 		Statement stmtLink = null;
-		String dbAddress = "jdbc:postgresql://localhost/liveandgov?autoReconnect=true";
+		String dbAddress = "jdbc:postgresql://localhost/gtfsdb?autoReconnect=true";
 		try {
 
 			connection = DriverManager.getConnection(
