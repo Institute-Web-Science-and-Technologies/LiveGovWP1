@@ -13,10 +13,15 @@ public class DivideAndConquerGtfs {
 	
 	public static void main(String[] args) throws UnavailableException {
 		ArrayList<RouteSnippet> a = getShapeOfTripFromDb("1065A_20130930_Ma_2_2000", "1065A_20120813_2");
+		//ArrayList<RouteSnippet> a = new ArrayList<RouteSnippet>(a1.subList(0, 12));
 		cleanUpRows(a);
 		interpolateArrivalTimes(a);
 		ensureSnippetSpatialDistance(a, 10); // max distance 10 meters
 		ensureSnippetTemporalDistance(a, 3); // max distance 3 minutes
+		
+//    	for(RouteSnippet r:a){
+//    		System.out.println("L.marker(["+r.shapes_shape_pt_lat+", "+r.shapes_shape_pt_lon+"]).addTo(map).bindPopup('"+r.toCSV()+"');");
+//    	}
 	}
 
     private static void ensureSnippetTemporalDistance(ArrayList<RouteSnippet> allRows, int distanceInMinutes) {
@@ -25,7 +30,35 @@ public class DivideAndConquerGtfs {
 	}
 
 	private static void ensureSnippetSpatialDistance(ArrayList<RouteSnippet> allRows, int distanceInMeter) {
-		// TODO Auto-generated method stub
+
+    	int size = allRows.size();
+
+		for(int j = 0; j < size-1; j++){
+			RouteSnippet r0 = allRows.get(j);
+			RouteSnippet r1 = allRows.get(j+1);
+			
+			double sDelta = r1.meterTraveled - r0.meterTraveled;
+			int ratio = (int) Math.ceil(sDelta / distanceInMeter);
+			// this part is longer than distanceInMeter, split it in smaller pieces
+			if(ratio > 1) {
+				double partLength = sDelta / ratio;
+				double partTime = (r1.stop_times_arrival_time - r0.stop_times_arrival_time) / ratio;
+				for(int i = 1; i < ratio; i++){
+					double[] latLon =  latLonBetweenAtDistance(r0.shapes_shape_pt_lat, 
+							r0.shapes_shape_pt_lon, 
+							r1.shapes_shape_pt_lat, 
+							r1.shapes_shape_pt_lon, 
+							partLength*i);
+					int arrivalTimeInSec = (int)(r0.stop_times_arrival_time + partTime*i);
+					RouteSnippet rIntermediate = new RouteSnippet(r0);
+					rIntermediate.shapes_shape_pt_lat = (float)latLon[0];
+					rIntermediate.shapes_shape_pt_lon = (float)latLon[1];
+					rIntermediate.stop_times_arrival_time = arrivalTimeInSec;
+					rIntermediate.meterTraveled = r0.meterTraveled + partLength*i;
+					allRows.add(rIntermediate);
+				}
+			}
+		}
 		
 	}
 
@@ -71,12 +104,7 @@ public class DivideAndConquerGtfs {
 			t0 = t1;
 			t0Index = t1Index;
 			t0MeterTraveled = t1MeterTraveled;
-		}
-    	
-    	for(RouteSnippet r:allRows){
-    		System.out.println(r.toCSV());
-    	}
-		
+		}		
 	}
 
 	private static int secSinceMidnight(int t0) {
@@ -147,9 +175,30 @@ public class DivideAndConquerGtfs {
         double a = Math.pow(Math.sin(dlat / 2D), 2D) + Math.cos(lat1 * d2r) * Math.cos(lat2 * d2r)
                 * Math.pow(Math.sin(dlong / 2D), 2D);
         double c = 2D * Math.atan2(Math.sqrt(a), Math.sqrt(1D - a));
-        double d = equatorialEarthRadius * c;
-
-        return d;
+        return equatorialEarthRadius * c;
+    }
+    
+    public static double[] latLonBetweenAtDistance(double lat1, double long1, double lat2, double long2, double distanceInMeter) {
+    	double bearing = bearingInRad(lat1, long1, lat2, long2);
+    	return greatCircleEndPositionLatLon(lat1, long1, bearing, distanceInMeter);    
+    }
+    
+    // http://www.movable-type.co.uk/scripts/latlong.html
+    private static double bearingInRad(double lat1, double long1, double lat2, double long2){
+    	double dlong = (long2 - long1) * d2r;
+    	double y = Math.sin(dlong) * Math.cos(lat2 * d2r);
+    	double x = Math.cos(lat1 * d2r)*Math.sin(lat2 * d2r) -
+    	        Math.sin(lat1 * d2r)*Math.cos(lat2 * d2r)*Math.cos(dlong);
+    	return Math.atan2(y, x);
+    }
+    
+    // http://www.movable-type.co.uk/scripts/latlong.html
+    private static double[] greatCircleEndPositionLatLon(double lat, double lon, double bearingInRad, double distanceInMeter){
+    	double lat2 = Math.asin( Math.sin(lat * d2r)*Math.cos(distanceInMeter/equatorialEarthRadius) + 
+            Math.cos(lat * d2r)*Math.sin(distanceInMeter/equatorialEarthRadius)*Math.cos(bearingInRad));
+    	double lon2 = lon * d2r + Math.atan2(Math.sin(bearingInRad)*Math.sin(distanceInMeter/equatorialEarthRadius)*Math.cos(lat * d2r), 
+                   Math.cos(distanceInMeter/equatorialEarthRadius)-Math.sin(lat * d2r)*Math.sin(lat2));
+    	return new double[] {lat2 / d2r, lon2 / d2r};
     }
     
 	private static ArrayList<RouteSnippet> getShapeOfTripFromDb(String tripId, String shapeId) throws UnavailableException {
@@ -198,7 +247,7 @@ public class DivideAndConquerGtfs {
 				+ "        FROM   shapes "
 				+ "        WHERE  shapes.shape_id = '"+shapeId+"') AS u "
 				+ "ORDER  BY u.shape_pt_sequence";
-		System.out.println(q);
+		// System.out.println(q);
 		db = new PostgresqlDatabase("liveandgov", "liveandgov");
 		
 		ArrayList<RouteSnippet> allRows = new ArrayList<RouteSnippet>();
@@ -266,20 +315,42 @@ class RouteSnippet {
 		calendar_saturday = rs.getBoolean(13);
 		calendar_sunday = rs.getBoolean(14);
 	}
+
+	public RouteSnippet(RouteSnippet r0) {
+		trips_route_id = r0.trips_route_id;
+		shapes_shape_id = r0.shapes_shape_id;
+		trips_trip_id = r0.trips_trip_id;
+		shapes_shape_pt_lat = r0.shapes_shape_pt_lat;
+		shapes_shape_pt_lon = r0.shapes_shape_pt_lon;
+		shapes_shape_pt_sequence = r0.shapes_shape_pt_sequence;
+		stop_times_arrival_time = r0.stop_times_arrival_time;
+		calendar_monday = r0.calendar_monday;
+		calendar_tuesday = r0.calendar_tuesday;
+		calendar_wednesday = r0.calendar_wednesday;
+		calendar_thursday = r0.calendar_thursday;
+		calendar_friday = r0.calendar_friday;
+		calendar_saturday = r0.calendar_saturday;
+		calendar_sunday = r0.calendar_sunday;
+
+		meterTraveled = r0.meterTraveled;
+	}
 	String toCSV() {
 		return 	trips_route_id + ","
-	      + shapes_shape_id + ","
-		  + trips_trip_id + ","
+//	      + shapes_shape_id + ","
+//		  + trips_trip_id + ","
 		  + shapes_shape_pt_lat + ","
 		  + shapes_shape_pt_lon + "," 	
 		  + shapes_shape_pt_sequence + "," 	
 		  + stop_times_arrival_time + "," 	
-		  + calendar_monday + "," 	
-		  + calendar_tuesday + "," 	
-		  + calendar_wednesday + "," 	
-		  + calendar_thursday + "," 	
-		  + calendar_friday + "," 	
-		  + calendar_saturday + "," 	
-		  + calendar_sunday + "\n";
+		  
+		  + meterTraveled + "," 	
+		  
+//		  + calendar_monday + "," 	
+//		  + calendar_tuesday + "," 	
+//		  + calendar_wednesday + "," 	
+//		  + calendar_thursday + "," 	
+//		  + calendar_friday + "," 	
+//		  + calendar_saturday + "," 	
+		  + calendar_sunday + "";
 	}
 }
