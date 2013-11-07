@@ -1,9 +1,18 @@
 package eu.liveandgov.wp1.backend;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import javax.servlet.UnavailableException;
 
@@ -11,38 +20,61 @@ public class DivideAndConquerGtfs {
 	
 	static PostgresqlDatabase db;
 	
-	public static void main(String[] args) throws UnavailableException {
-		ArrayList<RouteSnippet> a = getShapeOfTripFromDb("1065A_20130930_Ma_2_2000", "1065A_20120813_2");
+	public static void main(String[] args) throws UnavailableException, SQLException, IOException {
+		//ArrayList<RouteSnippet> a = getShapeOfTripFromDb("1065A_20130930_Ma_2_2000", "1065A_20120813_2");
 		//ArrayList<RouteSnippet> a = new ArrayList<RouteSnippet>(a1.subList(0, 12));
-		cleanUpRows(a);
-		interpolateArrivalTimes(a);
-		ensureSnippetSpatialDistance(a, 10); // max distance 10 meters
-		ensureSnippetTemporalDistance(a, 3); // max distance 3 minutes
-		
+		db = new PostgresqlDatabase("liveandgov", "liveandgov");
+		File file = new File("/tmp/snippets.csv");
+		FileOutputStream fos = new FileOutputStream(file);
+		Writer out = new OutputStreamWriter(fos, "UTF8");
+
+		Statement stm = db.connection.createStatement();
+		ResultSet rs = stm.executeQuery("SELECT trip_id, shape_id FROM trips");
+		int processedRows = 0;
+		while (rs.next()) {
+			writeTripToFile(rs.getString(1), rs.getString(2),  10, 2, out);
+			processedRows++;
+			if(processedRows%1000 == 0){
+				System.out.println("processed rows: " + processedRows + " (" + processedRows*100/206153.0 + "%)");
+			}
+		}
 //    	for(RouteSnippet r:a){
-//    		System.out.println("L.marker(["+r.shapes_shape_pt_lat+", "+r.shapes_shape_pt_lon+"]).addTo(map).bindPopup('"+r.toCSV()+"');");
+////    		System.out.println("L.marker(["+r.shapes_shape_pt_lat+", "+r.shapes_shape_pt_lon+"]).addTo(map).bindPopup('"+r.toCSV()+"');");
+////  System.out.println( r.toCSV());
 //    	}
 	}
 
-    private static void ensureSnippetTemporalDistance(ArrayList<RouteSnippet> allRows, int distanceInMinutes) {
-		// TODO Auto-generated method stub
+	public static void writeTripToFile(String tripId, String shapeId,  int distanceInMeter, int distanceInMinutes, Writer out) throws UnavailableException, IOException{
+		ArrayList<RouteSnippet> a = getShapeOfTripFromDb(tripId, shapeId);
+		cleanUpRows(a);
+		interpolateArrivalTimes(a);
+		ensureSnippetDistance(a, distanceInMeter, distanceInMinutes);
+		//Collections.sort(a, new RouteSnippetComparator());
+    	for(RouteSnippet r:a){
+    		out.write(r.toCSV()+"\n");
+    	}
 		
 	}
-
-	private static void ensureSnippetSpatialDistance(ArrayList<RouteSnippet> allRows, int distanceInMeter) {
+	
+	private static void ensureSnippetDistance(ArrayList<RouteSnippet> allRows, int distanceInMeter, int distanceInMinutes) {
 
     	int size = allRows.size();
+    	int distanceInSec = distanceInMinutes * 60;
 
 		for(int j = 0; j < size-1; j++){
 			RouteSnippet r0 = allRows.get(j);
 			RouteSnippet r1 = allRows.get(j+1);
 			
 			double sDelta = r1.meterTraveled - r0.meterTraveled;
-			int ratio = (int) Math.ceil(sDelta / distanceInMeter);
-			// this part is longer than distanceInMeter, split it in smaller pieces
+			int spatialRatio = (int) Math.ceil(sDelta / distanceInMeter);
+			double tDelta = r1.stop_times_arrival_time - r0.stop_times_arrival_time;
+			int temporalRatio = (int) Math.ceil(tDelta / distanceInSec);
+			int ratio = Math.max(spatialRatio,temporalRatio);
+			
 			if(ratio > 1) {
+				// this part is longer than distanceInMeter or distanceInMinutes, split it in smaller pieces
 				double partLength = sDelta / ratio;
-				double partTime = (r1.stop_times_arrival_time - r0.stop_times_arrival_time) / ratio;
+				double partTime = tDelta / ratio;
 				for(int i = 1; i < ratio; i++){
 					double[] latLon =  latLonBetweenAtDistance(r0.shapes_shape_pt_lat, 
 							r0.shapes_shape_pt_lon, 
@@ -248,7 +280,7 @@ public class DivideAndConquerGtfs {
 				+ "        WHERE  shapes.shape_id = '"+shapeId+"') AS u "
 				+ "ORDER  BY u.shape_pt_sequence";
 		// System.out.println(q);
-		db = new PostgresqlDatabase("liveandgov", "liveandgov");
+
 		
 		ArrayList<RouteSnippet> allRows = new ArrayList<RouteSnippet>();
 		RouteSnippet lastRow = new RouteSnippet();
@@ -336,21 +368,28 @@ class RouteSnippet {
 	}
 	String toCSV() {
 		return 	trips_route_id + ","
-//	      + shapes_shape_id + ","
-//		  + trips_trip_id + ","
-		  + shapes_shape_pt_lat + ","
-		  + shapes_shape_pt_lon + "," 	
+	      + shapes_shape_id + ","
+		  + trips_trip_id + ","
+		  + (calendar_monday?"t,":"f,") 	
+		  + (calendar_tuesday?"t,":"f,") 	
+		  + (calendar_wednesday?"t,":"f,") 	
+		  + (calendar_thursday?"t,":"f,") 	
+		  + (calendar_friday?"t,":"f,") 	
+		  + (calendar_saturday?"t,":"f,") 	
+		  + (calendar_sunday?"t,":"f,")
+		  + "SRID=4326;POINT(" 
+		  + shapes_shape_pt_lon + " "
+		  + shapes_shape_pt_lat + ")," 	
 		  + shapes_shape_pt_sequence + "," 	
 		  + stop_times_arrival_time + "," 	
 		  
-		  + meterTraveled + "," 	
-		  
-//		  + calendar_monday + "," 	
-//		  + calendar_tuesday + "," 	
-//		  + calendar_wednesday + "," 	
-//		  + calendar_thursday + "," 	
-//		  + calendar_friday + "," 	
-//		  + calendar_saturday + "," 	
-		  + calendar_sunday + "";
+		  + meterTraveled;
+	}
+}
+
+class RouteSnippetComparator implements Comparator<RouteSnippet> {
+	@Override
+	public int compare(RouteSnippet arg0, RouteSnippet arg1) {
+		return new Double(arg0.meterTraveled).compareTo(arg1.meterTraveled);
 	}
 }
