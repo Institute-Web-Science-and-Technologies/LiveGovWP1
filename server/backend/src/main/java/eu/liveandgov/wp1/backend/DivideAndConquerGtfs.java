@@ -43,6 +43,8 @@ public class DivideAndConquerGtfs {
 				System.out.println("processed rows: " + processedRows + " (" + processedRows*100/206153.0 + "%)");
 			}
 		}
+		out.flush();
+		out.close();
 		createSnippetTable();
 		loadSnippetTable(filename);
 //    	for(RouteSnippet r:a){
@@ -323,25 +325,25 @@ public class DivideAndConquerGtfs {
 		s.execute("DROP TABLE IF EXISTS snippets");
 		s.execute("CREATE TABLE IF NOT EXISTS snippets"
 				+ "( trips_route_id  VARCHAR(20),"
-			      + " shapes_shape_id VARCHAR(20),"
-				  + " trips_trip_id VARCHAR(20),"
+			      + " shapes_shape_id VARCHAR(100),"
+				  + " trips_trip_id VARCHAR(100),"
 				  + " calendar_monday boolean," 	
 				  + " calendar_tuesday boolean," 	
 				  + " calendar_wednesday boolean," 	
 				  + " calendar_thursday boolean," 	
-				  + " calendar_friday? boolean," 	
+				  + " calendar_friday boolean," 	
 				  + " calendar_saturday boolean," 	
-				  + " calendar_sunday? boolean,"
+				  + " calendar_sunday boolean,"
 				  + " geom  GEOMETRY(POINT,4326)," 	
 				  + " shapes_shape_pt_sequence INTEGER," 	
 				  + " stop_times_arrival_time INTEGER," 	
 				  + " meterTraveled REAL )");			
 	}
 	static void loadSnippetTable(String filename) throws SQLException, FileNotFoundException, IOException {
+
+		CopyManager copyManager = new CopyManager((BaseConnection) db.connection);
+        copyManager.copyIn("COPY snippets FROM STDIN (NULL '', DELIMITER ',');",  new FileReader(filename) );
 		Statement s = db.connection.createStatement();
-		CopyManager copyManager = new CopyManager((BaseConnection) s);
-        copyManager.copyIn("COPY snippets FROM STDIN (NULL '');",  new FileReader(filename) );
-        
         s.execute("create index snippets_idx on snippets using gist (geom);");
 	}
 }
