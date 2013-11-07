@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.backend;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -16,6 +17,9 @@ import java.util.Comparator;
 
 import javax.servlet.UnavailableException;
 
+import org.postgresql.copy.CopyManager;
+import org.postgresql.core.BaseConnection;
+
 public class DivideAndConquerGtfs {
 	
 	static PostgresqlDatabase db;
@@ -24,7 +28,8 @@ public class DivideAndConquerGtfs {
 		//ArrayList<RouteSnippet> a = getShapeOfTripFromDb("1065A_20130930_Ma_2_2000", "1065A_20120813_2");
 		//ArrayList<RouteSnippet> a = new ArrayList<RouteSnippet>(a1.subList(0, 12));
 		db = new PostgresqlDatabase("liveandgov", "liveandgov");
-		File file = new File("/tmp/snippets.csv");
+		String filename = "/tmp/snippets.csv";
+		File file = new File(filename);
 		FileOutputStream fos = new FileOutputStream(file);
 		Writer out = new OutputStreamWriter(fos, "UTF8");
 
@@ -38,6 +43,8 @@ public class DivideAndConquerGtfs {
 				System.out.println("processed rows: " + processedRows + " (" + processedRows*100/206153.0 + "%)");
 			}
 		}
+		createSnippetTable();
+		loadSnippetTable(filename);
 //    	for(RouteSnippet r:a){
 ////    		System.out.println("L.marker(["+r.shapes_shape_pt_lat+", "+r.shapes_shape_pt_lon+"]).addTo(map).bindPopup('"+r.toCSV()+"');");
 ////  System.out.println( r.toCSV());
@@ -310,6 +317,33 @@ public class DivideAndConquerGtfs {
 		
 	return allRows;
 }
+	static void createSnippetTable() throws SQLException {
+		Statement s = db.connection.createStatement();
+
+		s.execute("DROP TABLE IF EXISTS snippets");
+		s.execute("CREATE TABLE IF NOT EXISTS snippets"
+				+ "( trips_route_id  VARCHAR(20),"
+			      + " shapes_shape_id VARCHAR(20),"
+				  + " trips_trip_id VARCHAR(20),"
+				  + " calendar_monday boolean," 	
+				  + " calendar_tuesday boolean," 	
+				  + " calendar_wednesday boolean," 	
+				  + " calendar_thursday boolean," 	
+				  + " calendar_friday? boolean," 	
+				  + " calendar_saturday boolean," 	
+				  + " calendar_sunday? boolean,"
+				  + " geom  GEOMETRY(POINT,4326)," 	
+				  + " shapes_shape_pt_sequence INTEGER," 	
+				  + " stop_times_arrival_time INTEGER," 	
+				  + " meterTraveled REAL )");			
+	}
+	static void loadSnippetTable(String filename) throws SQLException, FileNotFoundException, IOException {
+		Statement s = db.connection.createStatement();
+		CopyManager copyManager = new CopyManager((BaseConnection) s);
+        copyManager.copyIn("COPY snippets FROM STDIN (NULL '');",  new FileReader(filename) );
+        
+        s.execute("create index snippets_idx on snippets using gist (geom);");
+	}
 }
 	
 class RouteSnippet {
