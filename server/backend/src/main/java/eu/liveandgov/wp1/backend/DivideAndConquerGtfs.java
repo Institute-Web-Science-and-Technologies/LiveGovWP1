@@ -6,13 +6,11 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 import javax.servlet.UnavailableException;
@@ -234,7 +232,7 @@ public class DivideAndConquerGtfs {
     }
     
     // http://www.movable-type.co.uk/scripts/latlong.html
-    private static double[] greatCircleEndPositionLatLon(double lat, double lon, double bearingInRad, double distanceInMeter){
+    public static double[] greatCircleEndPositionLatLon(double lat, double lon, double bearingInRad, double distanceInMeter){
     	double lat2 = Math.asin( Math.sin(lat * d2r)*Math.cos(distanceInMeter/equatorialEarthRadius) + 
             Math.cos(lat * d2r)*Math.sin(distanceInMeter/equatorialEarthRadius)*Math.cos(bearingInRad));
     	double lon2 = lon * d2r + Math.atan2(Math.sin(bearingInRad)*Math.sin(distanceInMeter/equatorialEarthRadius)*Math.cos(lat * d2r), 

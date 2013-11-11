@@ -35,7 +35,7 @@ function initilize(){
 		  });
 	    var start = new Date().getTime();
 	    $.ajax({type:"POST",
-	    	url:"/backend/ServiceLineDetection",
+	    	url:"/backend/ServiceLineDetection2",
 	    	data: postData,
 	    	success: function (data) {
 //	    			routes.clearLayers();
