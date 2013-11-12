@@ -181,7 +181,6 @@ public class ServiceSensorControl extends Service {
         connectorThread.addConsumer(streamer);
     }
 
-
     private void doSetId(String id) {
         Log.i(LOG_TAG, "Set id to:" + id);
         userId = id;
@@ -199,11 +198,13 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doDisableRecording() {
+        doAnnotate(IntentAPI.VALUE_STOP_RECORDING);
         SensorThread.stopAllRecording();
         isRecording = false;
     }
 
     private void doEnableRecording() {
+        doAnnotate(IntentAPI.VALUE_START_RECORDING);
         SensorThread.startAllRecording();
         isRecording = true;
     }
