@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -18,11 +19,12 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class InspectionServlet
  */
-@WebServlet("/ServiceLineDetection2")
+@WebServlet("/ServiceLineDetection")
 public class SnippetServiceLineDetection extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	PostgresqlDatabase db;
 	ArrayList<LatLonTsDayTuple> coordinates;
+	HashMap<String, String> transportationMeans;
 
 	/**
 	 * @throws UnavailableException
@@ -31,7 +33,7 @@ public class SnippetServiceLineDetection extends HttpServlet {
 	public SnippetServiceLineDetection() throws UnavailableException {
 		super();
 		db = new PostgresqlDatabase("liveandgov", "liveandgov");
-		// TODO Auto-generated constructor stub
+		initTransportationMeans();
 	}
 
 	/**
@@ -95,8 +97,7 @@ public class SnippetServiceLineDetection extends HttpServlet {
 	  + "ORDER  BY score DESC "
 	  + "LIMIT 10;";
   System.out.println(routcodeSelect);
-
-
+  
 	try {
 		Statement stm = db.connection.createStatement();
 		ResultSet rs = stm.executeQuery(routcodeSelect);
@@ -113,6 +114,7 @@ public class SnippetServiceLineDetection extends HttpServlet {
 		json += "\"route_id\":\""+rs.getString(1)+"\",";
 		json += "\"shape_id\":\""+rs.getString(2)+"\",";
 		json += "\"trip_id\":\""+rs.getString(3)+"\",";
+		json += "\"transportation_mean\":\""+transportationMeans.get(rs.getString(1))+"\",";
 		json += "\"score\":"+rs.getInt(4);
 		json += "}";
 	}
@@ -122,5 +124,25 @@ public class SnippetServiceLineDetection extends HttpServlet {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-  }
+	}
+	private void initTransportationMeans(){
+		String selectMeans = ""
+				+ "SELECT routes.route_id, "
+				+ "       route_type.route_type_name "
+				+ "FROM   routes, "
+				+ "       route_type "
+				+ "WHERE  routes.route_type = route_type.route_type";
+		try {
+			Statement stm = db.connection.createStatement();
+			ResultSet rs = stm.executeQuery(selectMeans);
+			transportationMeans = new HashMap<String, String>();
+		while (rs.next()) {
+			transportationMeans.put(rs.getString(1),rs.getString(2));
+		}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 }

@@ -35,7 +35,7 @@ function initilize(){
 		  });
 	    var start = new Date().getTime();
 	    $.ajax({type:"POST",
-	    	url:"/backend/ServiceLineDetection2",
+	    	url:"/backend/ServiceLineDetection",
 	    	data: postData,
 	    	success: function (data) {
 //	    			routes.clearLayers();
@@ -55,12 +55,13 @@ function initilize(){
 //	    			}
 	    		var end = new Date().getTime();
 	    		var table = $("#response");
-	    		table.html("<tr><th>route_id</th><th>shape_id</th><th>trip_id</th><th>score</th>");
+	    		table.html("<tr><th>route_id</th><th>shape_id</th><th>trip_id</th><th>mean</th><th>score</th>");
 	    		  $.each(data.routes, function(index, item){
 	    		         var table_row = $('<tr>');
 	    		         table_row.append($('<td>').html(item.route_id));
 	    		         table_row.append($('<td>').html(item.shape_id));
 	    		         table_row.append($('<td>').html(item.trip_id));
+	    		         table_row.append($('<td>').html(item.transportation_mean));
 	    		         table_row.append($('<td>').html(item.score));
 	    		         table.append(table_row);
 	    		    });
