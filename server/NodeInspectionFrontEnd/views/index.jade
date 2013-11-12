@@ -18,11 +18,6 @@ block content
                 div.item(data-value=device.devId)= device.devId + " GPS Count:" + device.gpsCount
         div.column
           div.ui.floating.fluid.selection.dropdown
-            div.text Routes
-            i.dropdown.icon
-            div.menu
-        div.column
-          div.ui.floating.fluid.selection.dropdown
             div.text Service Lines
             i.dropdown.icon
             div.menu
@@ -34,7 +29,15 @@ block content
           div.ui.purple.button#showBtn Show
   div.ui.tab.segment(data-tab="map")
     div.ui.vertical.segment
-      h1.ui.header Map
+      div.ui.two.column.grid
+        div.row
+          div.column
+            h1.ui.header Map
+          div.column
+            div.ui.floating.fluid.selection.dropdown#route
+              div.text Routes
+              i.dropdown.icon
+              div.menu#routeMenu
       div.plot#domMap  
   div.ui.tab.segment(data-tab="graphs")
     div.ui.vertical.segment
@@ -77,3 +80,13 @@ block content
             th Timestamp
             th Tag
         tbody
+  div.ui.small.modal
+    i.close.icon
+    div.header Save Training Data
+    div.content
+      div.left
+        div.ui.fluid.input
+          input(type="text",placeholder="Tag")#newTag
+      div.right
+    div.actions
+      div.ui.positive.labeled.button#acceptSave Save

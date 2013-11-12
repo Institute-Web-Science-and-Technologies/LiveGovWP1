@@ -16,6 +16,8 @@ function register (app) {
   app.get('/api/1/:id/gra/count', apiV1.getGraCount);
 
   app.get('/api/1/:id/tag', apiV1.getTags);
+
+  app.post('/api/1/:id/window', apiV1.postWindow);
 }
 
 module.exports = register;

@@ -42,28 +42,28 @@
     data.forEach(function (item) {
       var ts = new Date(item.midTime);
       avgX.push([ts, item.avgX]);
-      maxX.push([ts, item.maxX]);
-      minX.push([ts, item.minX]);
+      //maxX.push([ts, item.maxX]);
+      //minX.push([ts, item.minX]);
 
       avgY.push([ts, item.avgY]);
-      maxY.push([ts, item.maxY]);
-      minY.push([ts, item.minY]);
+      //maxY.push([ts, item.maxY]);
+      //minY.push([ts, item.minY]);
 
       avgZ.push([ts, item.avgZ]);
-      maxZ.push([ts, item.maxZ]);
-      minZ.push([ts, item.minZ]);
+      //maxZ.push([ts, item.maxZ]);
+      //minZ.push([ts, item.minZ]);
     });
     
     var plotData = [
       { label: "avgX", data: avgX },
-      { label: "maxX", data: maxX },
-      { label: "minX", data: minX },
+      //{ label: "maxX", data: maxX },
+      //{ label: "minX", data: minX },
       { label: "avgY", data: avgY },
-      { label: "maxY", data: maxY },
-      { label: "minY", data: minY },
-      { label: "avgZ", data: avgZ },
-      { label: "maxZ", data: maxZ },
-      { label: "minZ", data: minZ }
+      //{ label: "maxY", data: maxY },
+      //{ label: "minY", data: minY },
+      { label: "avgZ", data: avgZ }
+      //{ label: "maxZ", data: maxZ },
+      //{ label: "minZ", data: minZ }
     ];
     var plotOptions = {
       series: {
@@ -108,6 +108,16 @@
     };
   }
 
+  function limitToTime (start, end) {
+    var ranges = {
+      xaxis: {
+        from: start.getTime(),
+        to: end.getTime()
+      }
+    };
+    zoom(window.currentDevId, ranges);
+  }
+
   function showAccelerometerForId(id) {
     $.ajax({
       url: apiUrl + "/" + id + "/acc"
@@ -145,4 +155,5 @@
   window.showAccelerometerForId = showAccelerometerForId;
   window.showLinearAccelerationForId = showLinearAccelerationForId;
   window.showGravityForId = showGravityForId;
+  window.limitToTime = limitToTime;
 })();
