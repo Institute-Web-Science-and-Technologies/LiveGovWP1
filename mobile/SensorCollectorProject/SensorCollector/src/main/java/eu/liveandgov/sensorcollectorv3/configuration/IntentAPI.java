@@ -42,7 +42,6 @@ public class IntentAPI {
     public static final String VALUE_STOP_RECORDING = "STOP_RECORDING";
     public static final String VALUE_START_RECORDING = "START_RECORDING";
 
-
     /**
      * Set User ID
      *

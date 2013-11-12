@@ -29,6 +29,9 @@ public class PrefixFilter extends Pipeline<String, String> {
         for(String filter : filterList) {
             if(m.startsWith(filter)) {
                 consumer.push(m);
+
+                // avoid messages getting pushed more than once
+                return;
             }
         }
     }

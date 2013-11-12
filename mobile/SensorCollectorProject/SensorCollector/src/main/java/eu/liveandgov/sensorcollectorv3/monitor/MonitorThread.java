@@ -52,7 +52,7 @@ public class MonitorThread implements Runnable {
         for (MonitorItem m : observables){
             s.append(m.render());
         }
-        s.append("Androdi ID: " + GlobalContext.androidId);
+        s.append("User ID: " + GlobalContext.getUserId());
         return s.toString();
     }
 

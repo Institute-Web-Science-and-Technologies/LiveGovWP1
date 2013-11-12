@@ -8,7 +8,10 @@ import android.provider.Settings;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
+import static eu.liveandgov.sensorcollectorv3.configuration.SsfFileFormat.*;
 
 /**
  * Converts sensor events into the ssf Format.
@@ -16,13 +19,6 @@ import eu.liveandgov.sensorcollectorv3.GlobalContext;
  * Created by hartmann on 9/15/13.
  */
 public class SensorSerializer {
-
-    private static String id = Settings.Secure.getString(GlobalContext.context.getContentResolver(),
-            Settings.Secure.ANDROID_ID);
-
-    public static void setId(String id){
-        SensorSerializer.id = id;
-    }
 
     public static MotionSensorValue parseEvent(String event) {
         MotionSensorValue newEvent = new MotionSensorValue();
@@ -42,65 +38,37 @@ public class SensorSerializer {
         return newEvent;
     }
 
-    public static String parse(SensorEvent event) {
+    public static String fromSensorEvent(SensorEvent event) {
         int sensorType= event.sensor.getType();
+
         // event.timestamp is in ns = 1E-9 sec.
         long timestamp_ms = (long) (event.timestamp / 1E6);
+
         if ( sensorType == Sensor.TYPE_ACCELEROMETER){
-            return fillString("ACC", timestamp_ms , id, event.values);
+            return fillStringFloats(SSF_ACCELEROMETER, timestamp_ms, GlobalContext.getUserId(), event.values);
         } else if (sensorType == Sensor.TYPE_LINEAR_ACCELERATION){
-            return fillString("LAC", timestamp_ms, id, event.values);
+            return fillStringFloats(SSF_LINEAR_ACCELERATION, timestamp_ms, GlobalContext.getUserId(), event.values);
         } else if (sensorType == Sensor.TYPE_GRAVITY) {
-            return fillString("GRA", timestamp_ms, id, event.values);
+            return fillStringFloats(SSF_GRAVITY, timestamp_ms, GlobalContext.getUserId(), event.values);
         }
         return "ERR," + timestamp_ms + ",,Unknown sensor " + sensorType;
     }
 
-    public static String parse(Location location) {
-        return fillString("GPS", location.getTime(), id, new double[]{location.getLatitude(), location.getLongitude(), location.getAltitude()});
+    public static String fromLocation(Location location) {
+        return fillStringDoubles(SSF_GPS, location.getTime(), GlobalContext.getUserId(), new double[]{location.getLatitude(), location.getLongitude(), location.getAltitude()});
     }
 
-    public static String parse(ActivityRecognitionResult result) {
+    public static String fromTag(String tag) {
+        return fillDefaults(SSF_TAG, "\""+ StringEscapeUtils.escapeJava(tag) +"\"");
+    }
+
+    // GOOGLE ACTIVITY RECOGNITION HELPER
+
+    public static String fromGoogleActivity(ActivityRecognitionResult result) {
         DetectedActivity detectedActivity = result.getMostProbableActivity();
-        return fillString("ACT", result.getTime(), id,
+        return fillStringObjects(SSF_GOOGLE_ACTIVITY, result.getTime(), GlobalContext.getUserId(),
                 new Object[]{getActivityNameFromType(detectedActivity.getType()),
                         detectedActivity.getConfidence()});
-    }
-
-    public static String parse(String tag) {
-        return String.format("%s,%d,%s,\"%s\"", "TAG", System.currentTimeMillis(), id, tag);
-    }
-
-    /**
-     * Writes sensor values in SSF format. (cf. project Wiki)
-     * @param type of Sensor
-     * @param timestamp of recording in ms
-     * @param deviceId unique device identified
-     * @param values float array
-     * @return ssfRow
-     */
-    private static String fillString(String type, long timestamp, String deviceId, float[] values) {
-        String msg = String.format("%s,%d,%s,", type, timestamp, deviceId);
-        for (float value : values) {
-            msg += value + " ";
-        }
-        return msg;
-    }
-
-    private static String fillString(String type, long timestamp, String deviceId, double[] values) {
-        String msg = String.format("%s,%d,%s,", type, timestamp, deviceId);
-        for (double value : values) {
-            msg += value + " ";
-        }
-        return msg;
-    }
-
-    private static String fillString(String type, long timestamp, String deviceId, Object[] values) {
-        String msg = String.format("%s,%d,%s,", type, timestamp, deviceId);
-        for (Object value : values) {
-            msg += value + " ";
-        }
-        return msg;
     }
 
     private static String getActivityNameFromType(int activityType) {
@@ -121,4 +89,43 @@ public class SensorSerializer {
         return "unknown";
     }
 
+    /**
+     * Writes sensor values in SSF format. (cf. project Wiki)
+     * @param type of Sensor
+     * @param timestamp of recording in ms
+     * @param deviceId unique device identified
+     * @param value String
+     * @return ssfRow
+     */
+    private static String fillString(String type, long timestamp, String deviceId, String value) {
+        return String.format("%s,%d,%s,%s", type, timestamp, deviceId, value);
+    }
+
+    private static String fillStringFloats(String type, long timestamp, String deviceId, float[] values) {
+        String valueString = "";
+        for (float value : values) {
+            valueString += value + " ";
+        }
+        return fillString(type, timestamp, deviceId, valueString);
+    }
+
+    private static String fillStringDoubles(String type, long timestamp, String deviceId, double[] values) {
+        String valueString = "";
+        for (double value : values) {
+            valueString += value + " ";
+        }
+        return fillString(type, timestamp, deviceId, valueString);
+    }
+
+    private static String fillStringObjects(String type, long timestamp, String deviceId, Object[] values) {
+        String valueString = "";
+        for (Object value : values) {
+            valueString += value + " ";
+        }
+        return fillString(type, timestamp, deviceId, valueString);
+    }
+
+    public static String fillDefaults(String prefix, String value) {
+        return fillString(prefix, System.currentTimeMillis(), GlobalContext.getUserId(), value);
+    }
 }

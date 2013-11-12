@@ -11,4 +11,6 @@ public class Activities {
     public static String WALKING = "walking";
     public static String RUNNING = "running";
     public static String CYCLING = "cycling";
+    public static String DRIVING = "driving";
+    public static String UNKNOWN = "UNKNOWN";
 }

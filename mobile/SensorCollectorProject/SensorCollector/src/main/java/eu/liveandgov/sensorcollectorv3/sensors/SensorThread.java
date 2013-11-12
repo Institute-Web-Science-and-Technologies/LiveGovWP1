@@ -98,7 +98,7 @@ public class SensorThread implements Runnable {
 
 
     private void setupMotionSensor(int sensorType){
-        Sensor sensor = GlobalContext.sensorManager.getDefaultSensor(sensorType);
+        Sensor sensor = GlobalContext.getSensorManager().getDefaultSensor(sensorType);
 
         if (sensor == null) {
             Log.i(LOG_TAG,"Sensor " + sensorType + " not available.");

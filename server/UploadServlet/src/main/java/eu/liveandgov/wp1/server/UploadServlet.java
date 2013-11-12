@@ -81,7 +81,7 @@ public class UploadServlet extends HttpServlet {
         try {
             bytesWritten = writeStreamToFile(fileStream, outFile);
         } catch (IOException e) {
-            Log.error("Error writing output file.");
+            Log.error("Error writing output file:",e);
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }

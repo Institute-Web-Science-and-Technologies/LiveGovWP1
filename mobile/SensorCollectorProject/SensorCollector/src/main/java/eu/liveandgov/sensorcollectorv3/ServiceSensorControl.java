@@ -2,7 +2,9 @@ package eu.liveandgov.sensorcollectorv3;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 
 import java.io.File;
@@ -13,11 +15,12 @@ import eu.liveandgov.sensorcollectorv3.connectors.implementations.ConnectorThrea
 import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.IntentEmitter;
 import eu.liveandgov.sensorcollectorv3.connectors.Pipeline;
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.Multiplexer;
 import eu.liveandgov.sensorcollectorv3.human_activity_recognition.HarPipeline;
 import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
-import eu.liveandgov.sensorcollectorv3.persistence.ZipFilePersistor;
+import eu.liveandgov.sensorcollectorv3.persistence.PublicationPipeline;
 import eu.liveandgov.sensorcollectorv3.streaming.ZmqStreamer;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.LinkedSensorQueue;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
@@ -32,8 +35,11 @@ public class ServiceSensorControl extends Service {
     public static final String SENSOR_FILENAME = "sensor.ssf";
     public static final String STAGE_FILENAME = "sensor.stage.ssf";
 
+    private static final String SHARED_PREFS_NAME = "SensorCollectorPrefs";
+    private static final String PREF_ID = "userid";
+
     // REMARK:
-    // Need to put initialization to onCreate, since FilesDir is not avaialble
+    // Need to put initialization to onCreate, since FilesDir, etc. is not available
     // from a static context.
 
     // STATUS FLAGS
@@ -45,8 +51,9 @@ public class ServiceSensorControl extends Service {
     // COMMUNICATION CHANNELS
     public SensorQueue sensorQueue;
     public Persistor persistor;
+    public Consumer<String> publisher;
     public Consumer<String> streamer;
-    public Pipeline<String, String> harPipeline;
+    public Consumer<String> harPipeline;
 
     // THREADS
     public ConnectorThread connectorThread;
@@ -65,15 +72,21 @@ public class ServiceSensorControl extends Service {
         // Setup static variables
         GlobalContext.set(this);
 
+        // Set Default UserID to AndroidID
+        restoreUserId();
+
         // INITIALIZATIONS
-        final File sensorFile = new File(getFilesDir(), SENSOR_FILENAME);
-        final File stageFile  = new File(getFilesDir(), STAGE_FILENAME);
+        final File sensorFile   = new File(getFilesDir(), SENSOR_FILENAME);
+        final File stageFile    = new File(getFilesDir(), STAGE_FILENAME);
 
         // INIT COMMUNICATION CHANNELS
         sensorQueue = new LinkedSensorQueue();
         persistor   = new FilePersistor(sensorFile);
         streamer    = new ZmqStreamer();
         harPipeline = new HarPipeline();
+
+        // EXTERNAL COMMUNICATION
+        publisher = new PublicationPipeline();
 
         // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
@@ -85,10 +98,8 @@ public class ServiceSensorControl extends Service {
 
         // Connect sensorQueue to Consumers
         connectorThread.addConsumer(persistor);
-        // streamer and harPipeline are added in the methods below
-
-        // Publish HAR results as intent
-        harPipeline.setConsumer(new IntentEmitter(IntentAPI.RETURN_ACTIVITY, IntentAPI.FIELD_ACTIVITY));
+        connectorThread.addConsumer(publisher);
+        // streamer and harPipeline are added on demand in the methods below
 
         // Setup monitoring thread
         monitorThread.registerMonitorable(connectorThread, "SampleCount");
@@ -122,7 +133,7 @@ public class ServiceSensorControl extends Service {
         }
 
         String action = intent.getAction();
-        Log.i(LOG_TAG, "Received intent with action " + action);
+        Log.d(LOG_TAG, "Received intent with action " + action);
 
         if (action == null) return START_STICKY;
 
@@ -183,13 +194,22 @@ public class ServiceSensorControl extends Service {
 
     private void doSetId(String id) {
         Log.i(LOG_TAG, "Set id to:" + id);
+
+        // Update Shared Preferences
+        SharedPreferences settings = getSharedPreferences(SHARED_PREFS_NAME, 0);
+        if (settings == null) throw new IllegalStateException("Failed to load SharedPreferences");
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(PREF_ID, id);
+        editor.commit();
+
         userId = id;
-        doAnnotate("USER_ID=" + id);
+
+        doAnnotate("USER_ID SET TO: " + id);
     }
 
     private void doAnnotate(String tag) {
         Log.i(LOG_TAG, "Adding annotation:" + tag);
-        String msg = SensorSerializer.parse(tag);
+        String msg = SensorSerializer.fromTag(tag);
         sensorQueue.push(msg);
     }
 
@@ -222,5 +242,22 @@ public class ServiceSensorControl extends Service {
         intent.putExtra(IntentAPI.FIELD_USER_ID, userId);
         sendBroadcast(intent);
     }
+
+
+    // HELPER METHODS
+
+    /**
+     * Restore UserId from SharedPreferences.
+     * Uses AndoridID if no Id is found.
+     */
+    private void restoreUserId() {
+        String androidId = Settings.Secure.getString(GlobalContext.context.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        // Restore preferences
+        SharedPreferences settings = getSharedPreferences(SHARED_PREFS_NAME, 0);
+        if (settings == null) throw new IllegalStateException("Failed to load SharedPreferences");
+        userId = settings.getString(PREF_ID, androidId); // use androidId as default;
+    }
+
 
 }

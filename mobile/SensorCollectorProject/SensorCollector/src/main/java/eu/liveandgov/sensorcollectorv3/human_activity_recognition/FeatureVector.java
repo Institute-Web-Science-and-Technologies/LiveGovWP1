@@ -20,7 +20,7 @@ public class FeatureVector {
         Object r[] = new Object[8];
         r[0] = (double)s2Mean;
         // Currently we are using the SD because our first tree was using it
-        r[1] = Math.sqrt(s2Var);
+        r[1] = (double)s2Var; // THIS NEEDS TO BE SQRT FOR THE CRAPPY CLASSIFIER
         r[2] = (double)xMean;
         r[3] = (double)yMean;
         r[4] = (double)zMean;

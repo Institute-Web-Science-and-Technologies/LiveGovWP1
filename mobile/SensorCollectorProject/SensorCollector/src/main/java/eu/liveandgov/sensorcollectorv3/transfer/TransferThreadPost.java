@@ -102,7 +102,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
             httppost.setEntity(mEntity);
 
             httppost.addHeader("CHECKSUM", String.valueOf(file.length()));
-            httppost.addHeader("ID", GlobalContext.androidId );
+            httppost.addHeader("ID", GlobalContext.getUserId() );
 
             HttpResponse response = httpclient.execute(httppost);
             int status = response.getStatusLine().getStatusCode();

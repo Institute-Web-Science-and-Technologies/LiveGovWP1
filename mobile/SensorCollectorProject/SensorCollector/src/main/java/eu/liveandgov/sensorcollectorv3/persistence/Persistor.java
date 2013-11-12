@@ -10,7 +10,7 @@ import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
  *
  * Created by hartmann on 9/20/13.
  */
-public interface Persistor extends Monitorable, Consumer<String> {
+public interface Persistor extends Consumer<String>, Monitorable {
     /**
      * Exports all stored samples into a given File in the ssf format.
      *

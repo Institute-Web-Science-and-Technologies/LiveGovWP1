@@ -18,7 +18,7 @@ public class Producer<T> {
      *
      * Created by hartmann on 10/25/13.
      */
-    public class EmpyConsumer<T> implements Consumer<T> {
+    public static class EmpyConsumer<T> implements Consumer<T> {
 
         @Override
         public void push(T m) {
