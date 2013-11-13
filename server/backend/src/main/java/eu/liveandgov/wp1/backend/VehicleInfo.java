@@ -60,8 +60,8 @@ public class VehicleInfo {
 	public VehicleInfo(String[] a) {
 		this.id = a[0];
 		this.route = a[1];
-		this.lat = Double.parseDouble(a[2]);
-		this.lon = Double.parseDouble(a[3]);
+		this.lon = Double.parseDouble(a[2]);
+		this.lat = Double.parseDouble(a[3]);
 		this.bearing = Integer.parseInt(a[4]);
 		this.direction = Integer.parseInt(a[5]);
 		this.previousStop = Integer.parseInt(a[6]);

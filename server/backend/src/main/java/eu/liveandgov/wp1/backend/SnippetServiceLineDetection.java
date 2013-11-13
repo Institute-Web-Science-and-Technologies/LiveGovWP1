@@ -70,10 +70,10 @@ public class SnippetServiceLineDetection extends HttpServlet {
   for (int i = 0; i < coordinates.size(); i++) {
 	  
 	  String p = coordinates.get(i).getLonLatPoint();
-	  String betweenTimeClause = coordinates.get(i).getBetweenTimeClause2(5);
+	  String betweenTimeClause = coordinates.get(i).getBetweenTimeClause2(2);
 	  String d = coordinates.get(i).getISO8601Date();
 	  String day = coordinates.get(i).getWeekdayName();
-	  String bb = coordinates.get(i).getBoundingBox(11);
+	  String bb = coordinates.get(i).getBoundingBox(5);
 
 	  routcodeSelect += i>0?"        UNION ALL \n        ":"";
 	  routcodeSelect += ""
