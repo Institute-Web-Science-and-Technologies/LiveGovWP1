@@ -59,12 +59,12 @@ public class LatLonTsDayTuple {
 		Date d1 = new Date(t + (toleranceInMinutes * ONE_MINUTE_IN_MILLIS));
 		return getDaytimeDigitsOnly(d0) + " AND " + getDaytimeDigitsOnly(d1);
 	}
-	public String getBetweenTimeClause2(int toleranceInMinutes) {
+	public String getBetweenTimeClause2(String colName, int toleranceInMinutes) {
 		long ONE_MINUTE_IN_MILLIS=60000;
 		long t = m_dateTime.getTime();
 		Date d0 = new Date(t - (toleranceInMinutes * ONE_MINUTE_IN_MILLIS));
 		Date d1 = new Date(t + (toleranceInMinutes * ONE_MINUTE_IN_MILLIS));
-		return getDaytimeSecSinceMidnight(d0) + " AND " + getDaytimeSecSinceMidnight(d1);
+		return colName + ">=" + getDaytimeSecSinceMidnight(d0) + " AND " + colName + "<" + getDaytimeSecSinceMidnight(d1);
 	}
 	public String getISO8601Date() {
 		return String.format(Locale.US,"%tF", m_dateTime );

@@ -61,39 +61,39 @@ public class SnippetServiceLineDetection extends HttpServlet {
 			  e.getMessage();
         }
   String routcodeSelect = ""
-	+ "SELECT suball.trips_route_id, \n"
-	+ "       suball.shapes_shape_id, \n"
-	+ "       suball.trips_trip_id, \n"
+	+ "SELECT suball.route_id, \n"
+	+ "       suball.shape_id, \n"
+	+ "       suball.trip_id, \n"
 	+ "       Sum(cnt) AS score \n"
 	+ "FROM   (";
   
   for (int i = 0; i < coordinates.size(); i++) {
 	  
 	  String p = coordinates.get(i).getLonLatPoint();
-	  String betweenTimeClause = coordinates.get(i).getBetweenTimeClause2(2);
+	  String betweenTimeClause = coordinates.get(i).getBetweenTimeClause2("arrival_time",2);
 	  String d = coordinates.get(i).getISO8601Date();
 	  String day = coordinates.get(i).getWeekdayName();
 	  String bb = coordinates.get(i).getBoundingBox(5);
 
 	  routcodeSelect += i>0?"        UNION ALL \n        ":"";
 	  routcodeSelect += ""
-					+ "(SELECT trips_route_id, \n"
-					+ "                shapes_shape_id, \n"
-					+ "                trips_trip_id, \n"
+					+ "(SELECT route_id, \n"
+					+ "                shape_id, \n"
+					+ "                trip_id, \n"
 					+ "                Count(*) AS cnt \n"
-					+ "         FROM   snippets \n"
+					+ "         FROM   snippets_"+day+" \n"
 					+ "         WHERE  geom && "+bb+" \n"
-					+ "                AND stop_times_arrival_time BETWEEN "+betweenTimeClause+" \n"
-					+ "                AND calendar_"+day+" \n"
+					+ "                AND "+betweenTimeClause+" \n"
+
 					+ "             -- AND DATE '"+d+"' BETWEEN calendar.start_date AND calendar.end_date \n"
-					+ "         GROUP  BY trips_route_id, \n"
-					+ "                   trips_trip_id, \n"
-					+ "                   shapes_shape_id) \n";
+					+ "         GROUP  BY route_id, \n"
+					+ "                   trip_id, \n"
+					+ "                   shape_id) \n";
   }
   routcodeSelect += ") AS suball \n"
-	  + "GROUP  BY suball.trips_route_id, \n"
-	  + "          suball.trips_trip_id, \n"
-	  + "          suball.shapes_shape_id \n"
+	  + "GROUP  BY suball.route_id, \n"
+	  + "          suball.trip_id, \n"
+	  + "          suball.shape_id \n"
 	  + "ORDER  BY score DESC "
 	  + "LIMIT 10;";
   System.out.println(routcodeSelect);
