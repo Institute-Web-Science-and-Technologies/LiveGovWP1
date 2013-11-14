@@ -20,7 +20,7 @@ import static eu.liveandgov.sensorcollectorv3.configuration.SsfFileFormat.*;
  */
 public class SensorSerializer {
 
-    public static MotionSensorValue parseEvent(String event) {
+    public static MotionSensorValue parseMotionEvent(String event) {
         MotionSensorValue newEvent = new MotionSensorValue();
 
         // Meta data
@@ -37,6 +37,25 @@ public class SensorSerializer {
 
         return newEvent;
     }
+
+    public static GpsSensorValue parseGpsEvent(String event) {
+        GpsSensorValue newEvent = new GpsSensorValue();
+
+        // Meta data
+        String[] temp = event.split(",");
+        newEvent.type = temp[0];
+        newEvent.time = Long.parseLong(temp[1]);
+        newEvent.id = temp[2];
+
+        // Values
+        String[] values = temp[3].split(" ");
+        newEvent.lat = Float.parseFloat(values[0]);
+        newEvent.lon = Float.parseFloat(values[1]);
+        newEvent.alt = Float.parseFloat(values[2]);
+
+        return newEvent;
+    }
+
 
     public static String fromSensorEvent(SensorEvent event) {
         int sensorType= event.sensor.getType();

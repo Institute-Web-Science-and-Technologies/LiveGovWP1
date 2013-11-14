@@ -11,11 +11,9 @@ import java.io.File;
 
 import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
 import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.GpsCache;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.ConnectorThread;
 import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
-import eu.liveandgov.sensorcollectorv3.connectors.implementations.IntentEmitter;
-import eu.liveandgov.sensorcollectorv3.connectors.Pipeline;
-import eu.liveandgov.sensorcollectorv3.connectors.implementations.Multiplexer;
 import eu.liveandgov.sensorcollectorv3.human_activity_recognition.HarPipeline;
 import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
@@ -54,6 +52,7 @@ public class ServiceSensorControl extends Service {
     public Consumer<String> publisher;
     public Consumer<String> streamer;
     public Consumer<String> harPipeline;
+    public GpsCache gpsCache;
 
     // THREADS
     public ConnectorThread connectorThread;
@@ -84,6 +83,7 @@ public class ServiceSensorControl extends Service {
         persistor   = new FilePersistor(sensorFile);
         streamer    = new ZmqStreamer();
         harPipeline = new HarPipeline();
+        gpsCache    = new GpsCache();
 
         // EXTERNAL COMMUNICATION
         publisher = new PublicationPipeline();
@@ -99,6 +99,7 @@ public class ServiceSensorControl extends Service {
         // Connect sensorQueue to Consumers
         connectorThread.addConsumer(persistor);
         connectorThread.addConsumer(publisher);
+        connectorThread.addConsumer(gpsCache);
         // streamer and harPipeline are added on demand in the methods below
 
         // Setup monitoring thread
@@ -149,6 +150,8 @@ public class ServiceSensorControl extends Service {
             doSendStatus();
         } else if (action.equals(IntentAPI.ACTION_ANNOTATE)) {
             doAnnotate(intent.getStringExtra(IntentAPI.FIELD_ANNOTATION));
+
+            doSendGps(); // ONLY TESTING REMOVE THIS!!!
         } else if (action.equals(IntentAPI.ACTION_GET_STATUS)) {
             doSendStatus();
         } else if (action.equals(IntentAPI.ACTION_START_HAR)) {
@@ -161,6 +164,8 @@ public class ServiceSensorControl extends Service {
             doStopStreaming();
         } else if (action.equals(IntentAPI.ACTION_SET_ID)) {
             doSetId(intent.getStringExtra(IntentAPI.FIELD_USER_ID));
+        } else if (action.equals(ExtendedIntentAPI.ACTION_GET_GPS)) {
+            doSendGps();
         } else {
             Log.i(LOG_TAG, "Received unknown action " + action);
         }
@@ -243,6 +248,16 @@ public class ServiceSensorControl extends Service {
         sendBroadcast(intent);
     }
 
+    private void doSendGps() {
+        if (gpsCache == null) Log.w(LOG_TAG, "gpsCache not initialized!");
+
+        Intent intent = new Intent(ExtendedIntentAPI.RETURN_GPS);
+        intent.putExtra(ExtendedIntentAPI.FIELD_GPS_ENTRIES, gpsCache.getEntryString());
+
+        sendBroadcast(intent);
+
+        Log.i(LOG_TAG, "Sent gps message " + gpsCache.getEntryString());
+    }
 
     // HELPER METHODS
 

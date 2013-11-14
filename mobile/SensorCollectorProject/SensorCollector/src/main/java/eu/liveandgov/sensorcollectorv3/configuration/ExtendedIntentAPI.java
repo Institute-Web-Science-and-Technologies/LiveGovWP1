@@ -25,15 +25,13 @@ public class ExtendedIntentAPI {
     public static final String RETURN_LOG = "eu.liveandgov.sensorcollectorapi.intent.return.LOG";
     public static final String FIELD_MESSAGE = "message";
 
-
     /**
      * Get latest GPS samples
      *
      * Returns the last captured GPS samples, for use in the Service Line Detection service.
      */
     public static final String ACTION_GET_GPS = "eu.liveandgov.sensorminingapi.intent.action.GET_GPS";
-    public static final String FIELD_COUNT = "count";
     public static final String RETURN_GPS = "eu.liveandgov.sensorminingapi.intent.action.GET_GPS";
-    public static final String FIELD_ENTRIES = "entries";
+    public static final String FIELD_GPS_ENTRIES = "entries";
 
 }
