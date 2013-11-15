@@ -7,10 +7,12 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -91,16 +93,19 @@ public class TransferThreadPost implements Runnable, TransferManager {
         Log.i(LOG_TAG, "Transfer finished successfully");
     }
 
-    public boolean transferFile(File file){
+    public boolean transferFile(File file, boolean compressed) {
         try {
             HttpClient      httpclient =    new DefaultHttpClient();
             HttpPost        httppost =      new HttpPost(uploadUrl);
             MultipartEntity mEntity =       new MultipartEntity();
 
-            ContentBody fileBody = new FileBody(file);
+            ContentType contentType = compressed ? ContentType.TEXT_PLAIN : ContentType.DEFAULT_BINARY;
+
+            ContentBody fileBody = new FileBody(file, contentType);
             mEntity.addPart("upfile", fileBody);
             httppost.setEntity(mEntity);
 
+            httppost.addHeader("COMPRESSED", String.valueOf(compressed));
             httppost.addHeader("CHECKSUM", String.valueOf(file.length()));
             httppost.addHeader("ID", GlobalContext.getUserId() );
 
@@ -120,6 +125,10 @@ public class TransferThreadPost implements Runnable, TransferManager {
             return false;
         }
         return true;
+    }
+
+    public boolean transferFile(File file){
+        return transferFile(file, false);
     }
 
 
