@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.sql.SQLException;
+import java.util.zip.GZIPInputStream;
 
 import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.io.IOUtils.copy;
@@ -65,7 +66,7 @@ public class UploadServlet extends HttpServlet {
         Log.info("Incoming POST request from " + req.getRemoteAddr());
 
         // Retrieve Upfile
-        InputStream fileStream = getFormFieldStream(req, FIELD_NAME_UPFILE);
+        InputStream fileStream = getStreamFromField(req, FIELD_NAME_UPFILE);
 
         if (fileStream == null) {
             Log.error("Field not found: " + FIELD_NAME_UPFILE);
@@ -96,10 +97,21 @@ public class UploadServlet extends HttpServlet {
         );
         resp.setStatus(HttpServletResponse.SC_ACCEPTED);
 
+
         // Insert directly to database
+
+        BufferedReader reader;
+        if (! isCompressed(req)) {
+            Log.info("Opening Text Reader");
+            reader = new BufferedReader(new FileReader(outFile));
+        } else {
+            Log.info("Opening GZIP Reader");
+            reader = new BufferedReader(new InputStreamReader(new GZIPInputStream( new FileInputStream(outFile)), "UTF8"));
+        }
+
         Log.info("Writing file into database.");
         try {
-            BatchInserter.batchInsertFile(new PostgresqlDatabase(), outFile);
+            BatchInserter.batchInsertFile(new PostgresqlDatabase(), reader);
         } catch (SQLException e) {
             Log.info("Error writing db.",e);
             e.printStackTrace();
@@ -137,7 +149,12 @@ public class UploadServlet extends HttpServlet {
      * @return fileName
      */
     private String generateFileName(HttpServletRequest req) {
-        return req.getHeader("ID") + "_" + currentTimeMillis();
+        String ending = isCompressed(req) ? ".csv.gz" : ".csv";
+        return req.getHeader("ID") + "_" + currentTimeMillis() + ending;
+    }
+
+    private boolean isCompressed(HttpServletRequest req) {
+        return Boolean.parseBoolean(req.getHeader("COMPRESSED"));
     }
 
     /**
@@ -149,7 +166,7 @@ public class UploadServlet extends HttpServlet {
      * @param fieldName         name of field to isolate
      * @return formFieldStream
      */
-    private InputStream getFormFieldStream(HttpServletRequest req, String fieldName) {
+    private InputStream getStreamFromField(HttpServletRequest req, String fieldName) {
         try {
             // Check that we have a file upload request
             boolean isMultipart = ServletFileUpload.isMultipartContent(req);

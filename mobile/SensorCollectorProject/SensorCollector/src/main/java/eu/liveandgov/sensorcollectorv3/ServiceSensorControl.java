@@ -19,6 +19,7 @@ import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
 import eu.liveandgov.sensorcollectorv3.persistence.PublicationPipeline;
+import eu.liveandgov.sensorcollectorv3.persistence.ZipFilePersistor;
 import eu.liveandgov.sensorcollectorv3.streaming.ZmqStreamer;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.LinkedSensorQueue;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
@@ -80,7 +81,7 @@ public class ServiceSensorControl extends Service {
 
         // INIT COMMUNICATION CHANNELS
         sensorQueue = new LinkedSensorQueue();
-        persistor   = new FilePersistor(sensorFile);
+        persistor   = new ZipFilePersistor(sensorFile);
         streamer    = new ZmqStreamer();
         harPipeline = new HarPipeline();
         gpsCache    = new GpsCache();
@@ -90,7 +91,7 @@ public class ServiceSensorControl extends Service {
 
         // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
-        transferManager = new TransferThreadPost(persistor, stageFile);
+        transferManager = new TransferThreadPost(persistor, stageFile, true);
         monitorThread   = new MonitorThread();
 
         // Setup sensor thread
@@ -98,8 +99,8 @@ public class ServiceSensorControl extends Service {
 
         // Connect sensorQueue to Consumers
         connectorThread.addConsumer(persistor);
-        connectorThread.addConsumer(publisher);
-        connectorThread.addConsumer(gpsCache);
+        // connectorThread.addConsumer(publisher);
+        // connectorThread.addConsumer(gpsCache);
         // streamer and harPipeline are added on demand in the methods below
 
         // Setup monitoring thread

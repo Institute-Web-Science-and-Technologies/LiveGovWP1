@@ -9,6 +9,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -38,12 +39,14 @@ public class TransferThreadPost implements Runnable, TransferManager {
     private static final String uploadUrl = SensorCollectionOptions.UPLOAD_URL;
 
     private Persistor persistor;
+    private Boolean compressed;
 
     private File stageFile;
 
-    public TransferThreadPost(Persistor persistor, File stageFile) {
+    public TransferThreadPost(Persistor persistor, File stageFile, Boolean isCompressed) {
         this.stageFile = stageFile;
         this.persistor = persistor;
+        this.compressed = isCompressed;
         thread = new Thread(this);
     };
 
@@ -82,7 +85,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
         }
 
         // transfer staged File
-        success = transferFile(stageFile);
+        success = transferFile(stageFile, compressed);
         if (!success) { Log.i(LOG_TAG,"Transfer failed");  return; }
 
         // delete local copy
@@ -97,13 +100,11 @@ public class TransferThreadPost implements Runnable, TransferManager {
         try {
             HttpClient      httpclient =    new DefaultHttpClient();
             HttpPost        httppost =      new HttpPost(uploadUrl);
-            MultipartEntity mEntity =       new MultipartEntity();
 
-            ContentType contentType = compressed ? ContentType.TEXT_PLAIN : ContentType.DEFAULT_BINARY;
+            MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
+            multipartEntityBuilder.addBinaryBody("upfile", file);
 
-            ContentBody fileBody = new FileBody(file, contentType);
-            mEntity.addPart("upfile", fileBody);
-            httppost.setEntity(mEntity);
+            httppost.setEntity(multipartEntityBuilder.build());
 
             httppost.addHeader("COMPRESSED", String.valueOf(compressed));
             httppost.addHeader("CHECKSUM", String.valueOf(file.length()));
