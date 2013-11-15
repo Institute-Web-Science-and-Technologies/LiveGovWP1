@@ -1,12 +1,8 @@
 package eu.liveandgov.sensorcollectorv3.connectors.implementations;
 
-import android.content.IntentFilter;
-import android.os.Environment;
-import android.util.Log;
-
-import java.io.File;
 import java.util.ArrayList;
 
+import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
 import eu.liveandgov.sensorcollectorv3.configuration.SsfFileFormat;
 import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
 import eu.liveandgov.sensorcollectorv3.human_activity_recognition.TimedQueue;
@@ -20,13 +16,19 @@ public class GpsCache implements Consumer<String> {
 
     PrefixFilter filter;
     GpsCacheImpl cacheImpl;
+    Multiplexer mpx;
+    IntentEmitter gpsBroadcast;
 
     public GpsCache() {
         cacheImpl = new GpsCacheImpl();
+        mpx       = new Multiplexer<String>();
+        gpsBroadcast = new IntentEmitter(ExtendedIntentAPI.RETURN_GPS_SAMPLE, ExtendedIntentAPI.FIELD_GPS_ENTRY);
 
         filter = new PrefixFilter();
         filter.addFilter(SsfFileFormat.SSF_GPS);
-        filter.setConsumer(cacheImpl);
+        filter.setConsumer(mpx);
+        mpx.addConsumer(cacheImpl);
+        mpx.addConsumer(gpsBroadcast);
     }
 
     @Override

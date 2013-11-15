@@ -6,7 +6,6 @@ package eu.liveandgov.sensorcollectorv3.configuration;
  * Created by hartmann on 10/26/13.
  */
 public class ExtendedIntentAPI {
-
     /**
      * Stream Sensor Samples to the remote server (using zmq).
      */
@@ -31,7 +30,13 @@ public class ExtendedIntentAPI {
      * Returns the last captured GPS samples, for use in the Service Line Detection service.
      */
     public static final String ACTION_GET_GPS = "eu.liveandgov.sensorminingapi.intent.action.GET_GPS";
-    public static final String RETURN_GPS = "eu.liveandgov.sensorminingapi.intent.action.GET_GPS";
+    public static final String RETURN_GPS_SAMPLES = "eu.liveandgov.sensorminingapi.intent.return.GET_GPS";
     public static final String FIELD_GPS_ENTRIES = "entries";
+
+    /**
+     * Get all recorded GPS samples
+     */
+    public static final String RETURN_GPS_SAMPLE = "eu.liveandgov.sensorminingapi.intent.return.SINGLE_GPS";
+    public static final String FIELD_GPS_ENTRY = "value";
 
 }

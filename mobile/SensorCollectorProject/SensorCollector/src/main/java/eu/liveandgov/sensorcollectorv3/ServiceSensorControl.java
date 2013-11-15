@@ -150,8 +150,6 @@ public class ServiceSensorControl extends Service {
             doSendStatus();
         } else if (action.equals(IntentAPI.ACTION_ANNOTATE)) {
             doAnnotate(intent.getStringExtra(IntentAPI.FIELD_ANNOTATION));
-
-            doSendGps(); // ONLY TESTING REMOVE THIS!!!
         } else if (action.equals(IntentAPI.ACTION_GET_STATUS)) {
             doSendStatus();
         } else if (action.equals(IntentAPI.ACTION_START_HAR)) {
@@ -251,7 +249,7 @@ public class ServiceSensorControl extends Service {
     private void doSendGps() {
         if (gpsCache == null) Log.w(LOG_TAG, "gpsCache not initialized!");
 
-        Intent intent = new Intent(ExtendedIntentAPI.RETURN_GPS);
+        Intent intent = new Intent(ExtendedIntentAPI.RETURN_GPS_SAMPLES);
         intent.putExtra(ExtendedIntentAPI.FIELD_GPS_ENTRIES, gpsCache.getEntryString());
 
         sendBroadcast(intent);
