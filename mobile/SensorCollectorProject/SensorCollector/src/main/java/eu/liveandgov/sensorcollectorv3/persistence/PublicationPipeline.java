@@ -21,7 +21,7 @@ public class PublicationPipeline implements Consumer<String>  {
     private FilePersistor persistor;
 
     public PublicationPipeline() {
-        File publishFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), PUBLISH_FILENAME);
+        File publishFile = new File(Environment.getExternalStorageDirectory(), PUBLISH_FILENAME);
 
         Log.d("WRITING TO", publishFile.getAbsolutePath());
         persistor = new FilePublisher(publishFile);
