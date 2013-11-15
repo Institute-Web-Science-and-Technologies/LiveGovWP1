@@ -30,6 +30,14 @@ public class LiveAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	// http://dl.dropboxusercontent.com/u/20567085/Mattersoft%20Live!%20interface%20description%20v1_6.pdf
 	private static final String REQUEST = "http://83.145.232.209:10001/?type=vehicles&lng1=20&lat1=60&lng2=30&lat2=70&online=1";
+	static long helsinkiTime;
+	static long startTime;
+	
+	public LiveAPI(){
+		super();
+        helsinkiTime = getLocalHelsinkiTime().getTime();
+        startTime = System.currentTimeMillis();
+	}
 	
 	public static List<VehicleInfo> getVehicles() throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(new URL(
@@ -66,7 +74,7 @@ public class LiveAPI extends HttpServlet {
 		PrintWriter out = response.getWriter();		
 		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
 		ft.setTimeZone(TimeZone.getTimeZone( "Europe/Helsinki" ));
-		Date d = getLocalHelsinkiTime();
+		Date d = new Date(helsinkiTime + (System.currentTimeMillis() - startTime));
 		String ts = ft.format(d.getTime());
 		String day = String.format(Locale.US,"%tA", d.getTime()).substring(0,3);
 		String json = "{\"vehicles\":[";
