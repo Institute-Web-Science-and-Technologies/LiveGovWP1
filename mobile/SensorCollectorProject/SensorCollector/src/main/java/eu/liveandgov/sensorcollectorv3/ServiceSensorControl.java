@@ -47,8 +47,10 @@ public class ServiceSensorControl extends Service {
     public boolean isHAR = false;
     public String userId = "";
 
-    // COMMUNICATION CHANNELS
+    // COMMUNICATION CHANNEL
     public SensorQueue sensorQueue;
+
+    // SENSOR CONSUMERS
     public Persistor persistor;
     public Consumer<String> publisher;
     public Consumer<String> streamer;
@@ -59,7 +61,7 @@ public class ServiceSensorControl extends Service {
     public ConnectorThread connectorThread;
     public TransferManager transferManager;
     public MonitorThread monitorThread;
-    // Rem: Also SensorThread belongs here, but it is realized via static methods
+    // Rem: Also SensorThread would belong here, but it is realized via static methods
 
     /* CONSTRUCTOR */
     public ServiceSensorControl() {}
@@ -99,8 +101,8 @@ public class ServiceSensorControl extends Service {
 
         // Connect sensorQueue to Consumers
         connectorThread.addConsumer(persistor);
-        // connectorThread.addConsumer(publisher);
-        // connectorThread.addConsumer(gpsCache);
+        connectorThread.addConsumer(publisher);
+        connectorThread.addConsumer(gpsCache);
         // streamer and harPipeline are added on demand in the methods below
 
         // Setup monitoring thread

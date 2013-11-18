@@ -16,7 +16,7 @@ public class GpsCache implements Consumer<String> {
 
     PrefixFilter filter;
     GpsCacheImpl cacheImpl;
-    Multiplexer mpx;
+    Multiplexer<String> mpx;
     IntentEmitter gpsBroadcast;
 
     public GpsCache() {
@@ -50,17 +50,24 @@ public class GpsCache implements Consumer<String> {
         return out.toString();
     }
 
-    private class GpsCacheImpl implements Consumer<String> {
+    /**
+     * Queues sensor values in a given time frame.
+     *
+     * The queued messages can be received by another tread using the getSamples() method.
+     */
+    private static class GpsCacheImpl implements Consumer<String> {
+        private static int LENGTH_IN_MINUTES = 5;
+        private static long LENGTH_IN_MS = LENGTH_IN_MINUTES * 60 * 1000;
 
-        TimedQueue<String> Q = new TimedQueue<String>(5 * 1000 * 60); // 1 Minutes time
+        TimedQueue<String> Q = new TimedQueue<String>(LENGTH_IN_MS);
 
         @Override
-        public void push(String message) {
+        public synchronized void push(String message) {
             GpsSensorValue value = SensorSerializer.parseGpsEvent(message);
             Q.push(value.time, message);
         }
 
-        public ArrayList<String> getSamples(){
+        public synchronized ArrayList<String> getSamples(){
             return Q.toArrayList();
         }
     }

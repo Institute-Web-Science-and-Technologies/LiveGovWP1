@@ -16,6 +16,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
+
 import static eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI.*;
 import static eu.liveandgov.sensorcollectorv3.configuration.IntentAPI.*;
 
@@ -185,6 +187,12 @@ public class ActivitySensorCollector extends Activity {
             intent.setAction(ACTION_STOP_HAR);
             startService(intent);
         }
+    }
+
+    public void onGpsButtonClick(View view){
+        Intent intent = new Intent(this, ServiceSensorControl.class);
+        intent.setAction(ExtendedIntentAPI.ACTION_GET_GPS);
+        startService(intent);
     }
 
     /* HANDLE RETURN INTENTS */
