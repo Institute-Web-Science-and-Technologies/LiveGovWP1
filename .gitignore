@@ -73,3 +73,6 @@ workspace.xml
 tasks.xml
 *.iml
 
+server/NodeInspectionFrontEnd/.idea
+mobile/SensorCollectorProject/.idea
+*.zip
