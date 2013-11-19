@@ -16,7 +16,6 @@ import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
  */
 public class FilePersistor implements Persistor {
     public static final String LOG_TAG = "FP";
-    public static final String FILENAME = "sensor.log";
 
     private File logFile;
     protected BufferedWriter fileWriter;

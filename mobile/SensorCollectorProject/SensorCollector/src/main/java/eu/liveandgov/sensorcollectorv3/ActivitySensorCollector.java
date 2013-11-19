@@ -288,7 +288,7 @@ public class ActivitySensorCollector extends Activity {
             harButton.setChecked(false);
         }
 
-        logStatus(intent);
+        // logStatus(intent);
     }
 
     private void logStatus(Intent intent) {
@@ -303,7 +303,7 @@ public class ActivitySensorCollector extends Activity {
      * Spawn new thread that request status updates in regular intervals.
      */
     private void runStatusLoop() {
-        final int INTERVAL = 5000; // in ms;
+        final int INTERVAL = 1000; // in ms;
 
         new Thread(new Runnable() {
             @Override

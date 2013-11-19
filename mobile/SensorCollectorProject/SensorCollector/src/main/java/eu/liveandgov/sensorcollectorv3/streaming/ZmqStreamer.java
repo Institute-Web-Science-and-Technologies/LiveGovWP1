@@ -27,7 +27,7 @@ public class ZmqStreamer implements Monitorable, Consumer<String> {
         // Lazy build up connection.
         // Constructor is called on main thread. No connection is possible there.
         if (!isConnected) {
-            socket.connect(SensorCollectionOptions.UPLOAD_ZMQ_SOCKET);
+            socket.connect(SensorCollectionOptions.STREAMING_ZMQ_SOCKET);
             isConnected = true;
         }
         socket.send(m);

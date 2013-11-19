@@ -11,6 +11,7 @@ import java.io.File;
 
 import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
 import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
+import static eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions.*;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.GpsCache;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.ConnectorThread;
 import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
@@ -83,17 +84,19 @@ public class ServiceSensorControl extends Service {
 
         // INIT COMMUNICATION CHANNELS
         sensorQueue = new LinkedSensorQueue();
-        persistor   = new ZipFilePersistor(sensorFile);
         streamer    = new ZmqStreamer();
         harPipeline = new HarPipeline();
         gpsCache    = new GpsCache();
+        persistor   = ZIPPED_PERSISTOR ?
+                    new ZipFilePersistor(sensorFile):
+                    new FilePersistor(sensorFile);
 
         // EXTERNAL COMMUNICATION
         publisher = new PublicationPipeline();
 
         // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
-        transferManager = new TransferThreadPost(persistor, stageFile, true);
+        transferManager = new TransferThreadPost(persistor, stageFile, ZIPPED_PERSISTOR);
         monitorThread   = new MonitorThread();
 
         // Setup sensor thread
@@ -101,8 +104,8 @@ public class ServiceSensorControl extends Service {
 
         // Connect sensorQueue to Consumers
         connectorThread.addConsumer(persistor);
-        connectorThread.addConsumer(publisher);
-        connectorThread.addConsumer(gpsCache);
+        if (API_EXTENSIONS) connectorThread.addConsumer(publisher);
+        if (API_EXTENSIONS) connectorThread.addConsumer(gpsCache);
         // streamer and harPipeline are added on demand in the methods below
 
         // Setup monitoring thread
