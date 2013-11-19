@@ -25,6 +25,12 @@
 
   function showDataInId (id, data) {
     if(!data) { console.log("No data for", id); return; }
+    window.currentWindow = {
+      min: data[0].midTime,
+      max: data[data.length-1].midTime
+    };
+    var meta = "From: " + Math.floor(data[0].midTime) + " To: " + Math.floor(data[data.length-1].midTime);
+    $(".metaLabel").text(meta);
     var labelId = id.replace("Plot", "Label");
     $(labelId).text(data.length);
     var avgX = [];
@@ -100,12 +106,6 @@
     }).done(function (data) {
       showDataInId("#graPlot", data);
     });
-    var meta = "From: " + Math.floor(ranges.xaxis.from) + " To: " + Math.floor(ranges.xaxis.to);
-    $(".metaLabel").text(meta);
-    window.currentWindow = {
-      min: ranges.xaxis.from,
-      max: ranges.xaxis.to
-    };
   }
 
   function limitToTime (start, end) {
