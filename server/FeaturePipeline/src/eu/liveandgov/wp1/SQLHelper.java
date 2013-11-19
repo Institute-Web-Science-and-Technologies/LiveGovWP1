@@ -108,8 +108,6 @@ public class SQLHelper {
             saveFeatureWindowQuery.setFloat(12, w.getS2Var());
             saveFeatureWindowQuery.setString(13, w.getTag());
 
-            saveFeatureWindowQuery.
-
             if(!saveFeatureWindowQuery.execute()) {
                 Log.Log("Save error?");
             }

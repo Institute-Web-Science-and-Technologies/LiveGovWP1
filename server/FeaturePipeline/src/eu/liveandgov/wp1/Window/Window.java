@@ -1,6 +1,6 @@
 package eu.liveandgov.wp1.Window;
 
-import eu.liveandgov.wp1.Features.FeatureHelper;
+import eu.liveandgov.wp1.human_activity_recognition.FeatureHelper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

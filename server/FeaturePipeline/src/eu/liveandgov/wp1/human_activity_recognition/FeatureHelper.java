@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.Features;
+package eu.liveandgov.wp1.human_activity_recognition;
 
 /**
  * Created with IntelliJ IDEA.
