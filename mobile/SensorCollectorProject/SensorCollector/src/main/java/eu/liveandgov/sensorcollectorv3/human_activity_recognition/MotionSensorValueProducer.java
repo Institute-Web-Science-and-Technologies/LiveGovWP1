@@ -12,7 +12,7 @@ class MotionSensorValueProducer extends Producer<MotionSensorValue> implements C
 
     @Override
     public void push(String m) {
-        MotionSensorValue msv = SensorSerializer.parseEvent(m);
+        MotionSensorValue msv = SensorSerializer.parseMotionEvent(m);
         consumer.push(msv);
     }
 

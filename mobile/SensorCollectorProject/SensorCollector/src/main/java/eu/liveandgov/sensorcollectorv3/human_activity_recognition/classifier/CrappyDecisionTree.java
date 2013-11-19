@@ -1,14 +1,16 @@
-package eu.liveandgov.sensorcollectorv3.human_activity_recognition;
+package eu.liveandgov.sensorcollectorv3.human_activity_recognition.classifier;
+
+import eu.liveandgov.sensorcollectorv3.human_activity_recognition.Activities;
 
 /**
  * Created by cehlen on 10/19/13.
  */
-class ActivityRecognition {
+public class CrappyDecisionTree {
 
     public static double classify(Object[] i) throws Exception {
 
         double p = Double.NaN;
-        p = ActivityRecognition.N2cf889c825(i);
+        p = CrappyDecisionTree.N2cf889c825(i);
         return p;
     }
 
@@ -17,7 +19,7 @@ class ActivityRecognition {
         if (i[0] == null) {
             p = 0;
         } else if (((Double) i[0]).doubleValue() <= 103.159134) {
-            p = ActivityRecognition.N711dc08826(i);
+            p = CrappyDecisionTree.N711dc08826(i);
         } else if (((Double) i[0]).doubleValue() > 103.159134) {
             p = 1;
         }
@@ -31,7 +33,7 @@ class ActivityRecognition {
         } else if (((Double) i[3]).doubleValue() <= 4.136329) {
             p = 0;
         } else if (((Double) i[3]).doubleValue() > 4.136329) {
-            p = ActivityRecognition.N584b5abc27(i);
+            p = CrappyDecisionTree.N584b5abc27(i);
         }
         return p;
     }
@@ -50,7 +52,7 @@ class ActivityRecognition {
 
     public static String myClassify(Object[] i) throws Exception {
         double p = Double.NaN;
-        p = ActivityRecognition.N2cf889c825(i);
+        p = CrappyDecisionTree.N2cf889c825(i);
         if(p == 0.0) {
             return Activities.WALKING;
         } else {

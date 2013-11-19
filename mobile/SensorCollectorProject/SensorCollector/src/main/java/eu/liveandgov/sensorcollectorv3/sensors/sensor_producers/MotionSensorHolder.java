@@ -31,20 +31,20 @@ public class MotionSensorHolder implements SensorHolder, SensorEventListener {
     // SensorHolder
     @Override
     public void startRecording() {
-        GlobalContext.sensorManager.registerListener(this, sensor, delay, handler);
+        GlobalContext.getSensorManager().registerListener(this, sensor, delay, handler);
     }
 
     @Override
     public void stopRecording() {
-        GlobalContext.sensorManager.unregisterListener(this);
+        GlobalContext.getSensorManager().unregisterListener(this);
     }
 
 
     // Sensor Listener
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        // Log.i(LOG_TAG,"Recieved Sensor Sample " + SensorSerializer.parse(sensorEvent));
-        sensorQueue.push(SensorSerializer.parse(sensorEvent));
+        // Log.i(LOG_TAG,"Recieved Sensor Sample " + SensorSerializer.fromSensorEvent(sensorEvent));
+        sensorQueue.push(SensorSerializer.fromSensorEvent(sensorEvent));
     }
 
     @Override

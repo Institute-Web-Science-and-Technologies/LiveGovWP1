@@ -90,15 +90,15 @@ public class SensorThread implements Runnable {
 
     private void setupSensorHolder() {
         if (SensorCollectionOptions.REC_ACC)     setupMotionSensor(Sensor.TYPE_ACCELEROMETER);
-        if (SensorCollectionOptions.REC_LIN_ACC) setupMotionSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        if (SensorCollectionOptions.REC_GRAV)    setupMotionSensor(Sensor.TYPE_GRAVITY );
+        if (SensorCollectionOptions.REC_LINEAR_ACC) setupMotionSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        if (SensorCollectionOptions.REC_GRAVITY_ACC)    setupMotionSensor(Sensor.TYPE_GRAVITY );
         if (SensorCollectionOptions.REC_GPS)     setupLocationUpdate();
         if (SensorCollectionOptions.REC_G_ACT)   setupActivityUpdate();
     }
 
 
     private void setupMotionSensor(int sensorType){
-        Sensor sensor = GlobalContext.sensorManager.getDefaultSensor(sensorType);
+        Sensor sensor = GlobalContext.getSensorManager().getDefaultSensor(sensorType);
 
         if (sensor == null) {
             Log.i(LOG_TAG,"Sensor " + sensorType + " not available.");

@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -76,7 +77,7 @@ public class ZipFilePersistor implements Persistor {
 
     private boolean openLogFileAppend() {
         try {
-            fileWriter = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(logFile,true))));
+            fileWriter = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(logFile,true)), "UTF8"));
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -86,7 +87,7 @@ public class ZipFilePersistor implements Persistor {
 
     private boolean openLogFileOverwrite() {
         try {
-            fileWriter = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(logFile,false))));
+            fileWriter = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(logFile,false)), "UTF8"));
         } catch (IOException e) {
             e.printStackTrace();
             return false;

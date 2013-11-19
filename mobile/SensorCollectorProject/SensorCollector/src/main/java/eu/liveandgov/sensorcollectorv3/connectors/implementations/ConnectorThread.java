@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
+import eu.liveandgov.sensorcollectorv3.connectors.MultiProducer;
 import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
 
@@ -14,7 +15,7 @@ import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
  *
  * Created by hartmann on 9/15/13.
  */
-public class ConnectorThread implements Runnable, Monitorable {
+public class ConnectorThread implements Runnable, Monitorable, MultiProducer<String> {
     private static final String LOG_TAG = "ConnectorThread";
 
     private final SensorQueue sensorQueue;
@@ -56,13 +57,12 @@ public class ConnectorThread implements Runnable, Monitorable {
         return "Throughput: " + count;
     }
 
-    public void addConsumer(Consumer c) {
+    public void addConsumer(Consumer<String> c) {
         consumerList.add(c);
     }
 
-    public boolean removeConsumer(Consumer c){
+    public boolean removeConsumer(Consumer<String> c){
         return consumerList.remove(c);
     }
-
 
 }

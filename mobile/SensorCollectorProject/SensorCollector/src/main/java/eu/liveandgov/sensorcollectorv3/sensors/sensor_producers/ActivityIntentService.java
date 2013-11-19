@@ -33,7 +33,7 @@ public class ActivityIntentService extends IntentService {
         Log.d("AIS", "HandleIntent");
         if(ActivityRecognitionResult.hasResult(intent)) {
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
-            sensorQueue.push(SensorSerializer.parse(result));
+            sensorQueue.push(SensorSerializer.fromGoogleActivity(result));
         }
     }
 
