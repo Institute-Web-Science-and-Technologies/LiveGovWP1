@@ -6,6 +6,7 @@ package eu.liveandgov.sensorcollectorv3.human_activity_recognition;
  * Created by hartmann on 10/25/13.
  */
 public class Activities {
+    public static String STAIRS = "stairs";
     public static String STANDING = "standing";
     public static String SITTING = "sitting";
     public static String WALKING = "walking";
