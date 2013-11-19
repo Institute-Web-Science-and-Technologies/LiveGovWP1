@@ -46,6 +46,7 @@
       currentRoute.addPoint(ele);
       lastTime = eleTime;
     });
+    self._routes.push(currentRoute);
     $("#routeMenu").empty();
     self._routes.forEach(function (ele, index) {
       $("#routeMenu").append('<div class="item" data-value="'+ index +'">Route '+ ele.label + ' ('+ ele._points.length +') </div>');
