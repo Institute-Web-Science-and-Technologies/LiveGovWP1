@@ -11,23 +11,25 @@ import java.io.File;
 
 import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
 import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
-import static eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions.*;
-import eu.liveandgov.sensorcollectorv3.connectors.implementations.GpsCache;
-import eu.liveandgov.sensorcollectorv3.connectors.implementations.ConnectorThread;
 import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.ConnectorThread;
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.GpsCache;
+import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.LinkedSensorQueue;
+import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.sensorcollectorv3.human_activity_recognition.HarPipeline;
 import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
 import eu.liveandgov.sensorcollectorv3.persistence.PublicationPipeline;
 import eu.liveandgov.sensorcollectorv3.persistence.ZipFilePersistor;
-import eu.liveandgov.sensorcollectorv3.streaming.ZmqStreamer;
-import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.LinkedSensorQueue;
-import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.sensorcollectorv3.sensors.SensorSerializer;
 import eu.liveandgov.sensorcollectorv3.sensors.SensorThread;
+import eu.liveandgov.sensorcollectorv3.streaming.ZmqStreamer;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferManager;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferThreadPost;
+
+import static eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions.API_EXTENSIONS;
+import static eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
 
 public class ServiceSensorControl extends Service {
     // CONSTANTS
@@ -102,11 +104,18 @@ public class ServiceSensorControl extends Service {
         // Setup sensor thread
         SensorThread.setup(sensorQueue);
 
-        // Connect sensorQueue to Consumers
-        connectorThread.addConsumer(persistor);
-        if (API_EXTENSIONS) connectorThread.addConsumer(publisher);
-        if (API_EXTENSIONS) connectorThread.addConsumer(gpsCache);
-        // streamer and harPipeline are added on demand in the methods below
+        // Start Recording once consumers are added
+        connectorThread.registerNonEmptyCallback(new ConnectorThread.Callback() {
+            public void call() {
+                SensorThread.startAllRecording();
+            }
+        });
+        connectorThread.registerEmptyCallback(new ConnectorThread.Callback() {
+            public void call() {
+                SensorThread.stopAllRecording();
+            }
+        });
+
 
         // Setup monitoring thread
         monitorThread.registerMonitorable(connectorThread, "SampleCount");
@@ -115,9 +124,17 @@ public class ServiceSensorControl extends Service {
         monitorThread.registerMonitorable(sensorQueue, "Queue");
 
         // Start threads
-        SensorThread.start();
         connectorThread.start();
         monitorThread.start();
+        SensorThread.start();
+
+
+        // Connect consumer to sensor thread
+        // REMARK: addConsumer triggers startAllRecording event.
+        // This should be done once the SensorThread is already running.
+        if (API_EXTENSIONS) connectorThread.addConsumer(publisher);
+        if (API_EXTENSIONS) connectorThread.addConsumer(gpsCache);
+        // persistor streamer and harPipeline are added on demand in the methods below
 
         super.onCreate();
     }
@@ -217,7 +234,7 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doAnnotate(String tag) {
-        Log.i(LOG_TAG, "Adding annotation:" + tag);
+        Log.d("AN", "Adding annotation:" + tag);
         String msg = SensorSerializer.fromTag(tag);
         sensorQueue.push(msg);
     }
@@ -227,14 +244,23 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doDisableRecording() {
+        // We have to push DisableRecording Intent directly to the persistor,
+        // since the message it will be still in the sensor queue when the persitor
+        // is turned off.
+        persistor.push(IntentAPI.VALUE_STOP_RECORDING);
         doAnnotate(IntentAPI.VALUE_STOP_RECORDING);
-        SensorThread.stopAllRecording();
+
+        connectorThread.removeConsumer(persistor);
+
         isRecording = false;
     }
 
     private void doEnableRecording() {
+        connectorThread.addConsumer(persistor);
+
+        // Send Annotation only after registering Persistor
         doAnnotate(IntentAPI.VALUE_START_RECORDING);
-        SensorThread.startAllRecording();
+
         isRecording = true;
     }
 
