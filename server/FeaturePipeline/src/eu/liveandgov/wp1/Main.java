@@ -3,17 +3,24 @@ package eu.liveandgov.wp1;
 import eu.liveandgov.wp1.database.DBHelper;
 import eu.liveandgov.wp1.human_activity_recognition.*;
 
+//
+// To run this script locally open an ssh tunnel to the remote server:
+//
+// ssh -L 5432:localhost:5432 user@RemoteHost
+//
 public class Main {
 
-    //public static final String DEVICE_ID = "61c206d1a77d509e";
+    public static int WINDOW_LENGTH_IN_MS = 5 * 1000;
+    public static int WINDOW_OVERLAP_IN_MS = 200;
 
     public static void main(String[] args) {
 
-        DBHelper.connect("liveandgov", "liveandgov");
+        // SETUP FeatureExtraction Pipeline
 
+        DBHelper.connect("liveandgov", "liveandgov");
         TaggedMotionSensorValueProducer tmsvp = new TaggedMotionSensorValueProducer();
 
-        TaggedWindowProducer wp = new TaggedWindowProducer(5000, 200);
+        TaggedWindowProducer wp = new TaggedWindowProducer(WINDOW_LENGTH_IN_MS, WINDOW_OVERLAP_IN_MS);
         tmsvp.setConsumer(wp);
 
         TaggedFeatureProducer fp = new TaggedFeatureProducer();
@@ -22,21 +29,15 @@ public class Main {
         CSVFileProducer csvfp = new CSVFileProducer();
         fp.setConsumer(csvfp);
 
+        // Start Classification
 
-        tmsvp.getFromDatabase("running", "trst13");
+        // TODO:
+        // FOR ID IN TEST_TABLE:
+        //     FOR TAG IN TEST_TABLE:
+                    tmsvp.getFromDatabase("running", "trst13");
+        //           RESET PIPELINE
+                    csvfp.close();
 
-        csvfp.close();
-
-        /*SQLHelper helper = new SQLHelper("liveandgov", "liveandgov");
-
-        ArrayList<String> tags = helper.getAllTagsForId(DEVICE_ID);
-        for(String t : tags) {
-            System.out.println(t);
-        }
-        TaggedWindow[] windows = helper.getWindows("acc", DEVICE_ID, "test", 1000, new Date(1381334892922L-2*60*60*1000), 5000);
-        for (TaggedWindow w : windows) {
-            helper.saveFeatureWindow(w);
-        }*/
     }
 
 

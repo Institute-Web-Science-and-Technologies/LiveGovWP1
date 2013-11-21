@@ -21,16 +21,16 @@ public class DBHelper {
     public static void connect(String username, String password) {
         db = new PostgresqlDatabase(username, password);
         try {
-            getByTagQuery = db.connection.prepareStatement("SELECT tag, ts, x, y, z FROM raw_training_data WHERE tag=? AND id=?");
+            getByTagQuery = db.connection.prepareStatement("SELECT id, tag, ts, x, y, z FROM raw_training_data WHERE tag=? AND id=?");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public static ResultSet getByTag(String tag, String id) {
+    public static ResultSet getByTagId(String tag, String id) {
         try {
-            getByTagQuery.setString(1, tag);
-            getByTagQuery.setString(2, id);
+            getByTagQuery.setString(1, id);
+            getByTagQuery.setString(2, tag);
             return getByTagQuery.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();

@@ -7,6 +7,7 @@ public class TaggedFeatureVector {
 
     public String tag;
 
+    // STATISTICAL FEATURES
     public float xMean;
     public float yMean;
     public float zMean;

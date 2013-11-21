@@ -13,16 +13,16 @@ import java.sql.SQLException;
 public class TaggedMotionSensorValueProducer extends Producer<TaggedMotionSensorValue> {
 
     public void getFromDatabase(String tag, String id) {
-        ResultSet rs = DBHelper.getByTag(tag, id);
+        ResultSet rs = DBHelper.getByTagId(tag, id);
         try {
             while(rs.next()) {
                 TaggedMotionSensorValue tmsv = new TaggedMotionSensorValue();
-                tmsv.tag = rs.getString("tag");
-                tmsv.x = rs.getFloat("x");
-                tmsv.y = rs.getFloat("y");
-                tmsv.z = rs.getFloat("z");
+                tmsv.tag =  rs.getString("tag");
+                tmsv.id =   rs.getString("id");
+                tmsv.x =    rs.getFloat("x");
+                tmsv.y =    rs.getFloat("y");
+                tmsv.z =    rs.getFloat("z");
                 tmsv.time = rs.getTime("ts").getTime();
-                tmsv.id = "training";
                 consumer.push(tmsv);
             }
         } catch (SQLException e) {
