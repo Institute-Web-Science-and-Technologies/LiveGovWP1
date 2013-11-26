@@ -1,5 +1,6 @@
 package eu.liveandgov.wp1.human_activity_recognition;
 
+import eu.liveandgov.wp1.Log;
 import eu.liveandgov.wp1.connectors.Consumer;
 import eu.liveandgov.wp1.connectors.Producer;
 import eu.liveandgov.wp1.sensors.TaggedMotionSensorValue;
@@ -40,6 +41,12 @@ public class TaggedWindowProducer extends Producer<TaggedWindow> implements Cons
         }
 
         queue.push(m.time, m);
+    }
+
+    public void clear() {
+        windowStart = -1;
+        windowEnd = -1;
+        queue.clear();
     }
 
     private void createNewWindow() {

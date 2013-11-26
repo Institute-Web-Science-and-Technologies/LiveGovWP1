@@ -24,6 +24,7 @@ public class CSVFileProducer implements Consumer<TaggedFeatureVector> {
         super();
         try {
             printWriter = new PrintWriter(FILE_PATH, "UTF-8");
+            printWriter.println("xMean,yMean,zMean,xVar,yVar,zVar,s2Mean,s2Var,tag");
         } catch (FileNotFoundException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (UnsupportedEncodingException e) {
