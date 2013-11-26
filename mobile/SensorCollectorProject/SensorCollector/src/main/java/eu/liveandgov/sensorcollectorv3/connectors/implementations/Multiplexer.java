@@ -3,7 +3,7 @@ package eu.liveandgov.sensorcollectorv3.connectors.implementations;
 import java.util.ArrayList;
 
 import eu.liveandgov.sensorcollectorv3.connectors.MultiProducer;
-import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 
 /**
  * Receives messages from one produces, and publishes them to many consumers.

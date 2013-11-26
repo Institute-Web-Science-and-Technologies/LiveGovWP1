@@ -4,7 +4,7 @@ import org.jeromq.ZMQ;
 
 import eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions;
 import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
-import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 
 /**
  * String-Consumer that sends samples to a remote server using ZMQ message queue system.

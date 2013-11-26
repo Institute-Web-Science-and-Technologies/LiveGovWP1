@@ -3,7 +3,7 @@ package eu.liveandgov.sensorcollectorv3.connectors.implementations;
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.sensorcollectorv3.sensors.SensorSerializer;
-import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 
 /**
  * Created by hartmann on 11/12/13.

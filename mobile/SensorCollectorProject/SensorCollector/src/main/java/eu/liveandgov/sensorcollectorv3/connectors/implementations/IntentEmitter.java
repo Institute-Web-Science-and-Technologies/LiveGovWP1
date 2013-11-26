@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
-import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 
 /**
  * Consumer that sends out received messages as broadcast intents.

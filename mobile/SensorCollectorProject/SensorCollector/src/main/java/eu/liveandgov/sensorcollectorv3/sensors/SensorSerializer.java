@@ -11,7 +11,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
 import eu.liveandgov.sensorcollectorv3.sensors.sensor_value_objects.GpsSensorValue;
-import eu.liveandgov.wp1.feature_pipeline.containers.MotionSensorValue;
+import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
 
 import static eu.liveandgov.sensorcollectorv3.configuration.SsfFileFormat.*;
 

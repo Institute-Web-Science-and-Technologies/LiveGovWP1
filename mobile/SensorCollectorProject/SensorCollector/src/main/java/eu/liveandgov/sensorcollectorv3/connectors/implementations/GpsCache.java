@@ -6,8 +6,8 @@ import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
 import eu.liveandgov.sensorcollectorv3.configuration.SsfFileFormat;
 import eu.liveandgov.sensorcollectorv3.sensors.sensor_value_objects.GpsSensorValue;
 import eu.liveandgov.sensorcollectorv3.sensors.SensorSerializer;
-import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
-import eu.liveandgov.wp1.feature_pipeline.helper.TimedQueue;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
+import eu.liveandgov.wp1.human_activity_recognition.helper.TimedQueue;
 
 /**
  * Created by hartmann on 11/14/13.

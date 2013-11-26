@@ -6,10 +6,10 @@ import eu.liveandgov.sensorcollectorv3.connectors.implementations.IntentEmitter;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.Multiplexer;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.PrefixFilter;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.SampleEmitter;
-import eu.liveandgov.wp1.feature_pipeline.HarPipeline;
-import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
-import eu.liveandgov.wp1.feature_pipeline.connectors.Pipeline;
-import eu.liveandgov.wp1.feature_pipeline.containers.MotionSensorValue;
+import eu.liveandgov.wp1.human_activity_recognition.HarPipeline;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Pipeline;
+import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
 
 /**
  * Pipeline class that consumes accelerometer values and produces an activity stream.

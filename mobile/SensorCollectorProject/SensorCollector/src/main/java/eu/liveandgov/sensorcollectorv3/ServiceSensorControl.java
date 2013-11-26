@@ -26,7 +26,7 @@ import eu.liveandgov.sensorcollectorv3.sensors.SensorThread;
 import eu.liveandgov.sensorcollectorv3.streaming.ZmqStreamer;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferManager;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferThreadPost;
-import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 
 import static eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions.API_EXTENSIONS;
 import static eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
