@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1;
+package eu.liveandgov.wp1.feature_pipeline.helper.database;
 
 import java.sql.Statement;
 

@@ -1,7 +1,7 @@
-package eu.liveandgov.wp1.human_activity_recognition;
+package eu.liveandgov.wp1.feature_pipeline.producers;
 
-import eu.liveandgov.wp1.connectors.Consumer;
-import eu.liveandgov.wp1.connectors.Producer;
+import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
+import eu.liveandgov.wp1.feature_pipeline.containers.TaggedFeatureVector;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -36,7 +36,6 @@ public class CSVFileProducer implements Consumer<TaggedFeatureVector> {
         printWriter.close();
     }
 
-    @Override
     public void push(TaggedFeatureVector fv) {
         printWriter.println( fv.toCSV() );
     }

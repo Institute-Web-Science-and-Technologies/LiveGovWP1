@@ -1,10 +1,4 @@
-package eu.liveandgov.wp1.sensors;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+package eu.liveandgov.wp1.feature_pipeline.containers;
 
 /**
  * Created with IntelliJ IDEA.

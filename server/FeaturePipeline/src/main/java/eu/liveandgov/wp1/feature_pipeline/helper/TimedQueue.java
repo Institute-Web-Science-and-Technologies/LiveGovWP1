@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.human_activity_recognition;
+package eu.liveandgov.wp1.feature_pipeline.helper;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

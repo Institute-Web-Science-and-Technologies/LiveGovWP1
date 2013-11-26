@@ -1,6 +1,6 @@
-package eu.liveandgov.wp1.human_activity_recognition;
+package eu.liveandgov.wp1.feature_pipeline.containers;
 
-import eu.liveandgov.wp1.sensors.TaggedWindow;
+import eu.liveandgov.wp1.feature_pipeline.helper.FeatureHelper;
 
 /**
  * Created by cehlen on 10/19/13.
@@ -27,7 +27,9 @@ public class TaggedFeatureVector {
     public float energy;
     public float kurtosis;
 
-    // FFT Features
+    // TODO: FFT Features
+
+    // TODO: Historgram Features
 
     public TaggedFeatureVector(TaggedWindow m) {
         tag = m.tag;

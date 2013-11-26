@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.connectors;
+package eu.liveandgov.wp1.feature_pipeline.connectors;
 
 /**
  * Producer objects register a consumer, that provided a push method.
@@ -20,7 +20,6 @@ public class Producer<T> {
      */
     public class EmpyConsumer<T> implements Consumer<T> {
 
-        @Override
         public void push(T m) {
             // do nothing
         }

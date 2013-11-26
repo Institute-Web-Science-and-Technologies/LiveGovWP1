@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.sensors;
+package eu.liveandgov.wp1.feature_pipeline.containers;
 
 public class TaggedMotionSensorValue {
     public String type;

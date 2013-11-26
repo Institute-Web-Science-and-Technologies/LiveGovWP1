@@ -1,15 +1,25 @@
 buildscript {
     repositories {
         mavenCentral()
+        mavenLocal()
+        //maven {
+        //    url 'https://raw.github.com/HeinrichHartmann/LiveGovWp1/mvn-repo/'
+        //}
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.6.1'
     }
 }
+
 apply plugin: 'android'
 
 repositories {
+    // Need to add new repositories also here!
     mavenCentral()
+    mavenLocal()
+    //maven {
+    //    url 'https://raw.github.com/HeinrichHartmann/LiveGovWp1/mvn-repo/'
+    //}
 }
 
 android {
@@ -31,6 +41,7 @@ dependencies {
     compile 'junit:junit:3.8'
     compile 'org.apache.commons:commons-math3:3.2'
     compile 'commons-lang:commons-lang:2.3'
+    compile 'eu.liveandgov.wp1:FeaturePipeline:1.0-SNAPSHOT'
 }
 
 apply plugin: 'idea'

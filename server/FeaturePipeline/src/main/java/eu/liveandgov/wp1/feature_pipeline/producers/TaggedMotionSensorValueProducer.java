@@ -1,9 +1,9 @@
-package eu.liveandgov.wp1.human_activity_recognition;
+package eu.liveandgov.wp1.feature_pipeline.producers;
 
-import eu.liveandgov.wp1.Log;
-import eu.liveandgov.wp1.connectors.Producer;
-import eu.liveandgov.wp1.database.DBHelper;
-import eu.liveandgov.wp1.sensors.TaggedMotionSensorValue;
+import eu.liveandgov.wp1.feature_pipeline.Log;
+import eu.liveandgov.wp1.feature_pipeline.connectors.Producer;
+import eu.liveandgov.wp1.feature_pipeline.helper.database.DBHelper;
+import eu.liveandgov.wp1.feature_pipeline.containers.TaggedMotionSensorValue;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,7 +13,6 @@ import java.sql.SQLException;
  */
 public class TaggedMotionSensorValueProducer extends Producer<TaggedMotionSensorValue> {
     public int globalCount = 0;
-
 
     public void getFromDatabase(String tag, String id) {
         ResultSet rs = DBHelper.getByTagId(tag, id);

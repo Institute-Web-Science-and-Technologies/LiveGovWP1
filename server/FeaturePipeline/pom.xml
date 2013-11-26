@@ -8,6 +8,7 @@
     <artifactId>FeaturePipeline</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -74,5 +75,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

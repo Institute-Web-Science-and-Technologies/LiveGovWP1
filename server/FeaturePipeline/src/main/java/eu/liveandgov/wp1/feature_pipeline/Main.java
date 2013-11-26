@@ -1,7 +1,7 @@
-package eu.liveandgov.wp1;
+package eu.liveandgov.wp1.feature_pipeline;
 
-import eu.liveandgov.wp1.database.DBHelper;
-import eu.liveandgov.wp1.human_activity_recognition.*;
+import eu.liveandgov.wp1.feature_pipeline.helper.database.DBHelper;
+import eu.liveandgov.wp1.feature_pipeline.producers.*;
 
 import java.util.List;
 
@@ -42,6 +42,7 @@ public class Main {
                 windowProducer.clear();
             }
         }
+
         csvFileProducer.close();
         Log.Log("Global Count:" + sensorValueProducer.globalCount);
     }

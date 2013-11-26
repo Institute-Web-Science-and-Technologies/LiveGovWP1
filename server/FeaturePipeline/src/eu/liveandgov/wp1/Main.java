@@ -1,7 +1,8 @@
 package eu.liveandgov.wp1;
 
-import eu.liveandgov.wp1.database.DBHelper;
-import eu.liveandgov.wp1.human_activity_recognition.*;
+import eu.liveandgov.wp1.feature_pipeline.Log;
+import eu.liveandgov.wp1.feature_pipeline.helper.database.DBHelper;
+import eu.liveandgov.wp1.feature_pipeline.producers.*;
 
 import java.util.List;
 

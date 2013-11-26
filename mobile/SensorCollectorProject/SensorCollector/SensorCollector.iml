@@ -71,6 +71,7 @@
     <orderEntry type="jdk" jdkName="Android 4.2.2 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="support-v4-18.0.0" level="project" />
+    <orderEntry type="library" exported="" name="postgresql-9.2-1003-jdbc4" level="project" />
     <orderEntry type="library" exported="" name="ComAndroidSupportAppcompatV71800.aar" level="project" />
     <orderEntry type="library" exported="" name="httpcore-4.3-beta2" level="project" />
     <orderEntry type="library" exported="" name="ComGoogleAndroidGmsPlayServices3136.aar" level="project" />
@@ -79,6 +80,7 @@
     <orderEntry type="library" exported="" name="httpmime-4.3-beta2" level="project" />
     <orderEntry type="library" exported="" name="commons-math3-3.2" level="project" />
     <orderEntry type="library" exported="" name="jeromq-0.2.0" level="project" />
+    <orderEntry type="library" exported="" name="FeaturePipeline-1.0-SNAPSHOT" level="project" />
   </component>
 </module>
 

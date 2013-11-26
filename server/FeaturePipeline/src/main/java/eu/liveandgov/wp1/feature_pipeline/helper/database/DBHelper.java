@@ -1,6 +1,4 @@
-package eu.liveandgov.wp1.database;
-
-import eu.liveandgov.wp1.PostgresqlDatabase;
+package eu.liveandgov.wp1.feature_pipeline.helper.database;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

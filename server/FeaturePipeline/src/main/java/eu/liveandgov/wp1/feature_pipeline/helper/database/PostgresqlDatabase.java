@@ -1,7 +1,9 @@
 /**
  *
  */
-package eu.liveandgov.wp1;
+package eu.liveandgov.wp1.feature_pipeline.helper.database;
+
+import eu.liveandgov.wp1.feature_pipeline.Log;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

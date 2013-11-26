@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.connectors;
+package eu.liveandgov.wp1.feature_pipeline.connectors;
 
 /**
  * A consumer accepts messages and performes actions on it.

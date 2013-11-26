@@ -1,6 +1,7 @@
-package eu.liveandgov.wp1;
+package eu.liveandgov.wp1.feature_pipeline.helper.database;
 
-import eu.liveandgov.wp1.Window.Window;
+import eu.liveandgov.wp1.feature_pipeline.Log;
+import eu.liveandgov.wp1.feature_pipeline.containers.Window;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

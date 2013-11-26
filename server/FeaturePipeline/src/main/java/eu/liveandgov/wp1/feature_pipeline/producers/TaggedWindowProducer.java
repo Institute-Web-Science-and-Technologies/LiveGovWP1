@@ -1,10 +1,10 @@
-package eu.liveandgov.wp1.human_activity_recognition;
+package eu.liveandgov.wp1.feature_pipeline.producers;
 
-import eu.liveandgov.wp1.Log;
-import eu.liveandgov.wp1.connectors.Consumer;
-import eu.liveandgov.wp1.connectors.Producer;
-import eu.liveandgov.wp1.sensors.TaggedMotionSensorValue;
-import eu.liveandgov.wp1.sensors.TaggedWindow;
+import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
+import eu.liveandgov.wp1.feature_pipeline.connectors.Producer;
+import eu.liveandgov.wp1.feature_pipeline.containers.TaggedMotionSensorValue;
+import eu.liveandgov.wp1.feature_pipeline.containers.TaggedWindow;
+import eu.liveandgov.wp1.feature_pipeline.helper.TimedQueue;
 
 import java.util.ArrayList;
 
@@ -25,7 +25,6 @@ public class TaggedWindowProducer extends Producer<TaggedWindow> implements Cons
         queue = new TimedQueue<TaggedMotionSensorValue>(windowSize);
     }
 
-    @Override
     public void push(TaggedMotionSensorValue m) {
         if(windowStart == -1) {
             windowStart = m.time;
