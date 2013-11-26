@@ -20,7 +20,12 @@ public class LatLonTsDayTuple {
 	private Pattern pattern = Pattern.compile("(.+),(.+),(.+),(.+)");
 	private SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss"); 
 	public LatLonTsDayTuple() {
+		m_lat = 0;
+		m_lng = 0;
+		m_dateTime = new Date(0);
+		m_day = "";
 	}
+
 	public LatLonTsDayTuple(String csvLine) throws ParseException {
 		Matcher matcher = pattern.matcher(csvLine);
 
@@ -32,6 +37,9 @@ public class LatLonTsDayTuple {
 		}
 //		System.out.println( m_day + " " + String.format("%tF %tT", m_dateTime, m_dateTime ) + " " + m_lat + " " + m_lng);
 //		System.out.println(getAbbreviatedWeekdayName() + " " + getDateDigitsOnly() + " " + getDaytimeDigitsOnly());
+	}
+	public long getTime() {
+		return m_dateTime.getTime();
 	}
 	public LatLonTsDayTuple(float lat, float lng){
 			m_lat = lat;
@@ -86,5 +94,12 @@ public class LatLonTsDayTuple {
     	double[] bottomLeft = DivideAndConquerGtfs.greatCircleEndPositionLatLon(m_lat, m_lng, 5*Math.PI/4.0, hypotenuse);
     	LatLonTsDayTuple bl = new LatLonTsDayTuple((float) bottomLeft[0],(float)bottomLeft[1]);
     	return "ST_MakeBox2D(St_geometryfromtext('"+tr.getLonLatPoint()+"',4326),St_geometryfromtext('"+bl.getLonLatPoint()+"',4326))";
+	}
+
+	public double getLat() {
+		return m_lat;
+	}
+	public double getLon() {
+		return m_lng;
 	}
 }
