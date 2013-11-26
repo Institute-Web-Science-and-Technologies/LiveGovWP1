@@ -50,6 +50,9 @@ public class PostgresqlDatabase extends Database {
             //  -> Maven Dependencies
             Class.forName("org.postgresql.Driver");
 
+            // Add explicit reference to Driver class in order to automate import (e.g. for Maven/IntelliJ).
+            Log.Log("Using db Driver" + org.postgresql.Driver.class.getName());
+
         } catch (ClassNotFoundException e) {
 
             System.out.println("Where is your PostgreSQL JDBC Driver? "

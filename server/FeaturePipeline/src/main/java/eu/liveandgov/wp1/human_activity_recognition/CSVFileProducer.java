@@ -16,7 +16,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class CSVFileProducer implements Consumer<TaggedFeatureVector> {
 
-    private final String FILE_PATH = "output.csv";
+    private final String FILE_PATH = "/tmp/HarFeatureTable.csv";
 
     private PrintWriter printWriter;
 
@@ -24,7 +24,7 @@ public class CSVFileProducer implements Consumer<TaggedFeatureVector> {
         super();
         try {
             printWriter = new PrintWriter(FILE_PATH, "UTF-8");
-            printWriter.println("xMean,yMean,zMean,xVar,yVar,zVar,s2Mean,s2Var,tag");
+            printWriter.println( TaggedFeatureVector.getCsvHead() );
         } catch (FileNotFoundException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (UnsupportedEncodingException e) {
@@ -38,7 +38,6 @@ public class CSVFileProducer implements Consumer<TaggedFeatureVector> {
 
     @Override
     public void push(TaggedFeatureVector fv) {
-        printWriter.println(String.format("%f,%f,%f,%f,%f,%f,%f,%f,%s",
-                fv.xMean, fv.yMean, fv.zMean, fv.xVar, fv.yVar, fv.zVar, fv.s2Mean, fv.s2Var, fv.tag));
+        printWriter.println( fv.toCSV() );
     }
 }

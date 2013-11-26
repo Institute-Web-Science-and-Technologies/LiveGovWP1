@@ -35,12 +35,37 @@ public class FeatureHelper {
         return (float)stats.getVariance();
     }
 
+    public static float kurtosis(float[] input) {
+        stats.clear();
+        for(float v: input) {
+            stats.addValue(v);
+        }
+        return (float)stats.getKurtosis();
+    }
+
     public static float[] S2(float[] x, float[] y, float[] z){
         float[] out = new float[x.length];
         for (int i =0; i< x.length; i++){
             out[i] = x[i]*x[i] + y[i]*y[i] + z[i]*z[i];
         }
         return out;
+    }
+
+    public static float sum(float[] xv) {
+        float sum = 0;
+        for (float x: xv){
+            sum += x;
+        }
+        return sum;
+    }
+
+    // Tilting measure to ground:
+    // 1 if Mobile is pointing to sky or ground
+    // 0 if lying flat
+    // arccos of return value gives tilting angle
+    public static float tilt(float x,float y,float z){
+        double abs = Math.sqrt(Math.pow(x,2) + Math.pow(y,2) + Math.pow(x,2));
+        return (float) (Math.abs(y) / abs);
     }
 
     public static Complex[] FFT(float[] input){
