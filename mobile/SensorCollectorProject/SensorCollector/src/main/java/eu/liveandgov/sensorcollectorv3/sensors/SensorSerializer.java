@@ -69,6 +69,12 @@ public class SensorSerializer {
             return fillStringFloats(SSF_LINEAR_ACCELERATION, timestamp_ms, GlobalContext.getUserId(), event.values);
         } else if (sensorType == Sensor.TYPE_GRAVITY) {
             return fillStringFloats(SSF_GRAVITY, timestamp_ms, GlobalContext.getUserId(), event.values);
+        } else if (sensorType == Sensor.TYPE_GYROSCOPE) {
+            return fillStringFloats(SSF_GYROSCOPE, timestamp_ms, GlobalContext.getUserId(), event.values);
+        } else if (sensorType == Sensor.TYPE_MAGNETIC_FIELD) {
+            return fillStringFloats(SSF_MAGNETOMETER, timestamp_ms, GlobalContext.getUserId(), event.values);
+        } else if (sensorType == Sensor.TYPE_ROTATION_VECTOR) {
+            return fillStringFloats(SSF_ROTATION, timestamp_ms, GlobalContext.getUserId(), event.values);
         }
         return "ERR," + timestamp_ms + ",,Unknown sensor " + sensorType;
     }

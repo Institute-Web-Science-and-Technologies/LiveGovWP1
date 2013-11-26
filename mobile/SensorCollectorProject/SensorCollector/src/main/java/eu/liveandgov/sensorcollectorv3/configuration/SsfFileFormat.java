@@ -7,10 +7,11 @@ public class SsfFileFormat {
     public static String SSF_GPS                   = "GPS";
 
     public static String SSF_ACCELEROMETER         = "ACC";
-    public static String SSF_LINEAR_ACCELERATION   = "LAC";
-    public static String SSF_GRAVITY               = "GRA";
+    public static String SSF_LINEAR_ACCELERATION   = "LAC"; // software emulated
+    public static String SSF_GRAVITY               = "GRA"; // software emulated
     public static String SSF_GYROSCOPE             = "GYR";
     public static String SSF_MAGNETOMETER          = "MAG";
+    public static String SSF_ROTATION              = "ROT"; // software emulated
     public static String SSF_WIFI                  = "WIFI";
     public static String SSF_BLUETOOTH             = "BLT";
     public static String SSF_GSM                   = "GSM";

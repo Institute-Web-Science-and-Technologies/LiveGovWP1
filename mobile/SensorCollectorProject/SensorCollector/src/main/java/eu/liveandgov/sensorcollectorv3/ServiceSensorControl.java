@@ -129,12 +129,12 @@ public class ServiceSensorControl extends Service {
         SensorThread.start();
 
 
-        // Connect consumer to sensor thread
+        // Connect Consumers to sensor thread
+        // More consumers are added dynamically below
         // REMARK: addConsumer triggers startAllRecording event.
         // This should be done once the SensorThread is already running.
         if (API_EXTENSIONS) connectorThread.addConsumer(publisher);
         if (API_EXTENSIONS) connectorThread.addConsumer(gpsCache);
-        // persistor streamer and harPipeline are added on demand in the methods below
 
         super.onCreate();
     }

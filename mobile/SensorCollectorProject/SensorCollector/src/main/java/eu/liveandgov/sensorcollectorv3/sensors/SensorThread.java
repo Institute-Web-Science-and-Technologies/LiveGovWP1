@@ -87,17 +87,22 @@ public class SensorThread implements Runnable {
         Looper.loop();
     }
 
-
     private void setupSensorHolder() {
-        if (SensorCollectionOptions.REC_ACC)     setupMotionSensor(Sensor.TYPE_ACCELEROMETER);
-        if (SensorCollectionOptions.REC_LINEAR_ACC) setupMotionSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        if (SensorCollectionOptions.REC_GRAVITY_ACC)    setupMotionSensor(Sensor.TYPE_GRAVITY );
-        if (SensorCollectionOptions.REC_GPS)     setupLocationUpdate();
-        if (SensorCollectionOptions.REC_G_ACT)   setupActivityUpdate();
+        setupMotionSensor(Sensor.TYPE_ACCELEROMETER,        SensorCollectionOptions.REC_ACC);
+        setupMotionSensor(Sensor.TYPE_LINEAR_ACCELERATION,  SensorCollectionOptions.REC_LINEAR_ACC);
+        setupMotionSensor(Sensor.TYPE_GRAVITY,              SensorCollectionOptions.REC_GRAVITY_ACC);
+        setupMotionSensor(Sensor.TYPE_GYROSCOPE,            SensorCollectionOptions.REC_GYROSCOPE);
+        setupMotionSensor(Sensor.TYPE_MAGNETIC_FIELD,       SensorCollectionOptions.REC_MAGNETOMETER);
+        setupMotionSensor(Sensor.TYPE_ROTATION_VECTOR,      SensorCollectionOptions.REC_ROTATION);
+
+        if (SensorCollectionOptions.REC_GPS) setupLocationUpdate();
+        if (SensorCollectionOptions.REC_G_ACT) setupActivityUpdate();
     }
 
 
-    private void setupMotionSensor(int sensorType){
+    private void setupMotionSensor(int sensorType, int delay){
+        if (delay == SensorCollectionOptions.SensorOptions.OFF) return;
+
         Sensor sensor = GlobalContext.getSensorManager().getDefaultSensor(sensorType);
 
         if (sensor == null) {
@@ -107,7 +112,7 @@ public class SensorThread implements Runnable {
         }
 
         Log.i(LOG_TAG, "Registering Listener for " + sensor.getName());
-        MotionSensorHolder holder = new MotionSensorHolder(sensorQueue, sensor,  SensorManager.SENSOR_DELAY_GAME, sensorHandler);
+        MotionSensorHolder holder = new MotionSensorHolder(sensorQueue, sensor, delay, sensorHandler);
         activeSensors.add(holder);
     }
 
