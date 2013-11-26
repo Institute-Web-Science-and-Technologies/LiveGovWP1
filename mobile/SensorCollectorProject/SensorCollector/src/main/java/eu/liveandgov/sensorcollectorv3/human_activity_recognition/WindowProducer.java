@@ -42,7 +42,6 @@ class WindowProducer extends Producer<Window> implements Consumer<MotionSensorVa
             windowStart = windowEnd - overlap;
             windowEnd = windowStart + windowSize;
         }
-
         queue.push(m.time, m);
     }
 

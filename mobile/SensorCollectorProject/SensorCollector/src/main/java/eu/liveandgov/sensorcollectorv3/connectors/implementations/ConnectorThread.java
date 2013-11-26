@@ -6,28 +6,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
-import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
+import eu.liveandgov.sensorcollectorv3.connectors.MultiProducer;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
 
 /**
  * Thread that actively polls a blocking queue and sends samples to a list of consumers.
  *
  * Created by hartmann on 9/15/13.
  */
-public class ConnectorThread implements Runnable, Monitorable {
-    private static final String LOG_TAG = "ConnectorThread";
+public class ConnectorThread implements Runnable, Monitorable, MultiProducer<String> {
+    private static final String LOG_TAG = "CT";
 
     private final SensorQueue sensorQueue;
     private final Thread thread;
 
-    private List<Consumer<String>> consumerList;
+    private List<Consumer<String>> consumerList = new ArrayList<Consumer<String>>();
+    private List<Callback> onEmptyList = new ArrayList<Callback>();
+    private List<Callback> onNonEmptyList = new ArrayList<Callback>();
 
-    private long count = 0;
+    private long messageCount = 0;
 
     public ConnectorThread(SensorQueue sensorQueue){
         this.sensorQueue = sensorQueue;
         this.thread = new Thread(this);
-        this.consumerList = new ArrayList<Consumer<String>>();
     }
 
     @Override
@@ -36,10 +38,10 @@ public class ConnectorThread implements Runnable, Monitorable {
         String msg;
         while (true) {
             msg = sensorQueue.blockingPull();
-            for(Consumer c : consumerList) {
+            for (Consumer<String> c : consumerList) {
                 c.push(msg);
             }
-            count++;
+            messageCount++;
         }
     }
 
@@ -50,19 +52,49 @@ public class ConnectorThread implements Runnable, Monitorable {
     /**
      * Returns number of samples transferred by the connector
      *
-     * @return count
+     * @return messageCount
      */
+    @Override
     public String getStatus(){
-        return "Throughput: " + count;
+        return "Throughput: " + messageCount;
     }
 
-    public void addConsumer(Consumer c) {
+    @Override
+    public void addConsumer(Consumer<String> c) {
+        if (consumerList.isEmpty()) callAll(onNonEmptyList);
+
+        if (consumerList.contains(c)) return;
         consumerList.add(c);
     }
 
-    public boolean removeConsumer(Consumer c){
-        return consumerList.remove(c);
+
+    @Override
+    public boolean removeConsumer(Consumer<String> c){
+        boolean ret = consumerList.remove(c);
+
+        if (consumerList.isEmpty()) callAll(onEmptyList);
+        return ret;
     }
 
 
+    private void callAll(List<Callback> callbackList) {
+        Log.d(LOG_TAG, "Callbacks triggered: " + callbackList.size());
+        for (Callback c : callbackList) {
+            if (c == null) continue;
+            c.call();
+        }
+    }
+
+    public void registerNonEmptyCallback(Callback c) {
+        if (c == null) return;
+        onNonEmptyList.add(c);
+    }
+
+    public void registerEmptyCallback(Callback c) {
+        onEmptyList.add(c);
+    }
+
+    public static interface Callback {
+        public void call();
+    }
 }

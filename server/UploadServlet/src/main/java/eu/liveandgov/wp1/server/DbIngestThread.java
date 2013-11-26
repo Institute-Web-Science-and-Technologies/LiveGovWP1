@@ -1,16 +1,14 @@
 package eu.liveandgov.wp1.server;
 
 import eu.liveandgov.wp1.server.db_helper.BatchInserter;
-import eu.liveandgov.wp1.server.sensor_helper.*;
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
-import eu.liveandgov.wp1.server.sensor_helper.sensor_value_objects.*;
 import org.apache.log4j.Logger;
 import org.jeromq.ZMQ;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.util.zip.GZIPInputStream;
 
 /**
  * User: hartmann
@@ -47,8 +45,12 @@ public class DbIngestThread implements Runnable {
 
                 if (message.equals("STOP")) { break; }
 
-                sensorFile = new File(message);
-                int rows = BatchInserter.batchInsertFile(db, sensorFile);
+                File outFile = new File(message);
+
+                BufferedReader reader;
+                reader = new BufferedReader(new FileReader(outFile));
+
+                int rows = BatchInserter.batchInsertFile(db, reader);
 
                 LOG.info("Imported files int db. Rows: " + rows);
 

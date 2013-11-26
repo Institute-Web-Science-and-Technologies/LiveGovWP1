@@ -2,28 +2,34 @@ package eu.liveandgov.sensorcollectorv3;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 
 import java.io.File;
 
 import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
 import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
-import eu.liveandgov.sensorcollectorv3.connectors.implementations.ConnectorThread;
 import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
-import eu.liveandgov.sensorcollectorv3.connectors.implementations.IntentEmitter;
-import eu.liveandgov.sensorcollectorv3.connectors.Pipeline;
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.ConnectorThread;
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.GpsCache;
+import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.LinkedSensorQueue;
+import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.sensorcollectorv3.human_activity_recognition.HarPipeline;
 import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
-import eu.liveandgov.sensorcollectorv3.streaming.ZmqStreamer;
-import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.LinkedSensorQueue;
-import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
+import eu.liveandgov.sensorcollectorv3.persistence.PublicationPipeline;
+import eu.liveandgov.sensorcollectorv3.persistence.ZipFilePersistor;
 import eu.liveandgov.sensorcollectorv3.sensors.SensorSerializer;
 import eu.liveandgov.sensorcollectorv3.sensors.SensorThread;
+import eu.liveandgov.sensorcollectorv3.streaming.ZmqStreamer;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferManager;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferThreadPost;
+
+import static eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions.API_EXTENSIONS;
+import static eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
 
 public class ServiceSensorControl extends Service {
     // CONSTANTS
@@ -31,8 +37,11 @@ public class ServiceSensorControl extends Service {
     public static final String SENSOR_FILENAME = "sensor.ssf";
     public static final String STAGE_FILENAME = "sensor.stage.ssf";
 
+    private static final String SHARED_PREFS_NAME = "SensorCollectorPrefs";
+    private static final String PREF_ID = "userid";
+
     // REMARK:
-    // Need to put initialization to onCreate, since FilesDir is not avaialble
+    // Need to put initialization to onCreate, since FilesDir, etc. is not available
     // from a static context.
 
     // STATUS FLAGS
@@ -41,17 +50,21 @@ public class ServiceSensorControl extends Service {
     public boolean isHAR = false;
     public String userId = "";
 
-    // COMMUNICATION CHANNELS
+    // COMMUNICATION CHANNEL
     public SensorQueue sensorQueue;
+
+    // SENSOR CONSUMERS
     public Persistor persistor;
+    public Consumer<String> publisher;
     public Consumer<String> streamer;
-    public Pipeline<String, String> harPipeline;
+    public Consumer<String> harPipeline;
+    public GpsCache gpsCache;
 
     // THREADS
     public ConnectorThread connectorThread;
     public TransferManager transferManager;
     public MonitorThread monitorThread;
-    // Rem: Also SensorThread belongs here, but it is realized via static methods
+    // Rem: Also SensorThread would belong here, but it is realized via static methods
 
     /* CONSTRUCTOR */
     public ServiceSensorControl() {}
@@ -64,30 +77,45 @@ public class ServiceSensorControl extends Service {
         // Setup static variables
         GlobalContext.set(this);
 
+        // Set Default UserID to AndroidID
+        restoreUserId();
+
         // INITIALIZATIONS
-        final File sensorFile = new File(getFilesDir(), SENSOR_FILENAME);
-        final File stageFile  = new File(getFilesDir(), STAGE_FILENAME);
+        final File sensorFile   = new File(getFilesDir(), SENSOR_FILENAME);
+        final File stageFile    = new File(getFilesDir(), STAGE_FILENAME);
 
         // INIT COMMUNICATION CHANNELS
         sensorQueue = new LinkedSensorQueue();
-        persistor   = new FilePersistor(sensorFile);
         streamer    = new ZmqStreamer();
         harPipeline = new HarPipeline();
+        gpsCache    = new GpsCache();
+        persistor   = ZIPPED_PERSISTOR ?
+                    new ZipFilePersistor(sensorFile):
+                    new FilePersistor(sensorFile);
+
+        // EXTERNAL COMMUNICATION
+        publisher = new PublicationPipeline();
 
         // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
-        transferManager = new TransferThreadPost(persistor, stageFile);
+        transferManager = new TransferThreadPost(persistor, stageFile, ZIPPED_PERSISTOR);
         monitorThread   = new MonitorThread();
 
         // Setup sensor thread
         SensorThread.setup(sensorQueue);
 
-        // Connect sensorQueue to Consumers
-        connectorThread.addConsumer(persistor);
-        // streamer and harPipeline are added in the methods below
+        // Start Recording once consumers are added
+        connectorThread.registerNonEmptyCallback(new ConnectorThread.Callback() {
+            public void call() {
+                SensorThread.startAllRecording();
+            }
+        });
+        connectorThread.registerEmptyCallback(new ConnectorThread.Callback() {
+            public void call() {
+                SensorThread.stopAllRecording();
+            }
+        });
 
-        // Publish HAR results as intent
-        harPipeline.setConsumer(new IntentEmitter(IntentAPI.RETURN_ACTIVITY, IntentAPI.FIELD_ACTIVITY));
 
         // Setup monitoring thread
         monitorThread.registerMonitorable(connectorThread, "SampleCount");
@@ -96,9 +124,17 @@ public class ServiceSensorControl extends Service {
         monitorThread.registerMonitorable(sensorQueue, "Queue");
 
         // Start threads
-        SensorThread.start();
         connectorThread.start();
         monitorThread.start();
+        SensorThread.start();
+
+
+        // Connect Consumers to sensor thread
+        // More consumers are added dynamically below
+        // REMARK: addConsumer triggers startAllRecording event.
+        // This should be done once the SensorThread is already running.
+        if (API_EXTENSIONS) connectorThread.addConsumer(publisher);
+        if (API_EXTENSIONS) connectorThread.addConsumer(gpsCache);
 
         super.onCreate();
     }
@@ -121,7 +157,7 @@ public class ServiceSensorControl extends Service {
         }
 
         String action = intent.getAction();
-        Log.i(LOG_TAG, "Received intent with action " + action);
+        Log.d(LOG_TAG, "Received intent with action " + action);
 
         if (action == null) return START_STICKY;
 
@@ -149,6 +185,8 @@ public class ServiceSensorControl extends Service {
             doStopStreaming();
         } else if (action.equals(IntentAPI.ACTION_SET_ID)) {
             doSetId(intent.getStringExtra(IntentAPI.FIELD_USER_ID));
+        } else if (action.equals(ExtendedIntentAPI.ACTION_GET_GPS)) {
+            doSendGps();
         } else {
             Log.i(LOG_TAG, "Received unknown action " + action);
         }
@@ -180,16 +218,24 @@ public class ServiceSensorControl extends Service {
         connectorThread.addConsumer(streamer);
     }
 
-
     private void doSetId(String id) {
         Log.i(LOG_TAG, "Set id to:" + id);
+
+        // Update Shared Preferences
+        SharedPreferences settings = getSharedPreferences(SHARED_PREFS_NAME, 0);
+        if (settings == null) throw new IllegalStateException("Failed to load SharedPreferences");
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(PREF_ID, id);
+        editor.commit();
+
         userId = id;
-        doAnnotate("USER_ID=" + id);
+
+        doAnnotate("USER_ID SET TO: " + id);
     }
 
     private void doAnnotate(String tag) {
-        Log.i(LOG_TAG, "Adding annotation:" + tag);
-        String msg = SensorSerializer.parse(tag);
+        Log.d("AN", "Adding annotation:" + tag);
+        String msg = SensorSerializer.fromTag(tag);
         sensorQueue.push(msg);
     }
 
@@ -198,12 +244,23 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doDisableRecording() {
-        SensorThread.stopAllRecording();
+        // We have to push DisableRecording Intent directly to the persistor,
+        // since the message it will be still in the sensor queue when the persitor
+        // is turned off.
+        persistor.push(IntentAPI.VALUE_STOP_RECORDING);
+        doAnnotate(IntentAPI.VALUE_STOP_RECORDING);
+
+        connectorThread.removeConsumer(persistor);
+
         isRecording = false;
     }
 
     private void doEnableRecording() {
-        SensorThread.startAllRecording();
+        connectorThread.addConsumer(persistor);
+
+        // Send Annotation only after registering Persistor
+        doAnnotate(IntentAPI.VALUE_START_RECORDING);
+
         isRecording = true;
     }
 
@@ -220,5 +277,32 @@ public class ServiceSensorControl extends Service {
         intent.putExtra(IntentAPI.FIELD_USER_ID, userId);
         sendBroadcast(intent);
     }
+
+    private void doSendGps() {
+        if (gpsCache == null) Log.w(LOG_TAG, "gpsCache not initialized!");
+
+        Intent intent = new Intent(ExtendedIntentAPI.RETURN_GPS_SAMPLES);
+        intent.putExtra(ExtendedIntentAPI.FIELD_GPS_ENTRIES, gpsCache.getEntryString());
+
+        sendBroadcast(intent);
+
+        Log.i(LOG_TAG, "Sent gps message " + gpsCache.getEntryString());
+    }
+
+    // HELPER METHODS
+
+    /**
+     * Restore UserId from SharedPreferences.
+     * Uses AndoridID if no Id is found.
+     */
+    private void restoreUserId() {
+        String androidId = Settings.Secure.getString(GlobalContext.context.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        // Restore preferences
+        SharedPreferences settings = getSharedPreferences(SHARED_PREFS_NAME, 0);
+        if (settings == null) throw new IllegalStateException("Failed to load SharedPreferences");
+        userId = settings.getString(PREF_ID, androidId); // use androidId as default;
+    }
+
 
 }

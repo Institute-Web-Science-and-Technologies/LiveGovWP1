@@ -22,7 +22,8 @@ public class TimedQueue<V> {
     private final Queue<TimeQueueEntry<V>> queue = new LinkedList<TimeQueueEntry<V>>();
 
     /**
-     * Creates a TimedQueue of a given duration
+     * Creates a TimedQueue of a given duration.
+     * (The duration is a long value and measured in the same unit that is used by push)
      * @param duration
      */
     public TimedQueue(long duration) {

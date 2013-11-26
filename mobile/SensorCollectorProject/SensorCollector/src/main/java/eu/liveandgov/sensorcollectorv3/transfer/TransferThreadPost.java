@@ -7,10 +7,13 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -36,12 +39,14 @@ public class TransferThreadPost implements Runnable, TransferManager {
     private static final String uploadUrl = SensorCollectionOptions.UPLOAD_URL;
 
     private Persistor persistor;
+    private Boolean compressed;
 
     private File stageFile;
 
-    public TransferThreadPost(Persistor persistor, File stageFile) {
+    public TransferThreadPost(Persistor persistor, File stageFile, Boolean isCompressed) {
         this.stageFile = stageFile;
         this.persistor = persistor;
+        this.compressed = isCompressed;
         thread = new Thread(this);
     };
 
@@ -80,7 +85,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
         }
 
         // transfer staged File
-        success = transferFile(stageFile);
+        success = transferFile(stageFile, compressed);
         if (!success) { Log.i(LOG_TAG,"Transfer failed");  return; }
 
         // delete local copy
@@ -91,18 +96,19 @@ public class TransferThreadPost implements Runnable, TransferManager {
         Log.i(LOG_TAG, "Transfer finished successfully");
     }
 
-    public boolean transferFile(File file){
+    public boolean transferFile(File file, boolean compressed) {
         try {
             HttpClient      httpclient =    new DefaultHttpClient();
             HttpPost        httppost =      new HttpPost(uploadUrl);
-            MultipartEntity mEntity =       new MultipartEntity();
 
-            ContentBody fileBody = new FileBody(file);
-            mEntity.addPart("upfile", fileBody);
-            httppost.setEntity(mEntity);
+            MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
+            multipartEntityBuilder.addBinaryBody("upfile", file);
 
+            httppost.setEntity(multipartEntityBuilder.build());
+
+            httppost.addHeader("COMPRESSED", String.valueOf(compressed));
             httppost.addHeader("CHECKSUM", String.valueOf(file.length()));
-            httppost.addHeader("ID", GlobalContext.androidId );
+            httppost.addHeader("ID", GlobalContext.getUserId() );
 
             HttpResponse response = httpclient.execute(httppost);
             int status = response.getStatusLine().getStatusCode();
@@ -120,6 +126,10 @@ public class TransferThreadPost implements Runnable, TransferManager {
             return false;
         }
         return true;
+    }
+
+    public boolean transferFile(File file){
+        return transferFile(file, false);
     }
 
 

@@ -79,6 +79,18 @@
             android:layout_gravity="center"
             android:onClick="onHarButtonClick" />
 
+        <Button
+            android:id="@+id/sendSamples"
+            android:layout_height="fill_parent"
+            android:text="Send queued GPS Samples"
+            android:checked="false"
+            android:textOff="Start Streaming"
+            android:textOn="Stop Streaming"
+            android:layout_weight="0.23"
+            android:layout_width="fill_parent"
+            android:layout_gravity="center_horizontal"
+            android:onClick="onGpsButtonClick" />
+
         <TextView
             android:id="@+id/textView1"
             android:layout_width="wrap_content"

@@ -1,15 +1,20 @@
 package eu.liveandgov.sensorcollectorv3.human_activity_recognition;
 
+import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
+import eu.liveandgov.sensorcollectorv3.configuration.SsfFileFormat;
 import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
 import eu.liveandgov.sensorcollectorv3.connectors.Pipeline;
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.IntentEmitter;
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.Multiplexer;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.PrefixFilter;
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.SampleEmitter;
 
 /**
  * Pipeline class that consumes accelerometer values and produces an activity stream.
  *
  * Created by hartmann on 10/20/13.
  */
-public class HarPipeline extends Pipeline<String,String> {
+public class HarPipeline implements Consumer<String> {
 
     private final PrefixFilter filter;
     private final MotionSensorValueProducer parseProd;
@@ -27,7 +32,7 @@ public class HarPipeline extends Pipeline<String,String> {
         filter.setConsumer(parseProd);
 
         // Window
-        windowProducer = new WindowProducer(5000, 1000);
+        windowProducer = new WindowProducer(5000, 200);
         parseProd.setConsumer(windowProducer);
 
         // Feature
@@ -38,20 +43,18 @@ public class HarPipeline extends Pipeline<String,String> {
         classifyProducer = new ClassifyProducer();
         featureProducer.setConsumer(classifyProducer);
 
-        // REMARK:
-        // using classifyProduces.setConsumer(consumer) does not work here,
-        // since consumer = EmptyConsumer at this point in time.
+        // Multiplex samples, in order for multiple consumers to connect
+        Multiplexer<String> multiplexer = new Multiplexer<String>();
+        classifyProducer.setConsumer(multiplexer);
+
+        // Publish samples as Intent and as Sensor Sample.
+        multiplexer.addConsumer(new IntentEmitter(IntentAPI.RETURN_ACTIVITY, IntentAPI.FIELD_ACTIVITY));
+        multiplexer.addConsumer(new SampleEmitter(SsfFileFormat.SSF_ACTIVITY) );
     }
 
     @Override
     public void push(String m) {
         filter.push(m);
-    }
-
-    @Override
-    public void setConsumer(Consumer<String> consumer){
-        // Subscribe to outputs of our own consumer
-        classifyProducer.setConsumer(consumer);
     }
 
 }

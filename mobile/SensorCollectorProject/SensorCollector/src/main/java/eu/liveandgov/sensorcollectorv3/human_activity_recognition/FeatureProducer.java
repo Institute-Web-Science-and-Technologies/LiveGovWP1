@@ -17,8 +17,8 @@ class FeatureProducer extends Producer<FeatureVector> implements Consumer<Window
         vec.xVar = FeatureHelper.var(m.x);
         vec.yMean = FeatureHelper.mean(m.y);
         vec.yVar = FeatureHelper.var(m.y);
-        vec.yMean = FeatureHelper.mean(m.z);
-        vec.yVar = FeatureHelper.var(m.z);
+        vec.zMean = FeatureHelper.mean(m.z);
+        vec.zVar = FeatureHelper.var(m.z);
 
         float[] S2 = FeatureHelper.S2(m.x, m.y, m.z);
         vec.s2Mean = FeatureHelper.mean(S2);

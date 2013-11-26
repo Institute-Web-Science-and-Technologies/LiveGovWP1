@@ -35,7 +35,7 @@ import java.sql.Statement;
  *       exit;
  */
 public class PostgresqlDatabase extends Database {
-    Connection connection = null;
+    public Connection connection = null;
 
     public PostgresqlDatabase(String user, String password) {
         try {
@@ -49,6 +49,9 @@ public class PostgresqlDatabase extends Database {
             //  -> Java Build Path Entries
             //  -> Maven Dependencies
             Class.forName("org.postgresql.Driver");
+
+            // Add explicit reference to Driver class in order to automate import (e.g. for Maven/IntelliJ).
+            Log.Log("Using db Driver" + org.postgresql.Driver.class.getName());
 
         } catch (ClassNotFoundException e) {
 

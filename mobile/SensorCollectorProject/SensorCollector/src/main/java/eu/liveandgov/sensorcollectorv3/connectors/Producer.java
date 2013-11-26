@@ -1,30 +1,19 @@
 package eu.liveandgov.sensorcollectorv3.connectors;
 
+import eu.liveandgov.sensorcollectorv3.connectors.implementations.EmptyConsumer;
+
 /**
  * Producer objects register a consumer, that provided a push method.
- * Created by cehlen on 10/19/13.
+ *
+ * To be extended by an implementing class.
+ *
+ * @author cehlen, hartmann
  */
 public class Producer<T> {
-    protected Consumer<T> consumer = new EmpyConsumer<T>();
+    // Initialize an EmptyConsumer, so that push method can be called, without Exception.
+    protected Consumer<T> consumer = new EmptyConsumer<T>();
 
     public void setConsumer(Consumer<T> c) {
         consumer = c;
     }
-
-    /**
-     * Consumer that drops all messages. Serves as default value in class Producer class.
-     *
-     * TODO: It would be favorable to use a singleton here.
-     *
-     * Created by hartmann on 10/25/13.
-     */
-    public class EmpyConsumer<T> implements Consumer<T> {
-
-        @Override
-        public void push(T m) {
-            // do nothing
-        }
-
-    }
-
 }
