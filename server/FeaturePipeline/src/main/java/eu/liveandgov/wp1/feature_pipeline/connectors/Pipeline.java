@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.connectors;
+package eu.liveandgov.wp1.feature_pipeline.connectors;
 
 import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
 import eu.liveandgov.wp1.feature_pipeline.connectors.Producer;

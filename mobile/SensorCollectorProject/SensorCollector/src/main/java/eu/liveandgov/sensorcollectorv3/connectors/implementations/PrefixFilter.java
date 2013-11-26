@@ -3,8 +3,6 @@ package eu.liveandgov.sensorcollectorv3.connectors.implementations;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.liveandgov.sensorcollectorv3.connectors.Pipeline;
-
 /**
  * Pipeline class, that filters String messages by Prefix.
  *
@@ -12,7 +10,7 @@ import eu.liveandgov.sensorcollectorv3.connectors.Pipeline;
  *
  * Created by cehlen on 10/18/13.
  */
-public class PrefixFilter extends Pipeline<String, String> {
+public class PrefixFilter extends eu.liveandgov.wp1.feature_pipeline.connectors.Producer<String> implements eu.liveandgov.wp1.feature_pipeline.connectors.Consumer<String> {
     private static final String LOG_TAG = "PrefixFilter";
     private List<String> filterList;
 
