@@ -43,6 +43,13 @@ public class TimedQueue<V> {
         limitToSize(time);
     }
 
+    /**
+     * Simply clears the whole queue
+     */
+    public void clear() {
+        queue.clear();
+    }
+
 
     public ArrayList<V> toArrayList() {
         ArrayList<V> list = new ArrayList<V>();

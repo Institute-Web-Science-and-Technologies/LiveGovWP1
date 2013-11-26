@@ -3,6 +3,8 @@ package eu.liveandgov.wp1;
 import eu.liveandgov.wp1.database.DBHelper;
 import eu.liveandgov.wp1.human_activity_recognition.*;
 
+import java.util.List;
+
 //
 // To run this script locally open an ssh tunnel to the remote server:
 //
@@ -18,6 +20,7 @@ public class Main {
         // SETUP FeatureExtraction Pipeline
 
         DBHelper.connect("liveandgov", "liveandgov");
+
         TaggedMotionSensorValueProducer tmsvp = new TaggedMotionSensorValueProducer();
 
         TaggedWindowProducer wp = new TaggedWindowProducer(WINDOW_LENGTH_IN_MS, WINDOW_OVERLAP_IN_MS);
@@ -31,12 +34,24 @@ public class Main {
 
         // Start Classification
 
+
+        List<String> ids = DBHelper.getAllIds();
+        for (String id : ids) {
+            List<String> tags = DBHelper.getTagsForId(id);
+            for (String tag : tags) {
+                Log.Log("New tag/id: " + tag + " " + id);
+                tmsvp.getFromDatabase(tag, id);
+                wp.clear();
+            }
+        }
+        csvfp.close();
+        Log.Log("Global Count:" + tmsvp.globalCount);
         // TODO:
         // FOR ID IN TEST_TABLE:
         //     FOR TAG IN TEST_TABLE:
-                    tmsvp.getFromDatabase("running", "trst13");
-        //           RESET PIPELINE
-                    csvfp.close();
+
+//        //           RESET PIPELINE
+//
 
     }
 
