@@ -17,9 +17,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
 
 @WebServlet("/LiveAPI")
 public class LiveAPI extends HttpServlet {
@@ -30,14 +27,6 @@ public class LiveAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	// http://dl.dropboxusercontent.com/u/20567085/Mattersoft%20Live!%20interface%20description%20v1_6.pdf
 	private static final String REQUEST = "http://83.145.232.209:10001/?type=vehicles&lng1=20&lat1=60&lng2=30&lat2=70&online=1";
-	static long helsinkiTime;
-	static long startTime;
-	
-	public LiveAPI(){
-		super();
-        helsinkiTime = getLocalHelsinkiTime().getTime();
-        startTime = System.currentTimeMillis();
-	}
 	
 	public static List<VehicleInfo> getVehicles() throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(new URL(
@@ -53,20 +42,6 @@ public class LiveAPI extends HttpServlet {
 		return list;
 	}
 	
-	public static Date getLocalHelsinkiTime() {
-		try {
-			SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss Z"); 
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse("http://www.earthtools.org/timezone-1.1/60/25");
-			return ft.parse(doc.getElementsByTagName("isotime").item(0).getTextContent());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;		
-	}
-
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		
@@ -74,8 +49,8 @@ public class LiveAPI extends HttpServlet {
 		PrintWriter out = response.getWriter();		
 		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
 		ft.setTimeZone(TimeZone.getTimeZone( "Europe/Helsinki" ));
-		Date d = new Date(helsinkiTime + (System.currentTimeMillis() - startTime));
-		String ts = ft.format(d.getTime());
+		Date d = new Date();
+		String ts = ft.format(d);
 		String day = String.format(Locale.US,"%tA", d.getTime()).substring(0,3);
 		String json = "{\"vehicles\":[";
 		for (VehicleInfo o : getVehicles()) {
