@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
   <groupId>eu.liveandgov.wp1</groupId>
-  <artifactId>FeaturePipeline</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <artifactId>HumanActivityRecognitionLibrary</artifactId>
+  <version>1.0</version>
   <versioning>
     <versions>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
     </versions>
-    <lastUpdated>20131126203710</lastUpdated>
+    <lastUpdated>20131126230455</lastUpdated>
   </versioning>
 </metadata>
