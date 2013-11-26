@@ -1,7 +1,7 @@
 package eu.liveandgov.sensorcollectorv3.connectors.sensor_queue;
 
-import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
 import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
+import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
 
 /**
  * Created by hartmann on 10/2/13.

@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.human_activity_recognition.classifier;
+package eu.liveandgov.wp1.feature_pipeline.classifier;
 
 // Generated with Weka 3.6.10
 //
@@ -6,7 +6,8 @@ package eu.liveandgov.sensorcollectorv3.human_activity_recognition.classifier;
 //
 // Timestamp: Tue Nov 19 16:28:02 CET 2013
 
-import eu.liveandgov.sensorcollectorv3.human_activity_recognition.Activities;
+
+import eu.liveandgov.wp1.feature_pipeline.Activities;
 
 public class DecisionTree {
 

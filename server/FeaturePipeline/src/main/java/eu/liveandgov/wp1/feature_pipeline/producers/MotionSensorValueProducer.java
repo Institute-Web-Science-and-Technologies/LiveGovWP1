@@ -2,8 +2,8 @@ package eu.liveandgov.wp1.feature_pipeline.producers;
 
 import eu.liveandgov.wp1.feature_pipeline.Log;
 import eu.liveandgov.wp1.feature_pipeline.connectors.Producer;
+import eu.liveandgov.wp1.feature_pipeline.containers.MotionSensorValue;
 import eu.liveandgov.wp1.feature_pipeline.helper.database.DBHelper;
-import eu.liveandgov.wp1.feature_pipeline.containers.TaggedMotionSensorValue;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,7 +11,7 @@ import java.sql.SQLException;
 /**
  * Created by cehlen on 10/19/13.
  */
-public class TaggedMotionSensorValueProducer extends Producer<TaggedMotionSensorValue> {
+public class MotionSensorValueProducer extends Producer<MotionSensorValue> {
     public int globalCount = 0;
 
     public void getFromDatabase(String tag, String id) {
@@ -19,7 +19,7 @@ public class TaggedMotionSensorValueProducer extends Producer<TaggedMotionSensor
         try {
             int count = 0;
             while(rs.next()) {
-                TaggedMotionSensorValue tmsv = new TaggedMotionSensorValue();
+                MotionSensorValue tmsv = new MotionSensorValue();
                 tmsv.tag =  rs.getString("tag");
                 tmsv.id =   rs.getString("id");
                 tmsv.x =    rs.getFloat("x");

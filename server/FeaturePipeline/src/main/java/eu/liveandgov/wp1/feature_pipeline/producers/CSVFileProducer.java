@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.feature_pipeline.producers;
 
 import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
-import eu.liveandgov.wp1.feature_pipeline.containers.TaggedFeatureVector;
+import eu.liveandgov.wp1.feature_pipeline.containers.FeatureVector;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -14,7 +14,7 @@ import java.io.UnsupportedEncodingException;
  * Time: 15:58
  * To change this template use File | Settings | File Templates.
  */
-public class CSVFileProducer implements Consumer<TaggedFeatureVector> {
+public class CSVFileProducer implements Consumer<FeatureVector> {
 
     private final String FILE_PATH = "/tmp/HarFeatureTable.csv";
 
@@ -24,7 +24,7 @@ public class CSVFileProducer implements Consumer<TaggedFeatureVector> {
         super();
         try {
             printWriter = new PrintWriter(FILE_PATH, "UTF-8");
-            printWriter.println( TaggedFeatureVector.getCsvHead() );
+            printWriter.println( FeatureVector.getCsvHead() );
         } catch (FileNotFoundException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (UnsupportedEncodingException e) {
@@ -36,7 +36,7 @@ public class CSVFileProducer implements Consumer<TaggedFeatureVector> {
         printWriter.close();
     }
 
-    public void push(TaggedFeatureVector fv) {
+    public void push(FeatureVector fv) {
         printWriter.println( fv.toCSV() );
     }
 }

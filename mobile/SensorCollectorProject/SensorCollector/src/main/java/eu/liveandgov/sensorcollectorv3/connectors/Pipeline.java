@@ -1,5 +1,8 @@
 package eu.liveandgov.sensorcollectorv3.connectors;
 
+import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
+import eu.liveandgov.wp1.feature_pipeline.connectors.Producer;
+
 /**
  * Abstract class providing Producer and Consumer methods
  *

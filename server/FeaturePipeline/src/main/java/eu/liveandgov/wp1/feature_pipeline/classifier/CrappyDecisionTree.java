@@ -1,6 +1,6 @@
-package eu.liveandgov.sensorcollectorv3.human_activity_recognition.classifier;
+package eu.liveandgov.wp1.feature_pipeline.classifier;
 
-import eu.liveandgov.sensorcollectorv3.human_activity_recognition.Activities;
+import eu.liveandgov.wp1.feature_pipeline.Activities;
 
 /**
  * Created by cehlen on 10/19/13.

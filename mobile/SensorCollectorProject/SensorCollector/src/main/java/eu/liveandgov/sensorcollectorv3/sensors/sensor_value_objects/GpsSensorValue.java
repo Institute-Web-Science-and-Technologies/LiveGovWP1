@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.sensors;
+package eu.liveandgov.sensorcollectorv3.sensors.sensor_value_objects;
 
 /**
  * Created by hartmann on 11/14/13.

@@ -11,12 +11,11 @@ import java.io.File;
 
 import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
 import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
-import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.ConnectorThread;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.GpsCache;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.LinkedSensorQueue;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.sensorcollectorv3.human_activity_recognition.HarPipeline;
+import eu.liveandgov.sensorcollectorv3.human_activity_recognition.HarAdapter;
 import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
@@ -27,6 +26,7 @@ import eu.liveandgov.sensorcollectorv3.sensors.SensorThread;
 import eu.liveandgov.sensorcollectorv3.streaming.ZmqStreamer;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferManager;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferThreadPost;
+import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
 
 import static eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions.API_EXTENSIONS;
 import static eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
@@ -87,7 +87,7 @@ public class ServiceSensorControl extends Service {
         // INIT COMMUNICATION CHANNELS
         sensorQueue = new LinkedSensorQueue();
         streamer    = new ZmqStreamer();
-        harPipeline = new HarPipeline();
+        harPipeline = new HarAdapter();
         gpsCache    = new GpsCache();
         persistor   = ZIPPED_PERSISTOR ?
                     new ZipFilePersistor(sensorFile):

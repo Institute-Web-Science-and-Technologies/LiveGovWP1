@@ -5,7 +5,7 @@ import eu.liveandgov.wp1.feature_pipeline.helper.FeatureHelper;
 /**
  * Created by cehlen on 10/19/13.
  */
-public class TaggedFeatureVector {
+public class FeatureVector {
 
 
     public String tag;
@@ -31,7 +31,7 @@ public class TaggedFeatureVector {
 
     // TODO: Historgram Features
 
-    public TaggedFeatureVector(TaggedWindow m) {
+    public FeatureVector(TaggedWindow m) {
         tag = m.tag;
 
         xMean = FeatureHelper.mean(m.x);
@@ -61,4 +61,26 @@ public class TaggedFeatureVector {
             xMean, yMean, zMean, xVar, yVar, zVar, s2Mean, s2Var, tilt, energy, kurtosis, tag
         );
     }
+
+
+    // Needed for classification
+    public Object[] toWekaObjArr() {
+        Object r[] = new Object[11];
+        r[0] = (double)xMean;
+        // Currently we are using the SD because our first tree was using it
+        r[1] = (double)yMean; // THIS NEEDS TO BE SQRT FOR THE CRAPPY CLASSIFIER
+        r[2] = (double)zMean;
+        r[3] = (double)xVar;
+        r[4] = (double)yVar;
+        r[5] = (double)zVar;
+        r[6] = (double)s2Mean;
+        r[7] = (double)s2Var;
+        r[8] = (double)tilt;
+        r[9] = (double)energy;
+        r[10] = (double)kurtosis;
+
+        return r;
+
+    }
+
 }

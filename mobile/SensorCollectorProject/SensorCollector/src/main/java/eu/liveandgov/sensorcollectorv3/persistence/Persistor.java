@@ -1,11 +1,9 @@
 package eu.liveandgov.sensorcollectorv3.persistence;
 
-import android.provider.ContactsContract;
-
 import java.io.File;
 
-import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
 import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
+import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
 
 /**
  * Interface for persistence providers.

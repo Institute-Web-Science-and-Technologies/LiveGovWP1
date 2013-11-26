@@ -2,27 +2,32 @@ package eu.liveandgov.sensorcollectorv3.human_activity_recognition;
 
 import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
 import eu.liveandgov.sensorcollectorv3.configuration.SsfFileFormat;
-import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
 import eu.liveandgov.sensorcollectorv3.connectors.Pipeline;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.IntentEmitter;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.Multiplexer;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.PrefixFilter;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.SampleEmitter;
+import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
+import eu.liveandgov.wp1.feature_pipeline.containers.MotionSensorValue;
+import eu.liveandgov.wp1.feature_pipeline.producers.ClassifyProducer;
+import eu.liveandgov.wp1.feature_pipeline.producers.FeatureProducer;
+import eu.liveandgov.wp1.feature_pipeline.producers.WindowProducer;
 
 /**
  * Pipeline class that consumes accelerometer values and produces an activity stream.
  *
  * Created by hartmann on 10/20/13.
  */
-public class HarPipeline implements Consumer<String> {
+public class HarAdapter implements Consumer<String> {
 
     private final PrefixFilter filter;
     private final MotionSensorValueProducer parseProd;
     private final WindowProducer windowProducer;
     private final FeatureProducer featureProducer;
     private final ClassifyProducer classifyProducer;
+//    private final Pipeline<MotionSensorValue, String> harPipeline;
 
-    public HarPipeline(){
+    public HarAdapter(){
         // ACC filter
         filter = new PrefixFilter();
         filter.addFilter("ACC");
@@ -30,6 +35,10 @@ public class HarPipeline implements Consumer<String> {
         // Parser
         parseProd = new MotionSensorValueProducer();
         filter.setConsumer(parseProd);
+
+        // HAR
+//        harPipeline = new HarPipeline();
+//        harPipeline.setConsumer(parseProd);
 
         // Window
         windowProducer = new WindowProducer(5000, 200);

@@ -4,16 +4,15 @@ import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
-import java.nio.channels.Pipe;
 
 import eu.liveandgov.sensorcollectorv3.configuration.SsfFileFormat;
-import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.PrefixFilter;
+import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
 
 /**
  * Created by hartmann on 11/12/13.
  */
-public class PublicationPipeline implements Consumer<String>  {
+public class PublicationPipeline implements Consumer<String> {
 
     public static final String PUBLISH_FILENAME = "published.ssf";
 

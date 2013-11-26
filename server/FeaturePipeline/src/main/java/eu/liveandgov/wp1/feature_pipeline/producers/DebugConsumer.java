@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.feature_pipeline.producers;
 
 import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
-import eu.liveandgov.wp1.feature_pipeline.containers.TaggedFeatureVector;
+import eu.liveandgov.wp1.feature_pipeline.containers.FeatureVector;
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,9 +10,9 @@ import eu.liveandgov.wp1.feature_pipeline.containers.TaggedFeatureVector;
  * Time: 15:35
  * To change this template use File | Settings | File Templates.
  */
-public class DebugConsumer implements Consumer<TaggedFeatureVector> {
+public class DebugConsumer implements Consumer<FeatureVector> {
 
-    public void push(TaggedFeatureVector fv) {
+    public void push(FeatureVector fv) {
         System.out.println(String.format("Xmean: %f | Ymean: %f | Zmean: %f | Xvar: %f | Yvar: %f | Zvar: %f | s2Mean: %f | s2Var: %f",
                 fv.xMean, fv.yMean, fv.zMean, fv.xVar, fv.yVar, fv.zVar, fv.s2Mean, fv.s2Var));
     }

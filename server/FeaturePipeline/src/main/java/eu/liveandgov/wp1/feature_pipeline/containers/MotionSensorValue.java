@@ -1,6 +1,6 @@
 package eu.liveandgov.wp1.feature_pipeline.containers;
 
-public class TaggedMotionSensorValue {
+public class MotionSensorValue {
     public String type;
     public long time;
     public String id;

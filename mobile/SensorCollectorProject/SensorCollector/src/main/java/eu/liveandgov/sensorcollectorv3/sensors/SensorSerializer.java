@@ -3,7 +3,6 @@ package eu.liveandgov.sensorcollectorv3.sensors;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.location.Location;
-import android.provider.Settings;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
@@ -11,6 +10,9 @@ import com.google.android.gms.location.DetectedActivity;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
+import eu.liveandgov.sensorcollectorv3.sensors.sensor_value_objects.GpsSensorValue;
+import eu.liveandgov.wp1.feature_pipeline.containers.MotionSensorValue;
+
 import static eu.liveandgov.sensorcollectorv3.configuration.SsfFileFormat.*;
 
 /**

@@ -5,10 +5,10 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
 import eu.liveandgov.sensorcollectorv3.connectors.MultiProducer;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
+import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
 
 /**
  * Thread that actively polls a blocking queue and sends samples to a list of consumers.

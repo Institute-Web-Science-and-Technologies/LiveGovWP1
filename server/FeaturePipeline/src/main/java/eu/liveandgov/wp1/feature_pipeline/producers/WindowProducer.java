@@ -2,7 +2,7 @@ package eu.liveandgov.wp1.feature_pipeline.producers;
 
 import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
 import eu.liveandgov.wp1.feature_pipeline.connectors.Producer;
-import eu.liveandgov.wp1.feature_pipeline.containers.TaggedMotionSensorValue;
+import eu.liveandgov.wp1.feature_pipeline.containers.MotionSensorValue;
 import eu.liveandgov.wp1.feature_pipeline.containers.TaggedWindow;
 import eu.liveandgov.wp1.feature_pipeline.helper.TimedQueue;
 
@@ -11,21 +11,21 @@ import java.util.ArrayList;
 /**
  * Created by cehlen on 10/19/13.
  */
-public class TaggedWindowProducer extends Producer<TaggedWindow> implements Consumer<TaggedMotionSensorValue> {
+public class WindowProducer extends Producer<TaggedWindow> implements Consumer<MotionSensorValue> {
 
-    private TimedQueue<TaggedMotionSensorValue> queue;
+    private TimedQueue<MotionSensorValue> queue;
     private long windowSize;
     private long overlap;
     private long windowStart = -1;
     private long windowEnd = -1;
 
-    public TaggedWindowProducer(long windowSize, long overlap) {
+    public WindowProducer(long windowSize, long overlap) {
         this.windowSize = windowSize;
         this.overlap = overlap;
-        queue = new TimedQueue<TaggedMotionSensorValue>(windowSize);
+        queue = new TimedQueue<MotionSensorValue>(windowSize);
     }
 
-    public void push(TaggedMotionSensorValue m) {
+    public void push(MotionSensorValue m) {
         if(windowStart == -1) {
             windowStart = m.time;
             windowEnd = m.time + windowSize;
@@ -51,7 +51,7 @@ public class TaggedWindowProducer extends Producer<TaggedWindow> implements Cons
     private void createNewWindow() {
         TaggedWindow w = new TaggedWindow();
 
-        ArrayList<TaggedMotionSensorValue> values = queue.toArrayList();
+        ArrayList<MotionSensorValue> values = queue.toArrayList();
         w.x = new float[values.size()];
         w.y = new float[values.size()];
         w.z = new float[values.size()];

@@ -21,12 +21,12 @@ public class Main {
 
         DBHelper.connect("liveandgov", "liveandgov");
 
-        TaggedMotionSensorValueProducer sensorValueProducer = new TaggedMotionSensorValueProducer();
+        MotionSensorValueProducer sensorValueProducer = new MotionSensorValueProducer();
 
-        TaggedWindowProducer windowProducer = new TaggedWindowProducer(WINDOW_LENGTH_IN_MS, WINDOW_OVERLAP_IN_MS);
+        WindowProducer windowProducer = new WindowProducer(WINDOW_LENGTH_IN_MS, WINDOW_OVERLAP_IN_MS);
         sensorValueProducer.setConsumer(windowProducer);
 
-        TaggedFeatureProducer featureProducer = new TaggedFeatureProducer();
+        FeatureProducer featureProducer = new FeatureProducer();
         windowProducer.setConsumer(featureProducer);
 
         CSVFileProducer csvFileProducer = new CSVFileProducer();

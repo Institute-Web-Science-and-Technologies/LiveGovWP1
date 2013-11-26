@@ -1,5 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.human_activity_recognition;
-
+package eu.liveandgov.wp1.feature_pipeline;
 /**
  * This class contains all activities that will be recognized with the HAR component.
  *

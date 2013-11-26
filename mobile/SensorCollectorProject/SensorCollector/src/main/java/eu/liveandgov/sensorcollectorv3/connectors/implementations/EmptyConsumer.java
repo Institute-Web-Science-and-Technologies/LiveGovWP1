@@ -1,6 +1,6 @@
 package eu.liveandgov.sensorcollectorv3.connectors.implementations;
 
-import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
+import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
 
 /**
  * Consumer that drops all messages. Serves as default value in class Producer class.
