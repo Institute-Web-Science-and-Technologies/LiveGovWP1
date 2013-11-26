@@ -10,60 +10,37 @@
 
     <packaging>jar</packaging>
 
+    <repositories>
+        <repository>
+            <id>LiveGovWp1-mvn-repo</id>
+            <url>https://raw.github.com/HeinrichHartmann/LiveGovWp1/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <dependencies>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.0</version>
-        </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>9.2-1003-jdbc4</version>
         </dependency>
+        <dependency>
+            <groupId>org.jeromq</groupId>
+            <artifactId>jeromq</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.liveandgov.wp1</groupId>
+            <artifactId>HumanActivityRecognitionLibrary</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
-
-    <!--http://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github-->
-    <distributionManagement>
-        <repository>
-            <id>internal.repo</id>
-            <name>Temporary Staging Repository</name>
-            <url>file://${project.build.directory}/mvn-repo</url>
-        </repository>
-    </distributionManagement>
-
-    <properties>
-        <!-- github server corresponds to entry in ~/.m2/settings.xml -->
-        <github.global.server>github</github.global.server>
-    </properties>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>com.github.github</groupId>
-                <artifactId>site-maven-plugin</artifactId>
-                <version>0.9</version>
-                <configuration>
-                    <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
-                    <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
-                    <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
-                    <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
-                    <includes><include>**/*</include></includes>
-                    <repositoryName>LiveGovWp1</repositoryName>      <!-- github repo name -->
-                    <repositoryOwner>HeinrichHartmann</repositoryOwner>    <!-- github username  -->
-                </configuration>
-                <executions>
-                    <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
-                    <execution>
-                        <goals>
-                            <goal>site</goal>
-                        </goals>
-                        <phase>deploy</phase>
-                    </execution>
-                </executions>
-            </plugin>
-
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -75,4 +52,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

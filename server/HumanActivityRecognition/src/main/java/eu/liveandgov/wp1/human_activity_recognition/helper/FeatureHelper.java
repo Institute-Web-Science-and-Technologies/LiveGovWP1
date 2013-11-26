@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.feature_pipeline.helper;
+package eu.liveandgov.wp1.human_activity_recognition.helper;
 
 /**
  * Created with IntelliJ IDEA.

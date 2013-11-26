@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.feature_pipeline.producers;
 
-import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
-import eu.liveandgov.wp1.feature_pipeline.containers.FeatureVector;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
+import eu.liveandgov.wp1.human_activity_recognition.containers.FeatureVector;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;

@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.feature_pipeline.helper.database;
 
 import eu.liveandgov.wp1.feature_pipeline.Log;
-import eu.liveandgov.wp1.feature_pipeline.containers.Window;
+import eu.liveandgov.wp1.human_activity_recognition.containers.Window;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

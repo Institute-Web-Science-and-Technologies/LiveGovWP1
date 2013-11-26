@@ -1,9 +1,9 @@
 package eu.liveandgov.wp1.feature_pipeline.producers;
 
 import eu.liveandgov.wp1.feature_pipeline.Log;
-import eu.liveandgov.wp1.feature_pipeline.connectors.Producer;
-import eu.liveandgov.wp1.feature_pipeline.containers.MotionSensorValue;
 import eu.liveandgov.wp1.feature_pipeline.helper.database.DBHelper;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Producer;
+import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

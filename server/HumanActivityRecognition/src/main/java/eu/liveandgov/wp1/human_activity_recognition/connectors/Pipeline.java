@@ -1,7 +1,4 @@
-package eu.liveandgov.wp1.feature_pipeline.connectors;
-
-import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
-import eu.liveandgov.wp1.feature_pipeline.connectors.Producer;
+package eu.liveandgov.wp1.human_activity_recognition.connectors;
 
 /**
  * Abstract class providing Producer and Consumer methods

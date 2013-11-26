@@ -1,6 +1,6 @@
-package eu.liveandgov.wp1.feature_pipeline.classifier;
+package eu.liveandgov.wp1.human_activity_recognition.classifier;
 
-import eu.liveandgov.wp1.feature_pipeline.Activities;
+import eu.liveandgov.wp1.human_activity_recognition.Activities;
 
 /**
  * Created by cehlen on 10/19/13.

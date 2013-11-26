@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.feature_pipeline.connectors;
+package eu.liveandgov.wp1.human_activity_recognition.connectors;
 
 /**
  * Producer objects register a consumer, that provided a push method.

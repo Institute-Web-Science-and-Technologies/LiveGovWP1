@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.feature_pipeline.connectors;
+package eu.liveandgov.wp1.human_activity_recognition.connectors;
 
 /**
  * A consumer accepts messages and performes actions on it.

@@ -1,11 +1,11 @@
-package eu.liveandgov.wp1.feature_pipeline;
+package eu.liveandgov.wp1.human_activity_recognition;
 
-import eu.liveandgov.wp1.feature_pipeline.connectors.Consumer;
-import eu.liveandgov.wp1.feature_pipeline.connectors.Pipeline;
-import eu.liveandgov.wp1.feature_pipeline.containers.MotionSensorValue;
-import eu.liveandgov.wp1.feature_pipeline.producers.ClassifyProducer;
-import eu.liveandgov.wp1.feature_pipeline.producers.FeatureProducer;
-import eu.liveandgov.wp1.feature_pipeline.producers.WindowProducer;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Pipeline;
+import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
+import eu.liveandgov.wp1.human_activity_recognition.producers.ClassifyProducer;
+import eu.liveandgov.wp1.human_activity_recognition.producers.FeatureProducer;
+import eu.liveandgov.wp1.human_activity_recognition.producers.WindowProducer;
 
 /**
  * Pipeline class that consumes accelerometer values and produces an activity stream.
@@ -39,5 +39,4 @@ public class HarPipeline extends Pipeline<MotionSensorValue, String> {
     public void setConsumer(Consumer<String> c) {
         classifyProducer.setConsumer(c);
     }
-
 }

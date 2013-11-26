@@ -1,6 +1,6 @@
-package eu.liveandgov.wp1.feature_pipeline.containers;
+package eu.liveandgov.wp1.human_activity_recognition.containers;
 
-import eu.liveandgov.wp1.feature_pipeline.helper.FeatureHelper;
+import eu.liveandgov.wp1.human_activity_recognition.helper.FeatureHelper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

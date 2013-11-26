@@ -2,6 +2,8 @@ package eu.liveandgov.wp1.feature_pipeline;
 
 import eu.liveandgov.wp1.feature_pipeline.helper.database.DBHelper;
 import eu.liveandgov.wp1.feature_pipeline.producers.*;
+import eu.liveandgov.wp1.human_activity_recognition.producers.FeatureProducer;
+import eu.liveandgov.wp1.human_activity_recognition.producers.WindowProducer;
 
 import java.util.List;
 
@@ -10,7 +12,7 @@ import java.util.List;
 //
 // ssh -L 5432:localhost:5432 user@RemoteHost
 //
-public class Main {
+public class FeatureExport {
 
     public static int WINDOW_LENGTH_IN_MS = 5 * 1000;
     public static int WINDOW_OVERLAP_IN_MS = WINDOW_LENGTH_IN_MS - 20;

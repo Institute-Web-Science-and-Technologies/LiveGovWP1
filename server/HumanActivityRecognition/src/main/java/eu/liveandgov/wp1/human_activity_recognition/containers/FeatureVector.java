@@ -1,12 +1,11 @@
-package eu.liveandgov.wp1.feature_pipeline.containers;
+package eu.liveandgov.wp1.human_activity_recognition.containers;
 
-import eu.liveandgov.wp1.feature_pipeline.helper.FeatureHelper;
+import eu.liveandgov.wp1.human_activity_recognition.helper.FeatureHelper;
 
 /**
  * Created by cehlen on 10/19/13.
  */
 public class FeatureVector {
-
 
     public String tag;
 

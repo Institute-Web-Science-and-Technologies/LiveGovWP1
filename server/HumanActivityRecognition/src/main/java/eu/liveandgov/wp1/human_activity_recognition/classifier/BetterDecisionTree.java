@@ -4,10 +4,10 @@
 //
 // Timestamp: Tue Nov 12 16:35:23 CET 2013
 
-package eu.liveandgov.wp1.feature_pipeline.classifier;
+package eu.liveandgov.wp1.human_activity_recognition.classifier;
 
 
-import eu.liveandgov.wp1.feature_pipeline.Activities;
+import eu.liveandgov.wp1.human_activity_recognition.Activities;
 
 public class BetterDecisionTree {
 
