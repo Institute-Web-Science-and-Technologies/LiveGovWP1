@@ -71,6 +71,12 @@ public class ZipFilePersistor implements Persistor {
     }
 
     @Override
+    public void deleteSamples() {
+        closeLogFile();
+        logFile.delete();
+    }
+
+    @Override
     public String getStatus() {
         return "File size: " + logFile.length()/1024 + "kb. Samples written: " + sampleCount;
     }
