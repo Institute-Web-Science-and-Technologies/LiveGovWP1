@@ -3,12 +3,17 @@ package eu.liveandgov.wp1.sensor_miner.sensors;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.location.Location;
+import android.net.wifi.ScanResult;
 import android.os.Build;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.text.StrBuilder;
+import org.json.JSONStringer;
+
+import java.util.List;
 
 import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
 import eu.liveandgov.wp1.sensor_miner.GlobalContext;
@@ -97,6 +102,32 @@ public class SensorSerializer {
             return fillStringFloats(SSF_ROTATION, timestamp_ms, GlobalContext.getUserId(), event.values);
         }
         return "ERR," + timestamp_ms + ",,Unknown sensor " + sensorType;
+    }
+
+    public static String fromScanResults(long timestamp_ms, List<ScanResult> scanResults) {
+        StringBuilder builder = new StringBuilder();
+        boolean separate = false;
+        for(ScanResult scanResult : scanResults)
+        {
+            if(separate)
+            {
+                // Separate entries of the scan result list by semicolon
+                builder.append(';');
+            }
+
+            // Write each scan result as a tuple of Escaped SSID/Escaped BSSID/Frequency in MHz/Level in dBm
+            builder.append( "\"" + StringEscapeUtils.escapeJava(scanResult.SSID) + "\"");
+            builder.append('/');
+            builder.append( "\"" + StringEscapeUtils.escapeJava(scanResult.BSSID) + "\"");
+            builder.append('/');
+            builder.append(scanResult.frequency);
+            builder.append('/');
+            builder.append(scanResult.level);
+
+            separate = true;
+        }
+
+         return fillString(SSF_WIFI, timestamp_ms, GlobalContext.getUserId(), builder.toString());
     }
 
     public static String fromLocation(Location location) {
