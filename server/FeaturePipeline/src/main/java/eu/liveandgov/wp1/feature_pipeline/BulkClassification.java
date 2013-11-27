@@ -22,7 +22,7 @@ public class BulkClassification {
 
         MotionSensorValueProducer sensorValueProducer = new MotionSensorValueProducer();
 
-        HarPipeline harPipeline = new HarPipeline();
+        HarPipeline harPipeline = new HarPipeline(1000);
         sensorValueProducer.setConsumer(harPipeline);
 
         harPipeline.setConsumer(new Consumer<String>() {

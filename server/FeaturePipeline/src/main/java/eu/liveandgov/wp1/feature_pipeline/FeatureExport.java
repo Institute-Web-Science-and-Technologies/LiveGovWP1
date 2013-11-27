@@ -39,6 +39,7 @@ public class FeatureExport {
         for (String id : ids) {
             List<String> tags = DBHelper.getTagsForId(id);
             for (String tag : tags) {
+                if (tag.equals(Activities.STAIRS)) continue;
                 Log.Log("New tag/id: " + tag + " " + id);
                 sensorValueProducer.getFromDatabase(tag, id);
                 windowProducer.clear();
