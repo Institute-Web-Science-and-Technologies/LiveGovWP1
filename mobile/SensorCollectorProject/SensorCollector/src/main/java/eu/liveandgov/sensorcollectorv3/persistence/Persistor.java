@@ -24,4 +24,9 @@ public interface Persistor extends Consumer<String>, Monitorable {
      * Return true if there are samples in store.
      */
     boolean hasSamples();
+
+    /**
+     * Delete all stored samples
+     */
+    void deleteSamples();
 }

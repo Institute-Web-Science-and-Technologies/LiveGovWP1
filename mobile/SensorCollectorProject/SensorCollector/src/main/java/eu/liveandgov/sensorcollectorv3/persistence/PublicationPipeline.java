@@ -38,4 +38,8 @@ public class PublicationPipeline implements Consumer<String>  {
     public void push(String message) {
         filter.push(message);
     }
+
+    public void deleteSamples() {
+        persistor.deleteSamples();
+    }
 }

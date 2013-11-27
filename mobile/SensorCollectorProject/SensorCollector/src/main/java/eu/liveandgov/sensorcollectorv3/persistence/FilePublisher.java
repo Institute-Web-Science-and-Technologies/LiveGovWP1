@@ -17,7 +17,7 @@ public class FilePublisher extends FilePersistor {
     @Override
     public synchronized void push(String s) {
         super.push(s);
-        Log.i("PUB", "Writing messsage:" + s);
+        Log.i("PUBF", "Writing messsage:" + s);
 
         try {
             super.fileWriter.flush();

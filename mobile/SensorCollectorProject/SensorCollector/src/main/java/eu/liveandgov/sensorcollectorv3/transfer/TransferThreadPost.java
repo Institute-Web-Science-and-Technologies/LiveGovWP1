@@ -68,6 +68,11 @@ public class TransferThreadPost implements Runnable, TransferManager {
     }
 
     @Override
+    public void deleteStagedSamples() {
+        stageFile.delete();
+    }
+
+    @Override
     public String getStatus() {
         return "StageFile: " + stageFile.length()/1024 + "kb. " +
                (isTransferring() ? "transferring" : "waiting");

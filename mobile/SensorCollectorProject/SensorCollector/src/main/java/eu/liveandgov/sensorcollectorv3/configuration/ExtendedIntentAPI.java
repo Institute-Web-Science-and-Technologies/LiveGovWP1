@@ -30,6 +30,12 @@ public class ExtendedIntentAPI {
     public static final String FIELD_GPS_ENTRY = "value";
 
     /**
+     * Delete all samples stored on the device.
+     */
+    public static final String ACTION_DELETE_SAMPLES = "eu.liveandgov.sensorcollectorapi.intent.action.DELETE_SAMPLES";
+
+
+    /**
      * @Deprecated Send Log messages to the GUI
      *
      * The {@code RETURN_LOG} intent contains a "message" field.
