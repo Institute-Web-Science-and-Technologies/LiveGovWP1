@@ -32,6 +32,8 @@ public class SensorCollectionOptions {
     public static final boolean REC_GSM = true;    // GSM
     public static final boolean REC_BLT = true;    // Bluetooth
 
+    public static final int WIFI_SCAN_DELAY = 20000;
+
     /**
      * Record Activity using the new Google Activity API
      */
