@@ -15,6 +15,7 @@ import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.ActivityHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.LocationHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.MotionSensorHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.SensorHolder;
+import eu.liveandgov.sensorcollectorv3.sensors.sensor_producers.WifiHolder;
 
 
 /**
@@ -94,6 +95,8 @@ public class SensorThread implements Runnable {
         setupMotionSensor(Sensor.TYPE_MAGNETIC_FIELD,       SensorCollectionOptions.REC_MAGNETOMETER);
         setupMotionSensor(Sensor.TYPE_ROTATION_VECTOR,      SensorCollectionOptions.REC_ROTATION);
 
+        if(SensorCollectionOptions.REC_WIFI) setupWifiUpdate(SensorCollectionOptions.WIFI_SCAN_DELAY);
+
         if (SensorCollectionOptions.REC_GPS) setupLocationUpdate();
         if (SensorCollectionOptions.REC_G_ACT) setupActivityUpdate();
     }
@@ -124,6 +127,12 @@ public class SensorThread implements Runnable {
     private void setupActivityUpdate() {
         Log.i(LOG_TAG, "Registering Listener for ACTIVITY");
         ActivityHolder holder = new ActivityHolder();
+        activeSensors.add(holder);
+    }
+
+    private void setupWifiUpdate(int delay) {
+        Log.i(LOG_TAG, "Registering Listener for Wifi");
+        WifiHolder holder = new WifiHolder(sensorQueue, delay, sensorHandler);
         activeSensors.add(holder);
     }
 }
