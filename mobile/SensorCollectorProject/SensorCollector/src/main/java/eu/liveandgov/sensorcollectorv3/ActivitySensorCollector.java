@@ -16,6 +16,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
+
 import static eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI.*;
 import static eu.liveandgov.sensorcollectorv3.configuration.IntentAPI.*;
 
@@ -74,7 +76,7 @@ public class ActivitySensorCollector extends Activity {
 
         // Setup Transfer Progress Bar
         transferProgressBar = (ProgressBar) findViewById(R.id.transferProgress);
-        // transferProgressBar.setVisibility(View.INVISIBLE);
+        transferProgressBar.setIndeterminate(false);
 
         // Setup Annotation Text
         annotationText = (EditText) findViewById(R.id.annotationText);
@@ -155,7 +157,6 @@ public class ActivitySensorCollector extends Activity {
         startService(intent);
     }
 
-
     public void onIdButtonClick(View view) {
         Intent intent = new Intent(this, ServiceSensorControl.class);
         intent.setAction(ACTION_SET_ID);
@@ -185,6 +186,18 @@ public class ActivitySensorCollector extends Activity {
             intent.setAction(ACTION_STOP_HAR);
             startService(intent);
         }
+    }
+
+    public void onGpsButtonClick(View view){
+        Intent intent = new Intent(this, ServiceSensorControl.class);
+        intent.setAction(ExtendedIntentAPI.ACTION_GET_GPS);
+        startService(intent);
+    }
+
+    public void onDeleteButtonClick(View view){
+        Intent intent = new Intent(this, ServiceSensorControl.class);
+        intent.setAction(ExtendedIntentAPI.ACTION_DELETE_SAMPLES);
+        startService(intent);
     }
 
     /* HANDLE RETURN INTENTS */
@@ -280,22 +293,22 @@ public class ActivitySensorCollector extends Activity {
             harButton.setChecked(false);
         }
 
-        logStatus(intent);
+        // logStatus(intent);
     }
 
     private void logStatus(Intent intent) {
-        Log.i("STATUS", "SAMPLING:       " + intent.getBooleanExtra(FIELD_SAMPLING, false));
-        Log.i("STATUS", "TRANSFERRING:   " + intent.getBooleanExtra(FIELD_TRANSFERRING, false));
-        Log.i("STATUS", "SAMPLES_STORED: " + intent.getBooleanExtra(FIELD_SAMPLES_STORED,false));
-        Log.i("STATUS", "HAR:            " + intent.getBooleanExtra(FIELD_HAR,false));
-        Log.i("STATUS", "ID:             " + intent.getStringExtra(FIELD_ID));
+        Log.d("STATUS", "SAMPLING:       " + intent.getBooleanExtra(FIELD_SAMPLING, false));
+        Log.d("STATUS", "TRANSFERRING:   " + intent.getBooleanExtra(FIELD_TRANSFERRING, false));
+        Log.d("STATUS", "SAMPLES_STORED: " + intent.getBooleanExtra(FIELD_SAMPLES_STORED,false));
+        Log.d("STATUS", "HAR:            " + intent.getBooleanExtra(FIELD_HAR,false));
+        Log.d("STATUS", "ID:             " + intent.getStringExtra(FIELD_ID));
     }
 
     /**
      * Spawn new thread that request status updates in regular intervals.
      */
     private void runStatusLoop() {
-        final int INTERVAL = 5000; // in ms;
+        final int INTERVAL = 1000; // in ms;
 
         new Thread(new Runnable() {
             @Override

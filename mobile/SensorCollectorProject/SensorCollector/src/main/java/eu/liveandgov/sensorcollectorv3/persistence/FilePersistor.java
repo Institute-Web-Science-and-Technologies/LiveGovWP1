@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
+
 /**
  * Persistor class that writes samples into a log file.
  *
@@ -14,10 +16,9 @@ import java.io.IOException;
  */
 public class FilePersistor implements Persistor {
     public static final String LOG_TAG = "FP";
-    public static final String FILENAME = "sensor.log";
 
     private File logFile;
-    private BufferedWriter fileWriter;
+    protected BufferedWriter fileWriter;
     private long sampleCount = 0L;
 
     public FilePersistor(File logFile) {
@@ -27,14 +28,15 @@ public class FilePersistor implements Persistor {
 
     @Override
     public synchronized void push(String s) {
-        if (fileWriter == null) {
-            Log.v(LOG_TAG, "Blocked write event");
-            return;
-        }
-
         try {
+            if (fileWriter == null) {
+                Log.v(LOG_TAG, "Blocked write event");
+                return;
+            }
+
             fileWriter.write(s + "\n");
             sampleCount ++;
+
         } catch (IOException e) {
             Log.e(LOG_TAG,"Cannot write file.");
             e.printStackTrace();
@@ -67,6 +69,13 @@ public class FilePersistor implements Persistor {
     }
 
     @Override
+    public void deleteSamples() {
+        closeLogFile();
+        if (logFile.exists()) logFile.delete();
+        openLogFileOverwrite();
+    }
+
+    @Override
     public String getStatus() {
         return "File size: " + logFile.length()/1024 + "kb. Samples written: " + sampleCount;
     }
@@ -92,6 +101,8 @@ public class FilePersistor implements Persistor {
     }
 
     private boolean closeLogFile() {
+        if (fileWriter == null) return true; // already closed
+
         try {
             fileWriter.close();
         } catch (IOException e) {
@@ -101,4 +112,5 @@ public class FilePersistor implements Persistor {
         fileWriter = null;
         return true;
     }
+
 }

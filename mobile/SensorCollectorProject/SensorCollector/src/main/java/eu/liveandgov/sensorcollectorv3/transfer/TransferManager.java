@@ -26,4 +26,6 @@ public interface TransferManager extends Monitorable {
      * @return samplesStaged
      */
     boolean hasStagedSamples();
+
+    void deleteStagedSamples();
 }

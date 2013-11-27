@@ -13,6 +13,8 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * User: hartmann
@@ -41,29 +43,38 @@ public class BatchInserter {
     /**
      * Insert samples form ssf file into database
      *
+     *
      * @param db            database to insert samples
-     * @param ssfFile       ssfFile to read samples from
      * @return count        number of rows inserted
      * @throws IOException  thrown when error reading the file
      * @throws SQLException thrown on error writing the database
      */
-    public static int batchInsertFile(PostgresqlDatabase db, File ssfFile) throws IOException, SQLException {
+    public static int batchInsertFile(PostgresqlDatabase db, BufferedReader reader) throws IOException, SQLException {
 
-        BufferedReader reader = new BufferedReader(new FileReader(ssfFile));
         BatchInserter batchInsert = new BatchInserter(db);
 
         int count = 0;
-        while (reader.ready()) {
-            String line = reader.readLine();
+        String line = "";
+
+        while ((line = reader.readLine()) != null) {
             try {
+
                 SensorValueInterface SVO = SensorValueFactory.parse(line);
+
+                if (SVO == null) {
+                    // sensor type not implemented, yet
+                    continue;
+                }
+
                 batchInsert.add(SVO);
                 if (++count % 1000 == 0) batchInsert.executeBatch();
-
             } catch (ParseException e) {
                 Log.error("Error reading line: " + line,e);
             } catch (SQLException e) {
                 Log.error("Error writing to db: " + line,e);
+            } catch (NullPointerException e) {
+                Log.error("Something odd went wrong:" + line, e);
+                break;
             }
         }
 
@@ -120,7 +131,8 @@ public class BatchInserter {
             ps.setFloat(5, grasv.z);
             ps.addBatch();
         } else {
-            throw new IllegalArgumentException("Sensor Type " + type + " not supported. SVO:" + svo.toSSF());
+            // throw new IllegalArgumentException("Sensor Type " + type + " not supported. SVO:" + svo.toSSF());
+            Log.warn("Sensortype " + type + "not supported, yet. Found in " + svo.toSSF() );
         }
 
     }

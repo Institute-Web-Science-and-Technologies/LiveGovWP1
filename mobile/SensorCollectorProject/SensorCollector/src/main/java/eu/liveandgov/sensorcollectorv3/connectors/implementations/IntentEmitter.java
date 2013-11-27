@@ -1,9 +1,10 @@
 package eu.liveandgov.sensorcollectorv3.connectors.implementations;
 
 import android.content.Intent;
+import android.util.Log;
 
 import eu.liveandgov.sensorcollectorv3.GlobalContext;
-import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 
 /**
  * Consumer that sends out received messages as broadcast intents.
@@ -24,7 +25,7 @@ public class IntentEmitter implements Consumer<String> {
 
     @Override
     public void push(String m) {
-        // Log.i("EM", "Sending out intent action:" + action + " - field:" + field);
+        Log.d("EM", "Sending out intent action:" + action + " \n " + field + ":" + m );
         Intent intent = new Intent(action);
         intent.putExtra(field, m);
         GlobalContext.context.sendBroadcast(intent);

@@ -1,3 +1,13 @@
+/mobile/SensorCollector_V1.9_Snapshot.zip
+/server/NodeInspectionFrontEnd/.idea/.name
+/server/NodeInspectionFrontEnd/.idea/encodings.xml
+/server/NodeInspectionFrontEnd/.idea/misc.xml
+/server/NodeInspectionFrontEnd/.idea/modules.xml
+/server/NodeInspectionFrontEnd/.idea/scopes/scope_settings.xml
+/server/NodeInspectionFrontEnd/.idea/vcs.xml
+/mobile/SensorCollectorProject/.idea/libraries/commons_lang_2_3.xml
+/mobile/SensorCollectorProject/.idea/libraries/httpcore_4_3_beta2.xml
+/mobile/SensorCollectorProject/.idea/libraries/httpmime_4_3_beta2.xml
 #
 # JAVA
 #
@@ -6,7 +16,7 @@
 *.class
 
 # Package Files 
-*.jar
+# *.jar
 *.war
 *.ear
 
@@ -73,3 +83,6 @@ workspace.xml
 tasks.xml
 *.iml
 
+server/NodeInspectionFrontEnd/.idea
+mobile/SensorCollectorProject/.idea
+*.zip

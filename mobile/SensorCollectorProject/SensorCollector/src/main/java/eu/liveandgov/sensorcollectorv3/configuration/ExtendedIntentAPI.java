@@ -6,7 +6,6 @@ package eu.liveandgov.sensorcollectorv3.configuration;
  * Created by hartmann on 10/26/13.
  */
 public class ExtendedIntentAPI {
-
     /**
      * Stream Sensor Samples to the remote server (using zmq).
      */
@@ -14,6 +13,27 @@ public class ExtendedIntentAPI {
     public static String STOP_STREAMING = "eu.liveandgov.sensorminingapi.intent.action.STOP_STREAMING";
     // this is part of the GET_STATUS INTENT
     public static final String FIELD_STREAMING = "streaming";
+
+    /**
+     * Get latest GPS samples
+     *
+     * Returns the last captured GPS samples, for use in the Service Line Detection service.
+     */
+    public static final String ACTION_GET_GPS = "eu.liveandgov.sensorminingapi.intent.action.GET_GPS";
+    public static final String RETURN_GPS_SAMPLES = "eu.liveandgov.sensorminingapi.intent.return.GET_GPS";
+    public static final String FIELD_GPS_ENTRIES = "entries";
+
+    /**
+     * Get all recorded GPS samples
+     */
+    public static final String RETURN_GPS_SAMPLE = "eu.liveandgov.sensorminingapi.intent.return.SINGLE_GPS";
+    public static final String FIELD_GPS_ENTRY = "value";
+
+    /**
+     * Delete all samples stored on the device.
+     */
+    public static final String ACTION_DELETE_SAMPLES = "eu.liveandgov.sensorcollectorapi.intent.action.DELETE_SAMPLES";
+
 
     /**
      * @Deprecated Send Log messages to the GUI
@@ -24,16 +44,4 @@ public class ExtendedIntentAPI {
     public static final String LOGGING_DISABLE = "eu.liveandgov.sensorcollectorapi.intent.action.LOGGING_DISABLE";
     public static final String RETURN_LOG = "eu.liveandgov.sensorcollectorapi.intent.return.LOG";
     public static final String FIELD_MESSAGE = "message";
-
-
-    /**
-     * Get latest GPS samples
-     *
-     * Returns the last captured GPS samples, for use in the Service Line Detection service.
-     */
-    public static final String ACTION_GET_GPS = "eu.liveandgov.sensorminingapi.intent.action.GET_GPS";
-    public static final String FIELD_COUNT = "count";
-    public static final String RETURN_GPS = "eu.liveandgov.sensorminingapi.intent.action.GET_GPS";
-    public static final String FIELD_ENTRIES = "entries";
-
 }

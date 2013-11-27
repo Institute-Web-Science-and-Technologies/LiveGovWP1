@@ -3,8 +3,8 @@ package eu.liveandgov.sensorcollectorv3.streaming;
 import org.jeromq.ZMQ;
 
 import eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions;
-import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
 import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 
 /**
  * String-Consumer that sends samples to a remote server using ZMQ message queue system.
@@ -27,7 +27,7 @@ public class ZmqStreamer implements Monitorable, Consumer<String> {
         // Lazy build up connection.
         // Constructor is called on main thread. No connection is possible there.
         if (!isConnected) {
-            socket.connect(SensorCollectionOptions.UPLOAD_ZMQ_SOCKET);
+            socket.connect(SensorCollectionOptions.STREAMING_ZMQ_SOCKET);
             isConnected = true;
         }
         socket.send(m);

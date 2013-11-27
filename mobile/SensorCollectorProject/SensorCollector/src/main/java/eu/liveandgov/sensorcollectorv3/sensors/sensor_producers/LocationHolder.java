@@ -97,7 +97,8 @@ public class LocationHolder implements
 
     @Override
     public void onLocationChanged(Location location) {
-        String locString = SensorSerializer.parse(location);
+        // TODO: Add speed and bearing (Ausrichtung) to SSF if they are available.
+        String locString = SensorSerializer.fromLocation(location);
         Log.d(LOG_TAG, locString);
         sensorQueue.push(locString);
     }

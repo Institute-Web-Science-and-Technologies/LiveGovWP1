@@ -7,13 +7,18 @@ public enum SampleType {
 	GPS,
     ACC,
     LAC,
-    TAG,
+    GRA,
+
+    ACTG,
     ACT,
-    GRA
-// NOT YET IMPLEMENTED
-// GYR,
-// MAG,
-// WIFI,
-// BLT,
-// GSM,
+
+    TAG,
+    ERR,
+
+    // NOT YET IMPLEMENTED
+    GYR,
+    MAG,
+    WIFI,
+    BLT,
+    GSM
 }

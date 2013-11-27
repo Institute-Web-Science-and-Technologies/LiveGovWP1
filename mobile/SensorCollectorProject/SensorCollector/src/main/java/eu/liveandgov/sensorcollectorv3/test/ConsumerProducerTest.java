@@ -2,8 +2,8 @@ package eu.liveandgov.sensorcollectorv3.test;
 
 import junit.framework.TestCase;
 
-import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
-import eu.liveandgov.sensorcollectorv3.connectors.Producer;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Producer;
 
 /**
  * Created by hartmann on 10/19/13.
