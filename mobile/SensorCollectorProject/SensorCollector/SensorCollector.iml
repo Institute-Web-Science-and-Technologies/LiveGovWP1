@@ -75,11 +75,9 @@
     <orderEntry type="library" exported="" name="httpcore-4.3-beta2" level="project" />
     <orderEntry type="library" exported="" name="ComGoogleAndroidGmsPlayServices3136.aar" level="project" />
     <orderEntry type="library" exported="" name="commons-lang-2.3" level="project" />
-    <orderEntry type="library" exported="" name="junit-3.8" level="project" />
     <orderEntry type="library" exported="" name="httpmime-4.3-beta2" level="project" />
     <orderEntry type="library" exported="" name="commons-math3-3.2" level="project" />
     <orderEntry type="library" exported="" name="commons-lang3-3.1" level="project" />
-    <orderEntry type="library" exported="" name="jeromq-0.2.0" level="project" />
     <orderEntry type="library" exported="" name="HumanActivityRecognitionLibrary-1.0" level="project" />
   </component>
 </module>

@@ -15,17 +15,13 @@ import eu.liveandgov.sensorcollectorv3.sensors.SensorSerializer;
  */
 public class ActivityIntentService extends IntentService {
 
-    private final SensorQueue sensorQueue;
-
     public ActivityIntentService() {
         super("ActivityIntentService");
-        this.sensorQueue = GlobalContext.context.sensorQueue;
     }
 
     public ActivityIntentService(String name) {
         super(name);
         Log.d("AIS", "Constructor");
-        this.sensorQueue = GlobalContext.context.sensorQueue;
     }
 
     @Override
@@ -33,7 +29,11 @@ public class ActivityIntentService extends IntentService {
         Log.d("AIS", "HandleIntent");
         if(ActivityRecognitionResult.hasResult(intent)) {
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
-            sensorQueue.push(SensorSerializer.fromGoogleActivity(result));
+            try {
+                GlobalContext.context.sensorQueue.push(SensorSerializer.fromGoogleActivity(result));
+            } catch (NullPointerException e) {
+                // Context Not initialized
+            }
         }
     }
 
