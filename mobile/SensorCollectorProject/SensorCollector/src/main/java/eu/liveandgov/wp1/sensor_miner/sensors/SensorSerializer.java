@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.sensor_miner.sensors;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.location.Location;
+import android.os.Build;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
@@ -70,8 +71,17 @@ public class SensorSerializer {
     public static String fromSensorEvent(SensorEvent event) {
         int sensorType= event.sensor.getType();
 
-        // event.timestamp is in ns = 1E-9 sec.
-        long timestamp_ms = (long) (event.timestamp / 1E6);
+        // If build-version is above jelly-bean mr1 (17), timestamps of the sensors are already in
+        // utc, otherwise convert by rebasing them on the uptime
+        long timestamp_ms;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+        {
+            timestamp_ms = (long) (event.timestamp / 1E6);
+        }
+        else
+        {
+            timestamp_ms = (long) (System.currentTimeMillis() + (event.timestamp - System.nanoTime()) / 1E6);
+        }
 
         if ( sensorType == Sensor.TYPE_ACCELEROMETER){
             return fillStringFloats(SSF_ACCELEROMETER, timestamp_ms, GlobalContext.getUserId(), event.values);
