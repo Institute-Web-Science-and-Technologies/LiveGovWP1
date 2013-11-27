@@ -157,7 +157,6 @@ public class ActivitySensorCollector extends Activity {
         startService(intent);
     }
 
-
     public void onIdButtonClick(View view) {
         Intent intent = new Intent(this, ServiceSensorControl.class);
         intent.setAction(ACTION_SET_ID);
@@ -192,6 +191,12 @@ public class ActivitySensorCollector extends Activity {
     public void onGpsButtonClick(View view){
         Intent intent = new Intent(this, ServiceSensorControl.class);
         intent.setAction(ExtendedIntentAPI.ACTION_GET_GPS);
+        startService(intent);
+    }
+
+    public void onDeleteButtonClick(View view){
+        Intent intent = new Intent(this, ServiceSensorControl.class);
+        intent.setAction(ExtendedIntentAPI.ACTION_DELETE_SAMPLES);
         startService(intent);
     }
 

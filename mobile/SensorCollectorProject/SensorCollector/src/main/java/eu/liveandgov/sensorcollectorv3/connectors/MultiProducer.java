@@ -1,5 +1,7 @@
 package eu.liveandgov.sensorcollectorv3.connectors;
 
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
+
 /**
  * Interface for a producer class that allows many consumers to subscribe.
  *

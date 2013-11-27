@@ -69,6 +69,13 @@ public class FilePersistor implements Persistor {
     }
 
     @Override
+    public void deleteSamples() {
+        closeLogFile();
+        if (logFile.exists()) logFile.delete();
+        openLogFileOverwrite();
+    }
+
+    @Override
     public String getStatus() {
         return "File size: " + logFile.length()/1024 + "kb. Samples written: " + sampleCount;
     }
@@ -94,6 +101,8 @@ public class FilePersistor implements Persistor {
     }
 
     private boolean closeLogFile() {
+        if (fileWriter == null) return true; // already closed
+
         try {
             fileWriter.close();
         } catch (IOException e) {

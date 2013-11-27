@@ -12,7 +12,7 @@ public class SensorCollectionOptions {
     public static String STREAMING_ZMQ_SOCKET = "tcp://" + REMOTE_HOST + ":5555";
 
     public static final boolean ZIPPED_PERSISTOR = false;
-    public static final boolean API_EXTENSIONS = false;
+    public static final boolean API_EXTENSIONS = true;
 
     // SENSOR RECORDING OPTIONS //
 

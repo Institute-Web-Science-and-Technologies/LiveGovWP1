@@ -11,12 +11,11 @@ import java.io.File;
 
 import eu.liveandgov.sensorcollectorv3.configuration.ExtendedIntentAPI;
 import eu.liveandgov.sensorcollectorv3.configuration.IntentAPI;
-import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.ConnectorThread;
 import eu.liveandgov.sensorcollectorv3.connectors.implementations.GpsCache;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.LinkedSensorQueue;
 import eu.liveandgov.sensorcollectorv3.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.sensorcollectorv3.human_activity_recognition.HarPipeline;
+import eu.liveandgov.sensorcollectorv3.human_activity_recognition.HarAdapter;
 import eu.liveandgov.sensorcollectorv3.monitor.MonitorThread;
 import eu.liveandgov.sensorcollectorv3.persistence.FilePersistor;
 import eu.liveandgov.sensorcollectorv3.persistence.Persistor;
@@ -27,6 +26,7 @@ import eu.liveandgov.sensorcollectorv3.sensors.SensorThread;
 import eu.liveandgov.sensorcollectorv3.streaming.ZmqStreamer;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferManager;
 import eu.liveandgov.sensorcollectorv3.transfer.TransferThreadPost;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 
 import static eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions.API_EXTENSIONS;
 import static eu.liveandgov.sensorcollectorv3.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
@@ -55,7 +55,7 @@ public class ServiceSensorControl extends Service {
 
     // SENSOR CONSUMERS
     public Persistor persistor;
-    public Consumer<String> publisher;
+    public PublicationPipeline publisher;
     public Consumer<String> streamer;
     public Consumer<String> harPipeline;
     public GpsCache gpsCache;
@@ -72,7 +72,9 @@ public class ServiceSensorControl extends Service {
     /* ANDROID LIFECYCLE */
     @Override
     public void onCreate() {
-        Log.i(LOG_TAG, "Creating ServiceSensorControl }");
+        super.onCreate();
+
+        Log.i(LOG_TAG, "Creating ServiceSensorControl");
 
         // Setup static variables
         GlobalContext.set(this);
@@ -81,13 +83,13 @@ public class ServiceSensorControl extends Service {
         restoreUserId();
 
         // INITIALIZATIONS
-        final File sensorFile   = new File(getFilesDir(), SENSOR_FILENAME);
-        final File stageFile    = new File(getFilesDir(), STAGE_FILENAME);
+        File sensorFile   = new File(getFilesDir(), SENSOR_FILENAME);
+        File stageFile    = new File(getFilesDir(), STAGE_FILENAME);
 
         // INIT COMMUNICATION CHANNELS
         sensorQueue = new LinkedSensorQueue();
         streamer    = new ZmqStreamer();
-        harPipeline = new HarPipeline();
+        harPipeline = new HarAdapter();
         gpsCache    = new GpsCache();
         persistor   = ZIPPED_PERSISTOR ?
                     new ZipFilePersistor(sensorFile):
@@ -116,6 +118,9 @@ public class ServiceSensorControl extends Service {
             }
         });
 
+        // REMARK: Now the first addConsumer triggers startAllRecording event.
+        // This should be done once the SensorThread is already running.
+
 
         // Setup monitoring thread
         monitorThread.registerMonitorable(connectorThread, "SampleCount");
@@ -127,16 +132,6 @@ public class ServiceSensorControl extends Service {
         connectorThread.start();
         monitorThread.start();
         SensorThread.start();
-
-
-        // Connect Consumers to sensor thread
-        // More consumers are added dynamically below
-        // REMARK: addConsumer triggers startAllRecording event.
-        // This should be done once the SensorThread is already running.
-        if (API_EXTENSIONS) connectorThread.addConsumer(publisher);
-        if (API_EXTENSIONS) connectorThread.addConsumer(gpsCache);
-
-        super.onCreate();
     }
 
     @Override
@@ -187,11 +182,19 @@ public class ServiceSensorControl extends Service {
             doSetId(intent.getStringExtra(IntentAPI.FIELD_USER_ID));
         } else if (action.equals(ExtendedIntentAPI.ACTION_GET_GPS)) {
             doSendGps();
+        } else if (action.equals(ExtendedIntentAPI.ACTION_DELETE_SAMPLES)) {
+            doDeleteSamples();
         } else {
             Log.i(LOG_TAG, "Received unknown action " + action);
         }
 
         return START_STICKY;
+    }
+
+    private void doDeleteSamples() {
+        persistor.deleteSamples();
+        publisher.deleteSamples();
+        transferManager.deleteStagedSamples();
     }
 
     private void doStopHAR() {
@@ -244,24 +247,29 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doDisableRecording() {
-        // We have to push DisableRecording Intent directly to the persistor,
-        // since the message it will be still in the sensor queue when the persitor
-        // is turned off.
-        persistor.push(IntentAPI.VALUE_STOP_RECORDING);
-        doAnnotate(IntentAPI.VALUE_STOP_RECORDING);
-
         connectorThread.removeConsumer(persistor);
-
         isRecording = false;
+
+
+        // API EXTENSIONS are triggered on together with recording
+        if (API_EXTENSIONS) {
+            // Add "STOP RECORDING TAG" to publisher
+            publisher.push(SensorSerializer.fromTag(IntentAPI.VALUE_STOP_RECORDING));
+            connectorThread.removeConsumer(publisher);
+            connectorThread.removeConsumer(gpsCache);
+        }
     }
 
     private void doEnableRecording() {
         connectorThread.addConsumer(persistor);
-
-        // Send Annotation only after registering Persistor
-        doAnnotate(IntentAPI.VALUE_START_RECORDING);
-
         isRecording = true;
+
+        // API EXTENSIONS are triggered on together with recording
+        if (API_EXTENSIONS) {
+            publisher.push(SensorSerializer.fromTag(IntentAPI.VALUE_START_RECORDING));
+            connectorThread.addConsumer(publisher);
+            connectorThread.addConsumer(gpsCache);
+        }
     }
 
     public void doSendStatus() {

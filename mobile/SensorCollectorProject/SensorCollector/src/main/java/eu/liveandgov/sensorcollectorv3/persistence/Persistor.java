@@ -1,11 +1,9 @@
 package eu.liveandgov.sensorcollectorv3.persistence;
 
-import android.provider.ContactsContract;
-
 import java.io.File;
 
-import eu.liveandgov.sensorcollectorv3.connectors.Consumer;
 import eu.liveandgov.sensorcollectorv3.monitor.Monitorable;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 
 /**
  * Interface for persistence providers.
@@ -24,4 +22,9 @@ public interface Persistor extends Consumer<String>, Monitorable {
      * Return true if there are samples in store.
      */
     boolean hasSamples();
+
+    /**
+     * Delete all stored samples
+     */
+    void deleteSamples();
 }
