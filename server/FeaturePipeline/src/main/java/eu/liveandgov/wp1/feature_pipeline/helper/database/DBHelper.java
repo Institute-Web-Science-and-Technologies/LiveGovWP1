@@ -23,7 +23,7 @@ public class DBHelper {
     public static void connect(String username, String password) {
         db = new PostgresqlDatabase(username, password);
         try {
-            getByTagQuery = db.connection.prepareStatement("SELECT id, tag, ts, x, y, z FROM raw_training_data WHERE tag=? AND id=?");
+            getByTagQuery = db.connection.prepareStatement("SELECT id, tag, ts, x, y, z FROM raw_training_data WHERE tag=? AND id=? ORDER BY ts");
             getTags = db.connection.prepareStatement("SELECT DISTINCT tag FROM raw_training_data WHERE id=?");
         } catch (SQLException e) {
             e.printStackTrace();

@@ -18,9 +18,12 @@ public class HarPipeline extends Pipeline<MotionSensorValue, String> {
     private final FeatureProducer featureProducer;
     private final ClassifyProducer classifyProducer;
 
+    public static int WINDOW_LENGTH_IN_MS = 5 * 1000;
+    public static int WINDOW_OVERLAP_IN_MS = WINDOW_LENGTH_IN_MS - 20;
+
     public HarPipeline(){
         // Window
-        windowProducer = new WindowProducer(5000, 200);
+        windowProducer = new WindowProducer(WINDOW_LENGTH_IN_MS, WINDOW_OVERLAP_IN_MS);
 
         // Feature
         featureProducer = new FeatureProducer();

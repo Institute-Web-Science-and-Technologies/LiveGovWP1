@@ -15,40 +15,41 @@ public class WindowProducer extends Producer<TaggedWindow> implements Consumer<M
 
     private TimedQueue<MotionSensorValue> queue;
     private long windowSize;
-    private long overlap;
-    private long windowStart = -1;
-    private long windowEnd = -1;
+    private long delta;
+    private long lastTime = -1;
+    private long nextWindowEnd = -1;
 
     public WindowProducer(long windowSize, long overlap) {
         this.windowSize = windowSize;
-        this.overlap = overlap;
+        this.delta = windowSize - overlap;
         queue = new TimedQueue<MotionSensorValue>(windowSize);
     }
 
     public void push(MotionSensorValue m) {
-        if(windowStart == -1) {
-            windowStart = m.time;
-            windowEnd = m.time + windowSize;
+        if (nextWindowEnd == -1 || m.time < lastTime) {
+            // lazy loading or monotony violated
+            nextWindowEnd = m.time + windowSize;
+            lastTime = m.time;
         }
-        if(m.time > windowEnd) {
+
+        if(m.time > nextWindowEnd) {
             // NEW WINDOW!
-            createNewWindow();
+            pushWindow();
 
             // Calculate new window timing
-            windowStart = windowEnd - overlap;
-            windowEnd = windowStart + windowSize;
+            nextWindowEnd = m.time + delta;
         }
 
         queue.push(m.time, m);
     }
 
     public void clear() {
-        windowStart = -1;
-        windowEnd = -1;
+        lastTime = -1;
+        nextWindowEnd = -1;
         queue.clear();
     }
 
-    private void createNewWindow() {
+    private void pushWindow() {
         TaggedWindow w = new TaggedWindow();
 
         ArrayList<MotionSensorValue> values = queue.toArrayList();
@@ -72,6 +73,7 @@ public class WindowProducer extends Producer<TaggedWindow> implements Consumer<M
         }
 
         // Push the TaggedWindow!
+//        System.out.println("Pushing Window Of size: " + values.size());
         consumer.push(w);
     }
 }

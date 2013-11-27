@@ -14,9 +14,6 @@ import java.util.List;
 //
 public class BulkClassification {
 
-    public static int WINDOW_LENGTH_IN_MS = 5 * 1000;
-    public static int WINDOW_OVERLAP_IN_MS = 0;
-
     public static void main(String[] args) {
 
         // SETUP FeatureExtraction Pipeline
