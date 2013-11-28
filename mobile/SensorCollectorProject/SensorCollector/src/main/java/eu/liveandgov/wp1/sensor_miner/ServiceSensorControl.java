@@ -40,18 +40,19 @@ public class ServiceSensorControl extends Service {
     private static final String SHARED_PREFS_NAME = "SensorCollectorPrefs";
     private static final String PREF_ID = "userid";
 
-    // REMARK:
-    // Need to put initialization to onCreate, since FilesDir, etc. is not available
-    // from a static context.
-
     // STATUS FLAGS
     public boolean isRecording = false;
     public boolean isStreaming = false;
     public boolean isHAR = false;
-    public String userId = "";
+    public String userId = ""; // will be set onCreate
 
     // COMMUNICATION CHANNEL
-    public SensorQueue sensorQueue;
+    public static SensorQueue sensorQueue = new LinkedSensorQueue();
+
+
+    // REMARK:
+    // Need to put initialization to onCreate, since FilesDir, etc. is not available
+    // from a static context.
 
     // SENSOR CONSUMERS
     public Persistor persistor;
@@ -67,7 +68,10 @@ public class ServiceSensorControl extends Service {
     // Rem: Also SensorThread would belong here, but it is realized via static methods
 
     /* CONSTRUCTOR */
-    public ServiceSensorControl() {}
+    public ServiceSensorControl() {
+        // Register this object globally
+        GlobalContext.set(this);
+    }
 
     /* ANDROID LIFECYCLE */
     @Override
@@ -76,37 +80,33 @@ public class ServiceSensorControl extends Service {
 
         Log.i(LOG_TAG, "Creating ServiceSensorControl");
 
-        // Setup static variables
-        GlobalContext.set(this);
-
-        // Set Default UserID to AndroidID
-        restoreUserId();
-
         // INITIALIZATIONS
+        // Warning: getFilesDir is only available after onCreate was called.
         File sensorFile   = new File(getFilesDir(), SENSOR_FILENAME);
         File stageFile    = new File(getFilesDir(), STAGE_FILENAME);
 
-        // INIT COMMUNICATION CHANNELS
-        sensorQueue = new LinkedSensorQueue();
+        // Init sensor consumers
         streamer    = new ZmqStreamer();
         harPipeline = new HarAdapter();
         gpsCache    = new GpsCache();
         persistor   = ZIPPED_PERSISTOR ?
-                    new ZipFilePersistor(sensorFile):
-                    new FilePersistor(sensorFile);
-
-        // EXTERNAL COMMUNICATION
-        publisher = new PublicationPipeline();
+                new ZipFilePersistor(sensorFile):
+                new FilePersistor(sensorFile);
+        publisher = new PublicationPipeline(); // for external communication
 
         // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
         transferManager = new TransferThreadPost(persistor, stageFile, ZIPPED_PERSISTOR);
         monitorThread   = new MonitorThread();
 
+        // Restore user id from shared preferences
+        restoreUserId();
+
         // Setup sensor thread
         SensorThread.setup(sensorQueue);
 
-        // Start Recording once consumers are added
+        // Start Recording once the first consumers connects to connector thread.
+        // This should be done once the SensorThread is already running.
         connectorThread.registerNonEmptyCallback(new ConnectorThread.Callback() {
             public void call() {
                 SensorThread.startAllRecording();
@@ -117,10 +117,6 @@ public class ServiceSensorControl extends Service {
                 SensorThread.stopAllRecording();
             }
         });
-
-        // REMARK: Now the first addConsumer triggers startAllRecording event.
-        // This should be done once the SensorThread is already running.
-
 
         // Setup monitoring thread
         monitorThread.registerMonitorable(connectorThread, "SampleCount");
@@ -142,7 +138,8 @@ public class ServiceSensorControl extends Service {
     /* INTENT API */
 
     /**
-     * Dispatches incoming intents
+     * Dispatches incoming intents.
+     * See {@link eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI} for valid intents.
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -311,6 +308,4 @@ public class ServiceSensorControl extends Service {
         if (settings == null) throw new IllegalStateException("Failed to load SharedPreferences");
         userId = settings.getString(PREF_ID, androidId); // use androidId as default;
     }
-
-
 }

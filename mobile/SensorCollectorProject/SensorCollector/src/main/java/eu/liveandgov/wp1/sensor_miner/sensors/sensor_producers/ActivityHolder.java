@@ -11,6 +11,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.ActivityRecognitionClient;
 
 import eu.liveandgov.wp1.sensor_miner.GlobalContext;
+import eu.liveandgov.wp1.sensor_miner.connectors.sensor_queue.SensorQueue;
 
 /**
  * Created by cehlen on 9/26/13.
@@ -32,7 +33,6 @@ public class ActivityHolder
     private boolean available = false;
     private boolean startImmediate = false;
 
-
     public ActivityHolder() {
         init();
     }
@@ -53,8 +53,7 @@ public class ActivityHolder
     }
 
     private void init() {
-        if(!playServicesAvailable())
-            return;
+        if(!playServicesAvailable()) return;
         available = true;
         activityRecognitionClient = new ActivityRecognitionClient(GlobalContext.context, this, this);
         Intent intent = new Intent(GlobalContext.context, ActivityIntentService.class);

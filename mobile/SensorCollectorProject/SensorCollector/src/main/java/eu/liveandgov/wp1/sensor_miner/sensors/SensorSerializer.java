@@ -10,8 +10,6 @@ import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.text.StrBuilder;
-import org.json.JSONStringer;
 
 import java.util.List;
 
@@ -19,15 +17,7 @@ import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue
 import eu.liveandgov.wp1.sensor_miner.GlobalContext;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_value_objects.GpsSensorValue;
 
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_ACCELEROMETER;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_GOOGLE_ACTIVITY;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_GPS;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_GRAVITY;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_GYROSCOPE;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_LINEAR_ACCELERATION;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_MAGNETOMETER;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_ROTATION;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_TAG;
+import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.*;
 
 /**
  * Converts sensor events into the ssf Format.
@@ -35,6 +25,20 @@ import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_TAG
  * Created by hartmann on 9/15/13.
  */
 public class SensorSerializer {
+
+    private static long timestampCorrectionMs = 0;
+
+    static {
+        // If build-version is above jelly-bean mr1 (17), timestamps of the sensors are already in
+        // utc, otherwise convert by rebasing them on the uptime
+        //
+        // We comute a global correction based on the fact, that currentTimeMillis is in UTC
+        // and nanoTime is in uptime.
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1)
+        {
+            timestampCorrectionMs = (long) (System.currentTimeMillis() - (System.nanoTime() / 1E6) );
+        }
+    }
 
     public static MotionSensorValue parseMotionEvent(String event) {
         MotionSensorValue newEvent = new MotionSensorValue();
@@ -76,17 +80,7 @@ public class SensorSerializer {
     public static String fromSensorEvent(SensorEvent event) {
         int sensorType= event.sensor.getType();
 
-        // If build-version is above jelly-bean mr1 (17), timestamps of the sensors are already in
-        // utc, otherwise convert by rebasing them on the uptime
-        long timestamp_ms;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-        {
-            timestamp_ms = (long) (event.timestamp / 1E6);
-        }
-        else
-        {
-            timestamp_ms = (long) (System.currentTimeMillis() + (event.timestamp - System.nanoTime()) / 1E6);
-        }
+        long timestamp_ms = (long) (event.timestamp / 1E6) + timestampCorrectionMs;
 
         if ( sensorType == Sensor.TYPE_ACCELEROMETER){
             return fillStringFloats(SSF_ACCELEROMETER, timestamp_ms, GlobalContext.getUserId(), event.values);
