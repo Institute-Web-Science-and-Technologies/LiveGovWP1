@@ -1,0 +1,14 @@
+eu.liveandgov.wp1.sensor_miner
+eu.liveandgov.wp1.sensor_miner.activity_recognition
+eu.liveandgov.wp1.sensor_miner.configuration
+eu.liveandgov.wp1.sensor_miner.connectors
+eu.liveandgov.wp1.sensor_miner.connectors.implementations
+eu.liveandgov.wp1.sensor_miner.connectors.sensor_queue
+eu.liveandgov.wp1.sensor_miner.monitor
+eu.liveandgov.wp1.sensor_miner.persistence
+eu.liveandgov.wp1.sensor_miner.sensors
+eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers
+eu.liveandgov.wp1.sensor_miner.sensors.sensor_value_objects
+eu.liveandgov.wp1.sensor_miner.streaming
+eu.liveandgov.wp1.sensor_miner.test
+eu.liveandgov.wp1.sensor_miner.transfer

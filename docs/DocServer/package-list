@@ -1,0 +1,14 @@
+eu.liveandgov.wp1.classifier_training
+eu.liveandgov.wp1.classifier_training.helper.database
+eu.liveandgov.wp1.classifier_training.producers
+eu.liveandgov.wp1.human_activity_recognition
+eu.liveandgov.wp1.human_activity_recognition.classifier
+eu.liveandgov.wp1.human_activity_recognition.connectors
+eu.liveandgov.wp1.human_activity_recognition.containers
+eu.liveandgov.wp1.human_activity_recognition.helper
+eu.liveandgov.wp1.human_activity_recognition.producers
+eu.liveandgov.wp1.server
+eu.liveandgov.wp1.server.db_helper
+eu.liveandgov.wp1.server.sensor_helper
+eu.liveandgov.wp1.server.sensor_helper.sensor_value_objects
+eu.liveandgov.wp1.server.tests
