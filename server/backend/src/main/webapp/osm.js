@@ -1,7 +1,7 @@
 
 var map;
 var routes = L.layerGroup();
-
+var sessionRouteCode = "";
 
 function updateMap() {
 	// eat the event to prevent a unwanted click event
@@ -22,7 +22,46 @@ function initilize(){
 
   map.on('dragend', this.updateMap, this);
   $("#uncheckall").click(function(){$('input:checkbox').removeAttr('checked');});
-  $("input:checkbox").click( function(){
+  $.ajax({type:"GET",
+  	url:"/backend/LiveAPI",
+  	success: function (data) {
+  		var size = data.vehicles.length - 1;
+  		var i =	Math.round(size * Math.random());
+	     appendTableRow(data.vehicles[i]);
+         sessionRouteCode = data.vehicles[i].trip_id;
+  		},
+  		dataType:"json"
+  });
+  
+  window.setInterval(pollNewData, 5000);
+  
+  function pollNewData () {
+	  $.ajax({type:"GET",
+		  	url:"/backend/LiveAPI",
+		  	success: function (data) {		  		
+		  		  $.each(data.vehicles, function(index, item) {	  			     
+		  		         if(sessionRouteCode == item.trip_id) {
+		  		        	appendTableRow(item);
+		  		         };
+		  		  });
+		  		},
+		  		dataType:"json"
+		  });
+  }
+  
+  function appendTableRow(item){
+	    var table = $("#vehicles");
+        var table_row = $('<tr>');
+        table_row.append($('<td>').html('<input type="checkbox">').click(checkboxCallback));
+        table_row.append($('<td class="lat">').html(item.lat));
+        table_row.append($('<td class="lon">').html(item.lon));
+        table_row.append($('<td>').html(item.ts));
+        table_row.append($('<td>').html(item.day));
+        table_row.append($('<td>').html(item.route_id));
+        table.append(table_row);
+  };
+  
+  function checkboxCallback(){
 	  var postData = "";
 	    $( "tr:has(input:checked) td:nth-child(2)" ).each(function( index ) {
 	      var latlon = new L.LatLng( $( this ).text(), $( this ).next().text());
@@ -34,39 +73,27 @@ function initilize(){
 		  postData += $(this).next().next().next().text() + "\n";
 		  });
 	    var start = new Date().getTime();
+	    $("#response").prepend('<div class="loading-centered"></div>');
 	    $.ajax({type:"POST",
 	    	url:"/backend/ServiceLineDetection",
 	    	data: postData,
 	    	success: function (data) {
-//	    			routes.clearLayers();
-//	    			var colors = ["#FF0000", "#00FF00"];
-//	    			for(var r in data.routes){
-//	    				routes.addLayer(L.geoJson(data.routes[r].geojson, {
-//	    				    style: {
-//		    				    "color": colors[parseInt(data.routes[r].routedir)-1],
-//		    				    "weight": 5,
-//		    				    "opacity": 0.65
-//		    				}
-//	    				}));
-//			    			var marker = L.marker([data.routes[r].geojson.coordinates[0][1],data.routes[r].geojson.coordinates[0][0]]);
-//			    			marker.bindPopup("<b>routecode: "+data.routes[r].routecode+"</b><br>direction: " + data.routes[r].routedir);
-//			    			routes.addLayer(marker);
-//			    			routes.addTo(map);
-//	    			}
 	    		var end = new Date().getTime();
 	    		var table = $("#response");
-	    		table.html("<tr><th>route_id</th><th>shape_id</th><th>trip_id</th><th>score</th>");
+	    		table.html("<tr><th>route_id</th><th>shape_id</th><th>trip_id</th><th>mean</th><th>score</th>");
 	    		  $.each(data.routes, function(index, item){
 	    		         var table_row = $('<tr>');
 	    		         table_row.append($('<td>').html(item.route_id));
 	    		         table_row.append($('<td>').html(item.shape_id));
 	    		         table_row.append($('<td>').html(item.trip_id));
+	    		         table_row.append($('<td>').html(item.transportation_mean));
 	    		         table_row.append($('<td>').html(item.score));
 	    		         table.append(table_row);
 	    		    });
 	    		  $("#timing").html(end-start + " ms");
+	    		  $("#response").children('.loading-centered').remove();
 	    		},
 	    		dataType:"json"
 	    });
-	});
+	}
 }
