@@ -86,3 +86,4 @@ tasks.xml
 server/NodeInspectionFrontEnd/.idea
 mobile/SensorCollectorProject/.idea
 *.zip
+/server/ClassifierTraining/output.csv

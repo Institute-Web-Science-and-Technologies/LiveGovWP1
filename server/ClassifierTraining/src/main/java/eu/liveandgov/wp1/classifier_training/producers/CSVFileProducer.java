@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.feature_pipeline.producers;
+package eu.liveandgov.wp1.classifier_training.producers;
 
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 import eu.liveandgov.wp1.human_activity_recognition.containers.FeatureVector;

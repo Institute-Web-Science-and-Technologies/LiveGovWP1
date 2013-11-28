@@ -1,7 +1,7 @@
-package eu.liveandgov.wp1.feature_pipeline;
+package eu.liveandgov.wp1.classifier_training;
 
-import eu.liveandgov.wp1.feature_pipeline.helper.database.DBHelper;
-import eu.liveandgov.wp1.feature_pipeline.producers.*;
+import eu.liveandgov.wp1.classifier_training.helper.database.DBHelper;
+import eu.liveandgov.wp1.classifier_training.producers.*;
 import eu.liveandgov.wp1.human_activity_recognition.producers.FeatureProducer;
 import eu.liveandgov.wp1.human_activity_recognition.producers.WindowProducer;
 

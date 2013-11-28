@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.feature_pipeline;
+package eu.liveandgov.wp1.classifier_training;
 /**
  * This class contains all activities that will be recognized with the HAR component.
  *

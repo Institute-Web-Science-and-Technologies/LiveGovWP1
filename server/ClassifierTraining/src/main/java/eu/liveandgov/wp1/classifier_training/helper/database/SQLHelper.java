@@ -1,6 +1,6 @@
-package eu.liveandgov.wp1.feature_pipeline.helper.database;
+package eu.liveandgov.wp1.classifier_training.helper.database;
 
-import eu.liveandgov.wp1.feature_pipeline.Log;
+import eu.liveandgov.wp1.classifier_training.Log;
 import eu.liveandgov.wp1.human_activity_recognition.containers.Window;
 
 import java.sql.PreparedStatement;
