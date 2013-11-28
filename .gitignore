@@ -69,7 +69,6 @@ local.properties
 # PDT-specific
 .buildpath
 
-
 #
 # IDEA
 #
@@ -81,4 +80,3 @@ local.properties
 .iws
 workspace.xml
 tasks.xml
-
