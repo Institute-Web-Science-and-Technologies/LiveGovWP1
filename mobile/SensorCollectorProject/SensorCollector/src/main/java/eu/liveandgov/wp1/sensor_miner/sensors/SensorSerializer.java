@@ -3,25 +3,21 @@ package eu.liveandgov.wp1.sensor_miner.sensors;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.location.Location;
+import android.net.wifi.ScanResult;
+import android.os.Build;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
+import java.util.List;
+
 import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
 import eu.liveandgov.wp1.sensor_miner.GlobalContext;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_value_objects.GpsSensorValue;
 
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_ACCELEROMETER;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_GOOGLE_ACTIVITY;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_GPS;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_GRAVITY;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_GYROSCOPE;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_LINEAR_ACCELERATION;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_MAGNETOMETER;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_ROTATION;
-import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_TAG;
+import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.*;
 
 /**
  * Converts sensor events into the ssf Format.
@@ -29,6 +25,20 @@ import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.SSF_TAG
  * Created by hartmann on 9/15/13.
  */
 public class SensorSerializer {
+
+    private static long timestampCorrectionMs = 0;
+
+    static {
+        // If build-version is above jelly-bean mr1 (17), timestamps of the sensors are already in
+        // utc, otherwise convert by rebasing them on the uptime
+        //
+        // We comute a global correction based on the fact, that currentTimeMillis is in UTC
+        // and nanoTime is in uptime.
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1)
+        {
+            timestampCorrectionMs = (long) (System.currentTimeMillis() - (System.nanoTime() / 1E6) );
+        }
+    }
 
     public static MotionSensorValue parseMotionEvent(String event) {
         MotionSensorValue newEvent = new MotionSensorValue();
@@ -70,8 +80,7 @@ public class SensorSerializer {
     public static String fromSensorEvent(SensorEvent event) {
         int sensorType= event.sensor.getType();
 
-        // event.timestamp is in ns = 1E-9 sec.
-        long timestamp_ms = (long) (event.timestamp / 1E6);
+        long timestamp_ms = (long) (event.timestamp / 1E6) + timestampCorrectionMs;
 
         if ( sensorType == Sensor.TYPE_ACCELEROMETER){
             return fillStringFloats(SSF_ACCELEROMETER, timestamp_ms, GlobalContext.getUserId(), event.values);
@@ -87,6 +96,32 @@ public class SensorSerializer {
             return fillStringFloats(SSF_ROTATION, timestamp_ms, GlobalContext.getUserId(), event.values);
         }
         return "ERR," + timestamp_ms + ",,Unknown sensor " + sensorType;
+    }
+
+    public static String fromScanResults(long timestamp_ms, List<ScanResult> scanResults) {
+        StringBuilder builder = new StringBuilder();
+        boolean separate = false;
+        for(ScanResult scanResult : scanResults)
+        {
+            if(separate)
+            {
+                // Separate entries of the scan result list by semicolon
+                builder.append(';');
+            }
+
+            // Write each scan result as a tuple of Escaped SSID/Escaped BSSID/Frequency in MHz/Level in dBm
+            builder.append( "\"" + StringEscapeUtils.escapeJava(scanResult.SSID) + "\"");
+            builder.append('/');
+            builder.append( "\"" + StringEscapeUtils.escapeJava(scanResult.BSSID) + "\"");
+            builder.append('/');
+            builder.append(scanResult.frequency);
+            builder.append('/');
+            builder.append(scanResult.level);
+
+            separate = true;
+        }
+
+         return fillString(SSF_WIFI, timestamp_ms, GlobalContext.getUserId(), builder.toString());
     }
 
     public static String fromLocation(Location location) {
