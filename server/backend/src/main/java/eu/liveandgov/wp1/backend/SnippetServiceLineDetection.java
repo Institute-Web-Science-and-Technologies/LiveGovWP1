@@ -10,8 +10,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -19,6 +24,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Servlet implementation class InspectionServlet
@@ -38,6 +46,9 @@ public class SnippetServiceLineDetection extends HttpServlet {
 	
 	static final int timeTableToleranceInMinutes = 2;
 	static final int timeTableToleranceInMeter = 10;
+	
+	ExecutorService liveApiExecutor;
+	Future<List<VehicleInfo>> liveApiResult;
 
 	/**
 
@@ -47,6 +58,7 @@ public class SnippetServiceLineDetection extends HttpServlet {
 		super();
 		transportationMeans = initTransportationMeans();
 		db = new PostgresqlDatabase("liveandgov", "liveandgov");
+		liveApiExecutor = Executors.newCachedThreadPool();
 	}
 
 	/**
@@ -62,7 +74,13 @@ public class SnippetServiceLineDetection extends HttpServlet {
 	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.getHeader("username");
+		String username = request.getHeader("username");
+		System.out.println("username: " + username);
+		if(username == null){
+			PrintWriter out = response.getWriter();
+			out.println("{\"error\":\"username required\"}");
+			return;
+		}
 		coordinates = new ArrayList<LatLonTsDayTuple>();  
 		String line = null;
 		LatLonTsDayTuple latestLatLonTsDayTuple = new LatLonTsDayTuple();
@@ -82,8 +100,11 @@ public class SnippetServiceLineDetection extends HttpServlet {
         }
 		// check if the most recent timestamp is actual enough to query the real time API
 		if(new Date().getTime() - latestLatLonTsDayTuple.getTime() < realtimeApiToleranceInMinutes*60*1000){
-			List<VehicleInfo> vi = LiveAPI.getVehiclesNearBy(latestLatLonTsDayTuple, realtimeApiToleranceInMeter);
-			
+			Callable<List<VehicleInfo>> c = new LiveApiVehiclesNearByCallable( latestLatLonTsDayTuple, realtimeApiToleranceInMeter );
+			// this Api call is a HTTP request
+			// don't wait for the response
+			liveApiResult = liveApiExecutor.submit( c );		
+			System.out.println("Using Live API");
 		}
 		 
 	  String routcodeSelect = ""
@@ -129,24 +150,64 @@ public class SnippetServiceLineDetection extends HttpServlet {
 			ResultSet rs = stm.executeQuery(routcodeSelect);
 			
 			response.setContentType("application/json");
+			
+			
+
 		PrintWriter out = response.getWriter();
+		
+		JSONObject responseJSON = new JSONObject();
+		
+		JSONArray routes = new JSONArray();
+		
 		String json = "{\"routes\":[";
 	
-		while (rs.next()) {
-			if(json.length() > 11) {
-				json += ",\n";
+		// now, we need the LiveAPI response
+		// wait until it arrives 
+		List<VehicleInfo> liveVehicles = liveApiResult.get();
+		
+		if(liveVehicles.size() != 0){
+			
+		}
+		else {		
+			while (rs.next()) {
+				JSONObject route = new JSONObject();
+				String routeId = rs.getString(1);
+				route.put("route_id", routeId);
+				route.put("shape_id", rs.getString(2));
+				String tripId = rs.getString(3);
+				int dir = Integer.getInteger(tripId.substring(tripId.length() - 1)); 
+				route.put("trip_id", tripId);
+				route.put("transportation_mean", transportationMeans.get(rs.getString(1)));
+				
+				Iterator<VehicleInfo> i = liveVehicles.iterator();
+				while (i.hasNext()) {
+					VehicleInfo v = i.next();
+					if(v.getRoute().equals(routeId) && v.getDirection() == dir) {
+						route.put("score", rs.getInt(4) + realtimeApiPreferentialTreatmentScore);
+						i.remove();
+					}
+				}
+				
+				route.put("score", rs.getInt(4));
+				
+				json += "{";
+				json += "\"route_id\":\""+rs.getString(1)+"\",";
+				json += "\"shape_id\":\""+rs.getString(2)+"\",";
+				json += "\"trip_id\":\""+rs.getString(3)+"\",";
+				json += "\"transportation_mean\":\""+transportationMeans.get(rs.getString(1))+"\",";
+				json += "\"score\":"+rs.getInt(4);
+				json += "}";
 			}
-			json += "{";
-			json += "\"route_id\":\""+rs.getString(1)+"\",";
-			json += "\"shape_id\":\""+rs.getString(2)+"\",";
-			json += "\"trip_id\":\""+rs.getString(3)+"\",";
-			json += "\"transportation_mean\":\""+transportationMeans.get(rs.getString(1))+"\",";
-			json += "\"score\":"+rs.getInt(4);
-			json += "}";
 		}
 		json += "]}";
 			out.println(json);
 		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -77,6 +77,7 @@ function initilize(){
 	    $.ajax({type:"POST",
 	    	url:"/backend/ServiceLineDetection",
 	    	data: postData,
+	    	headers:{"username":"test_user"},
 	    	success: function (data) {
 	    		var end = new Date().getTime();
 	    		var table = $("#response");

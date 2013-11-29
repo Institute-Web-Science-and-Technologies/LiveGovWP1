@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -101,4 +102,18 @@ public class LiveAPI extends HttpServlet {
 		}
 		return returnList;
 	}
+}
+
+class LiveApiVehiclesNearByCallable implements Callable<List<VehicleInfo>>
+{
+  private final LatLonTsDayTuple latLonTsDayTuple;
+  private final int toleranceInMeter;
+  LiveApiVehiclesNearByCallable( LatLonTsDayTuple latLonTsDayTuple, int toleranceInMeter ){
+    this.latLonTsDayTuple = latLonTsDayTuple;
+    this.toleranceInMeter = toleranceInMeter;
+  }
+  @Override public List<VehicleInfo> call()
+  {
+    return LiveAPI.getVehiclesNearBy(latLonTsDayTuple, toleranceInMeter);
+  }
 }
