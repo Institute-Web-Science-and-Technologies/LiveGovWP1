@@ -1,4 +1,4 @@
-package eu.liveandgov.sensorcollectorv3.sensors.sensor_producers;
+package eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
