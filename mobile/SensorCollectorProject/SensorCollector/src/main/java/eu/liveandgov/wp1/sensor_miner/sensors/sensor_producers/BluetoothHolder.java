@@ -154,7 +154,7 @@ public class BluetoothHolder implements SensorHolder {
                 long timestamp_ms = System.currentTimeMillis();
 
                 // On end of the disvocery, push the results to the pipeline
-                sensorQueue.push( "<HEAD> " + pushBuilder.toString());
+                Log.d(LOG_TAG,  "<HEAD> " + pushBuilder.toString());
 
                 // If results are on time, schedule the next scan at the handler with the given delay
                 if(lastScanRequest + delay > timestamp_ms)
