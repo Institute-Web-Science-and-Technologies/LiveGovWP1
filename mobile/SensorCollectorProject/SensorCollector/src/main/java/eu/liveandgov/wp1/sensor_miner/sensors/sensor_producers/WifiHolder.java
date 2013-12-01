@@ -11,7 +11,6 @@ import android.util.Log;
 import eu.liveandgov.wp1.sensor_miner.GlobalContext;
 import eu.liveandgov.wp1.sensor_miner.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.wp1.sensor_miner.sensors.SensorSerializer;
-import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.SensorHolder;
 
 /**
  * Created by lukashaertel on 27.11.13.
@@ -62,12 +61,8 @@ public class WifiHolder implements SensorHolder {
                 // Get receive-time of the intent
                 long timestamp_ms = System.currentTimeMillis();
 
-                String generated = SensorSerializer.fromScanResults(timestamp_ms, GlobalContext.getWifiManager().getScanResults());
-
-                Log.d(LOG_TAG, generated);
-
                 // Push converted scan results to queue
-                sensorQueue.push(generated);
+                sensorQueue.push(SensorSerializer.fromScanResults(timestamp_ms, GlobalContext.getWifiManager().getScanResults()));
 
                 // If results are on time, schedule the next scan at the handler with the given delay
                 if(lastScanRequest + delay > timestamp_ms)
