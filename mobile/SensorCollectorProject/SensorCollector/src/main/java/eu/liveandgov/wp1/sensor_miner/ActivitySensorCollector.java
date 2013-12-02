@@ -328,7 +328,7 @@ public class ActivitySensorCollector extends Activity {
      * Spawn new thread that request status updates in regular intervals.
      */
     private void runStatusLoop() {
-        final int INTERVAL = 1000; // in ms;
+        final int INTERVAL = 2000; // in ms;
 
         new Thread(new Runnable() {
             @Override

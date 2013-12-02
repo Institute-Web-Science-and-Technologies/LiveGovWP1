@@ -63,7 +63,11 @@ public class ConnectorThread implements Runnable, Monitorable, MultiProducer<Str
     public void addConsumer(Consumer<String> c) {
         if (consumerList.isEmpty()) callAll(onNonEmptyList);
 
-        if (consumerList.contains(c)) return;
+        if (consumerList.contains(c)) {
+            Log.w(LOG_TAG, "Consumer already connected: " + c.toString());
+            return;
+        }
+
         consumerList.add(c);
     }
 

@@ -149,7 +149,7 @@ public class ServiceSensorControl extends Service {
         }
 
         String action = intent.getAction();
-        Log.d(LOG_TAG, "Received intent with action " + action);
+        Log.v(LOG_TAG, "Received intent with action " + action);
 
         if (action == null) return START_STICKY;
 
@@ -201,8 +201,6 @@ public class ServiceSensorControl extends Service {
 
     private void doStartHAR() {
         isHAR = true;
-        // make sure we do not add the consumer twice
-        connectorThread.removeConsumer(harPipeline);
         connectorThread.addConsumer(harPipeline);
     }
 
@@ -213,8 +211,6 @@ public class ServiceSensorControl extends Service {
 
     private void doStartStreaming() {
         isStreaming = true;
-        // make sure we do not add the consumer twice
-        connectorThread.removeConsumer(streamer);
         connectorThread.addConsumer(streamer);
     }
 

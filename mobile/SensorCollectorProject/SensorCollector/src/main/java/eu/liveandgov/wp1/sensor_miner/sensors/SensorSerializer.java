@@ -82,7 +82,7 @@ public class SensorSerializer {
 
         long timestamp_ms = (long) (event.timestamp / 1E6) + timestampCorrectionMs;
 
-        if ( sensorType == Sensor.TYPE_ACCELEROMETER){
+        if (sensorType == Sensor.TYPE_ACCELEROMETER){
             return fillStringFloats(SSF_ACCELEROMETER, timestamp_ms, GlobalContext.getUserId(), event.values);
         } else if (sensorType == Sensor.TYPE_LINEAR_ACCELERATION){
             return fillStringFloats(SSF_LINEAR_ACCELERATION, timestamp_ms, GlobalContext.getUserId(), event.values);
