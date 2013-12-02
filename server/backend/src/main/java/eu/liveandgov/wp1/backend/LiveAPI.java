@@ -1,5 +1,6 @@
 package eu.liveandgov.wp1.backend;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,10 +64,9 @@ public class LiveAPI extends HttpServlet {
 		
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();		
-		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
-		ft.setTimeZone(TimeZone.getTimeZone( "Europe/Helsinki" ));
-		Date d = new Date();
-		String ts = ft.format(d);
+		
+		String ts = getHelsinkiDateAsSimpleDateString();
+		Date d = getSimpleDateStringAsDate(ts);
 		String day = String.format(Locale.US,"%tA", d.getTime()).substring(0,3);
 		String json = "{\"vehicles\":[";
 		for (VehicleInfo o : getVehicles()) {
@@ -86,13 +86,33 @@ public class LiveAPI extends HttpServlet {
 		out.println(json);
 	}
 
+	// return current time in Helsinki
+	public static String getHelsinkiDateAsSimpleDateString() {
+		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
+		ft.setTimeZone(TimeZone.getTimeZone( "Europe/Helsinki" ));
+		return ft.format(new Date());
+	}
+	
+	// return current time in Helsinki
+	public static Date getSimpleDateStringAsDate(String simpleDateString) {
+		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
+		try {
+			return ft.parse(simpleDateString);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new Date();
+	}
+
 
 	public static List<VehicleInfo> getVehiclesNearBy(LatLonTsDayTuple latLonTsDayTuple, int toleranceInMeter) {
 		List<VehicleInfo> returnList = new LinkedList<VehicleInfo>();
 		try {
 			for (VehicleInfo o : getVehicles()) {
-				if(DivideAndConquerGtfs.haversineInMeter(o.getLat(), o.getLon(), 
-						latLonTsDayTuple.getLat(), latLonTsDayTuple.getLon()) < toleranceInMeter) {
+				double distanceInMeter = DivideAndConquerGtfs.haversineInMeter(o.getLat(), o.getLon(), 
+						latLonTsDayTuple.getLat(), latLonTsDayTuple.getLon());
+				if(distanceInMeter < toleranceInMeter) {
 					returnList.add(o);	
 				}
 			}
