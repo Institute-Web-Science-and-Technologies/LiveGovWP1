@@ -1,5 +1,8 @@
 package eu.liveandgov.wp1.sensor_miner.sensors;
 
+import android.bluetooth.BluetoothClass;
+import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.location.Location;
@@ -15,6 +18,7 @@ import java.util.List;
 
 import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
 import eu.liveandgov.wp1.sensor_miner.GlobalContext;
+import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.BluetoothHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_value_objects.GpsSensorValue;
 
 import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.*;
@@ -98,8 +102,8 @@ public class SensorSerializer {
         return "ERR," + timestamp_ms + ",,Unknown sensor " + sensorType;
     }
 
-    public static String fromScanResults(long timestamp_ms, List<ScanResult> scanResults) {
-        StringBuilder builder = new StringBuilder();
+    public static String fromScanResults(List<ScanResult> scanResults) {
+        final StringBuilder builder = new StringBuilder();
         boolean separate = false;
         for(ScanResult scanResult : scanResults)
         {
@@ -121,7 +125,45 @@ public class SensorSerializer {
             separate = true;
         }
 
-         return fillString(SSF_WIFI, timestamp_ms, GlobalContext.getUserId(), builder.toString());
+         return fillString(SSF_WIFI, System.currentTimeMillis(), GlobalContext.getUserId(), builder.toString());
+    }
+
+    public static String intermediateFromBTFound(Intent intent)
+    {
+        final StringBuilder builder = new StringBuilder();
+
+        // Extract the stored data from the bundle of the intent
+        final BluetoothDevice bluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        final BluetoothClass bluetoothClass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
+        final String name = intent.hasExtra(BluetoothDevice.EXTRA_NAME) ? intent.getStringExtra(BluetoothDevice.EXTRA_NAME) : null;
+        final Short rssi = intent.hasExtra(BluetoothDevice.EXTRA_RSSI) ? intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE) : null;
+
+        // Write the values as a tuple of Escaped Address/Device Major Class/Device Class/Bond State/Optional Escaped Name/Optional RSSI
+        builder.append("\"" + StringEscapeUtils.escapeJava(bluetoothDevice.getAddress()) + "\"");
+        builder.append('/');
+        builder.append(BluetoothHolder.getDeviceMajorClassName(bluetoothClass.getMajorDeviceClass()));
+        builder.append('/');
+        builder.append(BluetoothHolder.getDeviceClassName(bluetoothClass.getDeviceClass()));
+        builder.append('/');
+        builder.append(BluetoothHolder.getBondName(bluetoothDevice.getBondState()));
+        builder.append('/');
+        if(name != null)
+        {
+            builder.append("\"" + StringEscapeUtils.escapeJava(name) + "\"");
+        }
+        builder.append('/');
+        if(rssi != null)
+        {
+            builder.append(rssi);
+        }
+
+        // Return the created value
+        return builder.toString();
+    }
+
+    public static String fromBluetooth(String accumulatedIntermediate)
+    {
+        return fillString(SSF_BLUETOOTH, System.currentTimeMillis(), GlobalContext.getUserId(), accumulatedIntermediate);
     }
 
     public static String fromLocation(Location location) {
