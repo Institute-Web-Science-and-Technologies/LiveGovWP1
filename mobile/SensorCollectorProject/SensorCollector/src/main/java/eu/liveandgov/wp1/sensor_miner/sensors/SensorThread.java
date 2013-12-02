@@ -12,6 +12,7 @@ import eu.liveandgov.wp1.sensor_miner.GlobalContext;
 import eu.liveandgov.wp1.sensor_miner.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_miner.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.ActivityHolder;
+import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.BluetoothHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.LocationHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.MotionSensorHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.SensorHolder;
@@ -96,6 +97,7 @@ public class SensorThread implements Runnable {
         setupMotionSensor(Sensor.TYPE_ROTATION_VECTOR,      SensorCollectionOptions.REC_ROTATION);
 
         if (SensorCollectionOptions.REC_WIFI) setupWifiUpdate(SensorCollectionOptions.WIFI_SCAN_DELAY_MS);
+        if (SensorCollectionOptions.REC_BLT) setupBluetoothUpdate(SensorCollectionOptions.BLT_SCAN_DELAY_MS);
         if (SensorCollectionOptions.REC_GPS) setupLocationUpdate();
         if (SensorCollectionOptions.REC_G_ACT) setupActivityUpdate();
     }
@@ -132,6 +134,12 @@ public class SensorThread implements Runnable {
     private void setupWifiUpdate(int delay) {
         Log.i(LOG_TAG, "Registering Listener for Wifi");
         WifiHolder holder = new WifiHolder(sensorQueue, delay, sensorHandler);
+        activeSensors.add(holder);
+    }
+
+    private void setupBluetoothUpdate(int delay) {
+        Log.i(LOG_TAG, "Registering Listener for Bluetooth");
+        BluetoothHolder holder = new BluetoothHolder(sensorQueue, delay, sensorHandler);
         activeSensors.add(holder);
     }
 }

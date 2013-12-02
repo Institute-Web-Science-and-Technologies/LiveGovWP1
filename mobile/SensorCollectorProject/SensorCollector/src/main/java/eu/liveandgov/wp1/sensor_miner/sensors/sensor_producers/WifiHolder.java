@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 
 import eu.liveandgov.wp1.sensor_miner.GlobalContext;
@@ -33,7 +34,7 @@ public class WifiHolder implements SensorHolder {
     private void startNextScan() {
         if(GlobalContext.getWifiManager().startScan())
         {
-            lastScanRequest = System.currentTimeMillis();
+            lastScanRequest = SystemClock.uptimeMillis();
         }
     }
 
@@ -58,21 +59,25 @@ public class WifiHolder implements SensorHolder {
         public void onReceive(Context context, Intent intent) {
             if(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction()))
             {
-                // Get receive-time of the intent
-                long timestamp_ms = System.currentTimeMillis();
+                // Get receive-time of the intent in system uptime
+                long scanEndtime = SystemClock.uptimeMillis();
 
                 // Push converted scan results to queue
-                sensorQueue.push(SensorSerializer.fromScanResults(timestamp_ms, GlobalContext.getWifiManager().getScanResults()));
+                sensorQueue.push(SensorSerializer.fromScanResults(GlobalContext.getWifiManager().getScanResults()));
 
                 // If results are on time, schedule the next scan at the handler with the given delay
-                if(lastScanRequest + delay > timestamp_ms)
+                if(lastScanRequest + delay > scanEndtime)
                 {
-                    handler.postAtTime(new Runnable() {
+                    if(!handler.postAtTime(new Runnable() {
                         @Override
                         public void run() {
                             startNextScan();
                         }
-                    }, lastScanRequest + delay);
+                    }, lastScanRequest + delay))
+                    {
+                        // If failed to schedule, scan immediately
+                        startNextScan();
+                    }
                 }
                 else
                 {

@@ -8,17 +8,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 
 import org.apache.commons.lang3.text.StrBuilder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
 import eu.liveandgov.wp1.sensor_miner.GlobalContext;
 import eu.liveandgov.wp1.sensor_miner.connectors.sensor_queue.SensorQueue;
+import eu.liveandgov.wp1.sensor_miner.sensors.SensorSerializer;
 
 /**
  * Created by lukashaertel on 30.11.13.
@@ -27,31 +30,32 @@ public class BluetoothHolder implements SensorHolder {
     public static String LOG_TAG = "BLTH";
 
     /**
+     * This TreeMap maps the integer representing the device major class to its name.
+     */
+    private static final Map<Integer, String> DEVICE_MAJOR_CLASS_MAP = new TreeMap<Integer, String>();
+
+    /**
      * This TreeMap maps the integer representing the device class to its name.
      */
     private static final Map<Integer, String> DEVICE_CLASS_MAP = new TreeMap<Integer, String>();
 
     static
     {
-        final Map<Integer, String> deviceMajorClassName = new TreeMap<Integer, String>();
-
         for(Field field : BluetoothClass.Device.Major.class.getFields())
         {
-            // We are looking for public static fields type int
             if((field.getModifiers() & Modifier.STATIC) == 0)continue;
             if((field.getModifiers() & Modifier.PUBLIC) == 0)continue;
 
-            if( field.getType().isAssignableFrom(int.class))
+            if(field.getType().isAssignableFrom(int.class))
             {
                 try
                 {
-                    // If found, add name to the map
-                    deviceMajorClassName.put(field.getInt(null), field.getName().replace('_', ' ').toLowerCase());
+                    // Insert inverse mapping
+                    DEVICE_MAJOR_CLASS_MAP.put(field.getInt(null), field.getName().replace('_', ' ').toLowerCase());
                 }
                 catch(IllegalAccessException e)
                 {
-                    // Should not happen
-                    continue;
+                    // Do nothing
                 }
             }
         }
@@ -62,25 +66,48 @@ public class BluetoothHolder implements SensorHolder {
             if((field.getModifiers() & Modifier.STATIC) == 0)continue;
             if((field.getModifiers() & Modifier.PUBLIC) == 0)continue;
 
-            if( field.getType().isAssignableFrom(int.class))
+            if(field.getType().isAssignableFrom(int.class))
             {
                 try
                 {
-                    // Get the combined device class code
-                    final int majorMinor = field.getInt(null);
-
-                    // Retrieve name of the field and the name of the major device class
-                    final String completeName = field.getName();
-                    final String majorName =  deviceMajorClassName.get(Integer.highestOneBit(majorMinor));
-
-                    // Insert a more readable version of the name into the map
-                    DEVICE_CLASS_MAP.put(majorMinor, majorName + ":" + completeName.substring(majorName.length() + 1).replace('_', ' ').toLowerCase());
+                    // Insert inverse mapping
+                    DEVICE_CLASS_MAP.put(field.getInt(null), field.getName().replace('_', ' ').toLowerCase());
                 }
                 catch(IllegalAccessException e)
                 {
-                    continue;
+                    // Do nothing
                 }
             }
+        }
+    }
+
+    public static String getDeviceMajorClassName(int i)
+    {
+        return DEVICE_MAJOR_CLASS_MAP.get(i);
+    }
+
+    public static String getDeviceClassName(int i)
+    {
+        return DEVICE_CLASS_MAP.get(i);
+    }
+
+    public static String getBondName(int i)
+    {
+        if(i == BluetoothDevice.BOND_NONE)
+        {
+            return "none";
+        }
+        else if(i == BluetoothDevice.BOND_BONDING)
+        {
+            return "bonding";
+        }
+        else if(i == BluetoothDevice.BOND_BONDED)
+        {
+            return "bonded";
+        }
+        else
+        {
+            return "unknown";
         }
     }
 
@@ -103,7 +130,13 @@ public class BluetoothHolder implements SensorHolder {
     private void startNextScan() {
         if(bluetoothAdapter.startDiscovery())
         {
-            lastScanRequest = System.currentTimeMillis();
+            lastScanRequest = SystemClock.uptimeMillis();
+
+            Log.d(LOG_TAG, "Scan successfully started");
+        }
+        else
+        {
+            Log.w(LOG_TAG, "Bluetooth scan could not be started (Is bluetooth activated?)");
         }
     }
 
@@ -143,28 +176,32 @@ public class BluetoothHolder implements SensorHolder {
                 if(!pushBuilder.isEmpty())
                 {
                     // We are operating on a tail element, so separate
-                    pushBuilder.append("<SEPARATOR>");
+                    pushBuilder.append(';');
                 }
 
-                pushBuilder.append("<REPRESENTATION OF" + intent + ">");
+                pushBuilder.append(SensorSerializer.intermediateFromBTFound(intent));
             }
             else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()))
             {
-                // Get receive-time of the intent
-                long timestamp_ms = System.currentTimeMillis();
+                // Get receive-time of the intent in system uptime
+                long scanEndtime = SystemClock.uptimeMillis();
 
-                // On end of the disvocery, push the results to the pipeline
-                Log.d(LOG_TAG,  "<HEAD> " + pushBuilder.toString());
+                // On end of the discovery, push the results to the pipeline
+                sensorQueue.push(SensorSerializer.fromBluetooth(pushBuilder.toString()));
 
                 // If results are on time, schedule the next scan at the handler with the given delay
-                if(lastScanRequest + delay > timestamp_ms)
+                if(lastScanRequest + delay > scanEndtime)
                 {
-                    handler.postAtTime(new Runnable() {
+                    if(!handler.postAtTime(new Runnable() {
                         @Override
                         public void run() {
                             startNextScan();
                         }
-                    }, lastScanRequest + delay);
+                    }, lastScanRequest + delay))
+                    {
+                        // If failed to schedule, scan immediately
+                        startNextScan();
+                    }
                 }
                 else
                 {
