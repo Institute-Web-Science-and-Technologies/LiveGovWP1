@@ -3,7 +3,8 @@ var gps = require('../models/GPS.js')
   , acc = require('../models/Accelerometer.js')
   , lac = require('../models/LinearAcceleration.js')
   , gra = require('../models/Gravity.js')
-  , tag = require('../models/Tags.js');
+  , tag = require('../models/Tags.js')
+  , trainingWindow = require('../models/TrainingWindow.js');
 
 function getAllIds(req, res) {
   meta.getAllIds(function (err, data) {
@@ -32,8 +33,8 @@ function getGPSCount (req, res) {
 function getAccWindow (req, res) {
   var options = { windows: 200 };
   if(req.query.windows)   options.windows = parseInt(req.query.windows);
-  if(req.query.startTime) options.startTime = new Date(parseInt(req.query.startTime));
-  if(req.query.endTime)   options.endTime = new Date(parseInt(req.query.endTime));
+  if(req.query.startTime) options.startTime = parseInt(req.query.startTime);
+  if(req.query.endTime)   options.endTime = parseInt(req.query.endTime);
   acc.getWindowsForId(req.params.id, options, function (err, data) {
     if(err) { res.send(err); console.error(err); return; }
     return res.send(data);
@@ -90,6 +91,12 @@ function getTags (req, res) {
   });
 }
 
+function postWindow (req, res) {
+  trainingWindow.saveWindow(req.body.tag, req.params.id, req.body.start, req.body.end, function (err) {
+    res.send(err);
+  });
+}
+
 module.exports = {
   getGPS: getGPS,
   getGPSCount: getGPSCount,
@@ -100,5 +107,6 @@ module.exports = {
   getLacCount: getLacCount,
   getGraWindow: getGraWindow,
   getGraCount: getGraCount,
-  getTags: getTags
+  getTags: getTags,
+  postWindow: postWindow
 };

@@ -1,5 +1,7 @@
 (function () {
-  window.apiUrl = window.apiUrl || "http://localhost:3000/api/1";
+  window.apiUrl = window.apiUrl || "/api/1";
+
+  var maxTimeDifference = 5 * 60 * 1000;
 
   function Map() {
     this._map = L.map("domMap");
@@ -11,6 +13,7 @@
       styleId: 997,
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
     }).addTo(this._map);
+    this._route = new Route('0');
   }
 
   Map.prototype.clearAll = function() {
@@ -26,14 +29,14 @@
     }
   };
 
-  Map.prototype.addRoute = function(points) {
-    var line = [];
-    points.forEach(function (p) {
-      line.push(new L.LatLng(p.lat, p.lon));
+  // Since every route has its own id now we dont have to seperate the points.
+  // Only show the whole point list
+  Map.prototype.addRoutes = function(points) {
+    var self = this;
+    points.forEach(function (ele) {
+      self._route.addPoint(ele)
     });
-    console.log(line[0]);
-    this._map.setView(new L.LatLng(points[0].lat, points[0].lon), 13);
-    L.polyline(line, {color: 'red'}).addTo(this._map);
+    self.drawRoute();
   };
 
   Map.prototype.showAllForId = function(id) {
@@ -41,10 +44,14 @@
     $.ajax({
       url: apiUrl + "/" + id + "/gps?limit=0"
     }).done(function (data) {
-      self.addRoute(data);
+      self.addRoutes(data);
     });
   };
 
-  window.MyMap = Map;
+  Map.prototype.drawRoute = function() {
+    this.clearAll();
+    this._route.draw(this._map);
+  };
 
+  window.MyMap = Map;
 })();

@@ -1,4 +1,5 @@
-var apiV1 = require('./routes/apiV1.js');
+var apiV1 = require('./routes/apiV1.js')
+  , trip = require('./routes/trip.js');
 
 function register (app) {
   app.get('/api/1/devices', apiV1.getAllIds);
@@ -16,6 +17,10 @@ function register (app) {
   app.get('/api/1/:id/gra/count', apiV1.getGraCount);
 
   app.get('/api/1/:id/tag', apiV1.getTags);
+
+  app.post('/api/1/:id/window', apiV1.postWindow);
+
+  app.get('/trip/:id', trip.getTrip);
 }
 
 module.exports = register;

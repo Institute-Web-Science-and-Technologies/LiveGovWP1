@@ -15,7 +15,7 @@ function getById (id, options, callback) {
 
   pg.connect(config.pgCon, function (err, client, done) {
     if(err) { callback(err); done(); return; }
-    var query = 'SELECT ts,ST_AsGeoJSON(lonlat) FROM gps WHERE id=$1 ORDER BY ts';
+    var query = 'SELECT ts,ST_AsGeoJSON(lonlat) FROM sensor_gps WHERE trip_id=$1 ORDER BY ts';
     var values = [id];
     if(options.limit && options.limit !== 0) {
       query += ' LIMIT $2';
@@ -47,7 +47,7 @@ function getCountForId (id, options, callback) {
 
   pg.connect(config.pgCon, function (err, client, done) {
     if(err) { callback(err); done(); return; }
-    var query = 'SELECT COUNT(*) FROM gps WHERE id=$1';
+    var query = 'SELECT COUNT(*) FROM sensor_gps WHERE trip_id=$1';
     client.query(query, [id], function (err, result) {
       done();
       if(err) { callback(err); return; }

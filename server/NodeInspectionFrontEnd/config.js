@@ -1,6 +1,6 @@
 // Database Info
 exports.pgCon = {
-  user: 'liveandgov',
+  user: 'postgres',
   password: 'liveandgov',
   database: 'liveandgov',
   host: 'localhost',
