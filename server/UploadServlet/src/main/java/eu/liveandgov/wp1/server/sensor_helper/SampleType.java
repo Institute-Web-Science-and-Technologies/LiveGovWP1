@@ -20,5 +20,6 @@ public enum SampleType {
     MAG,
     WIFI,
     BLT,
-    GSM
+    GSM,
+    ROT
 }

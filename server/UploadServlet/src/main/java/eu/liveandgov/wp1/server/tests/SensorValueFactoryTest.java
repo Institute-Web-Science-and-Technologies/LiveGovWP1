@@ -2,7 +2,6 @@ package eu.liveandgov.wp1.server.tests;
 
 import eu.liveandgov.wp1.server.sensor_helper.SensorValueFactory;
 import eu.liveandgov.wp1.server.sensor_helper.SensorValueInterface;
-import junit.framework.Test;
 import junit.framework.TestCase;
 
 import java.text.ParseException;

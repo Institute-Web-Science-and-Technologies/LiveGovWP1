@@ -5,9 +5,12 @@ import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.SimpleLayout;
 import org.jeromq.ZMQ;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +40,17 @@ public class UploadServlet extends HttpServlet {
     private static final String FIELD_NAME_UPFILE = "upfile";
     private static final Logger Log = Logger.getLogger(UploadServlet.class);
     private static final String BROKER_ADDRESS = "tcp://127.0.0.1:50111";
+
+    static {
+        try {
+            SimpleLayout layout = new SimpleLayout();
+            FileAppender appender = null;
+            appender = new FileAppender(layout,"/var/log/UploadServlet.log",true);
+            Logger.getRootLogger().addAppender(appender);
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
 
     /**
      * Handle GET REQUEST

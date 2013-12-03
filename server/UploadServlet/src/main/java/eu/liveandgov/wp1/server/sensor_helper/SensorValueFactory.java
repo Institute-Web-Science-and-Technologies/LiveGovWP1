@@ -43,7 +43,7 @@ public class SensorValueFactory {
         } catch (NumberFormatException e){
             throw new ParseException("Error timestamp in " + line,0);
         } catch (IllegalArgumentException e){
-            throw new ParseException("Error parsing sample type in " + line,0);
+            throw new ParseException("Error parsing sample-type. Is the type registered in SampleType-enum? " + line,0);
         }
         // nothing found?
         return null;

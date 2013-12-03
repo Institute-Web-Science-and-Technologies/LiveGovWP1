@@ -18,4 +18,15 @@ public interface SensorValueInterface {
      */
     public SampleType getType();
 
+    /**
+     * Return user id of samples
+     * @return userId
+     */
+    public String getUserId();
+
+    /**
+     * Return time stamp of
+     * @return timestamp
+     */
+    long getTimestamp();
 }

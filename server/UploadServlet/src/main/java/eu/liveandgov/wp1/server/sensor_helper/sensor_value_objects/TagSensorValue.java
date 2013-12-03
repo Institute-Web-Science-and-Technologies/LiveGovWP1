@@ -19,4 +19,8 @@ public class TagSensorValue extends AbstractSensorValue implements SensorValueIn
         return SampleType.TAG;
     }
 
+    public String getTag(){
+        return tag;
+    }
+
 }

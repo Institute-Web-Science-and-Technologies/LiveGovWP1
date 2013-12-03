@@ -11,4 +11,12 @@ public abstract class AbstractSensorValue {
         this.id = id;
     }
 
+    public String getUserId(){
+        return id;
+    }
+
+    public long getTimestamp(){
+        return timestamp;
+    }
+
 }
