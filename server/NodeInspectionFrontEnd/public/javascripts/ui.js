@@ -13,11 +13,11 @@
     var id = $('#devId .active.item').data("value");
     if(!id) { alert("Please select a device."); return;}
     window.lMap = window.lMap || new window.MyMap();
-    lMap.showAllForId(id);
+    //lMap.showAllForId(id);
     showTagsForId(id);
     showAccelerometerForId(id);
-    showLinearAccelerationForId(id);
-    showGravityForId(id);
+    //showLinearAccelerationForId(id);
+    //showGravityForId(id);
     window.currentDevId = id;
     $('[data-tab="map"]').click();
   });
@@ -26,8 +26,8 @@
     if(!window.currentDevId) return;
     var id = window.currentDevId;
     showAccelerometerForId(id);
-    showLinearAccelerationForId(id);
-    showGravityForId(id);
+    // showLinearAccelerationForId(id);
+    // showGravityForId(id);
   });
 
   $('.saveWindow').click(function (eventObject) {

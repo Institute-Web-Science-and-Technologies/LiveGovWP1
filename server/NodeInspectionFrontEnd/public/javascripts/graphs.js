@@ -25,9 +25,10 @@
 
   function showDataInId (id, data) {
     if(!data) { console.log("No data for", id); return; }
+    console.dir(data);
     window.currentWindow = {
-      min: data[0].midTime,
-      max: data[data.length-1].midTime
+      min: data[0].startTime,
+      max: data[data.length-1].endTime
     };
     var meta = "From: " + Math.floor(data[0].startTime) + " To: " + Math.floor(data[data.length-1].endTime);
     $(".metaLabel").text(meta);
@@ -47,6 +48,7 @@
 
     data.forEach(function (item) {
       var ts = new Date(item.midTime);
+      
       avgX.push([ts, item.avgX]);
       maxX.push([ts, item.maxX]);
       minX.push([ts, item.minX]);
@@ -92,20 +94,20 @@
 
   function zoom(id, ranges) {
     $.ajax({
-      url: apiUrl + "/" + id + "/acc?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
+      url: apiUrl + "/" + id + "/acc?startTime=" + ranges.xaxis.from.toFixed(0) + "&endTime=" +ranges.xaxis.to.toFixed(0)
     }).done(function (data) {
       showDataInId("#accPlot", data);
     });
-    $.ajax({
-      url: apiUrl + "/" + id + "/lac?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
-    }).done(function (data) {
-      showDataInId("#lacPlot", data);
-    });
-    $.ajax({
-      url: apiUrl + "/" + id + "/gra?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
-    }).done(function (data) {
-      showDataInId("#graPlot", data);
-    });
+    // $.ajax({
+    //   url: apiUrl + "/" + id + "/lac?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
+    // }).done(function (data) {
+    //   showDataInId("#lacPlot", data);
+    // });
+    // $.ajax({
+    //   url: apiUrl + "/" + id + "/gra?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
+    // }).done(function (data) {
+    //   showDataInId("#graPlot", data);
+    // });
   }
 
   function limitToTime (start, end) {

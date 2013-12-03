@@ -34,7 +34,7 @@
   Map.prototype.addRoutes = function(points) {
     var self = this;
     points.forEach(function (ele) {
-      self.route.addPoint(ele)
+      self._route.addPoint(ele)
     });
     self.drawRoute();
   };
