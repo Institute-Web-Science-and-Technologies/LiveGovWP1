@@ -7,26 +7,42 @@ block content
     a.item(data-tab="graphs") Graphs
     a.item(data-tab="tables") Tables
   div.ui.active.tab.segment(data-tab="settings")
-    div.ui.three.column.grid
-      div.row
-        div.column
-          div.ui.floating.fluid.selection.dropdown#devId
-            div.text Device
-            i.dropdown.icon
-            div.menu
-              each device in devices
-                div.item(data-value=device.devId)= device.devId + " GPS Count:" + device.gpsCount
-        div.column
-          div.ui.floating.fluid.selection.dropdown
-            div.text Service Lines
-            i.dropdown.icon
-            div.menu
-              each sl in serviceLines
-                div.item(data-value=sl.id)= sl.id + " " + sl.linename + " " + sl.type
-      div.row
-        div.column
-        div.column
-          div.ui.purple.button#showBtn Show
+    table.ui.five.column.table.segment
+      thead
+        tr
+          td Trip Id
+          td User Id
+          td Start Time
+          td End Time
+          td Duration
+          td Name
+      tbody
+        each device in devices
+          tr
+            td= device.tripId
+            td= device.userId
+            td= device.startTime
+            td= device.endTime
+            td= device.duration
+            td= device.name
+
+          //- div.ui.floating.fluid.selection.dropdown#devId
+          //-   div.text Device
+          //-   i.dropdown.icon
+          //-   div.menu
+          //-     each device in devices
+          //-       div.item(data-value=device.devId)= device.devId + " GPS Count:" + device.gpsCount
+        //- div.column
+        //-   div.ui.floating.fluid.selection.dropdown
+        //-     div.text Service Lines
+        //-     i.dropdown.icon
+        //-     div.menu
+        //-       each sl in serviceLines
+        //-         div.item(data-value=sl.id)= sl.id + " " + sl.linename + " " + sl.type
+    div.row
+      div.column
+      div.column
+        div.ui.purple.button#showBtn Show
   div.ui.tab.segment(data-tab="map")
     div.ui.vertical.segment
       div.ui.two.column.grid
