@@ -2,6 +2,7 @@ package eu.liveandgov.wp1.backend;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -22,14 +23,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONObject;
+
 @WebServlet("/LiveAPI")
 public class LiveAPI extends HttpServlet {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	// http://dl.dropboxusercontent.com/u/20567085/Mattersoft%20Live!%20interface%20description%20v1_6.pdf
 	private static final String REQUEST = "http://83.145.232.209:10001/?type=vehicles&lng1=20&lat1=60&lng2=30&lat2=70&online=1";
 	
 	// TODO refactor: in this class we only need the route_ids without transportation means
@@ -38,10 +37,17 @@ public class LiveAPI extends HttpServlet {
 	
 	public LiveAPI() {
 		super();
-		serviceLineWhiteList = SnippetServiceLineDetection.initTransportationMeans();
+		// The live API reply contains vehicles which are not
+		// in our database. Therefore, our LiveAPI wrapper  
+		// forwards only vehicles found on the white list.
+		serviceLineWhiteList = ServiceLineDetection.initTransportationMeans();
 	}
 	
-	
+	/**
+	 * 
+	 * @return A List of vehicles currently traveling in Helsinki
+	 * @throws IOException
+	 */
 	private static List<VehicleInfo> getVehicles() throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(new URL(
 				REQUEST).openStream()));
@@ -60,52 +66,55 @@ public class LiveAPI extends HttpServlet {
 	}
 	
 	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+			HttpServletResponse response) throws ServletException, IOException {	
+		
+		// current time in Helsinki
+		Date d = new Date();
+		String ts = getHelsinkiDateAsSimpleDateString(d);
+		
+		// current day in Helsinki
+		String day = getHelsinkiDayString(d);
+		
+		List<JSONObject> allTrips = new ArrayList<JSONObject>();
+		for (VehicleInfo o : getVehicles()) {
+			JSONObject trip = new JSONObject();
+			trip.put("route_id",o.getRoute());
+			trip.put("trip_id",o.getId());
+			trip.put("lat",o.getLat());
+			trip.put("lon",o.getLon());
+			trip.put("ts",ts);
+			trip.put("day",day);
+			allTrips.add(trip);
+		}
+		JSONObject responseJSON = new JSONObject();
+		responseJSON.put("vehicles", allTrips);
 		
 		response.setContentType("application/json");
-		PrintWriter out = response.getWriter();		
-		
-		String ts = getHelsinkiDateAsSimpleDateString();
-		Date d = getSimpleDateStringAsDate(ts);
-		String day = String.format(Locale.US,"%tA", d.getTime()).substring(0,3);
-		String json = "{\"vehicles\":[";
-		for (VehicleInfo o : getVehicles()) {
-			if(json.length() > 13) {
-				json += ",\n";
-			}
-			json += "{";
-			json += "\"route_id\":\""+o.getRoute()+"\",";
-			json += "\"trip_id\":\""+o.getId()+"\",";
-			json += "\"lat\":"+o.getLat()+",";
-			json += "\"lon\":"+o.getLon()+",";
-			json += "\"ts\":\""+ts+"\",";
-			json += "\"day\":\""+day;
-			json += "\"}";
-		}
-		json += "]}";
-		out.println(json);
+		PrintWriter out = response.getWriter();	
+		out.println(responseJSON.toString());
 	}
 
-	// return current time in Helsinki
-	public static String getHelsinkiDateAsSimpleDateString() {
-		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
+	public static String getHelsinkiDayString(Date d) {
+		SimpleDateFormat ft = new SimpleDateFormat ("EEE", Locale.US);
 		ft.setTimeZone(TimeZone.getTimeZone( "Europe/Helsinki" ));
-		return ft.format(new Date());
-	}
-	
-	// return current time in Helsinki
-	public static Date getSimpleDateStringAsDate(String simpleDateString) {
-		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
-		try {
-			return ft.parse(simpleDateString);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return new Date();
+		return ft.format(d);
 	}
 
+	/**
+	 * @return current time in Helsinki as String yyyy-MM-dd HH:mm:ss
+	 */
+	public static String getHelsinkiDateAsSimpleDateString(Date d) {
+		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss", Locale.US);
+		ft.setTimeZone(TimeZone.getTimeZone( "Europe/Helsinki" ));
+		return ft.format(d);
+	}
 
+    /**
+     * 
+     * @param latLonTsDayTuple origin where you are 
+     * @param toleranceInMeter radius in which you search
+     * @return all LiveAPI vehicles with a distance less than {@code toleranceInMeter} from {@code latLonTsDayTuple}
+     */
 	public static List<VehicleInfo> getVehiclesNearBy(LatLonTsDayTuple latLonTsDayTuple, int toleranceInMeter) {
 		List<VehicleInfo> returnList = new LinkedList<VehicleInfo>();
 		try {
@@ -117,13 +126,15 @@ public class LiveAPI extends HttpServlet {
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return returnList;
 	}
 }
 
+/**
+ *  A wrapper for asynchronous calls of {@code getVehiclesNearBy}
+ */
 class LiveApiVehiclesNearByCallable implements Callable<List<VehicleInfo>>
 {
   private final LatLonTsDayTuple latLonTsDayTuple;

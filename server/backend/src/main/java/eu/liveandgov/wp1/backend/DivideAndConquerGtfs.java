@@ -223,7 +223,7 @@ public class DivideAndConquerGtfs {
     }
     
     // http://www.movable-type.co.uk/scripts/latlong.html
-    private static double bearingInRad(double lat1, double long1, double lat2, double long2){
+    public static double bearingInRad(double lat1, double long1, double lat2, double long2){
     	double dlong = (long2 - long1) * d2r;
     	double y = Math.sin(dlong) * Math.cos(lat2 * d2r);
     	double x = Math.cos(lat1 * d2r)*Math.sin(lat2 * d2r) -
