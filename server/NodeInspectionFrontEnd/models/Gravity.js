@@ -29,7 +29,7 @@ function getWindowsForId (id, options, callback) {
                     FROM (\
                       SELECT x, y, z, ts\
                       , NTILE($1) OVER (ORDER BY ts) AS w\
-                      FROM gravity WHERE id=$2 {{LIMIT_TIME}}) A\
+                      FROM sensor_gravity WHERE trip_id=$2 {{LIMIT_TIME}}) A\
                     GROUP BY w\
                     ORDER BY w;";
     var limitTime = "";
@@ -81,7 +81,7 @@ function getCountForId (id, options, callback) {
 
   pg.connect(config.pgCon, function (err, client, done) {
     if(err) { callback(err); done(); return; }
-    var query = 'SELECT COUNT(*) FROM gravity WHERE id=$1;';
+    var query = 'SELECT COUNT(*) FROM sensor_gravity WHERE trip_id=$1;';
     client.query(query, [id], function (err, result) {
       done();
       if(err) { callback(err); return; }

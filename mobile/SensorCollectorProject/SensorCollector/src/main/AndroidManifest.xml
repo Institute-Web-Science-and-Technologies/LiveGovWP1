@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="eu.liveandgov.sensorcollectorv3"
+    package="eu.liveandgov.wp1.sensor_miner"
     android:versionCode="1"
-    android:versionName="0.9" >
+    android:versionName="2.0"
+    >
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -10,6 +11,13 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <uses-sdk
         android:minSdkVersion="7"
@@ -21,7 +29,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ActivitySensorCollector"
+            android:name="eu.liveandgov.wp1.sensor_miner.ActivitySensorCollector"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +38,7 @@
         </activity>
 
         <service
-            android:name=".ServiceSensorControl"
+            android:name="eu.liveandgov.wp1.sensor_miner.ServiceSensorControl"
             android:process="">
             <intent-filter>
                 <action android:name="eu.liveandgov.sensorcollectorapi.intent.action.GET_STATUS"/>
@@ -45,7 +53,7 @@
         </service>
 
         <service
-                android:name=".sensors.sensor_producers.ActivityIntentService"
+                android:name="eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.ActivityIntentService"
                 android:label="@string/app_name"
                 android:exported="false">
         </service>

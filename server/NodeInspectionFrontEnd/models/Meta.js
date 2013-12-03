@@ -5,13 +5,15 @@ var _ = require('underscore')
 function getAllIds(callback) {
   pg.connect(config.pgCon, function (err, client, done) {
     if(err) { callback(err); done(); return; }
-    client.query("SELECT id, COUNT(*) FROM gps GROUP BY id;", function (err, data) {
+    client.query("SELECT * FROM trips;", function (err, data) {
       done();
       if(err) { callback(err); return; }
       var result = _.map(data.rows, function(e) {
         return {
-          devId: e.id,
-          gpsCount: e.count
+          trip_id: e.trip_id,
+          userId: e.user_id,
+          duration: e.duration,
+          name: e.name
         };
       });
       callback(null, result);

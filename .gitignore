@@ -1,4 +1,10 @@
 #
+# General
+# 
+
+*.zip
+
+#
 # JAVA
 #
 
@@ -6,7 +12,7 @@
 *.class
 
 # Package Files 
-*.jar
+# *.jar
 *.war
 *.ear
 
@@ -63,13 +69,14 @@ local.properties
 # PDT-specific
 .buildpath
 
-
 #
 # IDEA
 #
 # see: http://stackoverflow.com/questions/11968531/what-to-gitignore-from-the-idea-folder
+
+*.iml
+.idea/
+
 .iws
 workspace.xml
 tasks.xml
-*.iml
-

@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class InspectionServlet
  */
-@WebServlet("/ServiceLineDetection")
+@WebServlet("/ServiceLineDetectionOld")
 public class ServiceLineDetection extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	PostgresqlDatabase db;

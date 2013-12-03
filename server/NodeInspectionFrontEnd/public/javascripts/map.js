@@ -1,5 +1,5 @@
 (function () {
-  window.apiUrl = window.apiUrl || "http://localhost:3000/api/1";
+  window.apiUrl = window.apiUrl || "/api/1";
 
   var maxTimeDifference = 5 * 60 * 1000;
 

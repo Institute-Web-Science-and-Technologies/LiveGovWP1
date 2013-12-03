@@ -46,7 +46,8 @@ public class SensorValueFactory {
             throw new ParseException("Error parsing sample type in " + line,0);
         }
         // nothing found?
-        throw new ParseException("Sensor type not found in " + line, 0);
+        return null;
+        // throw new ParseException("Sensor type not found in " + line, 0);
     }
 
     public static SensorValueInterface parseMotionSensorValue(SampleType type, long timestamp, String id, String value)
