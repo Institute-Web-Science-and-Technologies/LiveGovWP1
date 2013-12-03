@@ -37,34 +37,6 @@
       self.route.addPoint(ele)
     });
     self.drawRoute();
-
-    // var self = this;
-    // self._routes = [];
-    // var currentRoute = new Route("0");
-    // var currentRouteNumber = 0;
-    // var lastTime = -1;
-    // var eleTime = 0;
-    // points.forEach(function (ele) {
-    //   eleTime = new Date(ele.ts);
-    //   if(lastTime >= 0 && eleTime - lastTime >= maxTimeDifference) {
-    //     console.log("New Route");
-    //     self._routes.push(currentRoute);
-    //     currentRoute = new Route("" + (++currentRouteNumber));
-    //   }
-    //   currentRoute.addPoint(ele);
-    //   lastTime = eleTime;
-    // });
-    // self._routes.push(currentRoute);
-    // $("#routeMenu").empty();
-    // self._routes.forEach(function (ele, index) {
-    //   $("#routeMenu").append('<div class="item" data-value="'+ index +'">Route '+ ele.label + ' ('+ ele._points.length +') </div>');
-    //   ele.draw(self._map);
-    // });
-    // $('#route').dropdown({
-    //     onChange: function (value) {
-    //       window.lMap.drawRoute(value);
-    //     }
-    // });
   };
 
   Map.prototype.showAllForId = function(id) {
@@ -82,5 +54,4 @@
   };
 
   window.MyMap = Map;
-
 })();

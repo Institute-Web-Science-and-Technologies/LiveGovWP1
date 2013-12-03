@@ -48,16 +48,16 @@
     data.forEach(function (item) {
       var ts = new Date(item.midTime);
       avgX.push([ts, item.avgX]);
-      //maxX.push([ts, item.maxX]);
-      //minX.push([ts, item.minX]);
+      maxX.push([ts, item.maxX]);
+      minX.push([ts, item.minX]);
 
       avgY.push([ts, item.avgY]);
-      //maxY.push([ts, item.maxY]);
-      //minY.push([ts, item.minY]);
+      maxY.push([ts, item.maxY]);
+      minY.push([ts, item.minY]);
 
       avgZ.push([ts, item.avgZ]);
-      //maxZ.push([ts, item.maxZ]);
-      //minZ.push([ts, item.minZ]);
+      maxZ.push([ts, item.maxZ]);
+      minZ.push([ts, item.minZ]);
     });
     
     var plotData = [

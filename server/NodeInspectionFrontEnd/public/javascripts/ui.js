@@ -44,7 +44,6 @@
     var endDate = window.currentWindow.max + 60 * 60 * 1000;
     var tag = $("#newTag").val();
     $.post("/api/1/" + window.currentDevId + "/window", {start: startDate, end: endDate, tag: tag}, function(data) { console.dir(data)});
-    //alert("INSERT INTO raw_training_data (type, ts, x, y, z, tag) SELECT 'acc' AS type,ts,x,y,z, 'test' as tag FROM accelerometer WHERE id='"+window.currentDevId+"' AND ts>=TIMESTAMP '"+startDate+"' AND ts<=TIMESTAMP '"+endDate+"';");
   });
 
 
