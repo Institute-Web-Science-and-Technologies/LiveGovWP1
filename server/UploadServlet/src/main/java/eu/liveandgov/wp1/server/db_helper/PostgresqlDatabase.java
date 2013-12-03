@@ -3,16 +3,8 @@
  */
 package eu.liveandgov.wp1.server.db_helper;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.sql.*;
 
-import eu.liveandgov.wp1.server.db_helper.inserter.AccInserter;
-import eu.liveandgov.wp1.server.db_helper.inserter.TagInserter;
-import eu.liveandgov.wp1.server.sensor_helper.SensorValueFactory;
-import eu.liveandgov.wp1.server.sensor_helper.SensorValueInterface;
 import org.postgresql.Driver;
 
 /**

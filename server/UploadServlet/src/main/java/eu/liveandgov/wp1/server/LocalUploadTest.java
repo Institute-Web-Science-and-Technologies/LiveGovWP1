@@ -3,9 +3,7 @@ package eu.liveandgov.wp1.server;
 import eu.liveandgov.wp1.server.db_helper.BatchInserter;
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
 import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
-import org.jeromq.ZMQ;
 
 import java.io.*;
 import java.sql.SQLException;

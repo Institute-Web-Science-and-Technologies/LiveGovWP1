@@ -1,13 +1,10 @@
 package eu.liveandgov.wp1.server.db_helper.inserter;
 
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
-import eu.liveandgov.wp1.server.sensor_helper.sensor_value_objects.AccSensorValue;
-import eu.liveandgov.wp1.server.sensor_helper.sensor_value_objects.TagSensorValue;
+import eu.liveandgov.wp1.shared.sensor_value_objects.TagSensorValue;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
 
 /**
  * Created with IntelliJ IDEA.

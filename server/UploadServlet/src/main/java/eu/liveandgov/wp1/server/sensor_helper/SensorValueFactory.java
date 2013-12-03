@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.server.sensor_helper;
 
-import eu.liveandgov.wp1.server.sensor_helper.sensor_value_objects.*;
+import eu.liveandgov.wp1.shared.SampleType;
+import eu.liveandgov.wp1.shared.sensor_value_objects.*;
 
 import java.text.ParseException;
 

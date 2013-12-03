@@ -1,13 +1,11 @@
 package eu.liveandgov.wp1.server.db_helper;
 
-import eu.liveandgov.wp1.server.db_helper.inserter.AbstractInserter;
-import eu.liveandgov.wp1.server.db_helper.inserter.AccInserter;
-import eu.liveandgov.wp1.server.db_helper.inserter.GpsInserter;
-import eu.liveandgov.wp1.server.db_helper.inserter.TagInserter;
-import eu.liveandgov.wp1.server.sensor_helper.SampleType;
+import eu.liveandgov.wp1.server.db_helper.inserter.*;
+import eu.liveandgov.wp1.shared.SampleType;
 import eu.liveandgov.wp1.server.sensor_helper.SensorValueFactory;
-import eu.liveandgov.wp1.server.sensor_helper.SensorValueInterface;
-import eu.liveandgov.wp1.server.sensor_helper.sensor_value_objects.*;
+import eu.liveandgov.wp1.shared.sensor_value_objects.SensorValueInterface;
+import eu.liveandgov.wp1.shared.sensor_value_objects.*;
+import eu.liveandgov.wp1.shared.SsfFileFormat;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -22,13 +20,11 @@ import java.util.Map;
  * Time: 3:53 PM
  */
 public class BatchInserter {
-    private static PostgresqlDatabase db;
-    private Map<SampleType,AbstractInserter> insertMap = new HashMap<SampleType, AbstractInserter>();
     private static final Logger Log = Logger.getLogger(BatchInserter.class);
 
-    private AccInserter accInserter;
-    private TagInserter tagInserter;
-    private GpsInserter gpsInserter;
+    private static PostgresqlDatabase db;
+
+    private Map<SampleType,AbstractInserter> inserter = new HashMap<SampleType, AbstractInserter>();
 
     public static final String VALUE_STOP_RECORDING = "STOP_RECORDING";
     public static final String VALUE_START_RECORDING = "START_RECORDING";
@@ -36,10 +32,11 @@ public class BatchInserter {
     public BatchInserter(PostgresqlDatabase db) throws SQLException {
         this.db = db;
 
-        accInserter = new AccInserter(db);
-        tagInserter = new TagInserter(db);
-        gpsInserter = new GpsInserter(db);
-
+        inserter.put(SampleType.ACC, new AccInserter(db));
+        inserter.put(SampleType.LAC, new LacInserter(db));
+        inserter.put(SampleType.GRA, new GraInserter(db));
+        inserter.put(SampleType.TAG, new TagInserter(db));
+        inserter.put(SampleType.GPS, new GpsInserter(db));
     }
 
     private static enum ParsingState {
@@ -60,15 +57,13 @@ public class BatchInserter {
     public static int batchInsertFile(PostgresqlDatabase db, BufferedReader reader) throws IOException, SQLException {
         BatchInserter batchInsert = new BatchInserter(db);
 
-        int count = 0;
-        String line = "";
+        ParsingState state = ParsingState.INIT;
+        int rowCount = 0;
 
+        String line = "";
         String lastUserId = "";
         long lastTimestamp = -1;
-
         int tripId = -1;
-
-        ParsingState state = ParsingState.INIT;
 
 
         while ((line = reader.readLine()) != null) {
@@ -85,11 +80,14 @@ public class BatchInserter {
                     tripId = generateNewTripId(SVO);
                     lastUserId = SVO.getUserId();
                     state = ParsingState.RUNNING;
+
+                    if (isStartRecording(SVO)) continue; // do not insert "START_RECORING" tag
                 }
 
                 if (isStopRecording(SVO)) {
                     setStopTime(tripId, SVO.getTimestamp());
                     state = ParsingState.STOPPED;
+                    continue; // do not insert "STOP_RECORDING" tag
                 }
 
                 if (state == ParsingState.RUNNING){
@@ -102,7 +100,7 @@ public class BatchInserter {
                     }
 
                     batchInsert.add(SVO, tripId);
-                    if (++count % 1000 == 0) batchInsert.executeBatch();
+                    if (++rowCount % 1000 == 0) batchInsert.executeBatch();
                 }
 
                 lastTimestamp = SVO.getTimestamp();
@@ -120,7 +118,7 @@ public class BatchInserter {
         batchInsert.executeBatch();
         batchInsert.close();
 
-        return count;
+        return rowCount;
     }
 
     private static void setStopTime(int tripId, long timestamp) throws SQLException {
@@ -156,20 +154,9 @@ public class BatchInserter {
     public void add(SensorValueInterface svo, int tripId) throws SQLException {
         SampleType type = svo.getType();
 
-        if (type == SampleType.ACC) {
-            accInserter.batchInsert((AccSensorValue) svo, tripId);
-        } else if (type == SampleType.GPS ){
-            gpsInserter.batchInsert((GPSSensorValue) svo, tripId);
-        } else if (type == SampleType.TAG ) {
-            tagInserter.batchInsert((TagSensorValue) svo, tripId);
-        } else if (type == SampleType.ACT ) {
-            // TODO
-        } else if (type == SampleType.LAC) {
-            // TODO
-        } else if (type == SampleType.GRA) {
-            // TODO
+        if (inserter.keySet().contains(type)) {
+            inserter.get(type).batchInsert((AbstractSensorValue) svo, tripId);
         } else {
-            // throw new IllegalArgumentException("Sensor Type " + type + " not supported. SVO:" + svo.toSSF());
             Log.warn("Sensortype " + type + "not supported, yet. Found in " + svo.toSSF() );
         }
 
@@ -178,16 +165,16 @@ public class BatchInserter {
     public void executeBatch() throws SQLException {
         Log.info("## Execute Batch");
 
-        accInserter.executeBatch();
-        tagInserter.executeBatch();
-        gpsInserter.executeBatch();
+        for (AbstractInserter i : inserter.values()){
+            i.executeBatch();
+        }
     }
 
     public void close() throws SQLException {
         Log.info("## Close Statement");
 
-        accInserter.close();
-        tagInserter.close();
-        gpsInserter.close();
+        for (AbstractInserter i : inserter.values()){
+            i.close();
+        }
     }
 }

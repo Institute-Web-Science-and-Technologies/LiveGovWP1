@@ -1,7 +1,6 @@
-package eu.liveandgov.wp1.server.sensor_helper.sensor_value_objects;
+package eu.liveandgov.wp1.shared.sensor_value_objects;
 
-import eu.liveandgov.wp1.server.sensor_helper.SampleType;
-import eu.liveandgov.wp1.server.sensor_helper.SensorValueInterface;
+import eu.liveandgov.wp1.shared.SampleType;
 
 public class GoogleActivitySensorValue extends AbstractSensorValue implements SensorValueInterface {
 	public final String activity;

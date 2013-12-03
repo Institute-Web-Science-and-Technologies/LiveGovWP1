@@ -5,10 +5,8 @@ import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
 import org.apache.log4j.Logger;
 import org.jeromq.ZMQ;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.sql.SQLException;
-import java.util.zip.GZIPInputStream;
 
 /**
  * User: hartmann

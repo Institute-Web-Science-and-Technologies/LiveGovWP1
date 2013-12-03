@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.jeromq.ZMQ;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

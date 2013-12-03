@@ -1,7 +1,8 @@
 package eu.liveandgov.wp1.server.db_helper.inserter;
 
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
-import eu.liveandgov.wp1.server.sensor_helper.sensor_value_objects.AbstractSensorValue;
+import eu.liveandgov.wp1.shared.sensor_value_objects.AbstractSensorValue;
+import eu.liveandgov.wp1.shared.sensor_value_objects.SensorValueInterface;
 import org.apache.commons.lang.StringUtils;
 
 import java.sql.PreparedStatement;
@@ -47,9 +48,12 @@ public abstract class AbstractInserter<T extends AbstractSensorValue> {
         return db.connection.prepareStatement("INSERT INTO " + getTableName() + " VALUES " + getValueString() + ";");
     }
 
+    /**
+     * Generate String "(?, ?, ?, ?)" with the appropriate number of ?
+     * Override to modify perparedStatement to insert samples
+     * @return valueString
+     */
     protected String getValueString() {
-        // generate String "(?, ?, ?, ?)" with the appropriate number of ?
-
         int commaCount = StringUtils.countMatches(getSchema(),",");
         if (commaCount == 0) throw new IllegalStateException("No fields in Schema");
 
@@ -61,17 +65,32 @@ public abstract class AbstractInserter<T extends AbstractSensorValue> {
         return valueString.toString();
     }
 
+    /**
+     * Stage sensor values for insertion. Call executeBatch() to write transaction.
+     *
+     * @param svo - containing sensor values
+     * @param tripid - used in database
+     * @throws SQLException
+     */
     public void batchInsert(T svo, int tripid) throws SQLException {
         insertValues(insertStatement, svo, tripid);
         insertStatement.addBatch();
     }
 
-    public void prepareTable() throws SQLException {
-        db.createStatement().execute("CREATE TABLE IF NOT EXISTS " + getTableName() + " " + getSchema() + ";");
-    }
-
+    /**
+     * Store staged sensor samples.
+     * @throws SQLException
+     */
     public void executeBatch() throws SQLException {
         insertStatement.executeBatch();
+    }
+
+    /**
+     * Create tables if not exists.
+     * @throws SQLException
+     */
+    public void prepareTable() throws SQLException {
+        db.createStatement().execute("CREATE TABLE IF NOT EXISTS " + getTableName() + " " + getSchema() + ";");
     }
 
     public void close() throws SQLException {

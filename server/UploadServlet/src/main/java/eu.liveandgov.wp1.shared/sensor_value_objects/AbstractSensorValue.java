@@ -1,6 +1,4 @@
-package eu.liveandgov.wp1.server.sensor_helper.sensor_value_objects;
-
-import eu.liveandgov.wp1.server.sensor_helper.SampleType;
+package eu.liveandgov.wp1.shared.sensor_value_objects;
 
 public abstract class AbstractSensorValue {
     public final long timestamp;

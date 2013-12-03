@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.server.db_helper.inserter;
 
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
-import eu.liveandgov.wp1.shared.sensor_value_objects.AccSensorValue;
+import eu.liveandgov.wp1.shared.sensor_value_objects.LacSensorValue;
 
 import java.sql.SQLException;
 
@@ -9,18 +9,19 @@ import java.sql.SQLException;
  * Created with IntelliJ IDEA.
  * User: hartmann
  * Date: 12/3/13
- * Time: 2:45 PM
+ * Time: 11:37 PM
  * To change this template use File | Settings | File Templates.
+ *
  */
-public class AccInserter extends AbstractMotionValueInserter<AccSensorValue> {
+public class LacInserter extends AbstractMotionValueInserter<LacSensorValue> {
 
-    public AccInserter(PostgresqlDatabase db) throws SQLException {
+    public LacInserter(PostgresqlDatabase db) throws SQLException {
         super(db);
     }
 
     @Override
     protected String getTableName() {
-        return "sensor_accelerometer";
+        return "sensor_linear_acceleration";
     }
 
 }
