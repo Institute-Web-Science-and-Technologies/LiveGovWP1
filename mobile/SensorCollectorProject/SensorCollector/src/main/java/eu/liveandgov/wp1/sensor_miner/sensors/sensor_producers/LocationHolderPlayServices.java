@@ -26,7 +26,7 @@ import eu.liveandgov.wp1.sensor_miner.sensors.SensorSerializer;
  *
  * Created by hartmann on 9/15/13.
  */
-public class LocationHolder implements
+public class LocationHolderPlayServices implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener,
         LocationListener, SensorHolder {
@@ -50,7 +50,7 @@ public class LocationHolder implements
 
     private final SensorQueue sensorQueue;
 
-    public LocationHolder(SensorQueue sensorQueue, Looper myLooper){
+    public LocationHolderPlayServices(SensorQueue sensorQueue, Looper myLooper){
         this.myLooper = myLooper;
         this.sensorQueue = sensorQueue;
         init();

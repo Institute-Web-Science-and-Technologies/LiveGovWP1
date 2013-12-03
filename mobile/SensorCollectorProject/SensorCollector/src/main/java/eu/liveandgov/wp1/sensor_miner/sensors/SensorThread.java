@@ -5,6 +5,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,7 +16,7 @@ import eu.liveandgov.wp1.sensor_miner.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_miner.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.ActivityHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.BluetoothHolder;
-import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.LocationHolder;
+import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.LocationHolderPlayServices;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.MotionSensorHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.SensorHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.WifiHolder;
@@ -120,9 +123,16 @@ public class SensorThread implements Runnable {
     }
 
     private void setupLocationUpdate() {
-        Log.i(LOG_TAG, "Registering Listener for GPS");
-        LocationHolder holder = new LocationHolder(sensorQueue, Looper.myLooper());
-        activeSensors.add(holder);
+        // Check if Google Play Services are available
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(GlobalContext.context);
+        if(ConnectionResult.SUCCESS == resultCode) {
+            Log.i(LOG_TAG, "Registering Listener for GPS using GooglePlayServices.");
+            LocationHolderPlayServices holder = new LocationHolderPlayServices(sensorQueue, Looper.myLooper());
+            activeSensors.add(holder);
+        } else {
+            Log.d(LOG_TAG, "Register fallback GPS listener.");
+            // TODO
+        }
     }
 
     private void setupActivityUpdate() {

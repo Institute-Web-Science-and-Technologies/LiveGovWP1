@@ -30,9 +30,9 @@ public class SensorCollectionOptions {
     // Network samples
     public static final boolean REC_WIFI = true;   // wifi
     public static final int WIFI_SCAN_DELAY_MS = 20000; // delay in milli seconds
-    public static final boolean REC_GSM = true;    // GSM
     public static final boolean REC_BLT = true;    // Bluetooth
     public static final int BLT_SCAN_DELAY_MS = 20000; // delay in milli seconds
+    public static final boolean REC_GSM = true;    // GSM
 
 
     /**
