@@ -29,7 +29,7 @@
       min: data[0].midTime,
       max: data[data.length-1].midTime
     };
-    var meta = "From: " + Math.floor(data[0].midTime) + " To: " + Math.floor(data[data.length-1].midTime);
+    var meta = "From: " + Math.floor(data[0].startTime) + " To: " + Math.floor(data[data.length-1].endTime);
     $(".metaLabel").text(meta);
     var labelId = id.replace("Plot", "Label");
     $(labelId).text(data.length);

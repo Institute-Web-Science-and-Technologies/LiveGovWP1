@@ -1,6 +1,8 @@
 var _ = require('underscore')
   , pg = require('pg')
-  , config = require('../config.js');
+  , config = require('../config.js')
+  , moment = require('moment');
+
 
 function getAllIds(callback) {
   pg.connect(config.pgCon, function (err, client, done) {
@@ -9,10 +11,14 @@ function getAllIds(callback) {
       done();
       if(err) { callback(err); return; }
       var result = _.map(data.rows, function(e) {
+        var start = moment(parseInt(e.start_ts))
+          , end = moment(parseInt(e.stop_ts));
         return {
-          trip_id: e.trip_id,
+          tripId: e.trip_id,
           userId: e.user_id,
-          duration: e.duration,
+          startTime: start,
+          endTime: end,
+          duration: start.diff(end, 'seconds'),
           name: e.name
         };
       });
