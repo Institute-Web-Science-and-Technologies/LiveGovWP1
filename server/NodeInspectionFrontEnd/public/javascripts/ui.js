@@ -7,8 +7,7 @@
     }
   });
 
-  $('.ui.dropdown').dropdown();
-  
+  $('.ui.dropdown').dropdown();  
 
   $("#showBtn").click(function(eventObject) {
     var id = $('#devId .active.item').data("value");
