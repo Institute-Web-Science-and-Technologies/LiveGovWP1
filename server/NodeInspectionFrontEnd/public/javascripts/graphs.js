@@ -25,7 +25,6 @@
 
   function showDataInId (id, data) {
     if(!data) { console.log("No data for", id); return; }
-    console.dir(data);
     window.currentWindow = {
       min: data[0].startTime,
       max: data[data.length-1].endTime
@@ -98,16 +97,16 @@
     }).done(function (data) {
       showDataInId("#accPlot", data);
     });
-    // $.ajax({
-    //   url: apiUrl + "/" + id + "/lac?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
-    // }).done(function (data) {
-    //   showDataInId("#lacPlot", data);
-    // });
-    // $.ajax({
-    //   url: apiUrl + "/" + id + "/gra?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
-    // }).done(function (data) {
-    //   showDataInId("#graPlot", data);
-    // });
+    $.ajax({
+      url: apiUrl + "/" + id + "/lac?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
+    }).done(function (data) {
+      showDataInId("#lacPlot", data);
+    });
+    $.ajax({
+      url: apiUrl + "/" + id + "/gra?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
+    }).done(function (data) {
+      showDataInId("#graPlot", data);
+    });
   }
 
   function limitToTime (start, end) {

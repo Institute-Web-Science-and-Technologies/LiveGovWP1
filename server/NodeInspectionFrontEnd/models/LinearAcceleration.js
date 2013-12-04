@@ -61,9 +61,9 @@ function getWindowsForId (id, options, callback) {
           avgZ: e.avgz,
           minZ: e.minz,
           maxZ: e.maxz,
-          startTime: e.starttime.getTime(),
-          endTime: e.endtime.getTime(),
-          midTime: new Date((e.endtime.getTime() + e.starttime.getTime()) / 2).getTime()
+          startTime: parseInt(e.starttime),
+          endTime: parseInt(e.endtime),
+          midTime: (parseInt(e.starttime) + parseInt(e.endtime)) / 2
         };
       });
       callback(null, data);
