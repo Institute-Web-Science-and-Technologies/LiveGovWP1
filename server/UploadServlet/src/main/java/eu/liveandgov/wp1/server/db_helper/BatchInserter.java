@@ -5,6 +5,7 @@ import eu.liveandgov.wp1.shared.sensors.SampleType;
 import eu.liveandgov.wp1.shared.sensors.SensorValueFactory;
 import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.SensorValueInterface;
 import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.*;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -28,7 +29,7 @@ public class BatchInserter {
     public static final String VALUE_STOP_RECORDING = "STOP_RECORDING";
     public static final String VALUE_START_RECORDING = "START_RECORDING";
 
-    private static int MAX_TRIPS_PER_FILE = 20;
+    private static int MAX_TRIPS_PER_FILE = 30;
     private static final int MAX_DELAY_MS = 1000 * 60 * 5;
     private static final int MAX_ERRORS_PER_FILE = 30;
 
@@ -59,6 +60,8 @@ public class BatchInserter {
      * @throws SQLException thrown on error writing the database
      */
     public static int batchInsertFile(PostgresqlDatabase db, BufferedReader reader) throws IOException, SQLException {
+        Log.setLevel(Level.DEBUG);
+
         BatchInserter batchInsert = new BatchInserter(db);
 
         Log.debug("BatchInserterStarted.");
@@ -99,9 +102,11 @@ public class BatchInserter {
                 }
 
                 // EXCEPTIONAL BEHAVIOR: long delay
-                if (Math.abs(SVO.getTimestamp() - lastTimestamp) > MAX_DELAY_MS) {
+                if (! timeDeltaValid(lastTimestamp, SVO.getTimestamp())) {
+                    Log.debug("Delay between timestamps too large.");
                     generateNewTripId = true;
                 }
+                lastTimestamp = SVO.getTimestamp();
 
                 // EXCEPTIONAL BEHAVIOR: new user ID
                 if (! lastUserId.equals(SVO.getUserId())) {
@@ -114,16 +119,14 @@ public class BatchInserter {
 
                     tripId = generateNewTripId(SVO);
                     Log.info("Generated new trip_id: " + tripId);
+                    Log.debug(" at line " + line);
                     generateNewTripId = false;
                 }
 
                 // DO INSERT
                 batchInsert.add(SVO, tripId);
 
-
-                if (++rowCount % 1000 == 0) batchInsert.executeBatch();
-
-                lastTimestamp = SVO.getTimestamp();
+                if (++rowCount % 10000 == 0) batchInsert.executeBatch();
 
             } catch (ParseException e) {
                 Log.error("Error parsing line: " + line); // e not attached not to show stack trace.
@@ -142,6 +145,23 @@ public class BatchInserter {
         batchInsert.close();
 
         return rowCount;
+    }
+
+    private static boolean timeDeltaValid(long t1, long t2) {
+        // t1, t2 should be in milli seconds.
+
+        long delta = Math.abs(t1 - t2);
+
+        // if time stamps are close together (e.g. 5 minutes) everything is fine
+        if (delta < MAX_DELAY_MS) return true;
+
+        // In old Andorid Versions the time stamp of sensor values is measured since system startup
+        // But other sensor values get their timestamp from unix time. This can amount to a time
+        // delta in the range of the Unix Timestamp ~ 1.3 E12. We return true in this case.
+        if (delta > 1E11) return true;
+
+        Log.debug("Time difference invalid: " + t1 + " - " + t2);
+        return false;
     }
 
     private static void setStopTime(int tripId, long timestamp) throws SQLException {
