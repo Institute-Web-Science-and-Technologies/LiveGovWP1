@@ -92,6 +92,10 @@ public abstract class AbstractInserter<T extends AbstractSensorValue> {
         db.createStatement().execute("CREATE TABLE IF NOT EXISTS " + getTableName() + " " + getSchema() + ";");
     }
 
+    public void dropTable() throws SQLException {
+        db.createStatement().execute("DROP TABLE " + getTableName() + ";");
+    }
+
     public void close() throws SQLException {
         insertStatement.close();
     }

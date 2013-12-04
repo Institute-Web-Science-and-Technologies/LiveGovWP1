@@ -30,6 +30,7 @@ public class BatchInserter {
 
     private static int MAX_TRIPS_PER_FILE = 20;
     private static final int MAX_DELAY_MS = 1000 * 60 * 5;
+    private static final int MAX_ERRORS_PER_FILE = 30;
 
     public BatchInserter(PostgresqlDatabase db) throws SQLException {
         this.db = db;
@@ -60,6 +61,8 @@ public class BatchInserter {
     public static int batchInsertFile(PostgresqlDatabase db, BufferedReader reader) throws IOException, SQLException {
         BatchInserter batchInsert = new BatchInserter(db);
 
+        Log.debug("BatchInserterStarted.");
+
         ParsingState state = ParsingState.INIT;
         int rowCount = 0;
 
@@ -70,9 +73,12 @@ public class BatchInserter {
 
         boolean generateNewTripId = true;
         int userIdChangeCount = 0;
+        int errorCount = 0;
 
         while ((line = reader.readLine()) != null) {
             try {
+                if (errorCount > MAX_ERRORS_PER_FILE) throw new IllegalStateException("Too many errors in file.");
+
                 SensorValueInterface SVO = SensorValueFactory.parse(line);
 
                 if (SVO == null) {
@@ -103,27 +109,31 @@ public class BatchInserter {
                     generateNewTripId = true;
                 }
 
-                if (state == ParsingState.RUNNING){
-                    if (generateNewTripId) {
-                        if (userIdChangeCount++ > MAX_TRIPS_PER_FILE) throw new IllegalArgumentException("Too many userIdChanges");
+                if (generateNewTripId) {
+                    if (userIdChangeCount++ > MAX_TRIPS_PER_FILE) throw new IllegalStateException("Too many userIdChanges");
 
-                        Log.debug("Generating new trip_id");
-                        tripId = generateNewTripId(SVO);
-                        generateNewTripId = false;
-                    }
-
-                    batchInsert.add(SVO, tripId);
-                    if (++rowCount % 1000 == 0) batchInsert.executeBatch();
+                    tripId = generateNewTripId(SVO);
+                    Log.info("Generated new trip_id: " + tripId);
+                    generateNewTripId = false;
                 }
+
+                // DO INSERT
+                batchInsert.add(SVO, tripId);
+
+
+                if (++rowCount % 1000 == 0) batchInsert.executeBatch();
 
                 lastTimestamp = SVO.getTimestamp();
 
             } catch (ParseException e) {
-                Log.error("Error parsing line: " + line,e);
+                Log.error("Error parsing line: " + line); // e not attached not to show stack trace.
+                errorCount++;
             } catch (SQLException e) {
                 Log.error("Error writing to db: " + line,e);
+                errorCount++;
             } catch (NullPointerException e) {
                 Log.error("Something odd went wrong:" + line, e);
+                errorCount++;
                 break;
             }
         }
@@ -188,6 +198,12 @@ public class BatchInserter {
 
         for (AbstractInserter i : inserter.values()){
             i.close();
+        }
+    }
+
+    public void dropTables() throws SQLException {
+        for (AbstractInserter i : inserter.values()){
+            i.dropTable();
         }
     }
 }

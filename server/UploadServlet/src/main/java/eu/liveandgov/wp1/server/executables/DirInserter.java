@@ -42,6 +42,8 @@ public class DirInserter {
         File[] files = targetDir.listFiles();
         BufferedReader reader;
 
+        // dropTables(db);
+
         for (File curFile : files) {
             try {
                 LOG.info("Inserting File " + curFile.getAbsolutePath() );
@@ -68,15 +70,23 @@ public class DirInserter {
                 LOG.info("Imported files int db. Rows: " + rows);
 
             } catch (FileNotFoundException e) {
-                LOG.error("File not found: " + e.getMessage());
-                e.printStackTrace();
+                LOG.error("File not found.", e);
             } catch (IOException e) {
-                LOG.error("Error reading file: " + e.getMessage());
-                e.printStackTrace();
+                LOG.error("Error reading file.", e);
             } catch (SQLException e) {
-                LOG.error("Error writing to db");
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                LOG.error("Error writing to db", e);
+            } catch (Exception e) {
+                LOG.error("Something else went wrong.", e);
             }
+        }
+    }
+
+    private static void dropTables(PostgresqlDatabase db) {
+        LOG.info("Dropping Tables");
+        try {
+            new BatchInserter(db).dropTables();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }
