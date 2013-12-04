@@ -77,10 +77,7 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
           <version>1.2.1</version>
-          <configuration>
-              <mainClass>eu.liveandgov.wp1.server.DbIngestThread</mainClass>
-          </configuration>
-          </plugin>
-      </plugins>
+      </plugin>
+  </plugins>
   </build>
 </project>

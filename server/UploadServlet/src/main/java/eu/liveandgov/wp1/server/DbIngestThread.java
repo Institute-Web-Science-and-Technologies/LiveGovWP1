@@ -25,7 +25,7 @@ public class DbIngestThread implements Runnable {
     }
 
     public void run(){
-        System.out.println("Hello from DBThread");
+        System.out.println("DbIngestThread Litening on " + ZMQ_ADDRESS);
         LOG.info("Starting Ingest Thread");
         socket = ZMQ.context().socket(ZMQ.SUB);
         socket.subscribe(""); // all topics
