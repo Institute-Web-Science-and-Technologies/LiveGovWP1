@@ -1,6 +1,6 @@
-package eu.liveandgov.wp1.server.sensor_helper;
+package eu.liveandgov.wp1.shared.sensors;
 
-import eu.liveandgov.wp1.server.sensor_helper.sensor_value_objects.*;
+import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.*;
 
 import java.text.ParseException;
 
@@ -43,7 +43,7 @@ public class SensorValueFactory {
         } catch (NumberFormatException e){
             throw new ParseException("Error timestamp in " + line,0);
         } catch (IllegalArgumentException e){
-            throw new ParseException("Error parsing sample type in " + line,0);
+            throw new ParseException("Error parsing sample-type. Is the type registered in SampleType-enum? " + line,0);
         }
         // nothing found?
         return null;

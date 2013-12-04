@@ -1,7 +1,6 @@
-package eu.liveandgov.wp1.server.sensor_helper.sensor_value_objects;
+package eu.liveandgov.wp1.shared.sensors.sensor_value_objects;
 
-import eu.liveandgov.wp1.server.sensor_helper.SampleType;
-import eu.liveandgov.wp1.server.sensor_helper.SensorValueInterface;
+import eu.liveandgov.wp1.shared.sensors.SampleType;
 
 public class TagSensorValue extends AbstractSensorValue implements SensorValueInterface {
 	public String tag;
@@ -17,6 +16,10 @@ public class TagSensorValue extends AbstractSensorValue implements SensorValueIn
 
     public SampleType getType(){
         return SampleType.TAG;
+    }
+
+    public String getTag(){
+        return tag;
     }
 
 }

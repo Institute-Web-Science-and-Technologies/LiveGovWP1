@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.server.sensor_helper;
+package eu.liveandgov.wp1.shared.sensors;
 
 /**
  * See Wiki for Sample Types
@@ -20,5 +20,6 @@ public enum SampleType {
     MAG,
     WIFI,
     BLT,
-    GSM
+    GSM,
+    ROT
 }

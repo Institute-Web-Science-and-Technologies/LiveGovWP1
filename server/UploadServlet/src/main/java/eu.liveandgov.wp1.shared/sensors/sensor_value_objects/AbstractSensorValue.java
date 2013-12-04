@@ -1,6 +1,4 @@
-package eu.liveandgov.wp1.server.sensor_helper.sensor_value_objects;
-
-import eu.liveandgov.wp1.server.sensor_helper.SampleType;
+package eu.liveandgov.wp1.shared.sensors.sensor_value_objects;
 
 public abstract class AbstractSensorValue {
     public final long timestamp;
@@ -9,6 +7,14 @@ public abstract class AbstractSensorValue {
     public AbstractSensorValue(long timestamp, String id) {
         this.timestamp = timestamp;
         this.id = id;
+    }
+
+    public String getUserId(){
+        return id;
+    }
+
+    public long getTimestamp(){
+        return timestamp;
     }
 
 }

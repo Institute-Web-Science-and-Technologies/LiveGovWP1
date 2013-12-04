@@ -3,14 +3,8 @@
  */
 package eu.liveandgov.wp1.server.db_helper;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.sql.*;
 
-import eu.liveandgov.wp1.server.sensor_helper.SensorValueFactory;
-import eu.liveandgov.wp1.server.sensor_helper.SensorValueInterface;
 import org.postgresql.Driver;
 
 /**
@@ -71,19 +65,10 @@ public class PostgresqlDatabase {
 
 			stmtLink = connection.createStatement();
 
-			String createAccelerometerTable = "CREATE TABLE IF NOT EXISTS accelerometer (id VARCHAR(36), ts TIMESTAMP, x FLOAT, y FLOAT, z FLOAT);";
-			String createGPSTable = "CREATE TABLE IF NOT EXISTS gps (id VARCHAR(36), ts TIMESTAMP, lonlat GEOGRAPHY(Point));";
-			String createTagsTable = "CREATE TABLE IF NOT EXISTS tags (id VARCHAR(36), ts TIMESTAMP, tag TEXT);";
-			String createGActivityTable = "CREATE TABLE IF NOT EXISTS google_activity (id VARCHAR(36), ts TIMESTAMP, activity TEXT);";
-			String createLACTable = "CREATE TABLE IF NOT EXISTS linear_acceleration (id VARCHAR(36), ts TIMESTAMP, x FLOAT, y FLOAT, z FLOAT);";
-			String createGravityTable = "CREATE TABLE IF NOT EXISTS gravity (id VARCHAR(36), ts TIMESTAMP, x FLOAT, y FLOAT, z FLOAT);";
+            String createTripTable = "CREATE TABLE IF NOT EXISTS trip (trip_id SERIAL, user_id VARCHAR(36), start_ts BIGINT, stop_ts BIGINT, name VARCHAR(255));";
+            stmtLink.execute(createTripTable);
 
-			stmtLink.execute(createAccelerometerTable);
-			stmtLink.execute(createGPSTable);
-			stmtLink.execute(createTagsTable);
-			stmtLink.execute(createGActivityTable);
-			stmtLink.execute(createLACTable);
-			stmtLink.execute(createGravityTable);
+            // TODO: Create Sensor Tables
 
 		} catch (SQLException e) {
 			throw new IllegalArgumentException(e.getMessage());

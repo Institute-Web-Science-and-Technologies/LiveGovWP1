@@ -243,6 +243,7 @@ public class ServiceSensorControl extends Service {
         connectorThread.removeConsumer(persistor);
         isRecording = false;
 
+        persistor.push(SensorSerializer.fromTag(IntentAPI.VALUE_STOP_RECORDING));
 
         // API EXTENSIONS are triggered on together with recording
         if (API_EXTENSIONS) {
@@ -256,6 +257,8 @@ public class ServiceSensorControl extends Service {
     private void doEnableRecording() {
         connectorThread.addConsumer(persistor);
         isRecording = true;
+
+        persistor.push(SensorSerializer.fromTag(IntentAPI.VALUE_START_RECORDING));
 
         // API EXTENSIONS are triggered on together with recording
         if (API_EXTENSIONS) {
