@@ -16,7 +16,7 @@ import org.json.JSONObject;
 /**
 * USAGE:
 *
-* mvn clean compile exec:java -Dexec.mainClass=eu.liveandgov.wp1.server.backend.LiveApiRecorder -Dexec.args="/tmp/data/"
+*  mvn clean compile exec:java -Dexec.mainClass=eu.liveandgov.wp1.backend.LiveApiRecorder -Dexec.args="/home/chrisschaefer/ 10000"
 *
 */
 public class LiveApiRecorder {
