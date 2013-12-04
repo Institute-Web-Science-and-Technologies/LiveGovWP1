@@ -18,7 +18,7 @@ public class LiveApiRecorder {
 		{
 			Date now = new Date();
 			
-		    String filename= LiveAPI.getHelsinkiDateAsSimpleDateString(now) + " HSL Live API Record.csv";
+		    String filename= LiveAPI.getHelsinkiDateAsSimpleDateString(now).substring(0,10) + "-HSL-Live-API-Record.csv";
 		    FileWriter fw = new FileWriter(filename,true); //the true will append the new data
 		    fw.write("##day,ts,route_id,trip_id,lat,lon,dir,departure\n");
 		    
@@ -38,9 +38,9 @@ public class LiveApiRecorder {
 					JSONObject o = arr.getJSONObject(i);
 					fw.write(o.get("day") + "," + o.get("ts") + "," + o.get("route_id") + "," + o.get("trip_id") + "," 
 					+ o.get("lat") + "," + o.get("lon") + "," + o.get("dir") + "," + o.get("departure") + "\n");
-					fw.flush();
-					Thread.sleep(10000);
 				}
+				fw.flush();
+				Thread.sleep(10000);
 		    }
 		}
 		catch(IOException ioe)
