@@ -2,8 +2,10 @@ package eu.liveandgov.wp1.sensor_miner;
 
 import android.content.Intent;
 import android.hardware.SensorManager;
+import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.provider.Settings;
+import android.telephony.TelephonyManager;
 
 import eu.liveandgov.wp1.sensor_miner.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_miner.connectors.sensor_queue.SensorQueue;
@@ -20,6 +22,13 @@ public class GlobalContext {
         context = newContext;
     }
 
+    public static LocationManager getLocationManager(){
+        if (context == null) throw new IllegalStateException("Context not initialized");
+        return (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+
+    }
+
+
     public static SensorManager getSensorManager(){
         if (context == null) throw new IllegalStateException("Context not initialized");
         return (SensorManager) context.getSystemService(context.SENSOR_SERVICE);
@@ -29,6 +38,11 @@ public class GlobalContext {
     public static WifiManager getWifiManager(){
         if (context == null) throw new IllegalStateException("Context not initialized");
         return (WifiManager) context.getSystemService(context.WIFI_SERVICE);
+    }
+
+    public static TelephonyManager getTelephonyManager(){
+        if (context == null) throw new IllegalStateException("Context not initialized");
+        return (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
     }
 
     public static String getUserId() {

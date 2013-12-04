@@ -16,6 +16,7 @@ import eu.liveandgov.wp1.sensor_miner.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_miner.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.ActivityHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.BluetoothHolder;
+import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.LocationHolderAndroid;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.LocationHolderPlayServices;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.MotionSensorHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.SensorHolder;
@@ -131,7 +132,8 @@ public class SensorThread implements Runnable {
             activeSensors.add(holder);
         } else {
             Log.d(LOG_TAG, "Register fallback GPS listener.");
-            // TODO
+            LocationHolderAndroid holder = new LocationHolderAndroid(sensorQueue, Looper.myLooper());
+            activeSensors.add(holder);
         }
     }
 
