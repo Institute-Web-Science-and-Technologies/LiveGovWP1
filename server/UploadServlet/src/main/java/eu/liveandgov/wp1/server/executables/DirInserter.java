@@ -10,11 +10,10 @@ import java.io.*;
 import java.sql.SQLException;
 
 /**
- * Created with IntelliJ IDEA.
- * User: hartmann
- * Date: 12/4/13
- * Time: 12:39 PM
- * To change this template use File | Settings | File Templates.
+ * USAGE:
+ *
+ * mvn clean compile exec:java -Dexec.mainClass=eu.liveandgov.wp1.server.executables.DirInserter -Dexec.args="/tmp/data/"
+ *
  */
 public class DirInserter {
     private static final Logger LOG = Logger.getLogger(DbIngestThread.class);
@@ -24,27 +23,43 @@ public class DirInserter {
     }
 
 
-    public static String IMPORT_DIR = "/srv/liveandgov/import";
+    public static String IMPORT_DIR = "/tmp/upload_data";
     private static long MIN_SIZE_BYTES = 100 * 1024; // Minimum 100 k file size
 
     public static void main(String[] args) {
+
         if (args.length == 1) IMPORT_DIR = args[0];
 
         LOG.info("Starting DirDbIngest on " + IMPORT_DIR);
 
         PostgresqlDatabase db = new PostgresqlDatabase();
 
-        File[] files = new File(IMPORT_DIR).listFiles();
+        File targetDir = new File(IMPORT_DIR);
+        if (! targetDir.isDirectory()) {
+            throw new IllegalArgumentException("Not a directory: " + targetDir.getAbsolutePath() );
+        }
+
+        File[] files = targetDir.listFiles();
         BufferedReader reader;
 
         for (File curFile : files) {
             try {
-
-                if (! curFile.isFile()) continue;
-                if ( curFile.getName().endsWith(".gz") ) continue;
-                if ( curFile.length() < MIN_SIZE_BYTES ) continue;
-
                 LOG.info("Inserting File " + curFile.getAbsolutePath() );
+
+                if (! curFile.isFile()) {
+                    LOG.info("Skipped. Not a file.");
+                    continue;
+                }
+
+                if ( curFile.getName().endsWith(".gz") ) {
+                    LOG.info("Skipped. gz-not supported.");
+                    continue;
+                }
+
+                if ( curFile.length() < MIN_SIZE_BYTES ) {
+                    LOG.info("Skipped. Too small.");
+                    continue;
+                }
 
                 reader = new BufferedReader(new FileReader(curFile));
 
