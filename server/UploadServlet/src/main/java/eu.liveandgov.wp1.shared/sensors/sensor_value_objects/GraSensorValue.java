@@ -1,6 +1,6 @@
-package eu.liveandgov.wp1.shared.sensor_value_objects;
+package eu.liveandgov.wp1.shared.sensors.sensor_value_objects;
 
-import eu.liveandgov.wp1.shared.SampleType;
+import eu.liveandgov.wp1.shared.sensors.SampleType;
 
 public class GraSensorValue extends AbstractMotionSensorValue implements SensorValueInterface {
 

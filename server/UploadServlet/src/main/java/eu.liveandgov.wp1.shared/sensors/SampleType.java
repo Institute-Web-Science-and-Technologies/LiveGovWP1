@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.shared;
+package eu.liveandgov.wp1.shared.sensors;
 
 /**
  * See Wiki for Sample Types

@@ -1,11 +1,10 @@
 package eu.liveandgov.wp1.server.db_helper;
 
 import eu.liveandgov.wp1.server.db_helper.inserter.*;
-import eu.liveandgov.wp1.shared.SampleType;
-import eu.liveandgov.wp1.server.sensor_helper.SensorValueFactory;
-import eu.liveandgov.wp1.shared.sensor_value_objects.SensorValueInterface;
-import eu.liveandgov.wp1.shared.sensor_value_objects.*;
-import eu.liveandgov.wp1.shared.SsfFileFormat;
+import eu.liveandgov.wp1.shared.sensors.SampleType;
+import eu.liveandgov.wp1.shared.sensors.SensorValueFactory;
+import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.SensorValueInterface;
+import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.*;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -29,6 +28,9 @@ public class BatchInserter {
     public static final String VALUE_STOP_RECORDING = "STOP_RECORDING";
     public static final String VALUE_START_RECORDING = "START_RECORDING";
 
+    private static int MAX_TRIPS_PER_FILE = 20;
+    private static final int MAX_DELAY_MS = 1000 * 60 * 5;
+
     public BatchInserter(PostgresqlDatabase db) throws SQLException {
         this.db = db;
 
@@ -42,7 +44,8 @@ public class BatchInserter {
     private static enum ParsingState {
         STOPPED,
         RUNNING,
-        INIT
+        INIT,
+        NEW_ID
     }
 
     /**
@@ -65,6 +68,8 @@ public class BatchInserter {
         long lastTimestamp = -1;
         int tripId = -1;
 
+        boolean generateNewTripId = true;
+        int userIdChangeCount = 0;
 
         while ((line = reader.readLine()) != null) {
             try {
@@ -75,13 +80,10 @@ public class BatchInserter {
                     continue;
                 }
 
-                // User ID changes (e.g. first sample)
-                if (! lastUserId.equals(SVO.getUserId()) || isStartRecording(SVO)) {
-                    tripId = generateNewTripId(SVO);
-                    lastUserId = SVO.getUserId();
+                if (isStartRecording(SVO)) {
+                    generateNewTripId = true;
                     state = ParsingState.RUNNING;
-
-                    if (isStartRecording(SVO)) continue; // do not insert "START_RECORING" tag
+                    continue; // do not insert "STOP_RECORDING" tag
                 }
 
                 if (isStopRecording(SVO)) {
@@ -90,13 +92,24 @@ public class BatchInserter {
                     continue; // do not insert "STOP_RECORDING" tag
                 }
 
-                if (state == ParsingState.RUNNING){
+                // EXCEPTIONAL BEHAVIOR: long delay
+                if (Math.abs(SVO.getTimestamp() - lastTimestamp) > MAX_DELAY_MS) {
+                    generateNewTripId = true;
+                }
 
-                    // generate new tripid if gap is too large.
-                    final int max_delay_ms = 1000 * 60 * 5;
-                    if (Math.abs(SVO.getTimestamp() - lastTimestamp) > max_delay_ms) {
+                // EXCEPTIONAL BEHAVIOR: new user ID
+                if (! lastUserId.equals(SVO.getUserId())) {
+                    lastUserId = SVO.getUserId();
+                    generateNewTripId = true;
+                }
+
+                if (state == ParsingState.RUNNING){
+                    if (generateNewTripId) {
+                        if (userIdChangeCount++ > MAX_TRIPS_PER_FILE) throw new IllegalArgumentException("Too many userIdChanges");
+
                         Log.debug("Generating new trip_id");
                         tripId = generateNewTripId(SVO);
+                        generateNewTripId = false;
                     }
 
                     batchInsert.add(SVO, tripId);
@@ -106,7 +119,7 @@ public class BatchInserter {
                 lastTimestamp = SVO.getTimestamp();
 
             } catch (ParseException e) {
-                Log.error("Error reading line: " + line,e);
+                Log.error("Error parsing line: " + line,e);
             } catch (SQLException e) {
                 Log.error("Error writing to db: " + line,e);
             } catch (NullPointerException e) {

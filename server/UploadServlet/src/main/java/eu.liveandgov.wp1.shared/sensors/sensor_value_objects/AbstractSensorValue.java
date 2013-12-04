@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.shared.sensor_value_objects;
+package eu.liveandgov.wp1.shared.sensors.sensor_value_objects;
 
 public abstract class AbstractSensorValue {
     public final long timestamp;

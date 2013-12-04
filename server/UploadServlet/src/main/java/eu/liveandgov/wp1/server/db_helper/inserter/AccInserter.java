@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.server.db_helper.inserter;
 
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
-import eu.liveandgov.wp1.shared.sensor_value_objects.AccSensorValue;
+import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.AccSensorValue;
 
 import java.sql.SQLException;
 
