@@ -112,7 +112,6 @@ public class UploadServlet extends HttpServlet {
 
 
         // Insert directly to database
-
         BufferedReader reader;
         if (! isCompressed(req)) {
             Log.info("Opening Text Reader");

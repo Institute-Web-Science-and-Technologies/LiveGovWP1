@@ -1,5 +1,6 @@
-package eu.liveandgov.wp1.server;
+package eu.liveandgov.wp1.server.executables;
 
+import eu.liveandgov.wp1.server.DbIngestThread;
 import eu.liveandgov.wp1.server.db_helper.BatchInserter;
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
 import org.apache.log4j.BasicConfigurator;
