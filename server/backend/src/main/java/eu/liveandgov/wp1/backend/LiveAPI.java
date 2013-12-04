@@ -84,6 +84,8 @@ public class LiveAPI extends HttpServlet {
 			trip.put("lon",o.getLon());
 			trip.put("ts",ts);
 			trip.put("day",day);
+			trip.put("dir",o.getDirection());
+			trip.put("departure",o.getDeparture());
 			allTrips.add(trip);
 		}
 		JSONObject responseJSON = new JSONObject();
