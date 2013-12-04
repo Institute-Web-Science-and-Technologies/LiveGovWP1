@@ -8,6 +8,15 @@ import android.hardware.SensorEvent;
 import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.os.Build;
+import android.telephony.CellIdentityCdma;
+import android.telephony.CellIdentityGsm;
+import android.telephony.CellIdentityLte;
+import android.telephony.CellInfo;
+import android.telephony.CellInfoCdma;
+import android.telephony.CellInfoGsm;
+import android.telephony.CellInfoLte;
+import android.telephony.ServiceState;
+import android.telephony.SignalStrength;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
@@ -15,10 +24,12 @@ import com.google.android.gms.location.DetectedActivity;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.List;
+import java.util.Locale;
 
 import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
 import eu.liveandgov.wp1.sensor_miner.GlobalContext;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.BluetoothHolder;
+import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.TelephonyHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_value_objects.GpsSensorValue;
 
 import static eu.liveandgov.wp1.sensor_miner.configuration.SsfFileFormat.*;
@@ -166,6 +177,67 @@ public class SensorSerializer {
         return fillString(SSF_BLUETOOTH, System.currentTimeMillis(), GlobalContext.getUserId(), accumulatedIntermediate);
     }
 
+    public static String fromPhoneState(ServiceState serviceState, SignalStrength signalStrength, List<CellInfo> cellInfo)
+    {
+        final StringBuilder builder = new StringBuilder();
+
+        // Write phone status as Service State/Roaming State/Manual Selection State/Operator Name/Phone Signal Strength
+        builder.append(TelephonyHolder.getStateName(serviceState.getState()));
+        builder.append('/');
+        builder.append(TelephonyHolder.getRoamingText(serviceState.getRoaming()));
+        builder.append('/');
+        builder.append(TelephonyHolder.getManualModeText(serviceState.getIsManualSelection()));
+        builder.append('/');
+        builder.append("\"" + StringEscapeUtils.escapeJava(serviceState.getOperatorAlphaLong()) + "\"");
+        builder.append('/');
+        builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getSignalStrengthText(signalStrength)) + "\"");
+
+        // Separate prefix from cells with colon
+        builder.append(':');
+
+        // Write each cell info as a tuple of Escaped Identity/Escaped Signal Strength
+        boolean separate = false;
+        for(CellInfo i : cellInfo)
+        {
+            if(separate)
+            {
+                // Separate entries of the scan result list by semicolon
+                builder.append(';');
+            }
+
+            if(i instanceof CellInfoCdma)
+            {
+                final CellInfoCdma cellInfoCdma = (CellInfoCdma)i;
+
+                builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getCellIdentityText(cellInfoCdma.getCellIdentity())) + "\"");
+                builder.append('/');
+                builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getCellSignalStrengthText(cellInfoCdma.getCellSignalStrength())) + "\"");
+            }
+            else if(i instanceof CellInfoGsm)
+            {
+                final CellInfoGsm cellInfoGsm = (CellInfoGsm)i;
+
+
+                builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getCellIdentityText(cellInfoGsm.getCellIdentity())) + "\"");
+                builder.append('/');
+                builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getCellSignalStrengthText(cellInfoGsm.getCellSignalStrength())) + "\"");
+
+            }
+            else if(i instanceof CellInfoLte)
+            {
+                final CellInfoLte cellInfoLte = (CellInfoLte)i;
+
+                builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getCellIdentityText(cellInfoLte.getCellIdentity())) + "\"");
+                builder.append('/');
+                builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getCellSignalStrengthText(cellInfoLte.getCellSignalStrength())) + "\"");
+            }
+
+            separate = true;
+        }
+
+        return fillString(SSF_GSM, System.currentTimeMillis(), GlobalContext.getUserId(), builder.toString());
+    }
+
     public static String fromLocation(Location location) {
         return fillStringDoubles(SSF_GPS, location.getTime(), GlobalContext.getUserId(), new double[]{location.getLatitude(), location.getLongitude(), location.getAltitude()});
     }
@@ -210,7 +282,7 @@ public class SensorSerializer {
      * @return ssfRow
      */
     private static String fillString(String type, long timestamp, String deviceId, String value) {
-        return String.format("%s,%d,%s,%s", type, timestamp, deviceId, value);
+        return String.format(Locale.ENGLISH, "%s,%d,%s,%s", type, timestamp, deviceId, value);
     }
 
     private static String fillStringFloats(String type, long timestamp, String deviceId, float[] values) {

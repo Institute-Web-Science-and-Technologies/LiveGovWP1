@@ -20,6 +20,7 @@ import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.LocationHolderAnd
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.LocationHolderPlayServices;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.MotionSensorHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.SensorHolder;
+import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.TelephonyHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.WifiHolder;
 
 
@@ -104,6 +105,7 @@ public class SensorThread implements Runnable {
         if (SensorCollectionOptions.REC_BLT) setupBluetoothUpdate(SensorCollectionOptions.BLT_SCAN_DELAY_MS);
         if (SensorCollectionOptions.REC_GPS) setupLocationUpdate();
         if (SensorCollectionOptions.REC_G_ACT) setupActivityUpdate();
+        if (SensorCollectionOptions.REC_GSM) setupTelephonyUpdate();
     }
 
 
@@ -135,6 +137,12 @@ public class SensorThread implements Runnable {
             LocationHolderAndroid holder = new LocationHolderAndroid(sensorQueue, Looper.myLooper());
             activeSensors.add(holder);
         }
+    }
+
+    private void setupTelephonyUpdate() {
+        Log.i(LOG_TAG, "Registering Listener for Telephone State");
+        TelephonyHolder holder = new TelephonyHolder(sensorQueue);
+        activeSensors.add(holder);
     }
 
     private void setupActivityUpdate() {
