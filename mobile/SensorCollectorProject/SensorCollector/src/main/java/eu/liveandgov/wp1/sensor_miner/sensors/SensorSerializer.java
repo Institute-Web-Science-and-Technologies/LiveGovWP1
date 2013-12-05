@@ -8,13 +8,7 @@ import android.hardware.SensorEvent;
 import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.os.Build;
-import android.telephony.CellIdentityCdma;
-import android.telephony.CellIdentityGsm;
-import android.telephony.CellIdentityLte;
-import android.telephony.CellInfo;
-import android.telephony.CellInfoCdma;
-import android.telephony.CellInfoGsm;
-import android.telephony.CellInfoLte;
+import android.telephony.NeighboringCellInfo;
 import android.telephony.ServiceState;
 import android.telephony.SignalStrength;
 
@@ -177,7 +171,7 @@ public class SensorSerializer {
         return fillString(SSF_BLUETOOTH, System.currentTimeMillis(), GlobalContext.getUserId(), accumulatedIntermediate);
     }
 
-    public static String fromPhoneState(ServiceState serviceState, SignalStrength signalStrength, List<CellInfo> cellInfo)
+    public static String fromPhoneState(ServiceState serviceState, SignalStrength signalStrength, List<NeighboringCellInfo> neighboringCellInfos)
     {
         final StringBuilder builder = new StringBuilder();
 
@@ -195,9 +189,9 @@ public class SensorSerializer {
         // Separate prefix from cells with colon
         builder.append(':');
 
-        // Write each cell info as a tuple of Escaped Identity/Escaped Signal Strength
+        // Write each cell info as a tuple of Escaped Identity/Network Type/Signal Strength in dBm
         boolean separate = false;
-        for(CellInfo i : cellInfo)
+        for(NeighboringCellInfo neighboringCellInfo : neighboringCellInfos)
         {
             if(separate)
             {
@@ -205,32 +199,11 @@ public class SensorSerializer {
                 builder.append(';');
             }
 
-            if(i instanceof CellInfoCdma)
-            {
-                final CellInfoCdma cellInfoCdma = (CellInfoCdma)i;
-
-                builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getCellIdentityText(cellInfoCdma.getCellIdentity())) + "\"");
-                builder.append('/');
-                builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getCellSignalStrengthText(cellInfoCdma.getCellSignalStrength())) + "\"");
-            }
-            else if(i instanceof CellInfoGsm)
-            {
-                final CellInfoGsm cellInfoGsm = (CellInfoGsm)i;
-
-
-                builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getCellIdentityText(cellInfoGsm.getCellIdentity())) + "\"");
-                builder.append('/');
-                builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getCellSignalStrengthText(cellInfoGsm.getCellSignalStrength())) + "\"");
-
-            }
-            else if(i instanceof CellInfoLte)
-            {
-                final CellInfoLte cellInfoLte = (CellInfoLte)i;
-
-                builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getCellIdentityText(cellInfoLte.getCellIdentity())) + "\"");
-                builder.append('/');
-                builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getCellSignalStrengthText(cellInfoLte.getCellSignalStrength())) + "\"");
-            }
+            builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getIdentityText(neighboringCellInfo.getCid(), neighboringCellInfo.getLac())) + "\"");
+            builder.append('/');
+            builder.append(StringEscapeUtils.escapeJava(TelephonyHolder.getNetworkTypeText(neighboringCellInfo.getNetworkType())));
+            builder.append('/');
+            builder.append(TelephonyHolder.getTS27SignalStrengthText(neighboringCellInfo.getRssi()));
 
             separate = true;
         }
