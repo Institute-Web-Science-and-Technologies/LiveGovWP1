@@ -3,14 +3,12 @@ package eu.liveandgov.wp1.backend;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,17 +27,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
 
-/**
- * Servlet implementation class InspectionServlet
- */
+
 @WebServlet("/ServiceLineDetection")
 public class ServiceLineDetection extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	PostgresqlDatabase db;
-	ArrayList<LatLonTsDayTuple> coordinates;
 	
 	// route_id -> transportation mean
-	HashMap<String, String> transportationMeans;
+	final HashMap<String, String> transportationMeans;
 	
 	static final int realtimeApiToleranceInMinutes = 1;
 	static final int realtimeApiToleranceInMeter = 50;
@@ -49,10 +44,8 @@ public class ServiceLineDetection extends HttpServlet {
 	static final int timeTableToleranceInMeter = 50;
 	
 	ExecutorService liveApiExecutor;
-	Future<List<VehicleInfo>> liveApiResult;
-
+	
 	/**
-
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public ServiceLineDetection() throws UnavailableException {
@@ -75,35 +68,24 @@ public class ServiceLineDetection extends HttpServlet {
 	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String username = request.getHeader("username");
-		if(username == null){
+		
+		// check it user is valid
+		if(!isUsernameValid(request)){
 			PrintWriter out = response.getWriter();
 			out.println("{\"error\":\"username required\"}");
 			return;
 		}
-		coordinates = new ArrayList<LatLonTsDayTuple>();  
-		String line = null;
-		LatLonTsDayTuple latestLatLonTsDayTuple = new LatLonTsDayTuple();
-		try {
-		    BufferedReader reader = request.getReader();
-
-			while ((line = reader.readLine()) != null) {
-				LatLonTsDayTuple t = new LatLonTsDayTuple(line);
-				if(t.getTime() > latestLatLonTsDayTuple.getTime()){
-					// store the most recent timestamp
-					latestLatLonTsDayTuple = t;
-				}
-				coordinates.add(t);
-			}
-		  } catch (Exception e) { 
-			  e.getMessage();
-        }
+		ArrayList<LatLonTsDayTuple> coordinates = new ArrayList<LatLonTsDayTuple>();
+		// parse data and get the most recent GPS coordinate
+		LatLonTsDayTuple latestLatLonTsDayTuple = parseLonLatTsDayTuples(request,coordinates);
 		
 		// compute the time difference
 		// between now and the latest 
 		// Helsinki timestamp.
-		long timeDiff = new Date().getTime() - latestLatLonTsDayTuple.getTime();
+		long timeDiff = System.currentTimeMillis() - latestLatLonTsDayTuple.getTime();
+		
 		// check if the most recent timestamp is actual enough to query the real time API
+		Future<List<VehicleInfo>> liveApiResult = null;
 		if(Math.abs(timeDiff) < realtimeApiToleranceInMinutes*60*1000){
 			Callable<List<VehicleInfo>> c = new LiveApiVehiclesNearByCallable( latestLatLonTsDayTuple, realtimeApiToleranceInMeter );
 			// this Api call is a HTTP request
@@ -111,54 +93,64 @@ public class ServiceLineDetection extends HttpServlet {
 			liveApiResult = liveApiExecutor.submit( c );
 			// System.out.println("Using Live API " + timeDiff + " " + latestLatLonTsDayTuple.getUTC());
 		}
-		 
-	  String routcodeSelect = ""
-		+ "SELECT suball.route_id, \n"
-		+ "       suball.shape_id, \n"
-		+ "       suball.trip_id, \n"
-		+ "       Sum(cnt) AS score \n"
-		+ "FROM   (";
-	  
-	  for (int i = 0; i < coordinates.size(); i++) {
-		  
-		  String betweenTimeClause = coordinates.get(i).getBetweenTimeClause("arrival_time",timeTableToleranceInMinutes);
-		  String d = coordinates.get(i).getISO8601Date();
-		  String day = coordinates.get(i).getWeekdayName();
-		  String bb = coordinates.get(i).getBoundingBox(timeTableToleranceInMeter);
-	
-		  routcodeSelect += i>0?"        UNION ALL \n        ":"";
-		  routcodeSelect += ""
-						+ "(SELECT route_id, \n"
-						+ "                shape_id, \n"
-						+ "                trip_id, \n"
-						+ "                Count(*) AS cnt \n"
-						+ "         FROM   snippets_"+day+" \n"
-						+ "         WHERE  geom && "+bb+" \n"
-						+ "                AND "+betweenTimeClause+" \n"
-	
-						+ "             -- AND DATE '"+d+"' BETWEEN calendar.start_date AND calendar.end_date \n"
-						+ "         GROUP  BY route_id, \n"
-						+ "                   trip_id, \n"
-						+ "                   shape_id) \n";
-	  }
-	  routcodeSelect += ") AS suball \n"
-		  + "GROUP  BY suball.route_id, \n"
-		  + "          suball.trip_id, \n"
-		  + "          suball.shape_id \n"
-		  + "ORDER  BY score DESC "
-		  + "LIMIT 10;";
+		
+		// build the sql query string to find all routes around the given GPS track
+	    String routcodeSelect = createRouteSelectSql(coordinates);
 	  
 		try {
 			Statement stm = db.connection.createStatement();
+			
+			// execute route query in postgres
 			ResultSet rs = stm.executeQuery(routcodeSelect);
 
-		List<JSONObject> allTrips = new ArrayList<JSONObject>();
-		// now, we need the LiveAPI response
-		// wait until it arrives 
-		List<VehicleInfo> liveVehicles = new ArrayList<VehicleInfo>();
-		if(liveApiResult != null) {
-			liveVehicles = liveApiResult.get();
+			// now, we need the LiveAPI response
+			// wait until it arrives 
+			List<VehicleInfo> liveVehicles = new ArrayList<VehicleInfo>();
+			if(liveApiResult != null) {
+				liveVehicles = liveApiResult.get();
+			}
+			List<JSONObject> allTrips = combineTimetableRoutesWithLiveRoutes(rs, liveVehicles);
+			
+			// create and send the result json
+			JSONObject responseJSON = new JSONObject();
+			responseJSON.put("routes", allTrips);			
+			response.setContentType("application/json");
+			PrintWriter out = response.getWriter();
+			out.println(responseJSON.toString());
+			System.out.println(getLogString(request.getHeader("username"),latestLatLonTsDayTuple,allTrips));
+			
+			//ZMQ.context();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
+	}
+
+	private String getLogString(String username, LatLonTsDayTuple latestLatLonTsDayTuple, List<JSONObject> allTrips) {
+		
+		String ret = "SLD,"+System.currentTimeMillis()+","+username+",";
+		ret+= latestLatLonTsDayTuple.getTime() + " ";
+		ret+= latestLatLonTsDayTuple.getLonLatPoint() + " ";
+		for(JSONObject o: allTrips) {
+			ret+= o.getString("route_id") + "/" + o.getInt("score") + " ";
+		}
+		return ret;
+	}
+
+	/**
+	 * Combines the database and the LiveAPI results in one ranked result set 
+	 * @param rs database response (all trips/routes in the static time table matching the GPS track)
+	 * @param liveVehicles LiveAPI response (all trips/routes given by the LiveAPI matching the GPS track)
+	 * @return combined and ranked result set
+	 * @throws SQLException
+	 */
+	public List<JSONObject> combineTimetableRoutesWithLiveRoutes(ResultSet rs, List<VehicleInfo> liveVehicles) throws SQLException {
+		
+		List<JSONObject> allTrips = new ArrayList<JSONObject>();
 		while (rs.next()) {
 			JSONObject trip = new JSONObject();
 			String routeId = rs.getString(1);
@@ -175,14 +167,21 @@ public class ServiceLineDetection extends HttpServlet {
 			int score = rs.getInt(4);
 			while (i.hasNext()) {
 				VehicleInfo v = i.next();
+				// 	increase the score of routes also found via live API
 				if(v.getRoute().equals(routeId) && v.getDirection() == dir) {
 					score *= realtimeApiPreferentialTreatmentScore;
+					// remove the route to make sure that the route will not be increased twice
 					i.remove();
 				}
 			}
 			trip.put("score", score);
 			allTrips.add(trip);
+			
+			// sort the result set descending by score
+			Collections.sort( allTrips, new ScoreComparator());
 		}
+		
+		// append routes not found in the static timetables but via the live API 
 		for(VehicleInfo v: liveVehicles){
 			JSONObject trip = new JSONObject();
 			trip.put("route_id", v.getRoute());
@@ -192,25 +191,93 @@ public class ServiceLineDetection extends HttpServlet {
 			trip.put("score", 1*realtimeApiPreferentialTreatmentScore);
 			allTrips.add(trip);
 		}
-		
-		Collections.sort( allTrips, new ScoreComparator());
-		JSONObject responseJSON = new JSONObject();
-		responseJSON.put("routes", allTrips);
-		
-		response.setContentType("application/json");
-		PrintWriter out = response.getWriter();		
+		return allTrips;
+	}
 
-			out.println(responseJSON.toString());
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
+	/**
+	 * Create the SQL query string to find all trips which match
+	 * the given GPS track
+	 * @param GPS track
+	 * @return SQL select query string
+	 */
+	public String createRouteSelectSql( ArrayList<LatLonTsDayTuple> coordinates) {
+		String routcodeSelect = ""
+			+ "SELECT suball.route_id, \n"
+			+ "       suball.shape_id, \n"
+			+ "       suball.trip_id, \n"
+			+ "       Sum(cnt) AS score \n"
+			+ "FROM   (";
+		  
+		  for (int i = 0; i < coordinates.size(); i++) {
+			  
+			  String betweenTimeClause = coordinates.get(i).getBetweenTimeClause("arrival_time",timeTableToleranceInMinutes);
+			  String d = coordinates.get(i).getISO8601Date();
+			  String day = coordinates.get(i).getWeekdayName();
+			  String bb = coordinates.get(i).getBoundingBox(timeTableToleranceInMeter);
+		
+			  routcodeSelect += i>0?"        UNION ALL \n        ":"";
+			  routcodeSelect += ""
+							+ "(SELECT route_id, \n"
+							+ "                shape_id, \n"
+							+ "                trip_id, \n"
+							+ "                Count(*) AS cnt \n"
+							+ "         FROM   snippets_"+day+" \n"
+							+ "         WHERE  geom && "+bb+" \n"
+							+ "                AND "+betweenTimeClause+" \n"
+		
+							+ "             -- AND DATE '"+d+"' BETWEEN calendar.start_date AND calendar.end_date \n"
+							+ "         GROUP  BY route_id, \n"
+							+ "                   trip_id, \n"
+							+ "                   shape_id) \n";
+		  }
+		  routcodeSelect += ") AS suball \n"
+			  + "GROUP  BY suball.route_id, \n"
+			  + "          suball.trip_id, \n"
+			  + "          suball.shape_id \n"
+			  + "ORDER  BY score DESC "
+			  + "LIMIT 10;";
+		return routcodeSelect;
+	}
+
+	/**
+	 * Parses the given GPS track and stores it in the member variable {@code coordinates}
+	 * 
+	 * @param request
+	 * @param result of parsed request
+	 * @return the latest {@code LatLonTsDayTuple} (the coordinate with the most recent timestamp)
+	 */
+	public LatLonTsDayTuple parseLonLatTsDayTuples(HttpServletRequest request, ArrayList<LatLonTsDayTuple> coordinates) {  
+		String line = null;
+		LatLonTsDayTuple latestLatLonTsDayTuple = new LatLonTsDayTuple();
+		try {
+		    BufferedReader reader = request.getReader();
+
+			while ((line = reader.readLine()) != null) {
+				LatLonTsDayTuple t = new LatLonTsDayTuple(line);
+				if(t.getTime() > latestLatLonTsDayTuple.getTime()){
+					// store the most recent timestamp
+					latestLatLonTsDayTuple = t;
+				}
+				coordinates.add(t);
+			}
+		  } catch (Exception e) { 
+			  e.getMessage();
+        }
+		return latestLatLonTsDayTuple;
+	}
+
+	public boolean isUsernameValid(HttpServletRequest request) throws IOException {
+		String username = request.getHeader("username");
+		if(username == null){
+			return false;
 		}
+		return true;
 	}
 	
-	// load the routeID -> transportation_mean map into RAM
+	/**
+	 * Create a look up map for the transportation means of each route
+	 * @return routeID -> transportation_mean map
+	 */
 	public static HashMap<String, String> initTransportationMeans(){
 		String selectMeans = ""
 				+ "SELECT routes.route_id, "
@@ -237,7 +304,11 @@ public class ServiceLineDetection extends HttpServlet {
 		return new HashMap<String, String>();
 	}
 	
-	// sort all JSONObjects descending by "score"
+
+	/**
+	 * A comparator for
+	 * sorting all JSONObjects descending by "score"
+	 */
 	class ScoreComparator implements Comparator<JSONObject>	{
 	    public int compare(JSONObject a, JSONObject b)
 	    {
