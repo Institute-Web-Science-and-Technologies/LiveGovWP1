@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.sensor_miner.connectors.implementations;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
@@ -21,7 +22,8 @@ public class ConnectorThread implements Runnable, Monitorable, MultiProducer<Str
     private final SensorQueue sensorQueue;
     private final Thread thread;
 
-    private List<Consumer<String>> consumerList = new ArrayList<Consumer<String>>();
+    // Remark: consumerList is modified by other threads.
+    private List<Consumer<String>> consumerList = Collections.synchronizedList(new ArrayList<Consumer<String>>());
     private List<Callback> onEmptyList = new ArrayList<Callback>();
     private List<Callback> onNonEmptyList = new ArrayList<Callback>();
 
