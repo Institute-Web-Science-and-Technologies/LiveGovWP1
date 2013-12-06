@@ -102,6 +102,8 @@ public class LocationHolderPlayServices extends LocationHolder implements
 
     @Override
     public void startRecording() {
+        checkEnableGPS();
+
         if(!available) {
             return;
         }

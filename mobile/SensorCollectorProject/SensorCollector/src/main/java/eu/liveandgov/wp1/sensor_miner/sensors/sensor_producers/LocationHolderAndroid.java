@@ -1,5 +1,6 @@
 package eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers;
 
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -9,6 +10,8 @@ import android.os.Looper;
 import eu.liveandgov.wp1.sensor_miner.GlobalContext;
 import eu.liveandgov.wp1.sensor_miner.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_miner.connectors.sensor_queue.SensorQueue;
+
+import static android.support.v4.app.ActivityCompat.startActivity;
 
 /**
  * Created by lukashaertel on 04.12.13.
@@ -20,13 +23,13 @@ public class LocationHolderAndroid extends LocationHolder
     public LocationHolderAndroid(SensorQueue sensorQueue, Looper looper)
     {
         super(sensorQueue);
-
         this.looper = looper;
     }
 
-
     @Override
     public void startRecording() {
+        checkEnableGPS();
+
         GlobalContext.getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, SensorCollectionOptions.GPS_DELAY_MS, 0, locationEndpoint, looper);
     }
 

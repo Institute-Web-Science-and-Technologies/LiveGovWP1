@@ -23,6 +23,8 @@ import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.SensorHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.TelephonyHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.WifiHolder;
 
+import static junit.framework.Assert.assertNotNull;
+
 
 /**
  * Singleton class that holds the sensor thread.
@@ -130,12 +132,13 @@ public class SensorThread implements Runnable {
     private void setupLocationUpdate() {
         // Check if Google Play Services are available
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(GlobalContext.context);
+
         if(ConnectionResult.SUCCESS == resultCode) {
             Log.i(LOG_TAG, "Registering Listener for GPS using GooglePlayServices.");
             LocationHolderPlayServices holder = new LocationHolderPlayServices(sensorQueue, Looper.myLooper());
             activeSensors.add(holder);
         } else {
-            Log.d(LOG_TAG, "Register fallback GPS listener.");
+            Log.i(LOG_TAG, "Register fallback GPS listener.");
             LocationHolderAndroid holder = new LocationHolderAndroid(sensorQueue, Looper.myLooper());
             activeSensors.add(holder);
         }
