@@ -59,7 +59,7 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
 			return;
 		}
 		
-		coordinates = new ArrayList<LatLonTsDayTuple>();  
+		coordinates = new ArrayList<LatLonTsDayTuple>(); 
 		String line = null;
 		  try {
 		    BufferedReader reader = request.getReader();
@@ -70,7 +70,11 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
 		  } catch (Exception e) { 
 			  e.getMessage();
         }
-		  
+		  String logmsg = "Test API call username: " + username;
+		  if(coordinates.size() > 0) {
+			  logmsg += " " + coordinates.get(0).getLonLatPoint();
+		  }
+		  Util.SLDLogger.log().info(logmsg);
 		try {
 			int lastDigitOfTimestamp = Integer.parseInt(coordinates.get(0)
 					.getDaytimeDigitsOnly().substring(5, 6));
@@ -86,7 +90,6 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
 			else {
 				// 10% return an empty result : {"routes":[]}
 			}
-			Util.SLDLogger.log().info("Test API call username: " + username);
 
 		} catch (ParseException e) {
 			e.printStackTrace();
