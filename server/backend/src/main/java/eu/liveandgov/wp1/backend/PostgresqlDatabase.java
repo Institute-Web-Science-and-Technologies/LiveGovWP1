@@ -52,11 +52,11 @@ public class PostgresqlDatabase extends Database {
 			//  -> Maven Dependencies
 			Class.forName("org.postgresql.Driver");
  
-		} catch (ClassNotFoundException e) {
- 
+		} catch (ClassNotFoundException e) { 
 			System.out.println("Where is your PostgreSQL JDBC Driver? "
 					+ "Include in your library path!");
 			e.printStackTrace();
+			Util.SLDLogger.log().error(e);
 		}
 		Statement stmtLink = null;
 		String dbAddress = "jdbc:postgresql://localhost/gtfsdb?autoReconnect=true";
@@ -101,9 +101,8 @@ public class PostgresqlDatabase extends Database {
 			stmtLink.execute(createGravityTable);
 
 		} catch (SQLException e) {
-			System.out.println("dbAdress: " + dbAddress);
-			System.out.println("user: " + user);
-			System.out.println("password: " + password);
+			Util.SLDLogger.log().error("dbAdress: " + dbAddress + " user: " + user + " password: " + password);
+			Util.SLDLogger.log().error(e);
 			throw new UnavailableException(e.getMessage());
 		} finally {
 			
@@ -112,6 +111,7 @@ public class PostgresqlDatabase extends Database {
 					stmtLink.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
+				Util.SLDLogger.log().error(e);
 			}
 		}
 	}
@@ -133,6 +133,7 @@ public class PostgresqlDatabase extends Database {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			Util.SLDLogger.log().error(e);
 		}
 		return 0;
 	}
@@ -144,6 +145,7 @@ public class PostgresqlDatabase extends Database {
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				Util.SLDLogger.log().error(e);
 			}
 	}
 	
@@ -154,6 +156,7 @@ public class PostgresqlDatabase extends Database {
 			return connection.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			Util.SLDLogger.log().error(e);
 		}
 		return stmtLink;
 	}

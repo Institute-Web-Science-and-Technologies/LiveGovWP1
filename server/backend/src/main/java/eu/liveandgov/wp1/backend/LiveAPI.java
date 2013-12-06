@@ -1,6 +1,5 @@
 package eu.liveandgov.wp1.backend;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,7 +16,6 @@ import java.net.URL;
 import java.util.concurrent.Callable;
 
 import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -77,13 +75,15 @@ public class LiveAPI extends HttpServlet {
 		
 		List<JSONObject> allTrips = new ArrayList<JSONObject>();
 		for (VehicleInfo o : getVehicles()) {
-			JSONObject trip = new JSONObject();
+			JSONObject trip = new JSONObject(); 
 			trip.put("route_id",o.getRoute());
 			trip.put("trip_id",o.getId());
 			trip.put("lat",o.getLat());
 			trip.put("lon",o.getLon());
 			trip.put("ts",ts);
 			trip.put("day",day);
+			trip.put("dir",o.getDirection());
+			trip.put("departure",o.getDeparture());
 			allTrips.add(trip);
 		}
 		JSONObject responseJSON = new JSONObject();
@@ -127,6 +127,7 @@ public class LiveAPI extends HttpServlet {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			Util.SLDLogger.log().error(e);
 		}
 		return returnList;
 	}
