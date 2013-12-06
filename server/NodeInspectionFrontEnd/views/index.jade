@@ -1,5 +1,10 @@
 extends layout
-
+tripId: e.trip_id,
+          userId: e.user_id,
+          startTime: start,
+          endTime: end,
+          duration: end.diff(start, 'milliseconds'),
+          name: e.name
 block content
   div.ui.purple.main.menu
     a.active.item(data-tab="settings") Settings
@@ -7,24 +12,25 @@ block content
     a.item(data-tab="graphs") Graphs
     a.item(data-tab="tables") Tables
   div.ui.active.tab.segment(data-tab="settings")
-    div.ui.three.column.grid
-      div.row
-        div.column
-
-          div.ui.floating.fluid.selection.dropdown#devId
-            div.text Device
-            i.dropdown.icon
-            div.menu
-              each trip in trips
-                div.item(data-value=trip.tripId)= trip.tripId + " " + trip.userId
-        div.column
-          div.ui.floating.fluid.selection.dropdown
-            div.text Service Lines
-            i.dropdown.icon
-            div.menu
-              each sl in serviceLines
-                div.item(data-value=sl.id)= sl.id + " " + sl.linename + " " + sl.type
-      div.row
+    table.ui.table.segment
+      thead
+        tr
+          th Trip ID
+          th User ID
+          th Start Time
+          th End Time
+          th Duration
+          th Name
+      tbody
+        each trip in trips
+          tr(data-id=trip.tripId)
+            td.showTrip= trip.tripId
+            td.showTrip= trip.userId
+            td.showTrip= trip.startTime
+            td.showTrip= trip.endTime
+            td.showTrip= trip.duration
+            td.showTrip= trip.name
+    div.row
         div.column
         div.column
           div.ui.purple.button#showBtn Show

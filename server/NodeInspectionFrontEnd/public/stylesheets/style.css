@@ -12,3 +12,6 @@ body {
   margin-right: auto;
   height: 600px;
 }
+.showTrip {
+  cursor: pointer;
+}
