@@ -18,6 +18,7 @@ public class SensorCollectionOptions {
 
     // GPS
     public static final boolean REC_GPS = true;
+    public static final int GPS_DELAY_MS = 5000; // delay of gps rescan in milli seconds
 
     // Motion sensors
     public static final int REC_ACC = SensorOptions.ON_GAME;

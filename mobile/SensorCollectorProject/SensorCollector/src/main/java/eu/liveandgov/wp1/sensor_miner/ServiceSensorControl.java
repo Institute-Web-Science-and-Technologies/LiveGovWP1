@@ -47,8 +47,7 @@ public class ServiceSensorControl extends Service {
     public String userId = ""; // will be set onCreate
 
     // COMMUNICATION CHANNEL
-    public static SensorQueue sensorQueue = new LinkedSensorQueue();
-
+    public SensorQueue sensorQueue = new LinkedSensorQueue();
 
     // REMARK:
     // Need to put initialization to onCreate, since FilesDir, etc. is not available

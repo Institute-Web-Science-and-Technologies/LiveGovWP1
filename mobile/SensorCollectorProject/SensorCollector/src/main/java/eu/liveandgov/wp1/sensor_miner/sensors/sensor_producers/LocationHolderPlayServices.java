@@ -26,10 +26,10 @@ import eu.liveandgov.wp1.sensor_miner.sensors.SensorSerializer;
  *
  * Created by hartmann on 9/15/13.
  */
-public class LocationHolderPlayServices implements
+public class LocationHolderPlayServices extends LocationHolder implements
         GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener,
-        LocationListener, SensorHolder {
+        GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
+         {
     /*
     * Change these if you want to change the interval
     */
@@ -48,11 +48,10 @@ public class LocationHolderPlayServices implements
     private boolean connected = false;
     private boolean startImmediate = false;
 
-    private final SensorQueue sensorQueue;
-
     public LocationHolderPlayServices(SensorQueue sensorQueue, Looper myLooper){
+        super(sensorQueue);
+
         this.myLooper = myLooper;
-        this.sensorQueue = sensorQueue;
         init();
     }
 
@@ -98,13 +97,13 @@ public class LocationHolderPlayServices implements
     @Override
     public void onLocationChanged(Location location) {
         // TODO: Add speed and bearing (Ausrichtung) to SSF if they are available.
-        String locString = SensorSerializer.fromLocation(location);
-        Log.d(LOG_TAG, locString);
-        sensorQueue.push(locString);
+        receivedNewLocation(location);
     }
 
     @Override
     public void startRecording() {
+        checkEnableGPS();
+
         if(!available) {
             return;
         }

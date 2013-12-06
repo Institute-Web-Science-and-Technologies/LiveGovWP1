@@ -16,10 +16,14 @@ import eu.liveandgov.wp1.sensor_miner.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_miner.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.ActivityHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.BluetoothHolder;
+import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.LocationHolderAndroid;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.LocationHolderPlayServices;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.MotionSensorHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.SensorHolder;
+import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.TelephonyHolder;
 import eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.WifiHolder;
+
+import static junit.framework.Assert.assertNotNull;
 
 
 /**
@@ -44,6 +48,8 @@ public class SensorThread implements Runnable {
     private static SensorThread instance;
 
     private SensorThread(SensorQueue sensorQueue){
+        assertNotNull(sensorQueue);
+
         this.sensorQueue = sensorQueue;
         this.thread = new Thread(this);
     }
@@ -103,6 +109,7 @@ public class SensorThread implements Runnable {
         if (SensorCollectionOptions.REC_BLT) setupBluetoothUpdate(SensorCollectionOptions.BLT_SCAN_DELAY_MS);
         if (SensorCollectionOptions.REC_GPS) setupLocationUpdate();
         if (SensorCollectionOptions.REC_G_ACT) setupActivityUpdate();
+        if (SensorCollectionOptions.REC_GSM) setupTelephonyUpdate();
     }
 
 
@@ -125,14 +132,22 @@ public class SensorThread implements Runnable {
     private void setupLocationUpdate() {
         // Check if Google Play Services are available
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(GlobalContext.context);
+
         if(ConnectionResult.SUCCESS == resultCode) {
             Log.i(LOG_TAG, "Registering Listener for GPS using GooglePlayServices.");
             LocationHolderPlayServices holder = new LocationHolderPlayServices(sensorQueue, Looper.myLooper());
             activeSensors.add(holder);
         } else {
-            Log.d(LOG_TAG, "Register fallback GPS listener.");
-            // TODO
+            Log.i(LOG_TAG, "Register fallback GPS listener.");
+            LocationHolderAndroid holder = new LocationHolderAndroid(sensorQueue, Looper.myLooper());
+            activeSensors.add(holder);
         }
+    }
+
+    private void setupTelephonyUpdate() {
+        Log.i(LOG_TAG, "Registering Listener for Telephone State");
+        TelephonyHolder holder = new TelephonyHolder(sensorQueue);
+        activeSensors.add(holder);
     }
 
     private void setupActivityUpdate() {
