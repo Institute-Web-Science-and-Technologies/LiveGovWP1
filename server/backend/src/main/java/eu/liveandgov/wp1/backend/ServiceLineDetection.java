@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -46,9 +45,10 @@ public class ServiceLineDetection extends HttpServlet {
 	ExecutorService liveApiExecutor;
 	
 	/**
+	 * @throws IOException 
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public ServiceLineDetection() throws UnavailableException {
+	public ServiceLineDetection() throws UnavailableException, IOException {
 		super();
 		transportationMeans = initTransportationMeans();
 		db = new PostgresqlDatabase("liveandgov", "liveandgov");
@@ -73,6 +73,7 @@ public class ServiceLineDetection extends HttpServlet {
 		if(!isUsernameValid(request)){
 			PrintWriter out = response.getWriter();
 			out.println("{\"error\":\"username required\"}");
+			Util.SLDLogger.log().warn("Request without username");
 			return;
 		}
 		ArrayList<LatLonTsDayTuple> coordinates = new ArrayList<LatLonTsDayTuple>();
@@ -117,16 +118,12 @@ public class ServiceLineDetection extends HttpServlet {
 			response.setContentType("application/json");
 			PrintWriter out = response.getWriter();
 			out.println(responseJSON.toString());
-			System.out.println(getLogString(request.getHeader("username"),latestLatLonTsDayTuple,allTrips));
-			
+			Util.SLDLogger.log().info(getLogString(request.getHeader("username"),latestLatLonTsDayTuple,allTrips));
 			//ZMQ.context();
 			
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
+			Util.SLDLogger.log().error(e);
 		}
 	}
 

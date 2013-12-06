@@ -127,6 +127,7 @@ public class LiveAPI extends HttpServlet {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			Util.SLDLogger.log().error(e);
 		}
 		return returnList;
 	}

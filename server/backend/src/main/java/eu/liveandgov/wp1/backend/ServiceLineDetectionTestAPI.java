@@ -55,6 +55,7 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
 		if(username == null){
 			PrintWriter out = response.getWriter();
 			out.println("{\"error\":\"username required\"}");
+			Util.SLDLogger.log().warn("Test API request without username");
 			return;
 		}
 		
@@ -85,9 +86,11 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
 			else {
 				// 10% return an empty result : {"routes":[]}
 			}
+			Util.SLDLogger.log().info("Test API call username: " + username);
 
 		} catch (ParseException e) {
 			e.printStackTrace();
+			Util.SLDLogger.log().error(e);
 		}
  
   String routcodeSelect = ""
@@ -126,7 +129,6 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
 	  + "          suball.shape_id \n"
 	  + "ORDER  BY score DESC "
 	  + "LIMIT 10;";
-  System.out.println(routcodeSelect);
   
 	try {
 		Statement stm = db.connection.createStatement();
@@ -153,6 +155,7 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
 	} catch (SQLException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
+		Util.SLDLogger.log().error(e);
 	}
 	}
 	private void initTransportationMeans(){
@@ -172,6 +175,7 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			Util.SLDLogger.log().error(e);
 		}
 
 	}
