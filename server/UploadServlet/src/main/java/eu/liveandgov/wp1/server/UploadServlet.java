@@ -2,12 +2,11 @@ package eu.liveandgov.wp1.server;
 
 import eu.liveandgov.wp1.server.db_helper.BatchInserter;
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
+import eu.liveandgov.wp1.shared.logging.ZmqAppender;
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
+import org.apache.log4j.*;
 import org.jeromq.ZMQ;
 
 import javax.servlet.ServletException;
@@ -45,15 +44,6 @@ public class UploadServlet extends HttpServlet {
     private static final ZMQ.Socket zmqOut;
 
     static {
-        // INIT LOGGER
-        try {
-            SimpleLayout layout = new SimpleLayout();
-            FileAppender appender = new FileAppender(layout,"/var/log/UploadServlet.log",true);
-            Logger.getRootLogger().addAppender(appender);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         // INIT ZMQ Socket
         zmqOut = ZMQ.context().socket(ZMQ.PUB);
         zmqOut.bind(BROKER_ADDRESS);
