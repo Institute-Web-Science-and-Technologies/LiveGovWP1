@@ -35,20 +35,37 @@ import static org.apache.commons.io.IOUtils.copy;
  * Date: 10/19/13
  */
 public class UploadServlet extends HttpServlet {
-    static final String OUT_DIR = "/srv/liveandgov/UploadServletRawFiles/";
-    private static final String FIELD_NAME_UPFILE = "upfile";
     private static final Logger Log = Logger.getLogger(UploadServlet.class);
+
+    static final String OUT_DIR = "/srv/liveandgov/UploadServletRawFiles/";
+
+    private static final String FIELD_NAME_UPFILE = "upfile";
+
     private static final String BROKER_ADDRESS = "tcp://127.0.0.1:50111";
+    private static final ZMQ.Socket zmqOut;
 
     static {
+        // INIT LOGGER
         try {
             SimpleLayout layout = new SimpleLayout();
-            FileAppender appender = null;
-            appender = new FileAppender(layout,"/var/log/UploadServlet.log",true);
+            FileAppender appender = new FileAppender(layout,"/var/log/UploadServlet.log",true);
             Logger.getRootLogger().addAppender(appender);
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
+
+        // INIT ZMQ Socket
+        zmqOut = ZMQ.context().socket(ZMQ.PUB);
+        zmqOut.bind(BROKER_ADDRESS);
+
+        // small sleep to give subscribers time to connect back
+        try {
+            Thread.sleep(100);
+            zmqOut.send("Hello from UploadServlet");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -217,7 +234,7 @@ public class UploadServlet extends HttpServlet {
      * @param message
      */
     private void notifyBroker(String message) {
-        Log.info("Sending ZMQ Message " + message + " to " + BROKER_ADDRESS);
+        Log.info("Publish ZMQ Message " + message + " on " + BROKER_ADDRESS);
         // need to create new context for each request, since this many threads are used by servlet engine.
         // for a discussion of performance issues see:
         // http://stackoverflow.com/questions/16659577/zeromq-multithreading-create-sockets-on-demand-or-use-sockets-object-pool
@@ -225,10 +242,8 @@ public class UploadServlet extends HttpServlet {
         // Surprisingly, this does not work with the PUB/SUB pattern, since the first few messages are
         // always dropped while the connection is being setup:
         // http://zguide.zeromq.org/page:all#Getting-the-Message-Out
-        ZMQ.Socket s = ZMQ.context().socket(ZMQ.PUSH);
-        s.connect(BROKER_ADDRESS);
-        s.send(message);
-        s.close();
+        zmqOut.send(message);
+        zmqOut.close();
     }
 
 }
