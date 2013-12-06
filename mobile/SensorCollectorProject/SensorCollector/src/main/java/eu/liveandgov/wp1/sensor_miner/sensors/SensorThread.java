@@ -46,6 +46,8 @@ public class SensorThread implements Runnable {
     private static SensorThread instance;
 
     private SensorThread(SensorQueue sensorQueue){
+        assertNotNull(sensorQueue);
+
         this.sensorQueue = sensorQueue;
         this.thread = new Thread(this);
     }
