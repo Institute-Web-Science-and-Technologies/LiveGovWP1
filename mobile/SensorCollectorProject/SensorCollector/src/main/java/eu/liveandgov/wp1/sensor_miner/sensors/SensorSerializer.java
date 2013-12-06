@@ -212,7 +212,7 @@ public class SensorSerializer {
     }
 
     public static String fromLocation(Location location) {
-        return fillStringDoubles(SSF_GPS, location.getTime(), GlobalContext.getUserId(), new double[]{location.getLatitude(), location.getLongitude(), location.getAltitude()});
+        return fillStringDoubles(SSF_GPS, System.currentTimeMillis(), GlobalContext.getUserId(), new double[]{location.getLatitude(), location.getLongitude(), location.getAltitude()});
     }
 
     public static String fromTag(String tag) {
