@@ -16,15 +16,15 @@ public class FilePublisher extends FilePersistor {
 
     @Override
     public synchronized void push(String s) {
+        if (disabled) return;
+
         super.push(s);
-        Log.i("PUBF", "Writing messsage:" + s);
+        Log.d("PUBF", "Writing messsage:" + s);
 
         try {
             super.fileWriter.flush();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NullPointerException e){
-            e.printStackTrace();
+            Log.e(LOG_TAG, "IO Exception", e);
         }
     }
 }

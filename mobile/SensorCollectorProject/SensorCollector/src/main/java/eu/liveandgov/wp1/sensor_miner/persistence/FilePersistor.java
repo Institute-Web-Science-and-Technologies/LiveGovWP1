@@ -19,13 +19,21 @@ public class FilePersistor implements Persistor {
     protected BufferedWriter fileWriter;
     private long sampleCount = 0L;
 
+    protected boolean disabled = false;
+
     public FilePersistor(File logFile) {
         this.logFile = logFile;
-        openLogFileAppend();
+        try {
+            openLogFileAppend();
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Could not open file. Disabling Persistor.");
+            disabled = true;
+        }
     }
 
     @Override
     public synchronized void push(String s) {
+        if (disabled) return;
         try {
             if (fileWriter == null) {
                 Log.v(LOG_TAG, "Blocked write event");
@@ -43,22 +51,38 @@ public class FilePersistor implements Persistor {
 
     @Override
     public boolean exportSamples(File stageFile) {
-        boolean suc = true;
+        if (disabled) return false;
 
-        Log.i(LOG_TAG, "Exporting samples.");
-        if (stageFile.exists()) { Log.e(LOG_TAG, "Stage file exists."); return false; }
+        try {
+            Log.i(LOG_TAG, "Exporting samples.");
 
-        suc = closeLogFile();
-        if (!suc) { Log.e(LOG_TAG, "Cosing LogFile failed."); return false; }
+            if (stageFile.exists()) { Log.e(LOG_TAG, "Stage file exists."); return false; }
 
-        suc = logFile.renameTo(stageFile);
-        if (!suc) { Log.e(LOG_TAG, "Renaming failed."); return false; }
+            closeLogFile();
 
-        suc = openLogFileOverwrite();
-        if (!suc) { Log.e(LOG_TAG, "Opening new Log File failed."); return false; }
+            boolean suc = logFile.renameTo(stageFile);
+            if (!suc) { Log.e(LOG_TAG, "Staging Failed"); return false; }
 
-        sampleCount = 0;
+            openLogFileOverwrite();
+
+            sampleCount = 0;
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error exporting samples", e);
+            return false;
+        }
         return true;
+    }
+
+    @Override
+    public void deleteSamples() {
+        if (disabled) return;
+        try {
+            closeLogFile();
+            if (logFile.exists()) logFile.delete();
+            openLogFileOverwrite();
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error deleting samples", e);
+        }
     }
 
     @Override
@@ -66,49 +90,25 @@ public class FilePersistor implements Persistor {
         return logFile.length() > 0;
     }
 
-    @Override
-    public void deleteSamples() {
-        closeLogFile();
-        if (logFile.exists()) logFile.delete();
-        openLogFileOverwrite();
-    }
 
     @Override
     public String getStatus() {
         return "File size: " + logFile.length()/1024 + "kb. Samples written: " + sampleCount;
     }
 
-    private boolean openLogFileAppend() {
-        try {
-            fileWriter = new BufferedWriter(new FileWriter(logFile,true));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
+    private void openLogFileAppend() throws IOException {
+        fileWriter = new BufferedWriter(new FileWriter(logFile,true));
     }
 
-    private boolean openLogFileOverwrite() {
-        try {
-            fileWriter = new BufferedWriter(new FileWriter(logFile,false));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
+    private void openLogFileOverwrite() throws IOException {
+        fileWriter = new BufferedWriter(new FileWriter(logFile,false));
     }
 
-    private boolean closeLogFile() {
-        if (fileWriter == null) return true; // already closed
+    private void closeLogFile() throws IOException {
+        if (fileWriter == null) return;
 
-        try {
-            fileWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
+        fileWriter.close();
         fileWriter = null;
-        return true;
     }
 
 }
