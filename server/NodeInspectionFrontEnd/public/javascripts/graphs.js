@@ -24,7 +24,7 @@
   };
 
   function showDataInId (id, data) {
-    if(!data) { console.log("No data for", id); return; }
+    if(!data || data.length === 0) { console.log("No data for", id); return; }
     window.currentWindow = {
       min: data[0].startTime,
       max: data[data.length-1].endTime
