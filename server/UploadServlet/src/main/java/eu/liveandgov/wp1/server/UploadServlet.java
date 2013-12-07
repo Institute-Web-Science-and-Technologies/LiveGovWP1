@@ -3,7 +3,9 @@ package eu.liveandgov.wp1.server;
 import eu.liveandgov.wp1.server.db_helper.BatchInserter;
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
 import eu.liveandgov.wp1.shared.logging.ZmqAppender;
-import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.*;
@@ -18,7 +20,6 @@ import java.sql.SQLException;
 import java.util.zip.GZIPInputStream;
 
 import static java.lang.System.currentTimeMillis;
-import static org.apache.commons.io.IOUtils.copy;
 
 /**
  * Implementation of a sensor data UploadServlet based on {@link org.apache.commons.fileupload}
@@ -40,22 +41,13 @@ public class UploadServlet extends HttpServlet {
 
     private static final String FIELD_NAME_UPFILE = "upfile";
 
-    private static final String BROKER_ADDRESS = "tcp://127.0.0.1:50111";
-    private static final ZMQ.Socket zmqOut;
+    private static final String PUB_ADDRESS = "tcp://127.0.0.1:50101";
+    private static ZMQ.Socket zmqOut = initZmqPublisher(PUB_ADDRESS);
+
+    private static final String LOG_ADDRESS = "tcp://*:50201";
 
     static {
-        // INIT ZMQ Socket
-        zmqOut = ZMQ.context().socket(ZMQ.PUB);
-        zmqOut.bind(BROKER_ADDRESS);
-
-        // small sleep to give subscribers time to connect back
-        try {
-            Thread.sleep(100);
-            zmqOut.send("Hello from UploadServlet");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        initLogger();
     }
 
     /**
@@ -218,13 +210,33 @@ public class UploadServlet extends HttpServlet {
         return null;
     }
 
+
+    private static void initLogger() {
+        try {
+            Layout layout = new PatternLayout("%-5p %d{yyyy-MM-dd HH:mm:ss} %c %x - %m%n");
+            Logger.getRootLogger().addAppender(new ZmqAppender(LOG_ADDRESS, layout));
+
+            Appender fileAppender = new FileAppender(layout,"/srv/log/UploadServlet.log",true);
+            Logger.getRootLogger().addAppender(fileAppender);
+
+        } catch (IOException e) {}
+
+    }
+
+    private static ZMQ.Socket initZmqPublisher(String brokerAddress) {
+        zmqOut = ZMQ.context().socket(ZMQ.PUB);
+        zmqOut.bind(brokerAddress);
+        return zmqOut;
+    }
+
+
     /**
      * Sends a ZMQ Message to a specified broker, informing it about the arrival of a new file.
      *
      * @param message
      */
     private void notifyBroker(String message) {
-        Log.info("Publish ZMQ Message " + message + " on " + BROKER_ADDRESS);
+        Log.info("Publish ZMQ Message " + message + " on " + PUB_ADDRESS);
         // need to create new context for each request, since this many threads are used by servlet engine.
         // for a discussion of performance issues see:
         // http://stackoverflow.com/questions/16659577/zeromq-multithreading-create-sockets-on-demand-or-use-sockets-object-pool
@@ -235,5 +247,7 @@ public class UploadServlet extends HttpServlet {
         zmqOut.send(message);
         zmqOut.close();
     }
+
+
 
 }
