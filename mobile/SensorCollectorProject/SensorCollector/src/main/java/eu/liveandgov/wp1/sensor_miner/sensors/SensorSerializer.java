@@ -223,7 +223,7 @@ public class SensorSerializer {
 
     public static String fromGoogleActivity(ActivityRecognitionResult result) {
         DetectedActivity detectedActivity = result.getMostProbableActivity();
-        return fillStringObjects(SSF_GOOGLE_ACTIVITY, result.getTime(), GlobalContext.getUserId(),
+        return fillStringObjects(SSF_GOOGLE_ACTIVITY, System.currentTimeMillis(), GlobalContext.getUserId(),
                 new Object[]{getActivityNameFromType(detectedActivity.getType()),
                         detectedActivity.getConfidence()});
     }
