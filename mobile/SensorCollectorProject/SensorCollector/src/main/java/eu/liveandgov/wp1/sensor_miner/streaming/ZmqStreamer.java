@@ -1,6 +1,9 @@
 package eu.liveandgov.wp1.sensor_miner.streaming;
 
+import android.util.Log;
+
 import org.jeromq.ZMQ;
+import org.jeromq.ZMQException;
 
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 import eu.liveandgov.wp1.sensor_miner.configuration.SensorCollectionOptions;
@@ -24,13 +27,28 @@ public class ZmqStreamer implements Monitorable, Consumer<String> {
 
     @Override
     public void push(String m) {
+
         // Lazy build up connection.
         // Constructor is called on main thread. No connection is possible there.
         if (!isConnected) {
-            socket.connect(SensorCollectionOptions.STREAMING_ZMQ_SOCKET);
-            isConnected = true;
+            if(socket.connect(SensorCollectionOptions.STREAMING_ZMQ_SOCKET))
+            {
+                isConnected = true;
+            }
+            else
+            {
+                Log.d(LOG_TAG, "Could not connect streamer");
+            }
         }
-        socket.send(m);
+
+        // If successfully initialized, try to send
+        if (isConnected)
+        {
+            if(!socket.send(m, ZMQ.NOBLOCK))
+            {
+                Log.d(LOG_TAG, "Could not send data");
+            }
+        }
     }
 
     @Override
