@@ -4,10 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
+
+import java.util.List;
 
 import eu.liveandgov.wp1.sensor_miner.GlobalContext;
 import eu.liveandgov.wp1.sensor_miner.connectors.sensor_queue.SensorQueue;
@@ -40,6 +43,7 @@ public class WifiHolder implements SensorHolder {
 
     @Override
     public void startRecording() {
+        Log.d(LOG_TAG, "Start Recording");
         GlobalContext.context.registerReceiver(scanResultsAvailableEndpoint, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION), null, handler);
 
         startNextScan();
@@ -47,6 +51,7 @@ public class WifiHolder implements SensorHolder {
 
     @Override
     public void stopRecording() {
+        Log.d(LOG_TAG, "Stop Recording");
         try {
             GlobalContext.context.unregisterReceiver(scanResultsAvailableEndpoint);
         } catch (IllegalArgumentException e) {
@@ -59,11 +64,20 @@ public class WifiHolder implements SensorHolder {
         public void onReceive(Context context, Intent intent) {
             if(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction()))
             {
+                Log.d(LOG_TAG, "Scan results available");
+
                 // Get receive-time of the intent in system uptime
                 long scanEndtime = SystemClock.uptimeMillis();
 
-                // Push converted scan results to queue
-                sensorQueue.push(SensorSerializer.fromScanResults(GlobalContext.getWifiManager().getScanResults()));
+                // Get scan results
+                final List<ScanResult> scanResults = GlobalContext.getWifiManager().getScanResults();
+
+                // If scan results are not null, push
+                if(scanResults != null)
+                {
+                    // Push converted scan results to queue
+                    sensorQueue.push(SensorSerializer.fromScanResults(scanResults));
+                }
 
                 // If results are on time, schedule the next scan at the handler with the given delay
                 if(lastScanRequest + delay > scanEndtime)
