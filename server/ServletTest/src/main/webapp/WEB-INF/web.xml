@@ -9,9 +9,24 @@
         <display-name>ServletTest</display-name>
         <description>For interernal testing</description>
         <servlet-class>net.hh.test.ServletTest</servlet-class>
+        <load-on-startup>1</load-on-startup>
     </servlet>
+
     <servlet-mapping>
         <servlet-name>ServletTest</servlet-name>
         <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>JmxMiniConsoleServlet</servlet-name>
+        <servlet-class>
+            org.jminix.console.servlet.MiniConsoleServlet
+        </servlet-class>
+    </servlet>
+
+
+    <servlet-mapping>
+        <servlet-name>JmxMiniConsoleServlet</servlet-name>
+        <url-pattern>/jmx/*</url-pattern>
     </servlet-mapping>
 </web-app>

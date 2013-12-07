@@ -46,7 +46,13 @@ public class UploadServlet extends HttpServlet {
 
     private static final String LOG_ADDRESS = "tcp://*:50201";
 
-    static {
+
+    @Override
+    public void destroy() {
+    }
+
+    @Override
+    public void init() throws ServletException {
         initLogger();
     }
 
@@ -56,6 +62,7 @@ public class UploadServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Log.info("Incoming GET request from "  + req.getRemoteAddr());
         PrintWriter writer = resp.getWriter();
         writer.write(
                 "<html>" +
@@ -213,12 +220,16 @@ public class UploadServlet extends HttpServlet {
 
     private static void initLogger() {
         try {
+
             Layout layout = new PatternLayout("%-5p %d{yyyy-MM-dd HH:mm:ss} %c %x - %m%n");
-            Logger.getRootLogger().addAppender(new ZmqAppender(LOG_ADDRESS, layout));
 
             Appender fileAppender = new FileAppender(layout,"/srv/log/UploadServlet.log",true);
+
             Logger.getRootLogger().addAppender(fileAppender);
 
+            Logger.getRootLogger().addAppender(new ZmqAppender(LOG_ADDRESS, layout));
+
+            Log.info("Initialized Loggers.");
         } catch (IOException e) {}
 
     }
@@ -228,7 +239,6 @@ public class UploadServlet extends HttpServlet {
         zmqOut.bind(brokerAddress);
         return zmqOut;
     }
-
 
     /**
      * Sends a ZMQ Message to a specified broker, informing it about the arrival of a new file.

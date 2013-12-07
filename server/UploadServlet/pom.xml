@@ -55,7 +55,6 @@
 
   <build>
     <finalName>UploadServlet</finalName>
-
     <plugins>
       <plugin>
           <!-- useage: mvn clean tomcat7:deploy -->

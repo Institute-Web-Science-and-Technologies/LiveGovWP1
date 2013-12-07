@@ -4,25 +4,23 @@
 
 <web-app>
     <display-name>Live+Gov WP1 UploadServlet</display-name>
-
     <servlet>
         <servlet-name>UploadServlet</servlet-name>
         <display-name>UploadServlet</display-name>
         <description>Takes POST request as input and stores them on the file system.</description>
         <servlet-class>eu.liveandgov.wp1.server.UploadServlet</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>UploadServlet</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 
-    <servlet>
+    <!--servlet>
         <servlet-name>Log4jInitServlet</servlet-name>
         <display-name>Log4J Init Servlet</display-name>
         <description>Manage central Logging</description>
         <servlet-class>eu.liveandgov.wp1.shared.logging.Log4jInitServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
-    </servlet>
+    </servlet- -->
 
 </web-app>

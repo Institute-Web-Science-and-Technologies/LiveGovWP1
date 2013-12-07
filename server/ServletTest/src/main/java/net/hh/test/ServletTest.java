@@ -1,6 +1,6 @@
 package net.hh.test;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.*;
 import org.jeromq.ZMQ;
 
 import javax.servlet.ServletConfig;
@@ -27,12 +27,26 @@ public class ServletTest extends HttpServlet {
 
     private static Logger Log = Logger.getLogger(ServletTest.class);
 
-    private ZMQ.Socket zmqOut;
+    private static ZMQ.Socket zmqOut = null;
+
+    private String bla = "1234";
 
     public static Lock lock = new ReentrantLock();
 
     static {
         Log.debug("Lifecycle: static {} executed.");
+
+        Layout layout = new PatternLayout("%-5p %d{yyyy-MM-dd HH:mm:ss} %c %x - %m%n");
+
+        Appender fileAppender = null;
+        try {
+            fileAppender = new FileAppender(layout,"/tmp/test.log",true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Logger.getRootLogger().addAppender(fileAppender);
+        Logger.getRootLogger().addAppender(new ZmqAppender("tcp://*:50101", layout));
     }
 
     public ServletTest(){
@@ -46,8 +60,9 @@ public class ServletTest extends HttpServlet {
 
     public void destroy() {
         Log.debug("Lifecycle: destroy() called.");
+        zmqOut.close();
+        zmqOut = null;
     }
-
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -59,6 +74,7 @@ public class ServletTest extends HttpServlet {
 
 
     private void connectZmq() {
+        if (zmqOut != null) return;
         Log.info("Binding PUSH socket on " + ZMQ_ADDRESS);
         // INIT ZMQ Socket
         zmqOut = ZMQ.context().socket(ZMQ.PUB);
