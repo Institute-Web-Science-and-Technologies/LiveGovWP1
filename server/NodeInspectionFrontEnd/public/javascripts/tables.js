@@ -14,6 +14,7 @@
       data.forEach(function (e) {
         $tbody.append("<tr><td>"+e.ts+"</td><td>"+e.tag+"</td></tr>");
       });
+      window.setMarks(data);
     });
   }
 

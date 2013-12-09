@@ -15,3 +15,6 @@ body {
 .showTrip {
   cursor: pointer;
 }
+[data-id]:hover {
+  color: #f00;
+}

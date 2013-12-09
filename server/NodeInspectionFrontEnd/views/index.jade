@@ -7,7 +7,7 @@ tripId: e.trip_id,
           name: e.name
 block content
   div.ui.purple.main.menu
-    a.active.item(data-tab="settings") Settings
+    a.active.item(data-tab="settings") Trips
     a.item(data-tab="map") Map
     a.item(data-tab="graphs") Graphs
     a.item(data-tab="tables") Tables
@@ -36,15 +36,7 @@ block content
           div.ui.purple.button#showBtn Show
   div.ui.tab.segment(data-tab="map")
     div.ui.vertical.segment
-      div.ui.two.column.grid
-        div.row
-          div.column
-            h1.ui.header Map
-          div.column
-            div.ui.floating.fluid.selection.dropdown#route
-              div.text Routes
-              i.dropdown.icon
-              div.menu#routeMenu
+      h1.ui.header Map
       div.plot#domMap  
   div.ui.tab.segment(data-tab="graphs")
     div.ui.vertical.segment

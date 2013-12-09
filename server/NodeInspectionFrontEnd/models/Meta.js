@@ -7,7 +7,7 @@ var _ = require('underscore')
 function getAllIds(callback) {
   pg.connect(config.pgCon, function (err, client, done) {
     if(err) { callback(err); done(); return; }
-    client.query("SELECT * FROM trip ORDER BY trip_id;", function (err, data) {
+    client.query("SELECT * FROM trip ORDER BY trip_id DESC;", function (err, data) {
       done();
       if(err) { callback(err); return; }
       var result = _.map(data.rows, function(e) {
@@ -16,8 +16,8 @@ function getAllIds(callback) {
         return {
           tripId: e.trip_id,
           userId: e.user_id,
-          startTime: start,
-          endTime: end,
+          startTime: start.format('Do MMMM YYYY, HH:mm:ss:SSS Z'),
+          endTime: end.format('Do MMMM YYYY, HH:mm:ss:SSS Z'),
           duration: end.diff(start, 'milliseconds'),
           name: e.name
         };

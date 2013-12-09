@@ -2,6 +2,9 @@
 (function() {
   window.apiUrl = window.apiUrl || "/api/1";
 
+  var plotData = {};
+  var tagMarks = {};
+
   var fplot = function(e,data,options){
     var jqParent, jqHidden;
     if (e.offsetWidth <=0 || e.offetHeight <=0){
@@ -23,7 +26,8 @@
     return plot;
   };
 
-  function showDataInId (id, data) {
+  function showDataInId (id, data, marks) {
+    marks = marks || tagMarks;
     if(!data || data.length === 0) { console.log("No data for", id); return; }
     window.currentWindow = {
       min: data[0].startTime,
@@ -86,8 +90,13 @@
       },
       selection: {
         mode: "x"
-      }
+      },
     };
+    if (marks && marks !== {}) {
+      plotOptions.grid = {
+        markings: marks
+      }
+    }
     fplot($(id)[0], plotData, plotOptions);
   }
 
@@ -96,17 +105,38 @@
       url: apiUrl + "/" + id + "/acc?startTime=" + ranges.xaxis.from.toFixed(0) + "&endTime=" +ranges.xaxis.to.toFixed(0)
     }).done(function (data) {
       showDataInId("#accPlot", data);
+      plotData.acc = data;
     });
     $.ajax({
       url: apiUrl + "/" + id + "/lac?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
     }).done(function (data) {
       showDataInId("#lacPlot", data);
+      plotData.lac = data;
     });
     $.ajax({
       url: apiUrl + "/" + id + "/gra?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
     }).done(function (data) {
       showDataInId("#graPlot", data);
+      plotData.gra = data;
     });
+  }
+
+  function setMarks (marks) {
+    var markings = [];
+    marks.forEach(function (m) {
+      var ts = parseInt(m.ts);
+      markings.push({xaxis: {from: ts, to: ts}, color: "#00bb00" });
+    });
+    tagMarks = markings;
+    if (plotData && plotData.acc) {
+      showDataInId("#accPlot", plotData.acc, markings);
+    }
+    if (plotData && plotData.lac) {
+      showDataInId("#lacPlot", plotData.lac, markings);
+    }
+    if (plotData && plotData.gra) {
+      showDataInId("#graPlot", plotData.gra, markings);
+    }
   }
 
   function limitToTime (start, end) {
@@ -157,4 +187,5 @@
   window.showLinearAccelerationForId = showLinearAccelerationForId;
   window.showGravityForId = showGravityForId;
   window.limitToTime = limitToTime;
+  window.setMarks = setMarks;
 })();
