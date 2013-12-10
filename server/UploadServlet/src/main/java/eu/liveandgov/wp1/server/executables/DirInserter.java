@@ -42,7 +42,7 @@ public class DirInserter {
         File[] files = targetDir.listFiles();
         BufferedReader reader;
 
-        // dropTables(db);
+        dropTables(db);
 
         for (File curFile : files) {
             try {

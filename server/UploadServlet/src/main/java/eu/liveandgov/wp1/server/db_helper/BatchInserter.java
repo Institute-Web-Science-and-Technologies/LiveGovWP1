@@ -78,6 +78,8 @@ public class BatchInserter {
         int userIdChangeCount = 0;
         int errorCount = 0;
 
+        SensorValueInterface lastEvent = null;
+
         while ((line = reader.readLine()) != null) {
             try {
                 if (errorCount > MAX_ERRORS_PER_FILE) throw new IllegalStateException("Too many errors in file.");
@@ -119,6 +121,10 @@ public class BatchInserter {
                 if (generateNewTripId) {
                     if (userIdChangeCount++ > MAX_TRIPS_PER_FILE) throw new IllegalStateException("Too many userIdChanges");
 
+                    if (lastEvent != null) {
+                        setStopTime(tripId, lastEvent.getTimestamp());
+                    }
+
                     tripId = generateNewTripId(SVO);
                     Log.info("Generated new trip_id: " + tripId);
                     Log.debug(" at line " + line);
@@ -127,6 +133,8 @@ public class BatchInserter {
 
                 // DO INSERT
                 batchInsert.add(SVO, tripId);
+
+                lastEvent = SVO;
 
                 if (++rowCount % 10000 == 0) batchInsert.executeBatch();
 
