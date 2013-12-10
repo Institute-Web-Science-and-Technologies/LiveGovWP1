@@ -34,14 +34,12 @@ public class TransferThreadPost implements Runnable, TransferManager {
     private static final String uploadUrl = SensorCollectionOptions.UPLOAD_URL;
 
     private Persistor persistor;
-    private Boolean compressed;
 
     private File stageFile;
 
-    public TransferThreadPost(Persistor persistor, File stageFile, Boolean isCompressed) {
+    public TransferThreadPost(Persistor persistor, File stageFile) {
         this.stageFile = stageFile;
         this.persistor = persistor;
-        this.compressed = isCompressed;
         thread = new Thread(this);
     };
 
@@ -84,8 +82,10 @@ public class TransferThreadPost implements Runnable, TransferManager {
             if (!success) { Log.i(LOG_TAG,"Staging failed");  return; }
         }
 
+        boolean isCompressed = infereCompressionStatusOf(stageFile);
+
         // transfer staged File
-        success = transferFile(stageFile, compressed);
+        success = transferFile(stageFile, isCompressed);
         if (!success) { Log.i(LOG_TAG,"Transfer failed");  return; }
 
         // delete local copy
@@ -94,6 +94,11 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
         // terminate
         Log.i(LOG_TAG, "Transfer finished successfully");
+    }
+
+    private boolean infereCompressionStatusOf(File stageFile) {
+        //if(stageFile.length())
+        return false;
     }
 
     public boolean transferFile(File file, boolean compressed) {
