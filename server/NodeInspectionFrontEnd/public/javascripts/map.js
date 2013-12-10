@@ -33,6 +33,7 @@
   // Only show the whole point list
   Map.prototype.addRoutes = function(points) {
     var self = this;
+    self._route = new Route();
     if (points.length === 0) return;
     points.forEach(function (ele) {
       self._route.addPoint(ele)
