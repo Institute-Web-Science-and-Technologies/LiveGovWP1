@@ -102,11 +102,13 @@ public class BatchInserter {
                 }
 
                 // EXCEPTIONAL BEHAVIOR: long delay
-                if (! timeDeltaValid(lastTimestamp, SVO.getTimestamp())) {
-                    Log.debug("Delay between timestamps too large.");
-                    generateNewTripId = true;
+                if (SVO.getType() == SampleType.ACC) {
+                    if (! timeDeltaValid(lastTimestamp, SVO.getTimestamp())) {
+                        Log.debug("Delay between ACC timestamps too large.");
+                        generateNewTripId = true;
+                    }
+                    lastTimestamp = SVO.getTimestamp();
                 }
-                lastTimestamp = SVO.getTimestamp();
 
                 // EXCEPTIONAL BEHAVIOR: new user ID
                 if (! lastUserId.equals(SVO.getUserId())) {

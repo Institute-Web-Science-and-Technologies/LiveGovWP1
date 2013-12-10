@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -188,9 +189,9 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doDeleteSamples() {
-        persistor.deleteSamples();
-        publisher.deleteSamples();
-        transferManager.deleteStagedSamples();
+        // persistor.deleteSamples();
+        // publisher.deleteSamples();
+        // transferManager.deleteStagedSamples();
     }
 
     private void doStopHAR() {
@@ -230,6 +231,10 @@ public class ServiceSensorControl extends Service {
 
     private void doAnnotate(String tag) {
         Log.d("AN", "Adding annotation:" + tag);
+
+        Toast toast = Toast.makeText(this, "Set Annotation: " + tag, Toast.LENGTH_SHORT);
+        toast.show();
+
         String msg = SensorSerializer.fromTag(tag);
         sensorQueue.push(msg);
     }
