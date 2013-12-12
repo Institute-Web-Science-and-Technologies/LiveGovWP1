@@ -95,7 +95,7 @@ public class ServiceSensorControl extends Service {
 
         // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
-        transferManager = new TransferThreadPost(persistor, stageFile, ZIPPED_PERSISTOR);
+        transferManager = new TransferThreadPost(persistor, stageFile);
         monitorThread   = new MonitorThread();
 
         // Restore user id from shared preferences

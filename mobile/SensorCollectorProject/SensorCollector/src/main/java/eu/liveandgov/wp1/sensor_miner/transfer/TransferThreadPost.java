@@ -11,6 +11,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import eu.liveandgov.wp1.sensor_miner.GlobalContext;
@@ -95,10 +96,40 @@ public class TransferThreadPost implements Runnable, TransferManager {
         // terminate
         Log.i(LOG_TAG, "Transfer finished successfully");
     }
-
     private boolean infereCompressionStatusOf(File stageFile) {
-        //if(stageFile.length())
-        return false;
+        boolean s = infereCompressionStatusOf_(stageFile);
+        Log.i(LOG_TAG, "Inferred compression of " + stageFile + ", compressed: " + s);
+
+        return s;
+    }
+
+    private boolean infereCompressionStatusOf_(File stageFile) {
+        Log.i(LOG_TAG, "Inferring compression of " + stageFile);
+
+        if(stageFile.length() >= 2)
+        {
+            try
+            {
+                // Read files first two bytes and check against the magic-number
+                final FileInputStream fileInputStream = new FileInputStream(stageFile);
+                final int first = fileInputStream.read();
+                final int second = fileInputStream.read();
+
+                fileInputStream.close();
+
+                return first == 0x1f && second == 0x8b;
+            }
+            catch(IOException e)
+            {
+                Log.e(LOG_TAG, "Error inferring type of stage file", e);
+
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public boolean transferFile(File file, boolean compressed) {
