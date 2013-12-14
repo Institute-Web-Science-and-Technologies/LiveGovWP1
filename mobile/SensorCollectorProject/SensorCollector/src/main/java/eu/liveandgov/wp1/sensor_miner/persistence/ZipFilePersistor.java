@@ -2,6 +2,8 @@ package eu.liveandgov.wp1.sensor_miner.persistence;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -10,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.channels.FileChannel;
+import java.util.Date;
 import java.util.zip.GZIPOutputStream;
 
 import eu.liveandgov.wp1.sensor_miner.GlobalContext;
@@ -26,16 +29,23 @@ public class ZipFilePersistor implements Persistor {
     private static final String SHARED_PREFS_NAME = "ZipFilePersistorPrefs";
     private static final String PREF_VALID_LENGTH = "validLength";
 
-    // Set this flag to write validation point after every push
-    private static final boolean DEFENSIVE_VALIDATION_POINTS = true;
+    private static final long MINIMUM_MANIFEST_DELAY = 4000;
 
     private File logFile;
+    private Handler handler;
+
     private BufferedWriter fileWriter;
     private long sampleCount = 0L;
+    private long lastManifestation = 0L;
 
     public ZipFilePersistor(File logFile) {
         this.logFile = logFile;
-        openLogFileAppend();
+
+        if(openLogFileAppend())
+        {
+            // Set manifestation point
+            lastManifestation = System.currentTimeMillis();
+        }
     }
 
     @Override
@@ -47,18 +57,24 @@ public class ZipFilePersistor implements Persistor {
 
         try {
             fileWriter.write(s + "\n");
-
-            // We defensive now, so store the new valid length of the GZIP stream
-            if(DEFENSIVE_VALIDATION_POINTS)
-            {
-                putValidLength(logFile.length());
-            }
-
             sampleCount ++;
         } catch (IOException e) {
             Log.e(LOG_TAG,"Cannot write file.");
             e.printStackTrace();
         }
+
+        // Manifest GZIP data, if specified amount of time has passed
+        long currentTime = System.currentTimeMillis();
+        if(lastManifestation + MINIMUM_MANIFEST_DELAY < currentTime)
+        {
+            if(manifestData())
+            {
+                Log.i(LOG_TAG, "Manifested the data at " + new Date(currentTime));
+
+                lastManifestation = currentTime;
+            }
+        }
+
     }
 
     @Override
@@ -72,12 +88,16 @@ public class ZipFilePersistor implements Persistor {
         if (!suc) { Log.e(LOG_TAG, "Cosing LogFile failed."); return false; }
 
         // Renamed, the valid length is now zero
-        putValidLength(0);
         suc = logFile.renameTo(stageFile);
+        putValidLength(0);
+
         if (!suc) { Log.e(LOG_TAG, "Renaming failed."); return false; }
 
         suc = openLogFileOverwrite();
         if (!suc) { Log.e(LOG_TAG, "Opening new Log File failed."); return false; }
+
+        // Set manifestation point
+        lastManifestation = System.currentTimeMillis();
 
         sampleCount = 0;
         return true;
@@ -93,8 +113,8 @@ public class ZipFilePersistor implements Persistor {
         closeLogFile();
 
         // Deleted, the valid length is now zero
-        putValidLength(0);
         logFile.delete();
+        putValidLength(0);
     }
 
     @Override
@@ -166,18 +186,41 @@ public class ZipFilePersistor implements Persistor {
             e.printStackTrace();
             return false;
         }
+
         return true;
     }
 
     private boolean closeLogFile() {
         try {
-            putValidLength(logFile.length());
+            fileWriter.flush();
             fileWriter.close();
+
+            putValidLength(logFile.length());
+
         } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
         fileWriter = null;
         return true;
+    }
+
+    private boolean manifestData()
+    {
+        // Filewriter is closed, so no manifest action required
+        if(fileWriter == null)
+        {
+            return true;
+        }
+
+        // Else we close an reopen for appending
+        if(closeLogFile()){
+            if(openLogFileAppend())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
