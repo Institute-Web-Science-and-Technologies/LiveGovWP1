@@ -191,6 +191,8 @@ public class ZipFilePersistor implements Persistor {
     }
 
     private boolean closeLogFile() {
+        if(fileWriter == null) return true;
+
         try {
             fileWriter.flush();
             fileWriter.close();
