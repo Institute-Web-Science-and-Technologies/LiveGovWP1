@@ -44,6 +44,30 @@
     showGravityForId(id);
   });
 
+  $('.csvDownload').click(function (eventObject) {
+    if(!window.currentDevId) return;
+    var tsSelect = '';
+    if(window.currentWindow && window.currentWindow.min && window.currentWindow.max) {
+      var startDate = window.currentWindow.min;
+      var endDate = window.currentWindow.max;// + 60 * 60 * 1000;
+      tsSelect = '?startTime='+startDate+'&endTime='+endDate;
+    }
+    var apiUrl = '/api/1/csv/' + window.currentDevId;
+    switch(eventObject.currentTarget.id) {
+      case('accCsv'):
+        apiUrl += '/acc'
+        break;
+      case('lacCsv'):
+        apiUrl += '/lac'
+        break;
+      case('graCsv'):
+        apiUrl += '/gra'
+        break;
+    }
+    apiUrl += tsSelect;
+    window.location = apiUrl;
+  });
+
   $('.saveWindow').click(function (eventObject) {
     if(!window.currentDevId) return;
     if(!window.currentWindow || !window.currentWindow.min || !window.currentWindow.max) return;

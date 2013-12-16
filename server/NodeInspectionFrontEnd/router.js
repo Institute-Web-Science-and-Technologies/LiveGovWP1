@@ -1,5 +1,6 @@
 var apiV1 = require('./routes/apiV1.js')
-  , trip = require('./routes/trip.js');
+  , trip = require('./routes/trip.js')
+  , csv = require('./routes/csv.js');
 
 function register (app) {
   app.get('/api/1/devices', apiV1.getAllIds);
@@ -20,7 +21,10 @@ function register (app) {
 
   app.post('/api/1/:id/window', apiV1.postWindow);
 
-  app.get('/trip/:id', trip.getTrip);
+  app.get('/api/1/csv/:id/acc', csv.getAccRaw);
+  app.get('/api/1/csv/:id/gps', csv.getGpsRaw);
+  app.get('/api/1/csv/:id/lac', csv.getLacRaw);
+  app.get('/api/1/csv/:id/gra', csv.getGraRaw);
 }
 
 module.exports = register;
