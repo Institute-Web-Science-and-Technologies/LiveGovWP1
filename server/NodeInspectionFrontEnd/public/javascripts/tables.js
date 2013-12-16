@@ -18,4 +18,18 @@
   }
 
   window.showTagsForId = showTagsForId;
+
+  $(document).ready(function () {
+    $("#tripTable").tablesorter();
+    $('#tripTable').filterTable();
+    $.fn.editable.defaults.mode = 'inline';
+    $('.tripName').editable({
+      type: 'text',
+      showbuttons: false,
+      clear: false,
+      success: function(params) {
+        console.log("[ X-EDITABLE params ] " + params);
+      }
+    });
+  });
 })();
