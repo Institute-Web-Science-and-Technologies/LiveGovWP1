@@ -29,23 +29,16 @@ public class ZipFilePersistor implements Persistor {
     private static final String SHARED_PREFS_NAME = "ZipFilePersistorPrefs";
     private static final String PREF_VALID_LENGTH = "validLength";
 
-    private static final long MINIMUM_MANIFEST_DELAY = 4000;
-
     private File logFile;
     private Handler handler;
 
     private BufferedWriter fileWriter;
     private long sampleCount = 0L;
-    private long lastManifestation = 0L;
 
     public ZipFilePersistor(File logFile) {
         this.logFile = logFile;
 
-        if(openLogFileAppend())
-        {
-            // Set manifestation point
-            lastManifestation = System.currentTimeMillis();
-        }
+        openLogFileAppend();
     }
 
     @Override
@@ -62,19 +55,6 @@ public class ZipFilePersistor implements Persistor {
             Log.e(LOG_TAG,"Cannot write file.");
             e.printStackTrace();
         }
-
-        // Manifest GZIP data, if specified amount of time has passed
-        long currentTime = System.currentTimeMillis();
-        if(lastManifestation + MINIMUM_MANIFEST_DELAY < currentTime)
-        {
-            if(manifestData())
-            {
-                Log.i(LOG_TAG, "Manifested the data at " + new Date(currentTime));
-
-                lastManifestation = currentTime;
-            }
-        }
-
     }
 
     @Override
@@ -96,9 +76,6 @@ public class ZipFilePersistor implements Persistor {
         suc = openLogFileOverwrite();
         if (!suc) { Log.e(LOG_TAG, "Opening new Log File failed."); return false; }
 
-        // Set manifestation point
-        lastManifestation = System.currentTimeMillis();
-
         sampleCount = 0;
         return true;
     }
@@ -118,28 +95,19 @@ public class ZipFilePersistor implements Persistor {
     }
 
     @Override
+    public void close() {
+        closeLogFile();
+    }
+
+    @Override
     public String getStatus() {
         return "File size: " + logFile.length()/1024 + "kb. Samples written: " + sampleCount;
     }
 
     private boolean openLogFileAppend() {
         try {
-            // Compare actual length to valid length
-            final long validLength = getValidLength();
-            final long actualLength = logFile.length();
 
-            Log.d(LOG_TAG, "Valid zipfile length: " + validLength + ", actual length " + actualLength);
-
-            if(actualLength > validLength)
-            {
-                Log.w(LOG_TAG, "Erronous file size, truncating");
-
-                // Truncate if mismatching
-                final FileChannel channel = new FileOutputStream(logFile, true).getChannel();
-
-                channel.truncate(validLength);
-                channel.close();
-            }
+            truncateFileIfCorupted();
 
             fileWriter = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(logFile,true)), "UTF8"));
         } catch (IOException e) {
@@ -147,6 +115,25 @@ public class ZipFilePersistor implements Persistor {
             return false;
         }
         return true;
+    }
+
+    private void truncateFileIfCorupted() throws IOException {
+        // Compare actual length to valid length
+        final long validLength = getValidLength();
+        final long actualLength = logFile.length();
+
+        Log.d(LOG_TAG, "Valid zipfile length: " + validLength + ", actual length " + actualLength);
+
+        if(actualLength > validLength)
+        {
+            Log.w(LOG_TAG, "Erronous file size, truncating");
+
+            // Truncate if mismatching
+            final FileChannel channel = new FileOutputStream(logFile, true).getChannel();
+
+            channel.truncate(validLength);
+            channel.close();
+        }
     }
 
     // Gets the valid length
@@ -198,31 +185,11 @@ public class ZipFilePersistor implements Persistor {
             fileWriter.close();
 
             putValidLength(logFile.length());
-
         } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
         fileWriter = null;
         return true;
-    }
-
-    private boolean manifestData()
-    {
-        // Filewriter is closed, so no manifest action required
-        if(fileWriter == null)
-        {
-            return true;
-        }
-
-        // Else we close an reopen for appending
-        if(closeLogFile()){
-            if(openLogFileAppend())
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
