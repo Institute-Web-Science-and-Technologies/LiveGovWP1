@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.sensor_miner.persistence;
 
 import java.io.File;
+import java.io.IOException;
 
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 import eu.liveandgov.wp1.sensor_miner.monitor.Monitorable;
@@ -27,4 +28,9 @@ public interface Persistor extends Consumer<String>, Monitorable {
      * Delete all stored samples
      */
     void deleteSamples();
+
+    /**
+     * Free all resources used by the persistor.
+     */
+    void close();
 }

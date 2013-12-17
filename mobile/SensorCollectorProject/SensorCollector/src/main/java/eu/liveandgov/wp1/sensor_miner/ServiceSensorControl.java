@@ -130,6 +130,13 @@ public class ServiceSensorControl extends Service {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        persistor.close();
+    }
+
+    @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
