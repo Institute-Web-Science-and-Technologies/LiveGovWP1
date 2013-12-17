@@ -75,6 +75,12 @@ public class TransferThreadPost implements Runnable, TransferManager {
     public void run() {
         boolean success;
 
+        try {
+
+        // TODO: Check methods if with success return should rather throw an exception in
+        // order to make calleing more uniform.
+
+
         // get stage file
         if (stageFile.exists()){
             Log.i(LOG_TAG, "Found old stage file.");
@@ -95,40 +101,26 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
         // terminate
         Log.i(LOG_TAG, "Transfer finished successfully");
-    }
-    private boolean infereCompressionStatusOf(File stageFile) {
-        boolean s = infereCompressionStatusOf_(stageFile);
-        Log.i(LOG_TAG, "Inferred compression of " + stageFile + ", compressed: " + s);
 
-        return s;
-    }
-
-    private boolean infereCompressionStatusOf_(File stageFile) {
-        Log.i(LOG_TAG, "Inferring compression of " + stageFile);
-
-        if(stageFile.length() >= 2)
-        {
-            try
-            {
-                // Read files first two bytes and check against the magic-number
-                final FileInputStream fileInputStream = new FileInputStream(stageFile);
-                final int first = fileInputStream.read();
-                final int second = fileInputStream.read();
-
-                fileInputStream.close();
-
-                return first == 0x1f && second == 0x8b;
-            }
-            catch(IOException e)
-            {
-                Log.e(LOG_TAG, "Error inferring type of stage file", e);
-
-                return false;
-            }
+        } catch (IOException e){
+            Log.e(LOG_TAG, "Error opening stage file", e);
         }
-        else
-        {
-            return false;
+    }
+
+    private boolean infereCompressionStatusOf(File stageFile) throws IOException {
+        Log.i(LOG_TAG, "Inferring compression of " + stageFile);
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream(stageFile);
+
+            // Read files first two bytes and check against the magic-number
+            final int first = fileInputStream.read();
+            final int second = fileInputStream.read();
+            return first == 0x1f && second == 0x8b;
+        } finally {
+            if (fileInputStream != null) {
+                fileInputStream.close();
+            }
         }
     }
 
