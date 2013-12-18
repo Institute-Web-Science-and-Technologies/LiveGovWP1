@@ -11,6 +11,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import eu.liveandgov.wp1.sensor_miner.GlobalContext;
@@ -34,14 +35,12 @@ public class TransferThreadPost implements Runnable, TransferManager {
     private static final String uploadUrl = SensorCollectionOptions.UPLOAD_URL;
 
     private Persistor persistor;
-    private Boolean compressed;
 
     private File stageFile;
 
-    public TransferThreadPost(Persistor persistor, File stageFile, Boolean isCompressed) {
+    public TransferThreadPost(Persistor persistor, File stageFile) {
         this.stageFile = stageFile;
         this.persistor = persistor;
-        this.compressed = isCompressed;
         thread = new Thread(this);
     };
 
@@ -76,6 +75,12 @@ public class TransferThreadPost implements Runnable, TransferManager {
     public void run() {
         boolean success;
 
+        try {
+
+        // TODO: Check methods if with success return should rather throw an exception in
+        // order to make calleing more uniform.
+
+
         // get stage file
         if (stageFile.exists()){
             Log.i(LOG_TAG, "Found old stage file.");
@@ -84,8 +89,10 @@ public class TransferThreadPost implements Runnable, TransferManager {
             if (!success) { Log.i(LOG_TAG,"Staging failed");  return; }
         }
 
+        boolean isCompressed = infereCompressionStatusOf(stageFile);
+
         // transfer staged File
-        success = transferFile(stageFile, compressed);
+        success = transferFile(stageFile, isCompressed);
         if (!success) { Log.i(LOG_TAG,"Transfer failed");  return; }
 
         // delete local copy
@@ -94,6 +101,27 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
         // terminate
         Log.i(LOG_TAG, "Transfer finished successfully");
+
+        } catch (IOException e){
+            Log.e(LOG_TAG, "Error opening stage file", e);
+        }
+    }
+
+    private boolean infereCompressionStatusOf(File stageFile) throws IOException {
+        Log.i(LOG_TAG, "Inferring compression of " + stageFile);
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream(stageFile);
+
+            // Read files first two bytes and check against the magic-number
+            final int first = fileInputStream.read();
+            final int second = fileInputStream.read();
+            return first == 0x1f && second == 0x8b;
+        } finally {
+            if (fileInputStream != null) {
+                fileInputStream.close();
+            }
+        }
     }
 
     public boolean transferFile(File file, boolean compressed) {

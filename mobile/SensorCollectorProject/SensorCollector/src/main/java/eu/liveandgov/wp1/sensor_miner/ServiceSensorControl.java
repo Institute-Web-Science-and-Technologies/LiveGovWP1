@@ -95,7 +95,7 @@ public class ServiceSensorControl extends Service {
 
         // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
-        transferManager = new TransferThreadPost(persistor, stageFile, ZIPPED_PERSISTOR);
+        transferManager = new TransferThreadPost(persistor, stageFile);
         monitorThread   = new MonitorThread();
 
         // Restore user id from shared preferences
@@ -127,6 +127,13 @@ public class ServiceSensorControl extends Service {
         connectorThread.start();
         monitorThread.start();
         SensorThread.start();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        persistor.close();
     }
 
     @Override
