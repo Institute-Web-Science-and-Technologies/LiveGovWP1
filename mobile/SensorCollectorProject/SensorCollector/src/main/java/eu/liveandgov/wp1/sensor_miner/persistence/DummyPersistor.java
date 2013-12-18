@@ -25,6 +25,9 @@ public class DummyPersistor implements Persistor {
     public void deleteSamples() {}
 
     @Override
+    public void close() {}
+
+    @Override
     public void push(String message) {}
 
     @Override
