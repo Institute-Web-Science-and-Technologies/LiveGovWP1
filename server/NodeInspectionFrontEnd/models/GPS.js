@@ -56,8 +56,33 @@ function getCountForId (id, options, callback) {
   });
 }
 
-function getNearestToTimeWithId (id, callback) {
-  // body...
+function getNearestToTimeWithId (id, ts, callback) {
+  if (!_.isFunction(callback)) {
+    throw new TypeError("Bad arguments");
+  }
+
+  pg.connect(config.pgCon, function (err, client, done) {
+    if(err) { callback(err); done(); return; }
+    var query = 'SELECT ABS( ts - $1 ) AS a, '
+              + '       ST_AsGeoJSON(lonlat) AS geojson '
+              + 'FROM sensor_gps '
+              + 'WHERE trip_id=$2 '
+              + 'ORDER BY a '
+              + 'LIMIT 1';
+    var values = [ts, id];
+    client.query(query, values, function (err, result) {
+      done();
+      if(err) { callback(err); return; }
+      var e = result.rows[0];
+      var geo = JSON.parse(e.geojson);
+      var data = { 
+        diff: e.a,
+        lon: geo.coordinates[0],
+        lat: geo.coordinates[1]
+      }
+      callback(null, data);
+    });
+  });
 }
 
 function getRawForId (id, options, callback) {
@@ -102,5 +127,6 @@ function getRawForId (id, options, callback) {
 module.exports = {
   getById: getById,
   getCountForId: getCountForId,
-  getRawForId: getRawForId
+  getRawForId: getRawForId,
+  getNearestToTimeWithId: getNearestToTimeWithId
 };

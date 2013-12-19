@@ -2,7 +2,10 @@
   $('.main.menu .item').tab({
     onTabLoad: function (tabPath, parameterArray, historyEvent) {
       if(tabPath === "map" && window.lMap) {
+        
+      } else if (tabPath === "har") {
         window.lMap._map.invalidateSize();
+        window.redrawHAR();
       }
     }
   });
@@ -10,7 +13,6 @@
   $('.ui.dropdown').dropdown();  
 
   $('.showTrip').click(function (eventObject) {
-    console.dir(eventObject);
     var id = $(this).parent().data('id');
     if(!id) { alert("Please select a device."); return;}
     window.lMap = window.lMap || new window.MyMap();
@@ -19,8 +21,9 @@
     showAccelerometerForId(id);
     showLinearAccelerationForId(id);
     showGravityForId(id);
+    showHARForId(id);
     window.currentDevId = id;
-    $('[data-tab="map"]').click();
+    $('[data-tab="har"]').click();
   });
 
   $("#showBtn").click(function(eventObject) {

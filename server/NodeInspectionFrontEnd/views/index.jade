@@ -1,16 +1,12 @@
 extends layout
-tripId: e.trip_id,
-          userId: e.user_id,
-          startTime: start,
-          endTime: end,
-          duration: end.diff(start, 'milliseconds'),
-          name: e.name
+
 block content
   div.ui.purple.main.menu
     a.active.item(data-tab="settings") Trips
     a.item(data-tab="map") Map
     a.item(data-tab="graphs") Graphs
     a.item(data-tab="tables") Tables
+    a.item(data-tab="har") HAR
   div.ui.active.tab.segment(data-tab="settings")
     table.ui.table.segment
       thead
@@ -35,9 +31,7 @@ block content
         div.column
           div.ui.purple.button#showBtn Show
   div.ui.tab.segment(data-tab="map")
-    div.ui.vertical.segment
-      h1.ui.header Map
-      div.plot#domMap  
+    
   div.ui.tab.segment(data-tab="graphs")
     div.ui.vertical.segment
       h1.ui.header Accelerometer
@@ -82,6 +76,13 @@ block content
             th Timestamp
             th Tag
         tbody
+  div.ui.tab.segment(data-tab="har")
+    div.ui.vertical.segment
+      h1.ui.header HAR
+      div#harTimeline
+    div.ui.vertical.segment
+      h1.ui.header Map
+      div.plot#domMap
   div.ui.small.modal
     i.close.icon
     div.header Save Training Data

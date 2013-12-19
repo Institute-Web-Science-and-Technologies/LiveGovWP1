@@ -7,6 +7,7 @@ function register (app) {
 
   app.get('/api/1/:id/gps', apiV1.getGPS);
   app.get('/api/1/:id/gps/count', apiV1.getGPSCount);
+  app.get('/api/1/:id/gps/:ts', apiV1.getGPSNearToTS);
 
   app.get('/api/1/:id/acc', apiV1.getAccWindow);
   app.get('/api/1/:id/acc/count', apiV1.getAccCount);
@@ -18,6 +19,8 @@ function register (app) {
   app.get('/api/1/:id/gra/count', apiV1.getGraCount);
 
   app.get('/api/1/:id/tag', apiV1.getTags);
+
+  app.get('/api/1/:id/har', apiV1.getHAR);
 
   app.post('/api/1/:id/window', apiV1.postWindow);
 

@@ -4,7 +4,8 @@ var gps = require('../models/GPS.js')
   , lac = require('../models/LinearAcceleration.js')
   , gra = require('../models/Gravity.js')
   , tag = require('../models/Tags.js')
-  , trainingWindow = require('../models/TrainingWindow.js');
+  , trainingWindow = require('../models/TrainingWindow.js')
+  , har = require('../models/HAR.js');
 
 function getAllIds(req, res) {
   meta.getAllIds(function (err, data) {
@@ -25,6 +26,15 @@ function getGPS (req, res) {
 
 function getGPSCount (req, res) {
   gps.getCountForId(req.params.id, function (err, data) {
+    if(err) { res.send(err); console.error(err); return; }
+    return res.send(data);
+  });
+}
+
+function getGPSNearToTS (req, res) {
+  var ts = req.params.ts;
+  var id = req.params.id;
+  gps.getNearestToTimeWithId(id, ts, function (err, data) {
     if(err) { res.send(err); console.error(err); return; }
     return res.send(data);
   });
@@ -97,8 +107,16 @@ function postWindow (req, res) {
   });
 }
 
+function getHAR (req, res) {
+  har.getById(req.params.id, function (err, data) {
+    if(err) { res.send(err); console.error(err); return; }
+    return res.send(data);
+  });
+}
+
 module.exports = {
   getGPS: getGPS,
+  getGPSNearToTS: getGPSNearToTS,
   getGPSCount: getGPSCount,
   getAllIds: getAllIds,
   getAccWindow: getAccWindow,
@@ -108,5 +126,6 @@ module.exports = {
   getGraWindow: getGraWindow,
   getGraCount: getGraCount,
   getTags: getTags,
-  postWindow: postWindow
+  postWindow: postWindow,
+  getHAR: getHAR
 };

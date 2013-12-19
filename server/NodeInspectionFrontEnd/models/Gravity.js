@@ -101,6 +101,7 @@ function getRawForId (id, options, callback) {
     if(err) { callback(err); done(); return; }
     var query = 'SELECT * FROM sensor_gravity WHERE trip_id=$1'
     var values = [id];
+    var limitTime = '';
     if(options.startTime && !options.endTime) {
       limitTime = "AND ts>=$2";
       values.push(options.startTime);

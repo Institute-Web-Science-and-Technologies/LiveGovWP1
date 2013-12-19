@@ -121,10 +121,6 @@ function getCountForId (id, options, callback) {
   });
 }
 
-function getById (id, options, callback) {
-  
-}
-
 module.exports = {
   getWindowsForId: getWindowsForId,
   getCountForId: getCountForId,
