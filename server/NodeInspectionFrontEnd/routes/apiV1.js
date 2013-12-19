@@ -61,8 +61,8 @@ function getAccCount (req, res) {
 function getLacWindow (req, res) {
   var options = { windows: 200 };
   if(req.query.windows)   options.windows = parseInt(req.query.windows);
-  if(req.query.startTime) options.startTime = new Date(parseInt(req.query.startTime));
-  if(req.query.endTime)   options.endTime = new Date(parseInt(req.query.endTime));
+  if(req.query.startTime) options.startTime = parseInt(req.query.startTime);
+  if(req.query.endTime)   options.endTime = parseInt(req.query.endTime);
   lac.getWindowsForId(req.params.id, options, function (err, data) {
     if(err) { res.send(err); console.error(err); return; }
     return res.send(data);
@@ -79,8 +79,8 @@ function getLacCount (req, res) {
 function getGraWindow (req, res) {
   var options = { windows: 200 };
   if(req.query.windows)   options.windows = parseInt(req.query.windows);
-  if(req.query.startTime) options.startTime = new Date(parseInt(req.query.startTime));
-  if(req.query.endTime)   options.endTime = new Date(parseInt(req.query.endTime));
+  if(req.query.startTime) options.startTime = parseInt(req.query.startTime);
+  if(req.query.endTime)   options.endTime = parseInt(req.query.endTime);
   gra.getWindowsForId(req.params.id, options, function (err, data) {
     if(err) { res.send(err); console.error(err); return; }
     return res.send(data);
