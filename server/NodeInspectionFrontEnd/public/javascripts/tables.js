@@ -14,8 +14,21 @@
       data.forEach(function (e) {
         $tbody.append("<tr><td>"+e.ts+"</td><td>"+e.tag+"</td></tr>");
       });
+      window.setMarks(data);
     });
   }
 
   window.showTagsForId = showTagsForId;
+
+  $(document).ready(function () {
+    $("#tripTable").tablesorter();
+    $('#tripTable').filterTable();
+    $.fn.editable.defaults.mode = 'inline';
+    $('.tripName').editable({
+      type: 'text',
+      showbuttons: false,
+      clear: false,
+      emptytext: ''
+    });
+  });
 })();
