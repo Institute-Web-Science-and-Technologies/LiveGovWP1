@@ -41,6 +41,7 @@ public class BatchInserter {
         inserter.put(SampleType.GRA, new GraInserter(db));
         inserter.put(SampleType.TAG, new TagInserter(db));
         inserter.put(SampleType.GPS, new GpsInserter(db));
+        inserter.put(SampleType.ACT, new HarInserter(db));
     }
 
     private static enum ParsingState {
