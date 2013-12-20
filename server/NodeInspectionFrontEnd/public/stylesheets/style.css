@@ -15,6 +15,49 @@ body {
 .showTrip {
   cursor: pointer;
 }
-[data-id]:hover {
-  color: #f00;
+/* jquery.filterTable */
+.filter-table .quick {
+  margin-left: 0.5em;
+  font-size: 0.8em;
+  text-decoration: none;
+}
+.fitler-table .quick:hover {
+  text-decoration: underline;
+}
+td.alt {
+  background-color: #ffc;
+  background-color: rgba(255,255,0,0.2);
+}
+/* TableSorter */
+th.tablesorter-header {
+  background-size: 12px;
+  background-position: right center;
+  background-repeat: no-repeat;
+}
+th.tablesorter-header.tablesorter-headerAsc {
+  background-image: url("/images/triangle-asc.png");
+}
+th.tablesorter-header.tablesorter-headerDesc {
+  background-image: url("/images/triangle-desc.png");
+}
+/* x-editable */
+td.tripName.editable.editable-click.editable-unsaved {
+  font-weight: normal;
+  color: #ff4c4c;
+}
+td.tripName.editable {
+  border-bottom: none;
+}
+.editable-click > a {
+  text-decoration: none;
+  color: #222;
+}
+/* delete button */
+td.deleteTrip > a {
+  text-decoration: none;
+  color: #222;
+}
+td.deleteTrip > a:hover {
+  text-decoration: none;
+  color: #ff4c4c;
 }
