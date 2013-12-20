@@ -18,7 +18,7 @@ function getAllIds(callback) {
           userId: e.user_id,
           startTime: start.format('YYYY/MM/DD hh:mm:ss'),
           endTime: end.format('YYYY/MM/DD hh:mm:ss'),
-          duration: end.diff(start, 'milliseconds'),
+          duration: moment(end.diff(start)).format('hh:mm:ss'),
           name: e.name
         };
       });

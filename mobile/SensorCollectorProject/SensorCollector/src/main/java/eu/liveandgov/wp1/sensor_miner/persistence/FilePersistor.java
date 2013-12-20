@@ -86,6 +86,15 @@ public class FilePersistor implements Persistor {
     }
 
     @Override
+    public void close() {
+        try {
+            closeLogFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public boolean hasSamples() {
         return logFile.length() > 0;
     }

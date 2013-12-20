@@ -50,7 +50,6 @@ function register (app) {
       }
       query = "UPDATE trip SET name = '" + req.body.value + "' WHERE trip_id = " + req.params.id + ";";
       client.query(query, function (err, result) {
-        console.log("XXX: " + req.body.value + ", " + req.params.id);
         done();
       });
       if (err) { res.end(err) } else { res.redirect('back'); }

@@ -1,6 +1,10 @@
 package eu.liveandgov.wp1.sensor_miner.streaming;
 
+import android.util.Log;
+
+import org.jeromq.ZContext;
 import org.jeromq.ZMQ;
+import org.jeromq.ZMQException;
 
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 import eu.liveandgov.wp1.sensor_miner.configuration.SensorCollectionOptions;
@@ -14,23 +18,41 @@ import eu.liveandgov.wp1.sensor_miner.monitor.Monitorable;
 public class ZmqStreamer implements Monitorable, Consumer<String> {
     public final static String LOG_TAG = "ZMQStreamer";
 
-    private final ZMQ.Socket socket;
-    private boolean isConnected = false;
+    public final static int MESSAGE_RETRY_COUNT = 10;
+
+    private final ZContext context;
+
+    private ZMQ.Socket socket;
 
     public ZmqStreamer(){
-        socket = ZMQ.context().socket(ZMQ.PUSH);
-        socket.setHWM(1000);
+        context = new ZContext();
+        context.setHWM(1000);
     }
 
     @Override
-    public void push(String m) {
-        // Lazy build up connection.
-        // Constructor is called on main thread. No connection is possible there.
-        if (!isConnected) {
-            socket.connect(SensorCollectionOptions.STREAMING_ZMQ_SOCKET);
-            isConnected = true;
+    public void push(String m)
+    {
+        for(int i=0;i<MESSAGE_RETRY_COUNT;i++)
+        {
+            if(socket == null)
+            {
+                socket = context.createSocket(ZMQ.PUSH);
+                socket.connect(SensorCollectionOptions.STREAMING_ZMQ_SOCKET);
+            }
+
+            if(!socket.send(m, ZMQ.DONTWAIT))
+            {
+                Log.w(LOG_TAG, "ZMQ connection transmission failed, invalidating socket");
+
+                context.destroySocket(socket);
+                socket = null;
+            }
+
+            if(socket != null)
+            {
+                return;
+            }
         }
-        socket.send(m);
     }
 
     @Override

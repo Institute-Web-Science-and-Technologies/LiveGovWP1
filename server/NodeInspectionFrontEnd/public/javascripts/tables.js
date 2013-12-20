@@ -28,9 +28,9 @@
       type: 'text',
       showbuttons: false,
       clear: false,
-      success: function(params) {
-        console.log("[ X-EDITABLE params ] " + params);
-      }
+      emptytext: ''
     });
   });
 })();
+
+>>>>>>> 6ee82f5faf2a8ac279f56d27284baa0af1de44be
