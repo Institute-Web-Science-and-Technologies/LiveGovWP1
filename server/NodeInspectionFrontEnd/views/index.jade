@@ -3,9 +3,7 @@ extends layout
 block content
   div.ui.purple.main.menu
     a.active.item(data-tab="settings") Trips
-    a.item(data-tab="map") Map
-    a.item(data-tab="graphs") Graphs
-    a.item(data-tab="tables") Tables
+    a.item(data-tab="graphs") Raw
     a.item(data-tab="har") HAR
   div.ui.active.tab.segment(data-tab="settings")
     table#tripTable.ui.table.segment.tablesorter.filterTable
@@ -34,9 +32,10 @@ block content
         div.column
         div.column
           div.ui.purple.button#showBtn Show
-  div.ui.tab.segment(data-tab="map")
-    
   div.ui.tab.segment(data-tab="graphs")
+    div.ui.vertical.segment
+      h1.ui.header Map
+      div.plot#rawMap
     div.ui.vertical.segment
       h1.ui.header Accelerometer
       div.ui.two.column.grid
@@ -49,6 +48,14 @@ block content
       div.ui.button.saveWindow Save Window
       div.ui.button.csvDownload#accCsv Download CSV
       div.plot#accPlot
+    div.ui.vertical.segment
+      h1.ui.header Tags
+      table.ui.celled.purple.inverted.two.column.table.segment#tags
+        thead
+          tr
+            th Timestamp
+            th Tag
+        tbody
     div.ui.vertical.segment
       h1.ui.header Linear Acceleration
       div.ui.two.column.grid
@@ -71,22 +78,13 @@ block content
       div.ui.purple.button.resetZoom Reset Zoom
       div.ui.button.csvDownload#graCsv Download CSV
       div.plot#graPlot
-  div.ui.tab.segment(data-tab="tables")
-    div.ui.vertical.segment
-      h1.ui.header Tags
-      table.ui.celled.purple.inverted.two.column.table.segment#tags
-        thead
-          tr
-            th Timestamp
-            th Tag
-        tbody
   div.ui.tab.segment(data-tab="har")
     div.ui.vertical.segment
       h1.ui.header HAR
       div#harTimeline
     div.ui.vertical.segment
       h1.ui.header Map
-      div.plot#domMap
+      div.plot#domMap    
   div.ui.small.modal
     i.close.icon
     div.header Save Training Data
