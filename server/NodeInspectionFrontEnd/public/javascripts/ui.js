@@ -1,8 +1,8 @@
  $(function() {
   $('.main.menu .item').tab({
     onTabLoad: function (tabPath, parameterArray, historyEvent) {
-      if(tabPath === "map" && window.lMap) {
-        
+      if(tabPath === "graphs" && window.rMap) {
+        window.rMap._map.invalidateSize();
       } else if (tabPath === "har") {
         window.lMap._map.invalidateSize();
         window.redrawHAR();
@@ -15,15 +15,17 @@
   $('.showTrip').click(function (eventObject) {
     var id = $(this).parent().data('id');
     if(!id) { alert("Please select a device."); return;}
-    window.lMap = window.lMap || new window.MyMap();
+    window.lMap = window.lMap || new window.MyMap('domMap');
+    window.rMap = window.rMap || new window.MyMap('rawMap');
     lMap.showAllForId(id);
+    rMap.showAllForId(id);
     showTagsForId(id);
     showAccelerometerForId(id);
     showLinearAccelerationForId(id);
     showGravityForId(id);
     showHARForId(id);
     window.currentDevId = id;
-    $('[data-tab="har"]').click();
+    $('[data-tab="graphs"]').click();
   });
 
   $("#showBtn").click(function(eventObject) {
@@ -31,6 +33,7 @@
     if(!id) { alert("Please select a device."); return;}
     window.lMap = window.lMap || new window.MyMap();
     lMap.showAllForId(id);
+    rMap.showAllForId(id);
     showTagsForId(id);
     showAccelerometerForId(id);
     showLinearAccelerationForId(id);

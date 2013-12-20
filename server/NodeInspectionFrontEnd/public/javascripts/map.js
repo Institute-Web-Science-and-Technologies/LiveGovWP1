@@ -3,8 +3,8 @@
 
   var maxTimeDifference = 5 * 60 * 1000;
 
-  function Map() {
-    this._map = L.map("domMap");
+  function Map(id) {
+    this._map = L.map(id);
     L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
       key: 'BC9A493B41014CAABB98F0471D759707',
       styleId: 997,
@@ -15,6 +15,9 @@
   }
 
   Map.prototype.clearAll = function() {
+    if (this._marker) {
+      this._map.removeLayer(this._marker);
+    }
     for(i in this._map._layers) {
       if(this._map._layers[i]._path != undefined) {
         try {
@@ -42,7 +45,10 @@
   Map.prototype.addRoutes = function(points) {
     var self = this;
     self._route = new Route();
-    if (points.length === 0) return;
+    if (points.length === 0) {
+      self.clearAll();
+      return;
+    }
     points.forEach(function (ele) {
       self._route.addPoint(ele);
     });
