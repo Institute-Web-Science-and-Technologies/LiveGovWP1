@@ -16,8 +16,8 @@ function getAllIds(callback) {
         return {
           tripId: e.trip_id,
           userId: e.user_id,
-          startTime: start.format('Do MMMM YYYY, HH:mm:ss:SSS Z'),
-          endTime: end.format('Do MMMM YYYY, HH:mm:ss:SSS Z'),
+          startTime: start.format('YYYY/MM/DD hh:mm:ss'),
+          endTime: end.format('YYYY/MM/DD hh:mm:ss'),
           duration: end.diff(start, 'milliseconds'),
           name: e.name
         };

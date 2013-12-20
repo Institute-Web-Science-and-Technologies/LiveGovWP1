@@ -8,7 +8,7 @@ block content
     a.item(data-tab="tables") Tables
     a.item(data-tab="har") HAR
   div.ui.active.tab.segment(data-tab="settings")
-    table.ui.table.segment
+    table#tripTable.ui.table.segment.tablesorter.filterTable
       thead
         tr
           th Trip ID
@@ -17,6 +17,7 @@ block content
           th End Time
           th Duration
           th Name
+          th
       tbody
         each trip in trips
           tr(data-id=trip.tripId)
@@ -25,7 +26,10 @@ block content
             td.showTrip= trip.startTime
             td.showTrip= trip.endTime
             td.showTrip= trip.duration
-            td.showTrip= trip.name
+            td.tripName
+              a(href="#" id="trip.name" pk="#{trip.tripId}" url="/trips") #{trip.name}
+            td.deleteTrip
+              a(href="/trips/#{trip.tripId}/delete") ✗
     div.row
         div.column
         div.column

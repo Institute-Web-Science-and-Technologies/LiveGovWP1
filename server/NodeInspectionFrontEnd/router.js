@@ -1,6 +1,7 @@
 var apiV1 = require('./routes/apiV1.js')
-  , trip = require('./routes/trip.js')
   , csv = require('./routes/csv.js');
+  , trip = require('./routes/trip.js')
+  , pg = require('pg');
 
 function register (app) {
   app.get('/api/1/devices', apiV1.getAllIds);
@@ -28,6 +29,33 @@ function register (app) {
   app.get('/api/1/csv/:id/gps', csv.getGpsRaw);
   app.get('/api/1/csv/:id/lac', csv.getLacRaw);
   app.get('/api/1/csv/:id/gra', csv.getGraRaw);
+  app.get('/trip/:id', trip.getTrip);
+
+  app.get('/trips/:id/delete', function(req, res) {
+    pg.connect("pg://postgres:liveandgov@localhost/liveandgov", function (err, client, done) {
+      if (err) {callback(err, null); done(); return; }
+      query = "DELETE FROM trip WHERE trip_id = " + req.params.id + ";";
+      client.query(query, function (err, result) {
+        done();
+      });
+      if (err) { res.end(err) } else { res.redirect('back'); }
+    });
+  });
+
+  app.post('/trips/:id', function(req, res) {
+    pg.connect("pg://postgres:liveandgov@localhost/liveandgov", function (err, client, done) {
+      if (err) {callback(err, null); done(); return; }
+      if (req.body.value === undefined || req.params.id === undefined) {
+        done(); return;
+      }
+      query = "UPDATE trip SET name = '" + req.body.value + "' WHERE trip_id = " + req.params.id + ";";
+      client.query(query, function (err, result) {
+        console.log("XXX: " + req.body.value + ", " + req.params.id);
+        done();
+      });
+      if (err) { res.end(err) } else { res.redirect('back'); }
+    });
+  });
 }
 
 module.exports = register;
