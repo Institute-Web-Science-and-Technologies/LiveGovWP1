@@ -40,8 +40,10 @@ public class ConnectorThread implements Runnable, Monitorable, MultiProducer<Str
         String msg;
         while (true) {
             msg = sensorQueue.blockingPull();
-            for (Consumer<String> c : consumerList) {
-                c.push(msg);
+            synchronized (consumerList) {
+                for (Consumer<String> c : consumerList) {
+                    c.push(msg);
+                }
             }
             messageCount++;
         }
@@ -63,23 +65,27 @@ public class ConnectorThread implements Runnable, Monitorable, MultiProducer<Str
 
     @Override
     public void addConsumer(Consumer<String> c) {
-        if (consumerList.isEmpty()) callAll(onNonEmptyList);
+        synchronized (consumerList) {
+            if (consumerList.isEmpty()) callAll(onNonEmptyList);
 
-        if (consumerList.contains(c)) {
-            Log.w(LOG_TAG, "Consumer already connected: " + c.toString());
-            return;
+            if (consumerList.contains(c)) {
+                Log.w(LOG_TAG, "Consumer already connected: " + c.toString());
+                return;
+            }
+
+            consumerList.add(c);
         }
-
-        consumerList.add(c);
     }
 
 
     @Override
     public boolean removeConsumer(Consumer<String> c){
-        boolean ret = consumerList.remove(c);
+        synchronized (consumerList) {
+            boolean ret = consumerList.remove(c);
 
-        if (consumerList.isEmpty()) callAll(onEmptyList);
-        return ret;
+            if (consumerList.isEmpty()) callAll(onEmptyList);
+            return ret;
+        }
     }
 
 
