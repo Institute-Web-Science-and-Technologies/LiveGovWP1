@@ -16,30 +16,31 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import eu.liveandgov.wp1.sensor_miner.configuration.ExtendedIntentAPI;
+import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
+import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 
-import static eu.liveandgov.wp1.sensor_miner.configuration.ExtendedIntentAPI.FIELD_MESSAGE;
-import static eu.liveandgov.wp1.sensor_miner.configuration.ExtendedIntentAPI.FIELD_STREAMING;
-import static eu.liveandgov.wp1.sensor_miner.configuration.ExtendedIntentAPI.RETURN_LOG;
-import static eu.liveandgov.wp1.sensor_miner.configuration.ExtendedIntentAPI.START_STREAMING;
-import static eu.liveandgov.wp1.sensor_miner.configuration.ExtendedIntentAPI.STOP_STREAMING;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.ACTION_ANNOTATE;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.ACTION_GET_STATUS;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.ACTION_RECORDING_ENABLE;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.ACTION_SET_ID;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.ACTION_START_HAR;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.ACTION_STOP_HAR;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.ACTION_TRANSFER_SAMPLES;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.FIELD_ACTIVITY;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.FIELD_ANNOTATION;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.FIELD_HAR;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.FIELD_ID;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.FIELD_SAMPLES_STORED;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.FIELD_SAMPLING;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.FIELD_TRANSFERRING;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.RECORDING_DISABLE;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.RETURN_ACTIVITY;
-import static eu.liveandgov.wp1.sensor_miner.configuration.IntentAPI.RETURN_STATUS;
+import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.FIELD_MESSAGE;
+import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.FIELD_STREAMING;
+import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.RETURN_LOG;
+import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.START_STREAMING;
+import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.STOP_STREAMING;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_ANNOTATE;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_GET_STATUS;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_RECORDING_ENABLE;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_SET_ID;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_START_HAR;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_STOP_HAR;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_TRANSFER_SAMPLES;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_ACTIVITY;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_ANNOTATION;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_HAR;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_ID;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_SAMPLES_STORED;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_SAMPLING;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_TRANSFERRING;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.RECORDING_DISABLE;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.RETURN_ACTIVITY;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.RETURN_STATUS;
 
 /**
  * Basic User Interface implementing the IntentAPI
@@ -70,7 +71,6 @@ public class ActivitySensorCollector extends Activity {
     private TextView        activityView;
     private EditText        idText;
     private Button          idButton;
-    private ToggleButton    streamButton;
     private ToggleButton    harButton;
 
 
@@ -120,10 +120,6 @@ public class ActivitySensorCollector extends Activity {
         // Setup ID Button
         idButton = (Button) findViewById(R.id.idButton);
         idButton.setEnabled(true);
-
-        // Setup Stream Button
-        streamButton = (ToggleButton) findViewById(R.id.streamButton);
-        streamButton.setEnabled(true);
 
         // Setup harButton
         harButton = (ToggleButton) findViewById(R.id.harButton);
@@ -283,7 +279,6 @@ public class ActivitySensorCollector extends Activity {
         // Update Flags
         isRecording = intent.getBooleanExtra(FIELD_SAMPLING, false );
         isTransferring = intent.getBooleanExtra(FIELD_TRANSFERRING, false );
-        isStreaming = intent.getBooleanExtra(FIELD_STREAMING, false );
         isHAR = intent.getBooleanExtra(FIELD_HAR, false );
 
         // Update Buttons
@@ -299,12 +294,6 @@ public class ActivitySensorCollector extends Activity {
             transferProgressBar.setIndeterminate(true);
         } else {
             transferProgressBar.setIndeterminate(false);
-        }
-
-        if (isStreaming) {
-            streamButton.setChecked(true);
-        } else {
-            streamButton.setChecked(false);
         }
 
         if (isHAR) {

@@ -38,7 +38,7 @@
         </activity>
 
         <service
-            android:name="eu.liveandgov.wp1.sensor_miner.ServiceSensorControl"
+            android:name="eu.liveandgov.wp1.sensor_collector.ServiceSensorControl"
             android:process="">
             <intent-filter>
                 <action android:name="eu.liveandgov.sensorcollectorapi.intent.action.GET_STATUS"/>
@@ -53,7 +53,7 @@
         </service>
 
         <service
-                android:name="eu.liveandgov.wp1.sensor_miner.sensors.sensor_producers.ActivityIntentService"
+                android:name="eu.liveandgov.wp1.sensor_collector.sensors.sensor_producers.ActivityIntentService"
                 android:label="@string/app_name"
                 android:exported="false">
         </service>
