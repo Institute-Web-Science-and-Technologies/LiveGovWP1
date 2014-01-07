@@ -35,8 +35,8 @@ public class Persistor<T> implements Consumer<T> {
             isFirst = false;
             writer.println(generateTableHead(
                     // Need the number of csv rows the message object needs to write
-                    // VERY DIRTY HACK
-                    StringUtils.countMatches(message.toString(), ",")
+                    // VERY DIRTY HACK: Number of , + 1
+                    StringUtils.countMatches(message.toString(), ",") + 1
             ));
         }
 
@@ -51,7 +51,7 @@ public class Persistor<T> implements Consumer<T> {
     public String generateTableHead(int length){
         String result = "";
         for (int i = 0; i < length; i++) {
-            result += "x" + i;
+            result += "x" + (i + 1); // start with x1
             if ((i + 1) != length) {
                 result += ",";
             }

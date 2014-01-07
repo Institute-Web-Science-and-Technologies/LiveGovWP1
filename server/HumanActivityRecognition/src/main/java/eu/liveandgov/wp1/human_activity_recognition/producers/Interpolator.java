@@ -21,6 +21,10 @@ public class Interpolator extends Producer<CountWindow> implements Consumer<Tagg
     }
 
     public void push(TaggedWindow tw) {
+        if (tw.x.length < 2) {
+            System.out.println("Dropped window of length is smaller than 2");
+            return;
+        }
 
         CountWindow cw = new CountWindow();
 

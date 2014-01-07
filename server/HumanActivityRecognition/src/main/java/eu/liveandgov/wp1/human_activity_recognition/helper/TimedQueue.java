@@ -8,7 +8,7 @@ import java.util.Queue;
 /**
  * Class that holds samples in a time frame of a given duration d.
  * The time frame ends with the time stamp t of the last sample that was pushed to the queue
- * and starts after the time t - d (exclusively).
+ * and starts after the time t - d (inclusively).
  *
  *  Time                    ---(t-d)--------t-->
  *  Samples:                + + | + + + + + + |
@@ -78,7 +78,7 @@ public class TimedQueue<V> {
 
         TimeQueueEntry<V> e;
         while( (e = queue.peekLast()) != null ) {
-            if (e.time > minTime) { break; }
+            if (e.time >= minTime) { break; }
             else { queue.removeLast(); }
         }
     }

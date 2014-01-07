@@ -19,14 +19,11 @@ import java.util.logging.SimpleFormatter;
 public class QualityFilter extends Producer<TaggedWindow> implements Consumer<TaggedWindow> {
 
     private double minFreq;
-    private double maxFreq;
 
     private Logger logger;
 
-    public QualityFilter(double frequency, double delta, String logFile) {
-        this.minFreq = frequency - delta;
-        this.maxFreq = frequency + delta;
-
+    public QualityFilter(double minFreq, String logFile) {
+        this.minFreq = minFreq;
 
         // Setup logger
         logger = Logger.getLogger("QualityFilter");
@@ -52,10 +49,6 @@ public class QualityFilter extends Producer<TaggedWindow> implements Consumer<Ta
         if (windowFreq < this.minFreq) {
             logger.info("< Frequency: " + windowFreq + " StartTime: " + tw.startTime + " EndTime: " + tw.endTime + " Samples: " + tw.x.length);
             return;
-        }
-
-        if (windowFreq > this.maxFreq) {
-            logger.info("> Frequency: " + windowFreq + " StartTime: " + tw.startTime + " EndTime: " + tw.endTime + " Samples: " + tw.x.length);
         }
 
         consumer.push(tw);
