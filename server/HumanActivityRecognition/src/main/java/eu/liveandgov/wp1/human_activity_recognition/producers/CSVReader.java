@@ -3,10 +3,7 @@ package eu.liveandgov.wp1.human_activity_recognition.producers;
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Producer;
 import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,6 +16,25 @@ public class CSVReader extends Producer<MotionSensorValue> {
 
     public CSVReader() {
 
+    }
+
+    public void readDir(String dir) {
+
+        File[] files = new File(dir).listFiles();
+        readFiles(files);
+    }
+
+    private void readFiles(File[] files) {
+        // Iterate through each file and call recursively if we encounter an directory
+        for (File file : files) {
+            if (file.isDirectory()) {
+                readFiles(file.listFiles());
+            } else {
+                System.out.println("Reading file " + file.getPath());
+                read(file.getPath());
+                consumer.clear();
+            }
+        }
     }
 
 
@@ -44,6 +60,8 @@ public class CSVReader extends Producer<MotionSensorValue> {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println(filePath + " not valid format");
         } finally {
             if (br != null) {
                 try {

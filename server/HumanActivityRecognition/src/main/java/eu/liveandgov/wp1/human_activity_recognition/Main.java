@@ -18,11 +18,11 @@ public class Main {
     public static void main(String args[]) {
         CSVReader csvReader = new CSVReader();
 
-        int WINDOW_LENGTH_MS = 5 * 1000;
-        int WINDOW_OVERLAP   = WINDOW_LENGTH_MS - 20;
+        int WINDOW_LENGTH_MS = 1000;
+        int WINDOW_OVERLAP   = WINDOW_LENGTH_MS - 500;
 
         int SAMPLING_FREQUENCY_HZ = 50;
-        int MIN_RECORDING_FREQUENCY = 40;
+        int MIN_RECORDING_FREQUENCY = 0;
 
         double SAMPLE_LENGHT_MS = 1000D / SAMPLING_FREQUENCY_HZ;
         int NO_SAMPLES_PER_WINDOW = (int) (WINDOW_LENGTH_MS / SAMPLE_LENGHT_MS);
@@ -40,7 +40,7 @@ public class Main {
         Persistor<CountWindow> pers = new Persistor<CountWindow>("out.csv");
         interpolator.setConsumer(pers);
 
-        csvReader.read("/home/hartmann/Desktop/Live+Gov DEVELOPMENT/TrainingData/RUNNING/5");
+        csvReader.readDir("Test");
     }
 
 }
