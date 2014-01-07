@@ -3,12 +3,11 @@ package eu.liveandgov.wp1.human_activity_recognition.containers;
 /**
  * Created with IntelliJ IDEA.
  * User: cehlen
- * Date: 10/11/13
- * Time: 7:38 PM
+ * Date: 06/01/14
+ * Time: 18:44
  * To change this template use File | Settings | File Templates.
  */
-public class TaggedWindow {
-    public String tag;
+public class CountWindow {
     public String type;
     public String id;
     public long startTime;
@@ -16,5 +15,5 @@ public class TaggedWindow {
     public float[] x;
     public float[] y;
     public float[] z;
-    public long time[];
+    public double frequency;
 }
