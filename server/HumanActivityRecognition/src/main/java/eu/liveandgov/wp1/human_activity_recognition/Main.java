@@ -22,7 +22,7 @@ public class Main {
         WindowProducer windowProducer = new WindowProducer(1001, 995);
         csvReader.setConsumer(windowProducer);
 
-        QualityFilter qualityFilter = new QualityFilter(50.0, 10, "windowFreq.log");
+        QualityFilter qualityFilter = new QualityFilter(2.0, 1.0, "windowFreq.log");
         windowProducer.setConsumer(qualityFilter);
 
         Interpolator interpolator = new Interpolator(50);
