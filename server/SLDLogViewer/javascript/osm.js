@@ -18,11 +18,10 @@ function getdata(e){
       var myPoints = [];
       for(var c in data.inputCoordinates){
         myPoints[c] = [data.inputCoordinates[c].lat,data.inputCoordinates[c].lng];
-        var m = L.marker(myPoints[c]).bindPopup("<b>" +
-                          data.inputCoordinates[c].ts,
-                          {minWidth:250} );
+        var m = L.marker(myPoints[c], {icon:L.divIcon(),opacity:0.1,title:data.inputCoordinates[c].ts});
         markers.addLayer(m);
       }
+      L.polyline(myPoints, {color: 'blue'}).addTo(map);
       map.fitBounds(new L.LatLngBounds(myPoints));
       var routes = "<table border=1 ><tr><td>responseTime</td><td>" + data.responseTime +
                    "</td></tr><tr><td>samples</td><td>" +  data.inputCoordinates.length + "</td></tr>" + 
@@ -67,7 +66,8 @@ function initilize(){
     url: "http://localhost:8080/keys",
     dataType: 'json',
     success: function(data, status){
-      for(var k in data.keys){
+      data.keys.sort();
+      for(var k = data.keys.length-1; k>=0; k--){
 	 $("#catTable tr:last").after('<tr><td><input class="cat" type="checkbox" /></td><td>' + data.keys[k] + '</td></tr>');
       }
       $("input.cat").click(getdata);
