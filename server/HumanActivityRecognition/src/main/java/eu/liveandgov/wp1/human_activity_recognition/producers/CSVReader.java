@@ -48,6 +48,7 @@ public class CSVReader extends Producer<MotionSensorValue> {
             if (br != null) {
                 try {
                     br.close();
+                    consumer.clear();
                 } catch (IOException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }

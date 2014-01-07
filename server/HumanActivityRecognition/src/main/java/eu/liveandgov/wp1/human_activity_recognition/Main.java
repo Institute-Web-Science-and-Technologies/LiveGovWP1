@@ -19,20 +19,28 @@ public class Main {
         CSVReader csvReader = new CSVReader();
 
 
-        WindowProducer windowProducer = new WindowProducer(5000, 4995);
+        WindowProducer windowProducer = new WindowProducer(1001, 995);
         csvReader.setConsumer(windowProducer);
 
-        QualityFilter qualityFilter = new QualityFilter(50.0, 1.0, "windowFreq.log");
-        windowProducer.setConsumer(qualityFilter);
+        PrintProducer<TaggedWindow> pp = new PrintProducer<TaggedWindow>("TaggedWindow");
+        windowProducer.setConsumer(pp);
 
+        QualityFilter qualityFilter = new QualityFilter(50.0, 10.0, "windowFreq.log");
+        pp.setConsumer(qualityFilter);
 
-        Interpolator interpolator = new Interpolator(50.0);
-        qualityFilter.setConsumer(interpolator);
+        PrintProducer<TaggedWindow> qfpp = new PrintProducer<TaggedWindow>("Quality Filter");
+        qualityFilter.setConsumer(qfpp);
 
-        Persistor<CountWindow> p = new Persistor("out.csv");
-        interpolator.setConsumer(p);
+        Interpolator interpolator = new Interpolator(50);
+        qfpp.setConsumer(interpolator);
 
-        csvReader.read("/Users/cehlen/TrainingData/WALKING/12");
+        PrintProducer<CountWindow> ipp = new PrintProducer<CountWindow>("INTERPOLATOR");
+        interpolator.setConsumer(ipp);
+
+        Persistor<CountWindow> p = new Persistor<CountWindow>("out.csv");
+        ipp.setConsumer(p);
+
+        csvReader.read("/Users/cehlen/TrainingData/RUNNING/10");
     }
 
 }

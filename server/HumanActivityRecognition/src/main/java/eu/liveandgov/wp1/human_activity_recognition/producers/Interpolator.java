@@ -14,23 +14,22 @@ import eu.liveandgov.wp1.human_activity_recognition.containers.TaggedWindow;
  */
 public class Interpolator extends Producer<CountWindow> implements Consumer<TaggedWindow> {
 
-    private double frequency;
+    private int numberOfSamples;
 
-    public Interpolator(double frequency) {
-        this.frequency = frequency;
+    public Interpolator(int numberOfSamples) {
+        this.numberOfSamples = numberOfSamples;
     }
 
-        public void push(TaggedWindow tw) {
+    public void push(TaggedWindow tw) {
 
         CountWindow cw = new CountWindow();
 
-        cw.frequency = frequency;
         cw.startTime = tw.startTime;
         cw.endTime = tw.endTime;
 
-        double length = (cw.endTime - cw.startTime) / 1000;
+        double length = (cw.endTime - cw.startTime);
 
-        int numberOfSamples =  (int)Math.floor(length * frequency);
+        double spacing = length / (double)numberOfSamples;
 
         cw.x = new float[numberOfSamples];
         cw.y = new float[numberOfSamples];
@@ -70,7 +69,7 @@ public class Interpolator extends Producer<CountWindow> implements Consumer<Tagg
 //            cw.x[i] = (float)(mX * currentTime + cX);
 //            cw.y[i] = (float)(mY * currentTime + cY);
 //            cw.z[i] = (float)(mZ * currentTime + cZ);
-            currentTime += 1 / frequency * 1000;
+            currentTime += spacing;
         }
 
         consumer.push(cw);

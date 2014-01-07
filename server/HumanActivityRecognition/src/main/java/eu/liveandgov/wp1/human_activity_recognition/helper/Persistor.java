@@ -34,6 +34,6 @@ public class Persistor<T> implements Consumer<T> {
     }
 
     public void clear() {
-
+        writer.flush();
     }
 }
