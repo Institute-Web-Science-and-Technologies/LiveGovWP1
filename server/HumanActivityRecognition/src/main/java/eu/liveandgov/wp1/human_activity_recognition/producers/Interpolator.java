@@ -20,7 +20,7 @@ public class Interpolator extends Producer<CountWindow> implements Consumer<Tagg
         this.frequency = frequency;
     }
 
-    public void push(TaggedWindow tw) {
+        public void push(TaggedWindow tw) {
 
         CountWindow cw = new CountWindow();
 
@@ -41,7 +41,6 @@ public class Interpolator extends Producer<CountWindow> implements Consumer<Tagg
         int indexOfEnd = 1;
 
         long currentTime = cw.startTime;
-        int currentIndex = 0;
 
         // Calculate each value
         for (int i = 0; i < numberOfSamples; i++) {
@@ -62,16 +61,15 @@ public class Interpolator extends Producer<CountWindow> implements Consumer<Tagg
             double mZ = (tw.z[indexOfEnd] - tw.z[indexOfStart]) / (endTime - startTime);
 
             // Calculate the y-intercept
-            double cX = tw.x[indexOfStart] - mX * startTime;
-            double cY = tw.y[indexOfStart] - mY * startTime;
-            double cZ = tw.z[indexOfStart] - mZ * startTime;
+            cw.x[i] = (float)(tw.x[indexOfStart] + mX * (currentTime - startTime));
+            cw.y[i] = (float)(tw.y[indexOfStart] + mY * (currentTime - startTime));
+            cw.z[i] = (float)(tw.z[indexOfStart] + mZ * (currentTime - startTime));
 
             // Calculate the value
             // y = m * x + c
-            cw.x[currentIndex] = (float)(mX * currentTime + cX);
-            cw.y[currentIndex] = (float)(mY * currentTime + cY);
-            cw.z[currentIndex] = (float)(mZ * currentTime + cZ);
-            currentIndex += 1;
+//            cw.x[i] = (float)(mX * currentTime + cX);
+//            cw.y[i] = (float)(mY * currentTime + cY);
+//            cw.z[i] = (float)(mZ * currentTime + cZ);
             currentTime += 1 / frequency * 1000;
         }
 

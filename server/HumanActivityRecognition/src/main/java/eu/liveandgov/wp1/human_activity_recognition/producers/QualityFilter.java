@@ -56,7 +56,6 @@ public class QualityFilter extends Producer<TaggedWindow> implements Consumer<Ta
 
         if (windowFreq > this.maxFreq) {
             logger.info("> Frequency: " + windowFreq + " StartTime: " + tw.startTime + " EndTime: " + tw.endTime + " Samples: " + tw.x.length);
-            return;
         }
 
         consumer.push(tw);

@@ -16,4 +16,16 @@ public class CountWindow {
     public float[] y;
     public float[] z;
     public double frequency;
+
+    public String toString() {
+        String result = "";
+        for (int i = 0; i < x.length; i++) {
+            result += x[i] + "," + y[i] + "," + z[i];
+            if ((i + 1) != x.length) {
+                result += ",";
+            }
+        }
+        return result;
+    }
+
 }
