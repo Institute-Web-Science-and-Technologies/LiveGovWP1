@@ -85,11 +85,18 @@ public class ZipFilePersistor implements Persistor {
 
     @Override
     public void deleteSamples() {
+        final boolean wasOpen = fileWriter != null;
+
         closeLogFile();
 
         // Deleted, the valid length is now zero
         logFile.delete();
         putValidLength(0);
+
+        if(wasOpen) {
+            // We can override here because we do in fact want to delete the samples
+            openLogFileOverwrite();
+        }
     }
 
     @Override
@@ -99,6 +106,7 @@ public class ZipFilePersistor implements Persistor {
 
     @Override
     public String getStatus() {
+
         return "File size: " + logFile.length()/1024 + "kb. Samples written: " + sampleCount;
     }
 
@@ -107,7 +115,7 @@ public class ZipFilePersistor implements Persistor {
 
             truncateFileIfCorupted();
 
-            fileWriter = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(logFile,true)), "UTF8"));
+            fileWriter = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream( new FileOutputStream(logFile,true)), "UTF8"));
         } catch (IOException e) {
             e.printStackTrace();
             return false;
