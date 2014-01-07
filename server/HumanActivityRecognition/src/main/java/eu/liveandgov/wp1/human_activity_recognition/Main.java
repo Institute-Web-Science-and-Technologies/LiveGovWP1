@@ -34,7 +34,7 @@ public class Main {
         Persistor<CountWindow> pers = new Persistor<CountWindow>("out.csv");
         pp.setConsumer(pers);
 
-        csvReader.read("Test/test.csv");
+        csvReader.readDir("/Users/cehlen/TrainingData");
     }
 
 }
