@@ -227,7 +227,7 @@ public class BluetoothHolder implements SensorHolder {
             Toast toast = Toast.makeText(GlobalContext.context, "Please enable Bluetooth.", Toast.LENGTH_SHORT);
             toast.show();
 
-            Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+            Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             GlobalContext.context.startActivity(intent);
         }

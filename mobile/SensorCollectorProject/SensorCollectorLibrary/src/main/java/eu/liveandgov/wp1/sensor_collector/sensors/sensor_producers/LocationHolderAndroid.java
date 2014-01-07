@@ -7,6 +7,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import android.widget.Toast;
 
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
@@ -20,6 +21,8 @@ import static junit.framework.Assert.assertNotNull;
  */
 public class LocationHolderAndroid extends LocationHolder
 {
+    private static final String LOG_TAG = "LOC_A";
+
     private final Looper looper;
 
     public LocationHolderAndroid(SensorQueue sensorQueue, Looper looper)
@@ -68,7 +71,9 @@ public class LocationHolderAndroid extends LocationHolder
     private void checkEnableAndroidGPS(){
         if(!SensorCollectionOptions.ASK_GPS) return;
 
-        if(!GlobalContext.getLocationManager().isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        final boolean gps_enabled = GlobalContext.getLocationManager().isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        if(!gps_enabled) {
             Toast toast = Toast.makeText(GlobalContext.context, "Please enable location services.", Toast.LENGTH_SHORT);
             toast.show();
 

@@ -45,7 +45,7 @@ public class LocationHolderPlayServices extends LocationHolder implements
     private static final long UPDATE_INTERVAL = UPDATE_INTERVAL_IN_SECONDS * MILISECONDS_PER_SECOND;
     private static final long FASTETST_INTERVAL = FASTEST_INTERVAL_IN_SECONDS * MILISECONDS_PER_SECOND;
 
-    private static final String LOG_TAG = "LOCP";
+    private static final String LOG_TAG = "LOC_P";
     private LocationClient locationClient;
     private LocationRequest locationRequest;
     private Looper myLooper;
@@ -140,7 +140,7 @@ public class LocationHolderPlayServices extends LocationHolder implements
              Toast toast = Toast.makeText(GlobalContext.context, "Please enable location services.", Toast.LENGTH_SHORT);
              toast.show();
 
-             Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+             Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
              intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
              GlobalContext.context.startActivity(intent);
          }
