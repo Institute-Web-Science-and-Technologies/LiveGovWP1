@@ -1,0 +1,27 @@
+{
+  "name": "NodeAngularFrontEnd",
+  "version": "0.1.0",
+  "description": "Node.js and AngularJS based front end for the Live+Gov project.",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HeinrichHartmann/LiveGovWP1#newFrontEnd"
+  },
+  "dependencies": {
+    "express": "~3.4.7",
+    "pg": "~2.11.0",
+    "jade": "~1.1.0",
+    "stylus": "~0.42.0",
+    "express-csv": "~0.6.0"
+  },
+  "contributors": [
+    "René Wilhelm <rene.wilhelm@gmail.com>",
+    "Christoph Ehlen <chehlen@uni-koblenz.de>"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/HeinrichHartmann/LiveGovWP1/issues"
+  },
+  "homepage": "https://github.com/HeinrichHartmann/LiveGovWP1",
+  "author": "René Wilhelm <rene.wilhelm@gmail.com>"
+}
