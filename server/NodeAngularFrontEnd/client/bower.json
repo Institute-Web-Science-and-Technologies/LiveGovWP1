@@ -1,0 +1,23 @@
+{
+  "name": "client",
+  "version": "1.9.2",
+  "homepage": "https://github.com/HeinrichHartmann/LiveGovWP1",
+  "authors": [
+    "René Wilhelm <rene.wilhelm@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/lib",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-resource": "~1.2.7",
+    "angularjs-nvd3-directives": "~0.0.5-beta",
+    "angular-route": "~1.2.7",
+    "bootstrap": "~3.0.3"
+  }
+}

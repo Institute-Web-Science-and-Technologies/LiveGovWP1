@@ -1,0 +1,48 @@
+doctype html
+html(lang='en', ng-app='nodeInspectionFrontEnd')
+
+	head
+		meta(charset='utf-8')
+		meta(name='google' content='notranslate')
+
+		//- base(href="/")
+
+		title= title
+
+		link(rel='stylesheet', href='/lib/bootstrap/dist/css/bootstrap.min.css')
+		link(rel='stylesheet', href='/css/style.css')
+		link(rel='stylesheet', href='/lib/nvd3/nv.d3.css')
+
+		script(src='/lib/angular/angular.js')
+		script(src='/lib/angular-resource/angular-resource.js')
+		script(src='/lib/angular-route/angular-route.js')
+
+		script(src="/lib/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.js")
+		script(src="/lib/d3/d3.js")
+		script(src="/lib/nvd3/nv.d3.js")
+
+		script(src='/js/angular/modules.js')
+		script(src='/js/angular/routes.js')
+		script(src='/js/angular/controllers.js')
+		script(src='/js/angular/services.js')
+		script(src='/js/angular/filters.js')
+
+		script(id='lt_ws', src='http://localhost:49956/socket.io/lighttable/ws.js')
+
+	body
+		header
+			nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation" ng-controller='navbarCtrl')
+				ul.nav.navbar-nav
+					li(ng-class="isActive('rec')")
+						a(href='/#/rec') Recordings
+					li(ng-class="isActive('raw')")
+						a(href='/#/raw') Raw Data
+					li(ng-class="isActive('har')")
+						a(href='/#/har') Activity Recognition
+					li(ng-class="isActive('sld')")
+						a(href='/#/sld') Service Line Detection
+
+		#body
+			div(ng-view)
+
+// ex:ft=jade
