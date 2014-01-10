@@ -1,8 +1,11 @@
 package eu.liveandgov.wp1.sensor_collector.connectors.implementations;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Pipeline;
 import eu.liveandgov.wp1.human_activity_recognition.helper.TimedQueue;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat;
@@ -18,17 +21,21 @@ public class GpsCache implements Consumer<String> {
     GpsCacheImpl cacheImpl;
     Multiplexer<String> mpx;
     IntentEmitter gpsBroadcast;
+    Pipeline<String, String> delayFilter;
 
     public GpsCache() {
         cacheImpl = new GpsCacheImpl();
         mpx       = new Multiplexer<String>();
         gpsBroadcast = new IntentEmitter(ExtendedIntentAPI.RETURN_GPS_SAMPLE, ExtendedIntentAPI.FIELD_GPS_ENTRY);
+        delayFilter = new SsfDelayFilter(30000);
 
         filter = new PrefixFilter();
         filter.addFilter(SsfFileFormat.SSF_GPS);
         filter.setConsumer(mpx);
-        mpx.addConsumer(cacheImpl);
+        mpx.addConsumer(delayFilter);
         mpx.addConsumer(gpsBroadcast);
+
+        delayFilter.setConsumer(cacheImpl);
     }
 
     @Override
@@ -63,6 +70,7 @@ public class GpsCache implements Consumer<String> {
 
         @Override
         public synchronized void push(String message) {
+            Log.d("GCI", "Cached value " + message);
             GpsSensorValue value = SensorSerializer.parseGpsEvent(message);
             Q.push(value.time, message);
         }
