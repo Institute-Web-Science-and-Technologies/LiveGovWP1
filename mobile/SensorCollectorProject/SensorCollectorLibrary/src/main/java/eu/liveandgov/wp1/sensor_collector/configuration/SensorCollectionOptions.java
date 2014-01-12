@@ -25,14 +25,14 @@ public class SensorCollectionOptions {
     public static final int REC_LINEAR_ACC = SensorOptions.ON_GAME;
     public static final int REC_GRAVITY_ACC = SensorOptions.ON_GAME;
     public static final int REC_GYROSCOPE = SensorOptions.ON_NORMAL;
-    public static final int REC_MAGNETOMETER = SensorOptions.ON_NORMAL;
-    public static final int REC_ROTATION = SensorOptions.ON_NORMAL;
+    public static final int REC_MAGNETOMETER = SensorOptions.OFF;
+    public static final int REC_ROTATION = SensorOptions.OFF;
 
     // Network samples
     public static final boolean REC_WIFI = true;   // wifi
-    public static final int WIFI_SCAN_DELAY_MS = 20000; // delay in milli seconds
-    public static final boolean REC_BLT = true;    // Bluetooth
-    public static final int BLT_SCAN_DELAY_MS = 20000; // delay in milli seconds
+    public static final int WIFI_SCAN_DELAY_MS = 30000; // delay in milli seconds
+    public static final boolean REC_BLT = false;    // Bluetooth
+    public static final int BLT_SCAN_DELAY_MS = 30000; // delay in milli seconds
     public static final boolean REC_GSM = true;    // GSM
 
     // Ask for user setup if these flags are activated
