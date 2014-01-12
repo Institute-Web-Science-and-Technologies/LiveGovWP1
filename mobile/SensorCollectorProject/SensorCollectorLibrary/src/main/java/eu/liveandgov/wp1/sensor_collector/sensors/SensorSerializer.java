@@ -114,6 +114,12 @@ public class SensorSerializer {
         return newEvent;
     }
 
+    /**
+     * Escapes the device-string
+     */
+    private static String escapeDevice(String d) {
+        return d.replace(',', ' ');
+    }
 
     /**
      * Escapes a string and puts it into quotes
@@ -130,7 +136,7 @@ public class SensorSerializer {
         builder.append(',');
         builder.append(timestamp);
         builder.append(',');
-        builder.append(escape(device));
+        builder.append(escapeDevice(device));
 
         return builder;
     }
