@@ -21,24 +21,25 @@ public class CSVReader extends Producer<MotionSensorValue> {
     public void readDir(String dir) {
 
         File[] files = new File(dir).listFiles();
-        readFiles(files);
+        readFiles(files, "UNKNOWN");
     }
 
-    private void readFiles(File[] files) {
+    private void readFiles(File[] files, String tag) {
         // Iterate through each file and call recursively if we encounter an directory
         for (File file : files) {
             if (file.isDirectory()) {
-                readFiles(file.listFiles());
+                System.out.println("Changing Tag to " + file.getName());
+                readFiles(file.listFiles(), file.getName());
             } else {
                 System.out.println("Reading file " + file.getPath());
-                read(file.getPath());
+                read(file.getPath(), tag);
                 consumer.clear();
             }
         }
     }
 
 
-    public void read(String filePath) {
+    public void read(String filePath, String tag) {
         BufferedReader br = null;
         String line = "";
 
@@ -53,6 +54,7 @@ public class CSVReader extends Producer<MotionSensorValue> {
                 msv.x = Float.parseFloat(value[2].replace("\"", ""));
                 msv.y = Float.parseFloat(value[3].replace("\"", ""));
                 msv.z = Float.parseFloat(value[4].replace("\"", ""));
+                msv.tag = tag;
 
                 consumer.push(msv);
             }

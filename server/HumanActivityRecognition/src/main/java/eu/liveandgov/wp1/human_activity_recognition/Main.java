@@ -18,8 +18,8 @@ public class Main {
     public static void main(String args[]) {
         CSVReader csvReader = new CSVReader();
 
-        int WINDOW_LENGTH_MS = 1000;
-        int WINDOW_OVERLAP   = WINDOW_LENGTH_MS - 500;
+        int WINDOW_LENGTH_MS = 5 * 1000;
+        int WINDOW_OVERLAP   = WINDOW_LENGTH_MS - 20;
 
         int SAMPLING_FREQUENCY_HZ = 50;
         int MIN_RECORDING_FREQUENCY = 0;
@@ -40,7 +40,7 @@ public class Main {
         Persistor<CountWindow> pers = new Persistor<CountWindow>("out.csv");
         interpolator.setConsumer(pers);
 
-        csvReader.readDir("Test");
+        csvReader.readDir("/Users/cehlen/TrainingData");
     }
 
 }

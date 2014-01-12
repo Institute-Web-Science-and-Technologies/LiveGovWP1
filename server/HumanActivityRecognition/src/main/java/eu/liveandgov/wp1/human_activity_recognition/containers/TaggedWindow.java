@@ -21,11 +21,9 @@ public class TaggedWindow {
     public String toString() {
         String result = "";
         for (int i = 0; i < x.length; i++) {
-            result += x[i] + "," + y[i] + "," + z[i];
-            if ((i + 1) != x.length) {
-                result += ",";
-            }
+            result += x[i] + "," + y[i] + "," + z[i] + ",";
         }
-        return result;
+        result += "\"" + tag + "\"";
+        return tag;
     }
 }

@@ -38,6 +38,8 @@ public class TimedQueue<V> {
      * @param value The sensor value
      */
     public void push(long time, V value) {
+        // If the time value of the new value is less than the value of the last element, we reset the window, because
+        // we assume something went wrong.
         if (time < maxTime) {
             clear();
             System.out.println("Reseting Window");
