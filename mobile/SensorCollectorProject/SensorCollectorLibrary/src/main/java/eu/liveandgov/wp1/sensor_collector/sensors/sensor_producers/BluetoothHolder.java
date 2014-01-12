@@ -13,6 +13,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.text.StrBuilder;
 
 import java.lang.reflect.Field;
@@ -117,7 +118,7 @@ public class BluetoothHolder implements SensorHolder {
     private final int delay;
     private final Handler handler;
     private final BluetoothAdapter bluetoothAdapter;
-    private final StrBuilder pushBuilder;
+    private final StrBuilder bluetoothIntermediateBuilder;
     private long lastScanRequest;
 
     public BluetoothHolder(SensorQueue sensorQueue,int delay, Handler handler)
@@ -126,7 +127,37 @@ public class BluetoothHolder implements SensorHolder {
         this.delay = delay;
         this.handler = handler;
         this.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        this.pushBuilder = new StrBuilder();
+        this.bluetoothIntermediateBuilder = new StrBuilder();
+    }
+
+    public static String intermediateFromBTFound(Intent intent) {
+        final StringBuilder builder = new StringBuilder();
+
+        // Extract the stored data from the bundle of the intent
+        final BluetoothDevice bluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        final BluetoothClass bluetoothClass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
+        final String name = intent.hasExtra(BluetoothDevice.EXTRA_NAME) ? intent.getStringExtra(BluetoothDevice.EXTRA_NAME) : null;
+        final Short rssi = intent.hasExtra(BluetoothDevice.EXTRA_RSSI) ? intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE) : null;
+
+        // Write the values as a tuple of Escaped Address/Device Major Class/Device Class/Bond State/Optional Escaped Name/Optional RSSI
+        builder.append("\"" + StringEscapeUtils.escapeJava(bluetoothDevice.getAddress()) + "\"");
+        builder.append('/');
+        builder.append(getDeviceMajorClassName(bluetoothClass.getMajorDeviceClass()));
+        builder.append('/');
+        builder.append(getDeviceClassName(bluetoothClass.getDeviceClass()));
+        builder.append('/');
+        builder.append(getBondName(bluetoothDevice.getBondState()));
+        builder.append('/');
+        if (name != null) {
+            builder.append("\"" + StringEscapeUtils.escapeJava(name) + "\"");
+        }
+        builder.append('/');
+        if (rssi != null) {
+            builder.append(rssi);
+        }
+
+        // Return the created value
+        return builder.toString();
     }
 
     private void startNextScan() {
@@ -173,17 +204,17 @@ public class BluetoothHolder implements SensorHolder {
             if(BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(intent.getAction()))
             {
                 // On start of the discovery, reset the pending push
-                pushBuilder.clear();
+                bluetoothIntermediateBuilder.clear();
             }
             else if(BluetoothDevice.ACTION_FOUND.equals(intent.getAction()))
             {
-                if(!pushBuilder.isEmpty())
+                if(!bluetoothIntermediateBuilder.isEmpty())
                 {
                     // We are operating on a tail element, so separate
-                    pushBuilder.append(';');
+                    bluetoothIntermediateBuilder.append(';');
                 }
 
-                pushBuilder.append(SensorSerializer.intermediateFromBTFound(intent));
+                bluetoothIntermediateBuilder.append(intermediateFromBTFound(intent));
             }
             else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()))
             {
@@ -191,7 +222,7 @@ public class BluetoothHolder implements SensorHolder {
                 long scanEndtime = SystemClock.uptimeMillis();
 
                 // On end of the discovery, push the results to the pipeline
-                sensorQueue.push(SensorSerializer.fromBluetooth(pushBuilder.toString()));
+                sensorQueue.push(SensorSerializer.bluetoothIntermediate.toSSFDefault(bluetoothIntermediateBuilder.toString()));
 
                 // If results are on time, schedule the next scan at the handler with the given delay
                 if(lastScanRequest + delay > scanEndtime)

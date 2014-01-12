@@ -44,7 +44,7 @@ public class MotionSensorHolder implements SensorHolder, SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         // Log.i(LOG_TAG,"Recieved Sensor Sample " + SensorSerializer.fromSensorEvent(sensorEvent));
-        sensorQueue.push(SensorSerializer.fromSensorEvent(sensorEvent));
+        sensorQueue.push(SensorSerializer.sensorEvent.toSSFDefault(sensorEvent));
     }
 
     @Override

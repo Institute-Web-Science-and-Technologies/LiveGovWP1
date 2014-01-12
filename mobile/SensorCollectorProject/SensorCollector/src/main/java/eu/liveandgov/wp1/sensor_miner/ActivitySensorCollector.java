@@ -71,6 +71,7 @@ public class ActivitySensorCollector extends Activity {
     private TextView        activityView;
     private EditText        idText;
     private Button          idButton;
+    private ToggleButton    streamButton;
     private ToggleButton    harButton;
 
 
@@ -120,6 +121,10 @@ public class ActivitySensorCollector extends Activity {
         // Setup ID Button
         idButton = (Button) findViewById(R.id.idButton);
         idButton.setEnabled(true);
+
+        // Setup Stream Button
+        streamButton = (ToggleButton) findViewById(R.id.streamButton);
+        streamButton.setEnabled(true);
 
         // Setup harButton
         harButton = (ToggleButton) findViewById(R.id.harButton);
@@ -279,6 +284,7 @@ public class ActivitySensorCollector extends Activity {
         // Update Flags
         isRecording = intent.getBooleanExtra(FIELD_SAMPLING, false );
         isTransferring = intent.getBooleanExtra(FIELD_TRANSFERRING, false );
+        isStreaming = intent.getBooleanExtra(FIELD_STREAMING, false );
         isHAR = intent.getBooleanExtra(FIELD_HAR, false );
 
         // Update Buttons
@@ -294,6 +300,12 @@ public class ActivitySensorCollector extends Activity {
             transferProgressBar.setIndeterminate(true);
         } else {
             transferProgressBar.setIndeterminate(false);
+        }
+
+        if (isStreaming) {
+            streamButton.setChecked(true);
+        } else {
+            streamButton.setChecked(false);
         }
 
         if (isHAR) {

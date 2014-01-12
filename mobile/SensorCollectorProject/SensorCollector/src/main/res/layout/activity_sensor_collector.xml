@@ -53,6 +53,17 @@
             android:max="100"
             android:indeterminate="true" />
 
+            <ToggleButton
+                android:id="@+id/streamButton"
+                android:layout_height="fill_parent"
+                android:onClick="onStreamButtonClick"
+                android:text="Streaming"
+                android:checked="false"
+                android:textOff="Start Streaming"
+                android:textOn="Stop Streaming"
+                android:layout_weight="0.23"
+                android:layout_width="match_parent" />
+
 
         <ToggleButton
             android:layout_width="match_parent"

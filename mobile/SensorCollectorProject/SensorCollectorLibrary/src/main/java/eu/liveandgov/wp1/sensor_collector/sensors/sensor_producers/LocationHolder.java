@@ -20,7 +20,7 @@ public abstract class LocationHolder implements SensorHolder {
 
     protected  void receivedNewLocation(Location location)
     {
-        sensorQueue.push(SensorSerializer.fromLocation(location));
+        sensorQueue.push(SensorSerializer.location.toSSFDefault(location));
     }
 
 }

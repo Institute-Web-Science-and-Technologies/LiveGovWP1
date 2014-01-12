@@ -19,8 +19,6 @@ import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorSerializer;
 
-import static junit.framework.Assert.assertNotNull;
-
 /**
  * Created by lukashaertel on 27.11.13.
  */
@@ -28,20 +26,18 @@ public class WifiHolder implements SensorHolder {
     public static String LOG_TAG = "WIFIH";
 
     private final SensorQueue sensorQueue;
-    private final int     delay;
+    private final int delay;
     private final Handler handler;
     private long lastScanRequest;
 
-    public WifiHolder(SensorQueue sensorQueue,int delay, Handler handler)
-    {
+    public WifiHolder(SensorQueue sensorQueue, int delay, Handler handler) {
         this.sensorQueue = sensorQueue;
         this.delay = delay;
         this.handler = handler;
     }
 
     private void startNextScan() {
-        if(GlobalContext.getWifiManager().startScan())
-        {
+        if (GlobalContext.getWifiManager().startScan()) {
             lastScanRequest = SystemClock.uptimeMillis();
         }
     }
@@ -68,8 +64,7 @@ public class WifiHolder implements SensorHolder {
     private final BroadcastReceiver scanResultsAvailableEndpoint = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction()))
-            {
+            if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction())) {
                 Log.d(LOG_TAG, "Scan results available");
 
                 // Get receive-time of the intent in system uptime
@@ -79,43 +74,36 @@ public class WifiHolder implements SensorHolder {
                 final List<ScanResult> scanResults = GlobalContext.getWifiManager().getScanResults();
 
                 // If scan results are not null, push
-                if(scanResults != null)
-                {
+                if (scanResults != null) {
                     // Push converted scan results to queue
-                    sensorQueue.push(SensorSerializer.fromScanResults(scanResults));
+                    sensorQueue.push(SensorSerializer.scanResults.toSSFDefault(scanResults));
                 }
 
                 // If results are on time, schedule the next scan at the handler with the given delay
-                if(lastScanRequest + delay > scanEndtime)
-                {
-                    if(!handler.postAtTime(new Runnable() {
+                if (lastScanRequest + delay > scanEndtime) {
+                    if (!handler.postAtTime(new Runnable() {
                         @Override
                         public void run() {
                             startNextScan();
                         }
-                    }, lastScanRequest + delay))
-                    {
+                    }, lastScanRequest + delay)) {
                         // If failed to schedule, scan immediately
                         startNextScan();
                     }
-                }
-                else
-                {
+                } else {
                     // Else, scan immediately
                     startNextScan();
                 }
-            }
-            else
-            {
+            } else {
                 throw new IllegalStateException("Illegal configuration of broadcast receiver");
             }
         }
     };
 
-    private void checkEnableWiFi(){
-        if(!SensorCollectionOptions.ASK_WIFI) return;
+    private void checkEnableWiFi() {
+        if (!SensorCollectionOptions.ASK_WIFI) return;
 
-        if(!GlobalContext.getWifiManager().isWifiEnabled()) {
+        if (!GlobalContext.getWifiManager().isWifiEnabled()) {
             Toast toast = Toast.makeText(GlobalContext.context, "Please enable WiFi.", Toast.LENGTH_SHORT);
             toast.show();
 

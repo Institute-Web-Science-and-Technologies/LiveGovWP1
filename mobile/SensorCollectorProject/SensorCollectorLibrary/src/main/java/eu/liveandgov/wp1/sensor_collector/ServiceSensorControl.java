@@ -237,8 +237,8 @@ public class ServiceSensorControl extends Service {
 
     private void doAnnotate(String tag) {
         Log.d("AN", "Adding annotation:" + tag);
-        String msg = SensorSerializer.fromTag(tag);
-        sensorQueue.push(msg);
+
+        sensorQueue.push(SensorSerializer.tag.toSSFDefault(tag));
     }
 
     private void doTransferSamples() {
@@ -249,12 +249,12 @@ public class ServiceSensorControl extends Service {
         connectorThread.removeConsumer(persistor);
         isRecording = false;
 
-        persistor.push(SensorSerializer.fromTag(IntentAPI.VALUE_STOP_RECORDING));
+        persistor.push(SensorSerializer.tag.toSSFDefault(IntentAPI.VALUE_STOP_RECORDING));
 
         // API EXTENSIONS are triggered on together with recording
         if (API_EXTENSIONS) {
             // Add "STOP RECORDING TAG" to publisher
-            publisher.push(SensorSerializer.fromTag(IntentAPI.VALUE_STOP_RECORDING));
+            publisher.push(SensorSerializer.tag.toSSFDefault(IntentAPI.VALUE_STOP_RECORDING));
             connectorThread.removeConsumer(publisher);
             connectorThread.removeConsumer(gpsCache);
         }
@@ -264,11 +264,11 @@ public class ServiceSensorControl extends Service {
         connectorThread.addConsumer(persistor);
         isRecording = true;
 
-        persistor.push(SensorSerializer.fromTag(IntentAPI.VALUE_START_RECORDING));
+        persistor.push(SensorSerializer.tag.toSSFDefault(IntentAPI.VALUE_START_RECORDING));
 
         // API EXTENSIONS are triggered on together with recording
         if (API_EXTENSIONS) {
-            publisher.push(SensorSerializer.fromTag(IntentAPI.VALUE_START_RECORDING));
+            publisher.push(SensorSerializer.tag.toSSFDefault(IntentAPI.VALUE_START_RECORDING));
             connectorThread.addConsumer(publisher);
             connectorThread.addConsumer(gpsCache);
         }

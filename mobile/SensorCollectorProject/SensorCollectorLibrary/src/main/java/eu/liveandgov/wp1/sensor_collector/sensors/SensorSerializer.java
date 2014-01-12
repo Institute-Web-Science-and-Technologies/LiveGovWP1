@@ -1,8 +1,5 @@
 package eu.liveandgov.wp1.sensor_collector.sensors;
 
-import android.bluetooth.BluetoothClass;
-import android.bluetooth.BluetoothDevice;
-import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.location.Location;
@@ -11,43 +8,75 @@ import android.os.Build;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.ServiceState;
 import android.telephony.SignalStrength;
+import android.telephony.TelephonyManager;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 
-import org.apache.commons.lang.StringEscapeUtils;
 
-import java.util.List;
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import java.util.Locale;
 
 import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
-import eu.liveandgov.wp1.sensor_collector.sensors.sensor_producers.BluetoothHolder;
 import eu.liveandgov.wp1.sensor_collector.sensors.sensor_producers.TelephonyHolder;
 import eu.liveandgov.wp1.sensor_collector.sensors.sensor_value_objects.GpsSensorValue;
 
-import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.*;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_ACCELEROMETER;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_BLUETOOTH;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_ERROR;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_GOOGLE_ACTIVITY;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_GPS;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_GRAVITY;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_GSM;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_GYROSCOPE;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_LINEAR_ACCELERATION;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_MAGNETOMETER;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_ROTATION;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_TAG;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_WIFI;
 
 /**
  * Converts sensor events into the ssf Format.
- *
+ * <p/>
  * Created by hartmann on 9/15/13.
  */
 public class SensorSerializer {
+    /**
+     * Baseclass for SSF conversion helpers
+     */
+    public static abstract class UtilityConversion<T> {
+        /**
+         * Uses this conversion to convert from t to a string
+         */
+        public abstract String toSSF(String type, long timestamp, String device, T t);
 
-    private static long timestampCorrectionMs = 0;
-
-    static {
-        // If build-version is above jelly-bean mr1 (17), timestamps of the sensors are already in
-        // utc, otherwise convert by rebasing them on the uptime
-        //
-        // We comute a global correction based on the fact, that currentTimeMillis is in UTC
-        // and nanoTime is in uptime.
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1)
-        {
-            timestampCorrectionMs = (long) (System.currentTimeMillis() - (System.nanoTime() / 1E6) );
+        /**
+         * Delegates the calculation of timestamp and device for {@link #toSSF(String, long, String, T)}
+         */
+        public String toSSFDefault(String type, T t) {
+            return toSSF(type, System.currentTimeMillis(), GlobalContext.getUserId(), t);
         }
     }
+
+    /**
+     * Baseclass for SSF conversions
+     */
+    public static abstract class Conversion<T> {
+        /**
+         * Uses this conversion to convert from t to a string
+         */
+        public abstract String toSSF(long timestamp, String device, T t);
+
+        /**
+         * Delegates the calculation of timestamp and device for {@link #toSSF(long, String, T)}
+         */
+        public String toSSFDefault(T t) {
+            return toSSF(System.currentTimeMillis(), GlobalContext.getUserId(), t);
+        }
+    }
+
 
     public static MotionSensorValue parseMotionEvent(String event) {
         MotionSensorValue newEvent = new MotionSensorValue();
@@ -86,203 +115,417 @@ public class SensorSerializer {
     }
 
 
-    public static String fromSensorEvent(SensorEvent event) {
-        int sensorType= event.sensor.getType();
-
-        long timestamp_ms = (long) (event.timestamp / 1E6) + timestampCorrectionMs;
-
-        if (sensorType == Sensor.TYPE_ACCELEROMETER){
-            return fillStringFloats(SSF_ACCELEROMETER, timestamp_ms, GlobalContext.getUserId(), event.values);
-        } else if (sensorType == Sensor.TYPE_LINEAR_ACCELERATION){
-            return fillStringFloats(SSF_LINEAR_ACCELERATION, timestamp_ms, GlobalContext.getUserId(), event.values);
-        } else if (sensorType == Sensor.TYPE_GRAVITY) {
-            return fillStringFloats(SSF_GRAVITY, timestamp_ms, GlobalContext.getUserId(), event.values);
-        } else if (sensorType == Sensor.TYPE_GYROSCOPE) {
-            return fillStringFloats(SSF_GYROSCOPE, timestamp_ms, GlobalContext.getUserId(), event.values);
-        } else if (sensorType == Sensor.TYPE_MAGNETIC_FIELD) {
-            return fillStringFloats(SSF_MAGNETOMETER, timestamp_ms, GlobalContext.getUserId(), event.values);
-        } else if (sensorType == Sensor.TYPE_ROTATION_VECTOR) {
-            return fillStringFloats(SSF_ROTATION, timestamp_ms, GlobalContext.getUserId(), event.values);
-        }
-        return "ERR," + timestamp_ms + ",,Unknown sensor " + sensorType;
-    }
-
-    public static String fromScanResults(List<ScanResult> scanResults) {
-        final StringBuilder builder = new StringBuilder();
-        boolean separate = false;
-        for(ScanResult scanResult : scanResults)
-        {
-            if(separate)
-            {
-                // Separate entries of the scan result list by semicolon
-                builder.append(';');
-            }
-
-            // Write each scan result as a tuple of Escaped SSID/Escaped BSSID/Frequency in MHz/Level in dBm
-            builder.append( "\"" + StringEscapeUtils.escapeJava(scanResult.SSID) + "\"");
-            builder.append('/');
-            builder.append( "\"" + StringEscapeUtils.escapeJava(scanResult.BSSID) + "\"");
-            builder.append('/');
-            builder.append(scanResult.frequency);
-            builder.append('/');
-            builder.append(scanResult.level);
-
-            separate = true;
-        }
-
-         return fillString(SSF_WIFI, System.currentTimeMillis(), GlobalContext.getUserId(), builder.toString());
-    }
-
-    public static String intermediateFromBTFound(Intent intent)
-    {
-        final StringBuilder builder = new StringBuilder();
-
-        // Extract the stored data from the bundle of the intent
-        final BluetoothDevice bluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-        final BluetoothClass bluetoothClass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
-        final String name = intent.hasExtra(BluetoothDevice.EXTRA_NAME) ? intent.getStringExtra(BluetoothDevice.EXTRA_NAME) : null;
-        final Short rssi = intent.hasExtra(BluetoothDevice.EXTRA_RSSI) ? intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE) : null;
-
-        // Write the values as a tuple of Escaped Address/Device Major Class/Device Class/Bond State/Optional Escaped Name/Optional RSSI
-        builder.append("\"" + StringEscapeUtils.escapeJava(bluetoothDevice.getAddress()) + "\"");
-        builder.append('/');
-        builder.append(BluetoothHolder.getDeviceMajorClassName(bluetoothClass.getMajorDeviceClass()));
-        builder.append('/');
-        builder.append(BluetoothHolder.getDeviceClassName(bluetoothClass.getDeviceClass()));
-        builder.append('/');
-        builder.append(BluetoothHolder.getBondName(bluetoothDevice.getBondState()));
-        builder.append('/');
-        if(name != null)
-        {
-            builder.append("\"" + StringEscapeUtils.escapeJava(name) + "\"");
-        }
-        builder.append('/');
-        if(rssi != null)
-        {
-            builder.append(rssi);
-        }
-
-        // Return the created value
-        return builder.toString();
-    }
-
-    public static String fromBluetooth(String accumulatedIntermediate)
-    {
-        return fillString(SSF_BLUETOOTH, System.currentTimeMillis(), GlobalContext.getUserId(), accumulatedIntermediate);
-    }
-
-    public static String fromPhoneState(ServiceState serviceState, SignalStrength signalStrength, List<NeighboringCellInfo> neighboringCellInfos)
-    {
-        final StringBuilder builder = new StringBuilder();
-
-        // Write phone status as Service State/Roaming State/Manual Selection State/Operator Name/Phone Signal Strength
-        builder.append(TelephonyHolder.getStateName(serviceState.getState()));
-        builder.append('/');
-        builder.append(TelephonyHolder.getRoamingText(serviceState.getRoaming()));
-        builder.append('/');
-        builder.append(TelephonyHolder.getManualModeText(serviceState.getIsManualSelection()));
-        builder.append('/');
-        builder.append("\"" + StringEscapeUtils.escapeJava(serviceState.getOperatorAlphaLong()) + "\"");
-        builder.append('/');
-        builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getSignalStrengthText(signalStrength)) + "\"");
-
-        // Separate prefix from cells with colon
-        builder.append(':');
-
-        // Write each cell info as a tuple of Escaped Identity/Network Type/Signal Strength in dBm
-        boolean separate = false;
-        for(NeighboringCellInfo neighboringCellInfo : neighboringCellInfos)
-        {
-            if(separate)
-            {
-                // Separate entries of the scan result list by semicolon
-                builder.append(';');
-            }
-
-            builder.append("\"" + StringEscapeUtils.escapeJava(TelephonyHolder.getIdentityText(neighboringCellInfo.getCid(), neighboringCellInfo.getLac())) + "\"");
-            builder.append('/');
-            builder.append(StringEscapeUtils.escapeJava(TelephonyHolder.getNetworkTypeText(neighboringCellInfo.getNetworkType())));
-            builder.append('/');
-            builder.append(TelephonyHolder.getTS27SignalStrengthText(neighboringCellInfo.getRssi()));
-
-            separate = true;
-        }
-
-        return fillString(SSF_GSM, System.currentTimeMillis(), GlobalContext.getUserId(), builder.toString());
-    }
-
-    public static String fromLocation(Location location) {
-        return fillStringDoubles(SSF_GPS, System.currentTimeMillis(), GlobalContext.getUserId(), new double[]{location.getLatitude(), location.getLongitude(), location.getAltitude()});
-    }
-
-    public static String fromTag(String tag) {
-        return fillDefaults(SSF_TAG, "\""+ StringEscapeUtils.escapeJava(tag) +"\"");
-    }
-
-    // GOOGLE ACTIVITY RECOGNITION HELPER
-
-    public static String fromGoogleActivity(ActivityRecognitionResult result) {
-        DetectedActivity detectedActivity = result.getMostProbableActivity();
-        return fillStringObjects(SSF_GOOGLE_ACTIVITY, System.currentTimeMillis(), GlobalContext.getUserId(),
-                new Object[]{getActivityNameFromType(detectedActivity.getType()),
-                        detectedActivity.getConfidence()});
-    }
-
-    private static String getActivityNameFromType(int activityType) {
-        switch(activityType) {
-            case DetectedActivity.IN_VEHICLE:
-                return "in_vehicle";
-            case DetectedActivity.ON_BICYCLE:
-                return "on_bicycle";
-            case DetectedActivity.ON_FOOT:
-                return "on_foot";
-            case DetectedActivity.STILL:
-                return "still";
-            case DetectedActivity.UNKNOWN:
-                return "unknown";
-            case DetectedActivity.TILTING:
-                return "tilting";
-        }
-        return "unknown";
+    /**
+     * Escapes a string and puts it into quotes
+     */
+    private static String escape(String s) {
+        return '"' + StringEscapeUtils.escapeCsv(s) + '"';
     }
 
     /**
-     * Writes sensor values in SSF format. (cf. project Wiki)
-     * @param type of Sensor
-     * @param timestamp of recording in ms
-     * @param deviceId unique device identified
-     * @param value String
-     * @return ssfRow
+     * Creates a string builder and initializes it with the default pattern
      */
-    private static String fillString(String type, long timestamp, String deviceId, String value) {
-        return String.format(Locale.ENGLISH, "%s,%d,%s,%s", type, timestamp, deviceId, value);
+    private static StringBuilder createHead(String type, long timestamp, String device) {
+        final StringBuilder builder = new StringBuilder(type);
+        builder.append(',');
+        builder.append(timestamp);
+        builder.append(',');
+        builder.append(escape(device));
+
+        return builder;
     }
 
-    private static String fillStringFloats(String type, long timestamp, String deviceId, float[] values) {
-        String valueString = "";
-        for (float value : values) {
-            valueString += value + " ";
+    /**
+     * Utility class fro converting SSF entries with a string-tail
+     */
+    public static final UtilityConversion<String> escapedString = new UtilityConversion<String>() {
+        @Override
+        public String toSSF(String type, long timestamp, String device, String s) {
+            // Create head and separate from tail
+            final StringBuilder builder = createHead(type, timestamp, device);
+            builder.append(',');
+
+            // Append error message
+            builder.append(s);
+
+            // Return result
+            return builder.toString();
         }
-        return fillString(type, timestamp, deviceId, valueString);
-    }
+    };
 
-    private static String fillStringDoubles(String type, long timestamp, String deviceId, double[] values) {
-        String valueString = "";
-        for (double value : values) {
-            valueString += value + " ";
+    /**
+     * Utility class for converting SSF entries with an string-tail
+     */
+    public static final UtilityConversion<String> unescapedString = new UtilityConversion<String>() {
+        @Override
+        public String toSSF(String type, long timestamp, String device, String s) {
+            // Escape and redelegate
+            return escapedString.toSSF(type, timestamp, device, escape(s));
         }
-        return fillString(type, timestamp, deviceId, valueString);
-    }
+    };
 
-    private static String fillStringObjects(String type, long timestamp, String deviceId, Object[] values) {
-        String valueString = "";
-        for (Object value : values) {
-            valueString += value + " ";
+    /**
+     * Utility class fro converting SSF entries with a float[]-tail
+     */
+    public static final UtilityConversion<float[]> floats = new UtilityConversion<float[]>() {
+        @Override
+        public String toSSF(String type, long timestamp, String device, float... floats) {
+            // Create head and separate from tail
+            final StringBuilder builder = createHead(type, timestamp, device);
+            builder.append(',');
+
+            // Append all floats separated
+            if (floats.length > 0) {
+                builder.append(floats[0]);
+                for (int i = 1; i < floats.length; i++) {
+                    builder.append(' ');
+                    builder.append(floats[i]);
+                }
+            }
+
+            return builder.toString();
         }
-        return fillString(type, timestamp, deviceId, valueString);
-    }
+    };
 
-    public static String fillDefaults(String prefix, String value) {
-        return fillString(prefix, System.currentTimeMillis(), GlobalContext.getUserId(), value);
-    }
+    /**
+     * Utility class fro converting SSF entries with a double[]-tail
+     */
+    public static final UtilityConversion<double[]> doubles = new UtilityConversion<double[]>() {
+        @Override
+        public String toSSF(String type, long timestamp, String device, double... doubles) {
+            // Create head and separate from tail
+            final StringBuilder builder = createHead(type, timestamp, device);
+            builder.append(',');
+
+            // Append all doubles separated
+            if (doubles.length > 0) {
+                builder.append(doubles[0]);
+                for (int i = 1; i < doubles.length; i++) {
+                    builder.append(' ');
+                    builder.append(doubles[i]);
+                }
+            }
+
+            return builder.toString();
+        }
+    };
+
+    /**
+     * Utility class fro converting SSF entries with a Object[]-tail
+     */
+    public static final UtilityConversion<Object[]> objects = new UtilityConversion<Object[]>() {
+        @Override
+        public String toSSF(String type, long timestamp, String device, Object... objects) {
+            // Create head and separate from tail
+            final StringBuilder builder = createHead(type, timestamp, device);
+            builder.append(',');
+
+            // Append all objects separated
+            if (objects.length > 0) {
+                builder.append(objects[0]);
+                for (int i = 1; i < objects.length; i++) {
+                    builder.append(' ');
+                    builder.append(objects[i]);
+                }
+            }
+
+            return builder.toString();
+        }
+    };
+
+
+    /**
+     * Converts a sensor eventx into the SSF format
+     */
+    public static final Conversion<SensorEvent> sensorEvent = new Conversion<SensorEvent>() {
+        /**
+         * Correction value for sensor timestamps
+         */
+        private final long timestampCorrectionMs;
+
+        /**
+         * Initializers checks build-version and sets the appropriate timestamp correction
+         */ {
+            // If build-version is above jelly-bean mr1 (17), timestamps of the sensors are already in
+            // utc, otherwise convert by rebasing them on the uptime
+            //
+            // We comute a global correction based on the fact, that currentTimeMillis is in UTC
+            // and nanoTime is in uptime.
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                timestampCorrectionMs = (long) (System.currentTimeMillis() - (System.nanoTime() / 1E6));
+            } else {
+                timestampCorrectionMs = 0;
+            }
+        }
+
+        @Override
+        public String toSSF(long timestamp, String device, SensorEvent sensorEvent) {
+            final String type;
+            switch (sensorEvent.sensor.getType()) {
+                // Assign type with correct representation
+                case Sensor.TYPE_ACCELEROMETER:
+                    type = SSF_ACCELEROMETER;
+                    break;
+                case Sensor.TYPE_LINEAR_ACCELERATION:
+                    type = SSF_LINEAR_ACCELERATION;
+                    break;
+                case Sensor.TYPE_GRAVITY:
+                    type = SSF_GRAVITY;
+                    break;
+                case Sensor.TYPE_GYROSCOPE:
+                    type = SSF_GYROSCOPE;
+                    break;
+                case Sensor.TYPE_MAGNETIC_FIELD:
+                    type = SSF_MAGNETOMETER;
+                    break;
+                case Sensor.TYPE_ROTATION_VECTOR:
+                    type = SSF_ROTATION;
+                    break;
+
+                // Or return a error string
+                default:
+                    return unescapedString.toSSF(SSF_ERROR, timestamp, device, "Unknown sensor");
+            }
+
+            // Replace timestamp with real value
+            timestamp = (long) (sensorEvent.timestamp / 1E6) + timestampCorrectionMs;
+
+            // Return by float conversion
+            return floats.toSSF(type, timestamp, device, sensorEvent.values);
+        }
+    };
+
+    /**
+     * Converts WiFi scan-results into the SSF format
+     */
+    public static final Conversion<Iterable<? extends ScanResult>> scanResults = new Conversion<Iterable<? extends ScanResult>>() {
+        @Override
+        public String toSSF(long timestamp, String device, Iterable<? extends ScanResult> scanResults) {
+            // Create head and separate from tail
+            final StringBuilder builder = createHead(SSF_WIFI, timestamp, device);
+            builder.append(',');
+
+            boolean separate = false;
+            for (ScanResult scanResult : scanResults) {
+                if (separate) {
+                    // Separate entries of the scan result list by semicolon
+                    builder.append(';');
+                }
+
+                // Write each scan result as a tuple of Escaped SSID/Escaped BSSID/Frequency in MHz/Level in dBm
+                builder.append(escape(scanResult.SSID));
+                builder.append('/');
+                builder.append(escape(scanResult.BSSID));
+                builder.append('/');
+                builder.append(scanResult.frequency);
+                builder.append('/');
+                builder.append(scanResult.level);
+
+                separate = true;
+            }
+
+            return builder.toString();
+        }
+    };
+
+    /**
+     * Converts a bluetooth intermediate string into the SSF format
+     */
+    public static final Conversion<String> bluetoothIntermediate = new Conversion<String>() {
+        @Override
+        public String toSSF(long timestamp, String device, String s) {
+            // Redelegate
+            return escapedString.toSSF(SSF_BLUETOOTH, timestamp, device, s);
+        }
+    };
+
+    /**
+     * Converts a phone state into the SSF format
+     */
+    public static final Conversion<TelephonyHolder.PhoneState> phoneState = new Conversion<TelephonyHolder.PhoneState>() {
+
+        public String getStateName(int i) {
+            if (i == ServiceState.STATE_EMERGENCY_ONLY) {
+                return "emergency only";
+            } else if (i == ServiceState.STATE_IN_SERVICE) {
+                return "in service";
+            } else if (i == ServiceState.STATE_OUT_OF_SERVICE) {
+                return "out of service";
+            } else if (i == ServiceState.STATE_POWER_OFF) {
+                return "power off";
+            } else {
+                return "unknown";
+            }
+        }
+
+        public String getRoamingText(boolean isRoaming) {
+            // TODO: Proper opposite of roaming??!
+            return isRoaming ? "roaming" : "not roaming";
+        }
+
+        public String getManualModeText(boolean isManualMode) {
+            return isManualMode ? "manual carrier" : "automatic carrier";
+        }
+
+        public String getSignalStrengthText(SignalStrength signalStrength) {
+            if (signalStrength.isGsm()) {
+                return String.format(Locale.ENGLISH, "gsm %d", convertTS27SignalStrength(signalStrength.getGsmSignalStrength()));
+            } else {
+                return String.format(Locale.ENGLISH, "other %d %d, %d %d", signalStrength.getCdmaDbm(), signalStrength.getCdmaEcio(), signalStrength.getEvdoDbm(), signalStrength.getEvdoEcio());
+            }
+        }
+
+        /**
+         * Returns the Signal Strength in dBm
+         */
+        public Integer convertTS27SignalStrength(int i) {
+            if (i == 99) {
+                return null;
+            } else {
+                return -113 + 2 * i;
+            }
+        }
+
+        public String getNetworkTypeText(int nt) {
+            switch (nt) {
+                case TelephonyManager.NETWORK_TYPE_GPRS:
+                    return "GPRS";
+                case TelephonyManager.NETWORK_TYPE_EDGE:
+                    return "EDGE";
+                case TelephonyManager.NETWORK_TYPE_UMTS:
+                    return "UMTS";
+                case TelephonyManager.NETWORK_TYPE_HSDPA:
+                    return "HSDPA";
+                case TelephonyManager.NETWORK_TYPE_HSUPA:
+                    return "HSUPA";
+                case TelephonyManager.NETWORK_TYPE_HSPA:
+                    return "HSPA";
+            }
+
+            return "other";
+        }
+
+        public String getTS27SignalStrengthText(int i) {
+            if (i == 99) {
+                return "unknown";
+            } else {
+                return String.format(Locale.ENGLISH, "%d", convertTS27SignalStrength(i));
+            }
+        }
+
+        public String getIdentityText(int cid, int lac) {
+            if (cid == NeighboringCellInfo.UNKNOWN_CID) {
+                if (lac == NeighboringCellInfo.UNKNOWN_CID) {
+                    return "unknown";
+                } else {
+                    return String.format(Locale.ENGLISH, "lac: %d", lac);
+                }
+            } else {
+                if (lac == NeighboringCellInfo.UNKNOWN_CID) {
+                    return String.format(Locale.ENGLISH, "cid: %d", cid);
+                } else {
+                    return String.format(Locale.ENGLISH, "cid: %d lac: %d", cid, lac);
+                }
+            }
+        }
+
+        @Override
+        public String toSSF(long timestamp, String device, TelephonyHolder.PhoneState phoneState) {
+            // Create head and separate from tail
+            final StringBuilder builder = createHead(SSF_GSM, timestamp, device);
+            builder.append(',');
+
+            // Write phone status as Service State/Roaming State/Manual Selection State/Operator Name/Phone Signal Strength
+            builder.append(getStateName(phoneState.getServiceState().getState()));
+            builder.append('/');
+            builder.append(getRoamingText(phoneState.getServiceState().getRoaming()));
+            builder.append('/');
+            builder.append(getManualModeText(phoneState.getServiceState().getIsManualSelection()));
+            builder.append('/');
+            builder.append(escape(phoneState.getServiceState().getOperatorAlphaLong()));
+            builder.append('/');
+            builder.append(escape(getSignalStrengthText(phoneState.getSignalStrength())));
+
+            // Separate prefix from cells with colon
+            builder.append(':');
+
+            // Write each cell info as a tuple of Escaped Identity/Network Type/Signal Strength in dBm
+            boolean separate = false;
+            for (NeighboringCellInfo neighboringCellInfo : phoneState.getNeighboringCellInfos()) {
+                if (separate) {
+                    // Separate entries of the scan result list by semicolon
+                    builder.append(';');
+                }
+
+                builder.append(escape(getIdentityText(neighboringCellInfo.getCid(), neighboringCellInfo.getLac())));
+                builder.append('/');
+                builder.append(escape(getNetworkTypeText(neighboringCellInfo.getNetworkType())));
+                builder.append('/');
+                builder.append(getTS27SignalStrengthText(neighboringCellInfo.getRssi()));
+
+                separate = true;
+            }
+
+            return builder.toString();
+        }
+    };
+
+    /**
+     * Converts a location into SSF format
+     */
+    public static final Conversion<Location> location = new Conversion<Location>() {
+        @Override
+        public String toSSF(long timestamp, String device, Location location) {
+            // Redelegate componentially
+            return doubles.toSSF(SSF_GPS, timestamp, device, new double[]{location.getLatitude(), location.getLongitude(), location.getAltitude()});
+        }
+    };
+
+    /**
+     * Converts a tag into SSF format
+     */
+    public static final Conversion<String> tag = new Conversion<String>() {
+        @Override
+        public String toSSF(long timestamp, String device, String s) {
+            // Redelegate
+            return unescapedString.toSSF(SSF_TAG, timestamp, device, s);
+        }
+    };
+
+    /**
+     * Converts an activity recognition result into the SSF format
+     */
+    public static final Conversion<ActivityRecognitionResult> activityRecognitionResult = new Conversion<ActivityRecognitionResult>() {
+        /**
+         * Utility method for converting the activity type into a readable string
+         */
+        private String getActivityNameFromType(int activityType) {
+            switch (activityType) {
+                case DetectedActivity.IN_VEHICLE:
+                    return "in_vehicle";
+                case DetectedActivity.ON_BICYCLE:
+                    return "on_bicycle";
+                case DetectedActivity.ON_FOOT:
+                    return "on_foot";
+                case DetectedActivity.STILL:
+                    return "still";
+                case DetectedActivity.UNKNOWN:
+                    return "unknown";
+                case DetectedActivity.TILTING:
+                    return "tilting";
+
+                default:
+                    return "unknown";
+            }
+        }
+
+        @Override
+        public String toSSF(long timestamp, String device, ActivityRecognitionResult activityRecognitionResult) {
+            // Get most probable
+            final DetectedActivity detectedActivity = activityRecognitionResult.getMostProbableActivity();
+
+            // Insert to SSF
+            return objects.toSSF(SSF_GOOGLE_ACTIVITY, timestamp, device, new Object[]{getActivityNameFromType(detectedActivity.getType()), detectedActivity.getConfidence()});
+        }
+    };
 }

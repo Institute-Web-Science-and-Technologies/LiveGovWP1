@@ -18,7 +18,7 @@ public class SampleEmitter implements Consumer<String> {
 
     @Override
     public void push(String value) {
-        sensorQueue.push(SensorSerializer.fillDefaults(prefix, value));
+        sensorQueue.push(SensorSerializer.unescapedString.toSSFDefault(prefix, value));
     }
 
 }
