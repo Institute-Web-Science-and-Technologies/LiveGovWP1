@@ -147,7 +147,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
         } catch (HttpHostConnectException e) {
             Log.i(LOG_TAG, "Connection Refused");
-            e.printStackTrace();
+            // e.printStackTrace();
             return false;
         } catch (IOException e) {
             e.printStackTrace();
