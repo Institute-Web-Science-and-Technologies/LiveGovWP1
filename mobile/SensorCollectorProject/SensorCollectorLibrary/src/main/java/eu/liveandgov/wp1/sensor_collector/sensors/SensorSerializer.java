@@ -118,7 +118,7 @@ public class SensorSerializer {
      * Escapes the device-string
      */
     private static String escapeDevice(String d) {
-        return d.replace(',', ' ');
+        return d.replace(',', ' ').replace('\r', ' ').replace('\n',' ');
     }
 
     /**
