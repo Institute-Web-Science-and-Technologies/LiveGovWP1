@@ -40,7 +40,7 @@ public class Main {
         Persistor<CountWindow> pers = new Persistor<CountWindow>("out.csv");
         interpolator.setConsumer(pers);
 
-        csvReader.readDir("/Users/cehlen/TrainingData");
+        csvReader.readDir("/Users/cehlen/TrainingData", false);
     }
 
 }
