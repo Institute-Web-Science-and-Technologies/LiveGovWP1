@@ -7,6 +7,7 @@ import eu.liveandgov.wp1.human_activity_recognition.containers.TaggedWindow;
 import eu.liveandgov.wp1.human_activity_recognition.helper.TimedQueue;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by cehlen on 10/19/13.
@@ -47,29 +48,35 @@ public class WindowProducer extends Producer<TaggedWindow> implements Consumer<M
         lastTime = -1;
         nextWindowEnd = -1;
         queue.clear();
+
+        consumer.clear();
     }
 
     private void pushWindow() {
         TaggedWindow w = new TaggedWindow();
 
         ArrayList<MotionSensorValue> values = queue.toArrayList();
+        Collections.reverse(values);
         w.x = new float[values.size()];
         w.y = new float[values.size()];
         w.z = new float[values.size()];
+        w.time = new long[values.size()];
 
-        for(int i = 0; i < values.size(); i++) {
+
+        for(int i =0; i < values.size(); i++) {
             // Get meta info from first element
             if(i == 0) {
-                w.startTime = values.get(0).time;
-                w.id = values.get(0).id;
-                w.type = values.get(0).type;
-                w.tag = values.get(0).tag;
+                w.startTime = values.get(i).time;
+                w.id = values.get(i).id;
+                w.type = values.get(i).type;
+                w.tag = values.get(i).tag;
             }
 
             w.endTime = values.get(i).time;
             w.x[i] = values.get(i).x;
             w.y[i] = values.get(i).y;
             w.z[i] = values.get(i).z;
+            w.time[i] = values.get(i).time;
         }
 
         // Push the TaggedWindow!
