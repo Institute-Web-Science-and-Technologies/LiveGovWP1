@@ -24,6 +24,10 @@ public class Producer<T> {
             // do nothing
         }
 
+        public void clear() {
+            // do nothing
+        }
+
     }
 
 }

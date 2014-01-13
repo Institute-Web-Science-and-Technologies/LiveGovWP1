@@ -37,6 +37,10 @@ public class HarPipeline extends Pipeline<MotionSensorValue, String> {
         windowProducer.push(message);
     }
 
+    public void clear() {
+        windowProducer.clear();
+    }
+
     @Override
     public void setConsumer(Consumer<String> c) {
         classifyProducer.setConsumer(c);
