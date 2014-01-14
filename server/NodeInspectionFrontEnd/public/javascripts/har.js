@@ -71,7 +71,7 @@ google.setOnLoadCallback(function() {
       return row;
     }
 
-    window.showHARForId = showHARForId;
-    window.redrawHAR = redraw;
+    //window.showHARForId = showHARForId;
+    //window.redrawHAR = redraw;
   });
 });
