@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.human_activity_recognition;
 
 import eu.liveandgov.wp1.human_activity_recognition.containers.CountWindow;
+import eu.liveandgov.wp1.human_activity_recognition.containers.FeatureVector;
 import eu.liveandgov.wp1.human_activity_recognition.containers.TaggedWindow;
 import eu.liveandgov.wp1.human_activity_recognition.helper.Persistor;
 import eu.liveandgov.wp1.human_activity_recognition.producers.*;
@@ -18,11 +19,11 @@ public class Main {
     public static void main(String args[]) {
         CSVReader csvReader = new CSVReader();
 
-        int WINDOW_LENGTH_MS = 5 * 1000;
-        int WINDOW_OVERLAP   = WINDOW_LENGTH_MS - 20;
+        int WINDOW_LENGTH_MS = 20 * 1000;
+        int WINDOW_OVERLAP   = WINDOW_LENGTH_MS - 1000;
 
         int SAMPLING_FREQUENCY_HZ = 50;
-        int MIN_RECORDING_FREQUENCY = 0;
+        int MIN_RECORDING_FREQUENCY = 40;
 
         double SAMPLE_LENGHT_MS = 1000D / SAMPLING_FREQUENCY_HZ;
         int NO_SAMPLES_PER_WINDOW = (int) (WINDOW_LENGTH_MS / SAMPLE_LENGHT_MS);
@@ -37,10 +38,13 @@ public class Main {
         Interpolator interpolator = new Interpolator(NO_SAMPLES_PER_WINDOW);
         qualityFilter.setConsumer(interpolator);
 
-        Persistor<CountWindow> pers = new Persistor<CountWindow>("out.csv");
-        interpolator.setConsumer(pers);
+        FeatureProducer featureProducer = new FeatureProducer();
+        interpolator.setConsumer(featureProducer);
 
-        csvReader.readDir("/Users/cehlen/TrainingData", false);
+        Persistor<FeatureVector> pers = new Persistor<FeatureVector>("out.csv");
+        featureProducer.setConsumer(pers);
+
+        csvReader.readDir("/Users/cehlen/TrainingData", true);
     }
 
 }

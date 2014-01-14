@@ -26,7 +26,7 @@ public class HarPipeline extends Pipeline<MotionSensorValue, String> {
 
         // Feature
         featureProducer = new FeatureProducer();
-        windowProducer.setConsumer(featureProducer);
+        // windowProducer.setConsumer(featureProducer);
 
         // Classify
         classifyProducer = new ClassifyProducer();

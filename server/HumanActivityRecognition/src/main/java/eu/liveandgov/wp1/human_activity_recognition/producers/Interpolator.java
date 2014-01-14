@@ -31,6 +31,7 @@ public class Interpolator extends Producer<CountWindow> implements Consumer<Tagg
         cw.startTime = tw.startTime;
         cw.endTime = tw.endTime;
         cw.tag = tw.tag;
+        cw.id = tw.id;
 
         double length = (cw.endTime - cw.startTime);
 

@@ -19,15 +19,15 @@ public class CountWindow {
     public double frequency;
 
     public String toString() {
-        String result = "";
+        String result = id;
+        if (tag != null && tag.length() != 0) {
+            result += ",\"" + tag + "\",";
+        }
         for (int i = 0; i < x.length; i++) {
             result += x[i] + "," + y[i] + "," + z[i];
             if ((i + 1) != x.length) {
                 result += ",";
             }
-        }
-        if (tag != null && tag.length() != 0) {
-            result += ",\"" + tag + "\"";
         }
         return result;
     }
