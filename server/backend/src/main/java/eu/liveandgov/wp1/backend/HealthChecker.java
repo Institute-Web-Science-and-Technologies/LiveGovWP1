@@ -25,8 +25,8 @@ public class HealthChecker {
 	
 	private static final String EXPECTED_SLD_RESPONSE = "{\"routes\":[{\"trip_id\":\"1074_20130930_Ti_1_1812\",\"route_id\":\"1074\",\"score\":16,\"transportation_mean\":\"Bus\",\"shape_id\":\"1074_20130812_1\"},{\"trip_id\":\"1072_20130930_Ti_2_1735\",\"route_id\":\"1072\",\"score\":14,\"transportation_mean\":\"Bus\",\"shape_id\":\"1072_20130812_2\"},{\"trip_id\":\"4732_20130930_Ti_2_1735\",\"route_id\":\"4732\",\"score\":14,\"transportation_mean\":\"Bus\",\"shape_id\":\"4732_20130812_2\"},{\"trip_id\":\"1064_20130930_Ti_1_1808\",\"route_id\":\"1064\",\"score\":14,\"transportation_mean\":\"Bus\",\"shape_id\":\"1064_20110815_1\"},{\"trip_id\":\"1071_20130930_Ti_1_1805\",\"route_id\":\"1071\",\"score\":14,\"transportation_mean\":\"Bus\",\"shape_id\":\"1071_20121203_1\"},{\"trip_id\":\"1077_20130930_Ti_1_1808\",\"route_id\":\"1077\",\"score\":14,\"transportation_mean\":\"Bus\",\"shape_id\":\"1077_20130812_1\"},{\"trip_id\":\"1075_20130930_Ti_2_1738\",\"route_id\":\"1075\",\"score\":14,\"transportation_mean\":\"Bus\",\"shape_id\":\"1075_20130919_2\"},{\"trip_id\":\"9633_20130930_Ti_2_1717\",\"route_id\":\"9633\",\"score\":14,\"transportation_mean\":\"Bus\",\"shape_id\":\"9633_20130812_2\"},{\"trip_id\":\"1067_20130930_Ti_2_1739\",\"route_id\":\"1067\",\"score\":14,\"transportation_mean\":\"Bus\",\"shape_id\":\"1067_20130828_2\"},{\"trip_id\":\"1067_20130930_Ti_1_1806\",\"route_id\":\"1067\",\"score\":14,\"transportation_mean\":\"Bus\",\"shape_id\":\"1067_20130828_1\"}]}";
 	private static final String LOG_DIR = "/var/log/";
-	private static final int HEALTH_CHECK_INTERVAL_IN_SEC = 18;//0;
-	private static final int POST_LOG_FILES_INTERVAL_IN_SEC = 24;//*60*60;
+	private static final int HEALTH_CHECK_INTERVAL_IN_SEC = 180;
+	private static final int POST_LOG_FILES_INTERVAL_IN_SEC = 24*60*60;
 	static final String crlf = "\r\n";
 	static final String twoHyphens = "--";
 	static final String boundary =  "---------------------------LIVEANDGOV---";
@@ -120,9 +120,8 @@ public class HealthChecker {
 		out.writeBytes(twoHyphens + boundary + crlf);
 		out.writeBytes("Content-Type: application/json" + crlf + crlf);
 		out.writeBytes(json.toString());		
-		out.writeBytes(crlf);
-		
-		out.writeBytes(twoHyphens + boundary + crlf);
+
+		out.writeBytes(crlf + twoHyphens + boundary + crlf);
 		out.writeBytes("Content-Type: application/text" + crlf + crlf);
 		BufferedReader f = new BufferedReader(new FileReader(LOG_DIR + filename));
 		
@@ -137,25 +136,25 @@ public class HealthChecker {
 	          pos++;
 	      }
 	      f.close();
-		out.writeBytes( crlf + crlf + twoHyphens + boundary + twoHyphens + crlf);
+		out.writeBytes( crlf + twoHyphens + boundary + twoHyphens + crlf);
 		out.flush();
 		out.close();
 		
+		String returnVal;
 		if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String decodedString;
-			String returnVal = "Posted " + (pos - lastLineCommited) + " lines. Cursor at position " + pos + ". Service center response: ";
+			returnVal = "Posted " + (pos - lastLineCommited) + " lines. Cursor at position " + pos + ". Service center response: ";
 			while ((decodedString = in.readLine()) != null) {
 				returnVal += decodedString;
 			}
 			in.close();
-			lastLineCommited = pos;
-			return returnVal;
 		}
 		else {
-			return "code: " + conn.getResponseCode();
+			returnVal = "Code: " + conn.getResponseCode() + ". Failed to commit " + (pos - lastLineCommited) + " lines. Cursor at position " + pos + ".";
 		}
-
+		lastLineCommited = pos; // Even if the commit failed, don't send this lines again. 
+		return returnVal;
 	}
 	public Status checkSLD() throws IOException {
 		HttpURLConnection conn = prepareHttpURLConnection(SLD_API_URL, Method.POST, "application/x-www-form-urlencoded");
