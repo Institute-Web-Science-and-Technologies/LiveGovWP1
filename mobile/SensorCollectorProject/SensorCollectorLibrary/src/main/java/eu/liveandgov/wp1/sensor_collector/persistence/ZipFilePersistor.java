@@ -80,7 +80,7 @@ public class ZipFilePersistor implements Persistor {
 
     @Override
     public boolean hasSamples() {
-        return logFile.length() > 0;
+        return sampleCount > 0;
     }
 
     @Override
