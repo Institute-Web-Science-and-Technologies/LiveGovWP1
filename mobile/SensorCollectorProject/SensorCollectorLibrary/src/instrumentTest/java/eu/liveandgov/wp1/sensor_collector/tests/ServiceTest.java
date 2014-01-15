@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
+import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.persistence.FilePersistor;
 import eu.liveandgov.wp1.sensor_collector.persistence.ZipFilePersistor;
 
@@ -24,8 +25,7 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
 
     private ServiceSensorControl service;
 
-    public ServiceTest()
-    {
+    public ServiceTest() {
         super(ServiceSensorControl.class);
     }
 
@@ -36,8 +36,10 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
         intent = new Intent(getSystemContext(), ServiceSensorControl.class);
     }
 
-    public void testIntentAPI()
-    {
+    /**
+     * Basic test of the intent API
+     */
+    public void testIntentAPI() {
         // Start and get service
         startService(intent);
         GlobalContext.set(service = getService());
@@ -45,7 +47,7 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
         Assert.assertFalse(service.isRecording);
 
         // Send recording enable intent
-        final Intent iaRecordingEnable= new Intent(getSystemContext(), ServiceSensorControl.class);
+        final Intent iaRecordingEnable = new Intent(getSystemContext(), ServiceSensorControl.class);
         iaRecordingEnable.setAction(ACTION_RECORDING_ENABLE);
         startService(iaRecordingEnable);
 
@@ -66,14 +68,43 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
         Assert.assertFalse(service.isStreaming);
 
         // Send recording disable intent
-        final Intent iaRecordingDisable= new Intent(getSystemContext(), ServiceSensorControl.class);
+        final Intent iaRecordingDisable = new Intent(getSystemContext(), ServiceSensorControl.class);
         iaRecordingDisable.setAction(RECORDING_DISABLE);
         startService(iaRecordingDisable);
 
         Assert.assertFalse(service.isRecording);
     }
 
+    /**
+     * Test-case for issue #43
+     */
+    public void testDeleteWhileRecording() {
+        // Start and get service
+        startService(intent);
+        GlobalContext.set(service = getService());
 
+        // Send recording enable intent
+        final Intent iaRecordingEnable = new Intent(getSystemContext(), ServiceSensorControl.class);
+        iaRecordingEnable.setAction(ACTION_RECORDING_ENABLE);
+        startService(iaRecordingEnable);
+
+        Assert.assertTrue(service.isRecording);
+
+        final Intent iaDeleteSamples = new Intent(getSystemContext(), ServiceSensorControl.class);
+        iaDeleteSamples.setAction(ExtendedIntentAPI.ACTION_DELETE_SAMPLES);
+        startService(iaDeleteSamples);
+
+        // Send recording disable intent
+        final Intent iaRecordingDisable = new Intent(getSystemContext(), ServiceSensorControl.class);
+        iaRecordingDisable.setAction(RECORDING_DISABLE);
+        startService(iaRecordingDisable);
+
+        Assert.assertFalse(service.isRecording);
+    }
+
+    /**
+     * Test if a regular file persistor reports empty if empty
+     */
     public void testRFPEmpty() throws IOException {
         // Start and get service
         startService(intent);
@@ -90,7 +121,10 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
         assertFalse(filePersistor.hasSamples());
     }
 
-    public  void testRFPNonEmpty() throws  IOException {
+    /**
+     * Test if a regular file persistor reports non-empty if non-empty
+     */
+    public void testRFPNonEmpty() throws IOException {
         // Start and get service
         startService(intent);
         GlobalContext.set(service = getService());
@@ -107,6 +141,10 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
         assertTrue(filePersistor.hasSamples());
     }
 
+
+    /**
+     * Test if a zipped file persistor reports empty if empty
+     */
     public void testZFPEmpty() throws IOException {
         // Start and get service
         startService(intent);
@@ -123,7 +161,10 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
         assertFalse(zipFilePersistor.hasSamples());
     }
 
-    public  void testZFPNonEmpty() throws  IOException {
+    /**
+     * Test if a zipped file persistor reports non-empty if non-empty
+     */
+    public void testZFPNonEmpty() throws IOException {
         // Start and get service
         startService(intent);
         GlobalContext.set(service = getService());
