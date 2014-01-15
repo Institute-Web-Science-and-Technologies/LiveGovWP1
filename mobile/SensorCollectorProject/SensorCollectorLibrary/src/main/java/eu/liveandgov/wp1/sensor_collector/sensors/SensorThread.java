@@ -8,8 +8,11 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
@@ -39,7 +42,7 @@ import static junit.framework.Assert.assertNotNull;
 public class SensorThread implements Runnable {
     private static final String LOG_TAG = "SensorThread";
 
-    private Set<SensorHolder> activeSensors = new HashSet<SensorHolder>();
+    private Set<SensorHolder> activeSensors = new CopyOnWriteArraySet<SensorHolder>();
     private Handler sensorHandler;
     private SensorQueue sensorQueue;
     private Thread thread;
@@ -68,14 +71,19 @@ public class SensorThread implements Runnable {
         instance.thread.start();
     }
 
+    private static <T> Collection<T> rewrap(Collection<? extends  T> ts)
+    {
+        return new ArrayList<T>(ts);
+    }
+
     public static void stopAllRecording(){
-        for (SensorHolder p : instance.activeSensors){
+        for (SensorHolder p : rewrap(instance.activeSensors)){
             p.stopRecording();
         }
     }
 
     public static void startAllRecording(){
-        for (SensorHolder p : instance.activeSensors){
+        for (SensorHolder p : rewrap(instance.activeSensors)){
             p.startRecording();
         }
     }

@@ -71,6 +71,7 @@ public class ActivityHolder
 
     @Override
     public void onDisconnected() {
+        connected = false;
     }
 
     @Override

@@ -5,6 +5,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 import eu.liveandgov.wp1.sensor_collector.connectors.MultiProducer;
@@ -13,7 +14,7 @@ import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
 
 /**
  * Thread that actively polls a blocking queue and sends samples to a list of consumers.
- *
+ * <p/>
  * Created by hartmann on 9/15/13.
  */
 public class ConnectorThread implements Runnable, Monitorable, MultiProducer<String> {
@@ -23,13 +24,13 @@ public class ConnectorThread implements Runnable, Monitorable, MultiProducer<Str
     private final Thread thread;
 
     // Remark: consumerList is modified by other threads.
-    private List<Consumer<String>> consumerList = Collections.synchronizedList(new ArrayList<Consumer<String>>());
+    private List<Consumer<String>> consumerList = new CopyOnWriteArrayList<Consumer<String>>();
     private List<Callback> onEmptyList = new ArrayList<Callback>();
     private List<Callback> onNonEmptyList = new ArrayList<Callback>();
 
     private long messageCount = 0;
 
-    public ConnectorThread(SensorQueue sensorQueue){
+    public ConnectorThread(SensorQueue sensorQueue) {
         this.sensorQueue = sensorQueue;
         this.thread = new Thread(this);
     }
@@ -59,33 +60,29 @@ public class ConnectorThread implements Runnable, Monitorable, MultiProducer<Str
      * @return messageCount
      */
     @Override
-    public String getStatus(){
+    public String getStatus() {
         return "Throughput: " + messageCount;
     }
 
     @Override
     public void addConsumer(Consumer<String> c) {
-        synchronized (consumerList) {
-            if (consumerList.isEmpty()) callAll(onNonEmptyList);
+        if (consumerList.isEmpty()) callAll(onNonEmptyList);
 
-            if (consumerList.contains(c)) {
-                Log.w(LOG_TAG, "Consumer already connected: " + c.toString());
-                return;
-            }
-
-            consumerList.add(c);
+        if (consumerList.contains(c)) {
+            Log.w(LOG_TAG, "Consumer already connected: " + c.toString());
+            return;
         }
+
+        consumerList.add(c);
     }
 
 
     @Override
-    public boolean removeConsumer(Consumer<String> c){
-        synchronized (consumerList) {
-            boolean ret = consumerList.remove(c);
+    public boolean removeConsumer(Consumer<String> c) {
+        boolean ret = consumerList.remove(c);
 
-            if (consumerList.isEmpty()) callAll(onEmptyList);
-            return ret;
-        }
+        if (consumerList.isEmpty()) callAll(onEmptyList);
+        return ret;
     }
 
 
