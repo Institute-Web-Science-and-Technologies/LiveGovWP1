@@ -35,13 +35,13 @@ public class PipelineTest extends TestCase {
         final PipeHelper<String> helper = new PipeHelper<String>();
 
         // Set up constraints
-        helper.expect(a).atMost(3).toBeEqual();
-        helper.expect(b).exactly(3).toBeEqual();
-        helper.expect(c).atLeast(3).toBeEqual();
+        helper.expectFrom(a).atMost(3).toBeEqual();
+        helper.expectFrom(b).exactly(3).toBeEqual();
+        helper.expectFrom(c).atLeast(3).toBeEqual();
 
-        helper.expect(d).atMost(3).toBeIdentic();
-        helper.expect(e).exactly(3).toBeIdentic();
-        helper.expect(f).atLeast(3).toBeIdentic();
+        helper.expectFrom(d).atMost(3).toBeIdentic();
+        helper.expectFrom(e).exactly(3).toBeIdentic();
+        helper.expectFrom(f).atLeast(3).toBeIdentic();
 
         // Run abstract simulation
         helper.push(a);
@@ -80,7 +80,7 @@ public class PipelineTest extends TestCase {
         final PipeHelper<String> helper = new PipeHelper<String>();
 
         // Set up constraints
-        helper.expect("a").atLeast(1).toBeEqual();
+        helper.expectFrom("a").atLeast(1).toBeEqual();
 
         // Asset one specific error
         Assert.assertEquals(helper.errors(), Collections.singleton("a should be equal to at least 1 instance"));
@@ -95,9 +95,9 @@ public class PipelineTest extends TestCase {
         final PipeHelper<String> helper = new PipeHelper<String>();
 
         // Set expected result
-        helper.expect("ABC").exactly(0).toBeEqual();
-        helper.expect("CDE").exactly(1).toBeEqual();
-        helper.expect("DEF").exactly(1).toBeEqual();
+        helper.expectFrom("ABC").exactly(0).toBeEqual();
+        helper.expectFrom("CDE").exactly(1).toBeEqual();
+        helper.expectFrom("DEF").exactly(1).toBeEqual();
 
         // Create prefix filter, add filters and set helper as consumer
         final PrefixFilter filter = new PrefixFilter();

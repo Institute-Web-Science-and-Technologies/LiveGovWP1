@@ -2,8 +2,10 @@ package eu.liveandgov.wp1.sensor_collector.tests.utils;
 
 import junit.framework.Assert;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 import static eu.liveandgov.wp1.sensor_collector.tests.utils.StringHelper.*;
@@ -12,6 +14,7 @@ import static eu.liveandgov.wp1.sensor_collector.tests.utils.StringHelper.*;
  * Created by lukashaertel on 13.01.14.
  */
 public class PipeHelper<T> implements Consumer<T> {
+    public static final long SLOT_GRANULARITY = 10l;
 
     /**
      * Evaluator interface
@@ -26,6 +29,11 @@ public class PipeHelper<T> implements Consumer<T> {
          * Evaluates the object
          */
         public void receive(Object o);
+
+        /**
+         * Resets the evaluator
+         */
+        public void reset();
     }
 
     /**
@@ -51,6 +59,11 @@ public class PipeHelper<T> implements Consumer<T> {
             if (base == null ? o == null : base.equals(o)) {
                 matched++;
             }
+        }
+
+        @Override
+        public void reset() {
+            matched = 0;
         }
     }
 
@@ -78,10 +91,49 @@ public class PipeHelper<T> implements Consumer<T> {
                 matched++;
             }
         }
+
+        @Override
+        public void reset() {
+            matched = 0;
+        }
     }
 
     /**
-     * Closure for expect formulation
+     * Abstract evaluator for counting identic objects
+     */
+    private static abstract class AbstractCountingMatch implements Evaluate {
+        private final Object base;
+
+        private final Matcher matcher;
+
+        private int matched;
+
+        public AbstractCountingMatch(Object base, Matcher matcher) {
+            this.base = base;
+            this.matcher = matcher;
+
+            matched = 0;
+        }
+
+        protected int getMatched() {
+            return matched;
+        }
+
+        @Override
+        public void receive(Object o) {
+            if (matcher.isMatch(base, o)) {
+                matched++;
+            }
+        }
+
+        @Override
+        public void reset() {
+            matched = 0;
+        }
+    }
+
+    /**
+     * Closure for expectFrom formulation
      */
     public static interface ExpectClosure {
         /**
@@ -113,6 +165,11 @@ public class PipeHelper<T> implements Consumer<T> {
          * Expect the matches to be identic
          */
         public void toBeIdentic();
+
+        /**
+         * Expect the matches to return true as input for the matcher
+         */
+        public void toMatch(Matcher matcher);
     }
 
     /**
@@ -128,9 +185,9 @@ public class PipeHelper<T> implements Consumer<T> {
     }
 
     /**
-     * Starts a new expect formulation
+     * Starts a new expectFrom formulation
      */
-    public ExpectClosure expect(final Object o) {
+    public ExpectClosure expectFrom(final Object o) {
         return new ExpectClosure() {
             @Override
             public MatchClosure atLeast(final int n) {
@@ -151,6 +208,16 @@ public class PipeHelper<T> implements Consumer<T> {
                             @Override
                             public String error() {
                                 return getMatched() >= n ? null : (o + " should be identic to at least " + n + pl(" instance", n));
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void toMatch(final Matcher matcher) {
+                        evaluators.add(new AbstractCountingMatch(o, matcher) {
+                            @Override
+                            public String error() {
+                                return getMatched() >= n ? null : (o + " should match at least " + n + pl(" instance", n)) + " with " + matcher;
                             }
                         });
                     }
@@ -179,6 +246,16 @@ public class PipeHelper<T> implements Consumer<T> {
                             }
                         });
                     }
+
+                    @Override
+                    public void toMatch(final Matcher matcher) {
+                        evaluators.add(new AbstractCountingMatch(o, matcher) {
+                            @Override
+                            public String error() {
+                                return getMatched() == n ? null : (o + " should match exactly " + n + pl(" instance", n)) + " with " + matcher;
+                            }
+                        });
+                    }
                 };
             }
 
@@ -204,6 +281,16 @@ public class PipeHelper<T> implements Consumer<T> {
                             }
                         });
                     }
+
+                    @Override
+                    public void toMatch(final Matcher matcher) {
+                        evaluators.add(new AbstractCountingMatch(o, matcher) {
+                            @Override
+                            public String error() {
+                                return getMatched() <= n ? null : (o + " should match at most " + n + pl(" instance", n)) + " with " + matcher;
+                            }
+                        });
+                    }
                 };
             }
         };
@@ -213,6 +300,24 @@ public class PipeHelper<T> implements Consumer<T> {
     public void push(T o) {
         for (Evaluate e : evaluators) {
             e.receive(o);
+        }
+    }
+
+    /**
+     * Clears all constraints
+     */
+    public void clear() {
+        reset();
+
+        evaluators.clear();
+    }
+
+    /**
+     * Resets all contraints
+     */
+    public void reset() {
+        for (Evaluate e : evaluators) {
+            e.reset();
         }
     }
 
@@ -233,6 +338,39 @@ public class PipeHelper<T> implements Consumer<T> {
         for(String error : errors())
         {
             Assert.fail(error);
+        }
+    }
+
+    /**
+     * Assert that the status is valid at one of the slots in the given time
+     */
+    public void assertStatusIn(long time, TimeUnit unit)
+    {
+        // Setup timebase
+        final long millis = unit.toMillis(time);
+        final long failtime = System.currentTimeMillis() + millis;
+        final long sleeptime = millis / SLOT_GRANULARITY == 0 ? 1 : millis / SLOT_GRANULARITY;
+
+        // List of errors
+        Set<String> lastErrors;
+        while (!(lastErrors = errors()).isEmpty())
+        {
+            // If errors were obtained after the failtime
+            if(System.currentTimeMillis() >= failtime)
+            {
+                // Fail with them
+                for(String error : lastErrors)
+                {
+                    Assert.fail(error);
+                }
+            }
+
+            // Else wait and try to leave the loop afterwards
+            try {
+                Thread.sleep(sleeptime);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 }

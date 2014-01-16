@@ -1,6 +1,5 @@
 package eu.liveandgov.wp1.sensor_collector.tests;
 
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +18,8 @@ import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.persistence.FilePersistor;
 import eu.liveandgov.wp1.sensor_collector.persistence.ZipFilePersistor;
+import eu.liveandgov.wp1.sensor_collector.tests.utils.Matcher;
+import eu.liveandgov.wp1.sensor_collector.tests.utils.PipeHelper;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.*;
 import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.*;
@@ -77,8 +78,7 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
             Thread.currentThread().interrupt();
 
             throw new IllegalStateException(e);
-        }
-        finally {
+        } finally {
             // Unregister the receiver, clean stuff up
             getContext().unregisterReceiver(receiver);
         }
@@ -178,6 +178,110 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
 
         Assert.assertFalse(service.isRecording);
     }
+
+    /**
+     * Test if annotation is entered in the pipeline
+     */
+    public void testAnnotation() {
+        // Setup pipeline with expected regular expression
+        final PipeHelper<String> helper = new PipeHelper<String>();
+        helper.expectFrom("TAG,[^,]+,[^,]+,\"ANONYTATION\"").exactly(1).toMatch(Matcher.PATTERN_MATCHER);
+
+        // Initialize service, add the pipeline tester to the pipeline
+        final ServiceSensorControl service = initialize();
+        service.connectorThread.addConsumer(helper);
+
+        // Send recording enable intent
+        final Intent iaRecordingEnable = new Intent(getContext(), ServiceSensorControl.class);
+        iaRecordingEnable.setAction(ACTION_RECORDING_ENABLE);
+        startService(iaRecordingEnable);
+
+        Assert.assertTrue(service.isRecording);
+
+        // Send annotaion intent
+        final Intent iaAnnotate = new Intent(getContext(), ServiceSensorControl.class);
+        iaAnnotate.setAction(ACTION_ANNOTATE);
+        iaAnnotate.putExtra(FIELD_ANNOTATION, "ANONYTATION");
+        startService(iaAnnotate);
+
+        // Assert that the pipeline commutes the annotation, give it time! 1 Second is long (hehe)
+        helper.assertStatusIn(1L, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Test the status update flag
+     */
+    public void testSetId() throws TimeoutException {
+        final ServiceSensorControl service = initialize();
+
+        // Send recording enable intent
+        final Intent iaRecordingEnable = new Intent(getContext(), ServiceSensorControl.class);
+        iaRecordingEnable.setAction(ACTION_RECORDING_ENABLE);
+        startService(iaRecordingEnable);
+
+        // Set Id change request
+        final Intent iaSetId = new Intent(getContext(), ServiceSensorControl.class);
+        iaSetId.setAction(ACTION_SET_ID);
+        iaSetId.putExtra(FIELD_USER_ID, "ANONYMOUSE");
+        startService(iaSetId);
+
+        // Get status intent
+        final Intent iaGetStatus = new Intent(getContext(), ServiceSensorControl.class);
+        iaGetStatus.setAction(ACTION_GET_STATUS);
+
+        // Ping pong stuff to app and back to the test case
+        final Intent resultIntent = pingPong(iaGetStatus, new IntentFilter(RETURN_STATUS), 1000L);
+
+        // Assert correct user identity
+        Assert.assertEquals(resultIntent.getStringExtra(FIELD_USER_ID), "ANONYMOUSE");
+
+        // Send recording disable intent
+        final Intent iaRecordingDisable = new Intent(getContext(), ServiceSensorControl.class);
+        iaRecordingDisable.setAction(RECORDING_DISABLE);
+        startService(iaRecordingDisable);
+    }
+
+    public void testHAR(){
+        // Setup pipeline with always matcher
+        final PipeHelper<String> helper = new PipeHelper<String>();
+
+        // Initialize service, set the pipeline tester as the HAR
+        final ServiceSensorControl service = initialize();
+        service.harPipeline = helper;
+
+        // Send recording enable intent
+        final Intent iaRecordingEnable = new Intent(getContext(), ServiceSensorControl.class);
+        iaRecordingEnable.setAction(ACTION_RECORDING_ENABLE);
+        startService(iaRecordingEnable);
+
+        // Start HAR
+        final Intent iaStartHAR = new Intent(getContext(), ServiceSensorControl.class);
+        iaStartHAR.setAction(ACTION_START_HAR);
+        startService(iaStartHAR);
+
+        // Setup helper, push some stuff, don't care for format, then assert stuff reaches HAR
+        helper.expectFrom(null).atLeast(1).toMatch(Matcher.ALWAYS);
+        service.sensorQueue.push("NOT EMPTY");
+        helper.assertStatusIn(1L, TimeUnit.SECONDS);
+
+        // Stop HAR
+        final Intent iaStopHAR = new Intent(getContext(), ServiceSensorControl.class);
+        iaStopHAR.setAction(ACTION_STOP_HAR);
+        startService(iaStopHAR);
+
+        // Update helper, push more stuff, still don't care for format, assert stuff does not reach
+        // HAR
+        helper.clear();
+        helper.expectFrom(null).exactly(0).toMatch(Matcher.ALWAYS);
+        service.sensorQueue.push("NOT EMPTY");
+        helper.assertStatusIn(1L, TimeUnit.SECONDS);
+
+        // Send recording disable intent
+        final Intent iaRecordingDisable = new Intent(getContext(), ServiceSensorControl.class);
+        iaRecordingDisable.setAction(RECORDING_DISABLE);
+        startService(iaRecordingDisable);
+    }
+
 
     /**
      * Test if a regular file persistor reports empty if empty
