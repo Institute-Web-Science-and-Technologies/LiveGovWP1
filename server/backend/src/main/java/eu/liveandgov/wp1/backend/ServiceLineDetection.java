@@ -75,7 +75,7 @@ public class ServiceLineDetection extends HttpServlet {
 		long startTs = System.currentTimeMillis();
 		JSONObject logJSON = new JSONObject();
 		
-		// check it user is valid
+		// check if user is valid
 		if(!isUsernameValid(request)){
 			PrintWriter out = response.getWriter();
 			String error = "{\"error\":\"username required\"}";
@@ -129,12 +129,15 @@ public class ServiceLineDetection extends HttpServlet {
 			response.setContentType("application/json");
 			PrintWriter out = response.getWriter();
 			out.println(responseJSON.toString());
-			logJSON.put("username",request.getHeader("username"));
-			logJSON.put("response",responseJSON);
+			
+			String username = request.getHeader("username");
+			logJSON.put("username",username);
+			
+			if(!username.equals("test_user")){
+				logJSON.put("response",responseJSON);
+			}
 			logJSON.put("responseTime", System.currentTimeMillis()-startTs);
 			mLogger.info(logJSON.toString());
-			
-			//ZMQ.context();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
