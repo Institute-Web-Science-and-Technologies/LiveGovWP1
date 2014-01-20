@@ -24,7 +24,6 @@ import eu.liveandgov.wp1.sensor_collector.persistence.PublicationPipeline;
 import eu.liveandgov.wp1.sensor_collector.persistence.ZipFilePersistor;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorSerializer;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorThread;
-import eu.liveandgov.wp1.sensor_collector.streaming.ZmqStreamer;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferManager;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferThreadPost;
 
@@ -56,7 +55,6 @@ public class ServiceSensorControl extends Service {
     // SENSOR CONSUMERS
     public Persistor persistor;
     public PublicationPipeline publisher;
-    public Consumer<String> streamer;
     public Consumer<String> harPipeline;
     public GpsCache gpsCache;
 
@@ -85,7 +83,6 @@ public class ServiceSensorControl extends Service {
         File stageFile    = new File(getFilesDir(), STAGE_FILENAME);
 
         // Init sensor consumers
-        streamer = new ZmqStreamer();
         harPipeline = new HarAdapter();
         gpsCache    = new GpsCache();
         persistor   = ZIPPED_PERSISTOR ?
@@ -177,10 +174,6 @@ public class ServiceSensorControl extends Service {
             doStartHAR();
         } else if (action.equals(IntentAPI.ACTION_STOP_HAR)) {
             doStopHAR();
-        } else if (action.equals(ExtendedIntentAPI.START_STREAMING)) {
-            doStartStreaming();
-        } else if (action.equals(ExtendedIntentAPI.STOP_STREAMING)) {
-            doStopStreaming();
         } else if (action.equals(IntentAPI.ACTION_SET_ID)) {
             doSetId(intent.getStringExtra(IntentAPI.FIELD_USER_ID));
         } else if (action.equals(ExtendedIntentAPI.ACTION_GET_GPS)) {
@@ -208,16 +201,6 @@ public class ServiceSensorControl extends Service {
     private void doStartHAR() {
         isHAR = true;
         connectorThread.addConsumer(harPipeline);
-    }
-
-    private void doStopStreaming() {
-        isStreaming = false;
-        connectorThread.removeConsumer(streamer);
-    }
-
-    private void doStartStreaming() {
-        isStreaming = true;
-        connectorThread.addConsumer(streamer);
     }
 
     private void doSetId(String id) {
