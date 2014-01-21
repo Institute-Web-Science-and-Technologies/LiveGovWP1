@@ -21,7 +21,7 @@ done
 echo "Merging files..."
 
 # merge files
-`pr -m -t -s, ${TEMP_FILES[0]} ${TEMP_FILES[1]} ${TEMP_FILES[2]} | awk -F, 'BEGIN {ts=1386680000000}; {printf "UCI_HAR,%u,%g,%g,%g\n",ts,$1,$2,$3; ts+=20}' > out.csv`
+`pr -m -t -s, ${TEMP_FILES[0]} ${TEMP_FILES[1]} ${TEMP_FILES[2]} | awk -F, 'BEGIN {ts=1386680000000}; {printf "UCI_HAR,%s,%g,%g,%g\n",ts,$1,$2,$3; ts+=20}' > out.csv`
 
 echo "Cleanup..."
 
