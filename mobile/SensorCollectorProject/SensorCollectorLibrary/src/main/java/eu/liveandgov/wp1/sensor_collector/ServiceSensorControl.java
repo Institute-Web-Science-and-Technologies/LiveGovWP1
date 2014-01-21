@@ -337,7 +337,7 @@ public class ServiceSensorControl extends Service {
     //Access to the service by an activity
     private final IBinder mBinder = new LocalBinder();
     //Callbacks for transfering status (success/failure)
-    private SensorServiceListener listener;
+    private SensorServiceListener listener = SensorServiceListener.NULL_LISTENER;
     //Used to receive the gps entries for the current route of the user
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
 
@@ -358,11 +358,25 @@ public class ServiceSensorControl extends Service {
     //Callback for deleting samples
     public interface SensorServiceListener
     {
+        public static final SensorServiceListener NULL_LISTENER = new SensorServiceListener() {
+            @Override
+            public void onDeletionCompleted() {
+
+            }
+        };
+
         public void onDeletionCompleted();
     }
     //Callback for transfer
     public interface TransferListener
     {
+        public static final TransferListener NULL_LISTENER = new TransferListener() {
+            @Override
+            public void onTransferCompleted(boolean success) {
+
+            }
+        };
+
         public void onTransferCompleted(boolean success);
     }
     //When gpsData is received (for current route of the user)
