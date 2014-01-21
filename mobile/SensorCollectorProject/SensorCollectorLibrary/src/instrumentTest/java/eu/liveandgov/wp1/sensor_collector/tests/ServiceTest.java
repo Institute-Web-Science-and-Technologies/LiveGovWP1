@@ -99,20 +99,6 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
 
         Assert.assertTrue(service.isRecording);
 
-        // Start streaming
-        final Intent iaStartStreaming = new Intent(getContext(), ServiceSensorControl.class);
-        iaStartStreaming.setAction(START_STREAMING);
-        startService(iaStartStreaming);
-
-        Assert.assertTrue(service.isStreaming);
-
-        // Stop streaming
-        final Intent iaStopStreaming = new Intent(getContext(), ServiceSensorControl.class);
-        iaStopStreaming.setAction(STOP_STREAMING);
-        startService(iaStopStreaming);
-
-        Assert.assertFalse(service.isStreaming);
-
         // Send recording disable intent
         final Intent iaRecordingDisable = new Intent(getContext(), ServiceSensorControl.class);
         iaRecordingDisable.setAction(RECORDING_DISABLE);
