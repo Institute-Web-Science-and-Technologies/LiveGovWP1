@@ -1,8 +1,19 @@
-package eu.liveandgov.wp1.sensor_collector.pps.gi;
+package eu.liveandgov.wp1.sensor_collector.pps.api.gi;
 
-public class Field implements Comparable<Field> {
+import java.io.Serializable;
+
+/**
+ * Two-dimensional, serializable and comparable index
+ */
+public class Field implements Comparable<Field>, Serializable {
+    /**
+     * Index in the horizontal dimension
+     */
     public final long x;
 
+    /**
+     * Index in the vertical dimension
+     */
     public final long y;
 
     public Field(long x, long y) {

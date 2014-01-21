@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.sensor_collector.pps.ooapi;
+package eu.liveandgov.wp1.sensor_collector.pps.api.ooapi;
 
 /**
  * Openstreetmaps Indexed Platform Proximity Service
@@ -8,8 +8,8 @@ package eu.liveandgov.wp1.sensor_collector.pps.ooapi;
 public class OSMIPPS extends OSMIPS {
     private final double distance;
 
-    public OSMIPPS(double horizontalResultion, double verticalResulution, int storeDegree, String baseURL, double distance) {
-        super(horizontalResultion, verticalResulution, storeDegree, baseURL);
+    public OSMIPPS(double horizontalResultion, double verticalResulution, boolean byCentroid, int storeDegree, String baseURL, double distance) {
+        super(horizontalResultion, verticalResulution, byCentroid, storeDegree, baseURL);
         this.distance = distance;
     }
 

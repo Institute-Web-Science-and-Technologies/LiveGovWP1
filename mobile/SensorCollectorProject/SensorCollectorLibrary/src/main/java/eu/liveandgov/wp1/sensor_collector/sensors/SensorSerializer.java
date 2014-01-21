@@ -20,6 +20,9 @@ import java.util.Locale;
 
 import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
+import eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat;
+import eu.liveandgov.wp1.sensor_collector.pps.ProximityEvent;
+import eu.liveandgov.wp1.sensor_collector.pps.api.Proximity;
 import eu.liveandgov.wp1.sensor_collector.sensors.sensor_producers.TelephonyHolder;
 import eu.liveandgov.wp1.sensor_collector.sensors.sensor_value_objects.GpsSensorValue;
 
@@ -33,6 +36,7 @@ import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF
 import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_GYROSCOPE;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_LINEAR_ACCELERATION;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_MAGNETOMETER;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_PPROXIMITY;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_ROTATION;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_TAG;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_WIFI;
@@ -239,6 +243,25 @@ public class SensorSerializer {
         }
     };
 
+    public static final Conversion<ProximityEvent> proximityEvent = new Conversion<ProximityEvent>() {
+        @Override
+        public String toSSF(long timestamp, String device, ProximityEvent proximityEvent) {
+            return objects.toSSF(SSF_PPROXIMITY, proximityEvent.time, device, new Object[]{proximityEvent.key, getName(proximityEvent.proximity)});
+        }
+
+        private String getName(Proximity proximity) {
+            switch (proximity) {
+                case IN_PROXIMITY:
+                    return "IN_PROXIMITY";
+                case NO_DECISION:
+                    return "UNKNOWN";
+                case NOT_IN_PROXIMITY:
+                    return "NOT_IN_PROXIMITY";
+            }
+
+            throw new IllegalArgumentException();
+        }
+    };
 
     /**
      * Converts a sensor eventx into the SSF format

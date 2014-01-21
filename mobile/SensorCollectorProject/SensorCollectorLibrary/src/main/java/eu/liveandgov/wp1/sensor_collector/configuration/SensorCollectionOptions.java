@@ -40,7 +40,6 @@ public class SensorCollectionOptions {
     public static final boolean ASK_BLT = false;
     public static final boolean ASK_WIFI = false;
 
-
     /**
      * Record Activity using the new Google Activity API
      */

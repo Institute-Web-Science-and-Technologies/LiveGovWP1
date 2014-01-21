@@ -1,5 +1,6 @@
-package eu.liveandgov.wp1.sensor_collector.pps;
+package eu.liveandgov.wp1.sensor_collector.pps.api;
 
+import java.security.spec.PSSParameterSpec;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,6 +28,17 @@ public class AggregatingPS implements ProximityService {
             result = s.calculate(lon, lat);
 
             if (result != Proximity.NO_DECISION) break;
+        }
+
+        return result;
+    }
+
+    public static AggregatingPS create(ProximityService... from)
+    {
+        final AggregatingPS result = new AggregatingPS();
+        for(ProximityService f : from)
+        {
+            result.getProximityServices().add(f);
         }
 
         return result;

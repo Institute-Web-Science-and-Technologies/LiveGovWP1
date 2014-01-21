@@ -1,18 +1,15 @@
-package eu.liveandgov.wp1.sensor_collector.pps.ooapi;
+package eu.liveandgov.wp1.sensor_collector.pps.api.ooapi;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
-import eu.liveandgov.wp1.sensor_collector.pps.Proximity;
-import eu.liveandgov.wp1.sensor_collector.pps.gi.GridIndexPS;
+import eu.liveandgov.wp1.sensor_collector.pps.api.Proximity;
+import eu.liveandgov.wp1.sensor_collector.pps.api.gi.GridIndexPS;
 
 
 /**
@@ -23,8 +20,8 @@ import eu.liveandgov.wp1.sensor_collector.pps.gi.GridIndexPS;
 public abstract class OSMIPS extends GridIndexPS {
     private String baseURL;
 
-    public OSMIPS(double horizontalResultion, double verticalResulution, int storeDegree, String baseURL) {
-        super(horizontalResultion, verticalResulution, storeDegree);
+    public OSMIPS(double horizontalResultion, double verticalResulution, boolean byCentroid, int storeDegree, String baseURL) {
+        super(horizontalResultion, verticalResulution, byCentroid, storeDegree);
         this.baseURL = baseURL;
 
         if (!this.baseURL.endsWith("/")) {

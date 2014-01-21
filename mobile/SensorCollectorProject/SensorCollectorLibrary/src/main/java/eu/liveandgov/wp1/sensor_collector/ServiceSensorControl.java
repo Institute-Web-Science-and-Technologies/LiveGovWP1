@@ -13,15 +13,19 @@ import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 import eu.liveandgov.wp1.sensor_collector.activity_recognition.HarAdapter;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
+import eu.liveandgov.wp1.sensor_collector.configuration.PPSOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.implementations.ConnectorThread;
 import eu.liveandgov.wp1.sensor_collector.connectors.implementations.GpsCache;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.LinkedSensorQueue;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.wp1.sensor_collector.monitor.MonitorThread;
+import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
 import eu.liveandgov.wp1.sensor_collector.persistence.FilePersistor;
 import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
 import eu.liveandgov.wp1.sensor_collector.persistence.PublicationPipeline;
 import eu.liveandgov.wp1.sensor_collector.persistence.ZipFilePersistor;
+import eu.liveandgov.wp1.sensor_collector.pps.PPSAdapter;
+import eu.liveandgov.wp1.sensor_collector.pps.api.ooapi.OSMIPPS;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorSerializer;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorThread;
 import eu.liveandgov.wp1.sensor_collector.streaming.ZmqStreamer;
@@ -53,11 +57,15 @@ public class ServiceSensorControl extends Service {
     // Need to put initialization to onCreate, since FilesDir, etc. is not available
     // from a static context.
 
+    // INDICES
+    public OSMIPPS osmipps;
+
     // SENSOR CONSUMERS
     public Persistor persistor;
     public PublicationPipeline publisher;
     public Consumer<String> streamer;
     public Consumer<String> harPipeline;
+    public Consumer<String> ppsPipeline;
     public GpsCache gpsCache;
 
     // THREADS
@@ -84,9 +92,20 @@ public class ServiceSensorControl extends Service {
         File sensorFile   = new File(getFilesDir(), SENSOR_FILENAME);
         File stageFile    = new File(getFilesDir(), STAGE_FILENAME);
 
+        // Init index
+        osmipps = new OSMIPPS(
+                PPSOptions.INDEX_HORIZONTAL_RESOLUTION,
+                PPSOptions.INDEX_VERTICAL_RESOLUTION,
+                PPSOptions.INDEX_BY_CENTROID,
+                PPSOptions.INDEX_STORE_DEGREE,
+                PPSOptions.OSMIPPS_BASE_URL,
+                PPSOptions.PROXIMITY);
+        osmipps.tryLoad(new File(getFilesDir(), PPSOptions.INDEX_FILE));
+
         // Init sensor consumers
         streamer = new ZmqStreamer();
         harPipeline = new HarAdapter();
+        ppsPipeline = new PPSAdapter("platform", osmipps);
         gpsCache    = new GpsCache();
         persistor   = ZIPPED_PERSISTOR ?
                 new ZipFilePersistor(sensorFile):
@@ -122,6 +141,7 @@ public class ServiceSensorControl extends Service {
         monitorThread.registerMonitorable(persistor, "Persitor");
         monitorThread.registerMonitorable(transferManager, "Transfer");
         monitorThread.registerMonitorable(sensorQueue, "Queue");
+        monitorThread.registerMonitorable((Monitorable)ppsPipeline, "PPS");
 
         // Start threads
         connectorThread.start();
@@ -132,6 +152,8 @@ public class ServiceSensorControl extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        osmipps.trySave(new File(getFilesDir(), PPSOptions.INDEX_FILE));
 
         persistor.close();
     }
@@ -203,10 +225,12 @@ public class ServiceSensorControl extends Service {
     private void doStopHAR() {
         isHAR = false;
         connectorThread.removeConsumer(harPipeline);
+        connectorThread.removeConsumer(ppsPipeline);
     }
 
     private void doStartHAR() {
         isHAR = true;
+        connectorThread.addConsumer(ppsPipeline);
         connectorThread.addConsumer(harPipeline);
     }
 

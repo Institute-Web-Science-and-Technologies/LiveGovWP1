@@ -1,11 +1,9 @@
 package eu.liveandgov.wp1.sensor_collector.tests;
 
-import static junit.framework.Assert.*;
-
 import junit.framework.TestCase;
 
-import eu.liveandgov.wp1.sensor_collector.pps.Proximity;
-import eu.liveandgov.wp1.sensor_collector.pps.ooapi.OSMIPPS;
+import eu.liveandgov.wp1.sensor_collector.pps.api.Proximity;
+import eu.liveandgov.wp1.sensor_collector.pps.api.ooapi.OSMIPPS;
 
 public class OOAPITest extends TestCase {
     private static final double[][] POSITIVE = {{50.343062, 7.587613}, {50.34514, 7.588736}, {50.350108, 7.590339}, {50.358634, 7.595564}, {50.340566, 7.592065}};
@@ -15,7 +13,7 @@ public class OOAPITest extends TestCase {
     public void testOSMIPPS() {
         double dia = 25.0;
 
-        OSMIPPS ips = new OSMIPPS(dia / 111132.954, dia / 111132.954, 2048, "http://overpass.osm.rambler.ru/cgi/", dia);
+        OSMIPPS ips = new OSMIPPS(dia / 111132.954, dia / 111132.954, true, 2048, "http://overpass.osm.rambler.ru/cgi/", dia);
 
         // Positive count/true positive
         final int pc = POSITIVE.length;
