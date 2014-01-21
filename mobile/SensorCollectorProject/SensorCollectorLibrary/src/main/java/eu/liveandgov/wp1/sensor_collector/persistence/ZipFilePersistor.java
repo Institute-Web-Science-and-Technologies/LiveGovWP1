@@ -92,6 +92,7 @@ public class ZipFilePersistor implements Persistor {
         // Deleted, the valid length is now zero
         logFile.delete();
         putValidLength(0);
+        sampleCount = 0;
 
         if(wasOpen) {
             // We can override here because we do in fact want to delete the samples
