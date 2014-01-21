@@ -39,7 +39,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
     private File stageFile;
     //Used to get callback if transfer completed successfully or not
-    public ServiceSensorControl.TransferListener listener;
+    public ServiceSensorControl.TransferListener listener = ServiceSensorControl.TransferListener.NULL_LISTENER;
 
     public TransferThreadPost(Persistor persistor, File stageFile) {
         this.stageFile = stageFile;
