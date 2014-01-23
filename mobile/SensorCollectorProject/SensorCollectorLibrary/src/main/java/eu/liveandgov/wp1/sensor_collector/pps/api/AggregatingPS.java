@@ -24,20 +24,24 @@ public class AggregatingPS implements ProximityService {
     public Proximity calculate(double lon, double lat) {
         Proximity result = Proximity.NO_DECISION;
 
+        search:
         for (ProximityService s : proximityServices) {
             result = s.calculate(lon, lat);
 
-            if (result != Proximity.NO_DECISION) break;
+            switch (result) {
+                case IN_PROXIMITY:
+                case NOT_IN_PROXIMITY:
+                    // Do not continue after full positive and full negative
+                    break search;
+            }
         }
 
         return result;
     }
 
-    public static AggregatingPS create(ProximityService... from)
-    {
+    public static AggregatingPS create(ProximityService... from) {
         final AggregatingPS result = new AggregatingPS();
-        for(ProximityService f : from)
-        {
+        for (ProximityService f : from) {
             result.getProximityServices().add(f);
         }
 

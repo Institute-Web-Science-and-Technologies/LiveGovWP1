@@ -1,5 +1,7 @@
 package eu.liveandgov.wp1.sensor_collector.pps.api.ooapi;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -18,6 +20,8 @@ import eu.liveandgov.wp1.sensor_collector.pps.api.gi.GridIndexPS;
  * @author lukashaertel
  */
 public abstract class OSMIPS extends GridIndexPS {
+    private final static String LOG_TAG = "OIPS";
+
     private String baseURL;
 
     public OSMIPS(double horizontalResultion, double verticalResulution, boolean byCentroid, int storeDegree, String baseURL) {
@@ -69,11 +73,13 @@ public abstract class OSMIPS extends GridIndexPS {
             // Return result
             return result ? Proximity.IN_PROXIMITY : Proximity.NOT_IN_PROXIMITY;
         } catch (IOException e) {
-            // On exception, set no decision as result
-            return Proximity.NO_DECISION;
+            Log.e(LOG_TAG, "Error in calculation of proximity", e);
+            // On exception, set error as result
+            return Proximity.ERROR;
         } catch (JSONException e) {
-            // On exception, set no decision as result
-            return Proximity.NO_DECISION;
+            Log.e(LOG_TAG, "Error in calculation of proximity", e);
+            // On exception, set error as result
+            return Proximity.ERROR;
         }
     }
 

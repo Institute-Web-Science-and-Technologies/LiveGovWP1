@@ -25,6 +25,8 @@ import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
 import eu.liveandgov.wp1.sensor_collector.persistence.PublicationPipeline;
 import eu.liveandgov.wp1.sensor_collector.persistence.ZipFilePersistor;
 import eu.liveandgov.wp1.sensor_collector.pps.PPSAdapter;
+import eu.liveandgov.wp1.sensor_collector.pps.api.AggregatingPS;
+import eu.liveandgov.wp1.sensor_collector.pps.api.helsinki.HelsinkiIPPS;
 import eu.liveandgov.wp1.sensor_collector.pps.api.ooapi.OSMIPPS;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorSerializer;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorThread;
@@ -58,7 +60,9 @@ public class ServiceSensorControl extends Service {
     // from a static context.
 
     // INDICES
-    public OSMIPPS osmipps;
+    public HelsinkiIPPS helsinkiIPPS;
+    public OSMIPPS osmIPPS;
+    public AggregatingPS aggregatorPS;
 
     // SENSOR CONSUMERS
     public Persistor persistor;
@@ -93,19 +97,31 @@ public class ServiceSensorControl extends Service {
         File stageFile    = new File(getFilesDir(), STAGE_FILENAME);
 
         // Init index
-        osmipps = new OSMIPPS(
+        helsinkiIPPS = new HelsinkiIPPS(
+                PPSOptions.INDEX_HORIZONTAL_RESOLUTION,
+                PPSOptions.INDEX_VERTICAL_RESOLUTION,
+                PPSOptions.INDEX_BY_CENTROID,
+                PPSOptions.INDEX_STORE_DEGREE,
+                this,
+                PPSOptions.HELSINKIIPPS_ASSET,
+                PPSOptions.PROXIMITY);
+
+        osmIPPS = new OSMIPPS(
                 PPSOptions.INDEX_HORIZONTAL_RESOLUTION,
                 PPSOptions.INDEX_VERTICAL_RESOLUTION,
                 PPSOptions.INDEX_BY_CENTROID,
                 PPSOptions.INDEX_STORE_DEGREE,
                 PPSOptions.OSMIPPS_BASE_URL,
                 PPSOptions.PROXIMITY);
-        osmipps.tryLoad(new File(getFilesDir(), PPSOptions.INDEX_FILE));
+
+        aggregatorPS = new AggregatingPS();
+        aggregatorPS.getProximityServices().add(helsinkiIPPS);
+        aggregatorPS.getProximityServices().add(osmIPPS);
 
         // Init sensor consumers
         streamer = new ZmqStreamer();
         harPipeline = new HarAdapter();
-        ppsPipeline = new PPSAdapter("platform", osmipps);
+        ppsPipeline = new PPSAdapter("platform", aggregatorPS);
         gpsCache    = new GpsCache();
         persistor   = ZIPPED_PERSISTOR ?
                 new ZipFilePersistor(sensorFile):
@@ -151,11 +167,9 @@ public class ServiceSensorControl extends Service {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-
-        osmipps.trySave(new File(getFilesDir(), PPSOptions.INDEX_FILE));
-
         persistor.close();
+
+        super.onDestroy();
     }
 
     @Override
@@ -223,12 +237,20 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doStopHAR() {
-        isHAR = false;
         connectorThread.removeConsumer(harPipeline);
         connectorThread.removeConsumer(ppsPipeline);
+
+        isHAR = false;
+
+        helsinkiIPPS.trySave(new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE));
+        osmIPPS.trySave(new File(getFilesDir(), PPSOptions.OSMIPPS_INDEX_FILE));
+
     }
 
     private void doStartHAR() {
+        helsinkiIPPS.tryLoad(new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE));
+        osmIPPS.tryLoad(new File(getFilesDir(), PPSOptions.OSMIPPS_INDEX_FILE));
+
         isHAR = true;
         connectorThread.addConsumer(ppsPipeline);
         connectorThread.addConsumer(harPipeline);

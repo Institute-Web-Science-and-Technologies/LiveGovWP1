@@ -106,8 +106,7 @@ public abstract class GridIndexPS implements ProximityService {
         fileInputStream.close();
     }
 
-    public void tryLoad(File file)
-    {
+    public void tryLoad(File file) {
         try {
             load(file);
         } catch (IOException e) {
@@ -161,9 +160,12 @@ public abstract class GridIndexPS implements ProximityService {
 
         Proximity result = calculated.get(at);
         if (result == null) {
-            calculated.put(at, result = calculateContains(lon, lat));
+            result = calculateContains(lon, lat);
+            if (result != Proximity.ERROR) {
+                calculated.put(at, result);
 
-            assertStoreDegree();
+                assertStoreDegree();
+            }
         }
 
         return result;

@@ -16,11 +16,14 @@ import com.google.android.gms.location.DetectedActivity;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
-import eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat;
 import eu.liveandgov.wp1.sensor_collector.pps.ProximityEvent;
 import eu.liveandgov.wp1.sensor_collector.pps.api.Proximity;
 import eu.liveandgov.wp1.sensor_collector.sensors.sensor_producers.TelephonyHolder;
@@ -47,6 +50,57 @@ import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF
  * Created by hartmann on 9/15/13.
  */
 public class SensorSerializer {
+    private static final Pattern manyNotComma = Pattern.compile("[^,]*");
+    private static final Pattern comma = Pattern.compile(",");
+
+    public static final class SSE<T> {
+        public final String type;
+        public final long timestamp;
+        public final String device;
+        public final T data;
+
+        public SSE(String type, long timestamp, String device, T data) {
+            this.type = type;
+            this.timestamp = timestamp;
+            this.device = device;
+            this.data = data;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            SSE<?> parse = (SSE<?>) o;
+
+            if (timestamp != parse.timestamp) return false;
+            if (data != null ? !data.equals(parse.data) : parse.data != null) return false;
+            if (device != null ? !device.equals(parse.device) : parse.device != null) return false;
+            if (type != null ? !type.equals(parse.type) : parse.type != null) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = type != null ? type.hashCode() : 0;
+            result = 31 * result + (int) (timestamp ^ (timestamp >>> 32));
+            result = 31 * result + (device != null ? device.hashCode() : 0);
+            result = 31 * result + (data != null ? data.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "Parse{" +
+                    "type='" + type + '\'' +
+                    ", timestamp=" + timestamp +
+                    ", device='" + device + '\'' +
+                    ", data=" + data +
+                    '}';
+        }
+    }
+
     /**
      * Baseclass for SSF conversion helpers
      */
@@ -61,6 +115,10 @@ public class SensorSerializer {
          */
         public String toSSFDefault(String type, T t) {
             return toSSF(type, System.currentTimeMillis(), GlobalContext.getUserId(), t);
+        }
+
+        public SSE<T> fromSSF(String ssf) {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -78,6 +136,10 @@ public class SensorSerializer {
          */
         public String toSSFDefault(T t) {
             return toSSF(System.currentTimeMillis(), GlobalContext.getUserId(), t);
+        }
+
+        public SSE<T> fromSSF(String ssf) {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -133,6 +195,15 @@ public class SensorSerializer {
     }
 
     /**
+     * Escapes a string and puts it into quotes
+     */
+    private static String unescape(String s) {
+        assert s.length() > 2;
+
+        return StringEscapeUtils.unescapeCsv(s.substring(1, s.length() - 2));
+    }
+
+    /**
      * Creates a string builder and initializes it with the default pattern
      */
     private static StringBuilder createHead(String type, long timestamp, String device) {
@@ -161,6 +232,21 @@ public class SensorSerializer {
             // Return result
             return builder.toString();
         }
+
+        @Override
+        public SSE<String> fromSSF(String ssf) {
+            final Scanner scanner = new Scanner(ssf);
+
+            final String type = scanner.next(manyNotComma).trim();
+            scanner.skip(comma);
+            final long timestamp = Long.valueOf(scanner.next(manyNotComma));
+            scanner.skip(comma);
+            final String device = scanner.next(manyNotComma).trim();
+            scanner.skip(comma);
+            final String value = scanner.nextLine();
+
+            return new SSE<String>(type, timestamp, device, value);
+        }
     };
 
     /**
@@ -171,6 +257,21 @@ public class SensorSerializer {
         public String toSSF(String type, long timestamp, String device, String s) {
             // Escape and redelegate
             return escapedString.toSSF(type, timestamp, device, escape(s));
+        }
+
+        @Override
+        public SSE<String> fromSSF(String ssf) {
+            final Scanner scanner = new Scanner(ssf);
+
+            final String type = scanner.next(manyNotComma).trim();
+            scanner.skip(comma);
+            final long timestamp = Long.valueOf(scanner.next(manyNotComma));
+            scanner.skip(comma);
+            final String device = scanner.next(manyNotComma).trim();
+            scanner.skip(comma);
+            final String value = unescape(scanner.nextLine());
+
+            return new SSE<String>(type, timestamp, device, value);
         }
     };
 
@@ -195,6 +296,30 @@ public class SensorSerializer {
 
             return builder.toString();
         }
+
+        @Override
+        public SSE<float[]> fromSSF(String ssf) {
+            final Scanner scanner = new Scanner(ssf);
+
+            final String type = scanner.next(manyNotComma).trim();
+            scanner.skip(comma);
+            final long timestamp = Long.valueOf(scanner.next(manyNotComma));
+            scanner.skip(comma);
+            final String device = scanner.next(manyNotComma).trim();
+            scanner.skip(comma);
+
+            final List<Float> buffer = new ArrayList<Float>();
+            while (scanner.hasNextFloat()) {
+                buffer.add(scanner.nextFloat());
+            }
+
+            final float[] value = new float[buffer.size()];
+            for (int i = 0; i < buffer.size(); i++) {
+                value[i] = buffer.get(i);
+            }
+
+            return new SSE<float[]>(type, timestamp, device, value);
+        }
     };
 
     /**
@@ -217,6 +342,30 @@ public class SensorSerializer {
             }
 
             return builder.toString();
+        }
+
+        @Override
+        public SSE<double[]> fromSSF(String ssf) {
+            final Scanner scanner = new Scanner(ssf);
+
+            final String type = scanner.next(manyNotComma).trim();
+            scanner.skip(comma);
+            final long timestamp = Long.valueOf(scanner.next(manyNotComma));
+            scanner.skip(comma);
+            final String device = scanner.next(manyNotComma).trim();
+            scanner.skip(comma);
+
+            final List<Double> buffer = new ArrayList<Double>();
+            while (scanner.hasNextDouble()) {
+                buffer.add(scanner.nextDouble());
+            }
+
+            final double[] value = new double[buffer.size()];
+            for (int i = 0; i < buffer.size(); i++) {
+                value[i] = buffer.get(i);
+            }
+
+            return new SSE<double[]>(type, timestamp, device, value);
         }
     };
 
@@ -246,20 +395,24 @@ public class SensorSerializer {
     public static final Conversion<ProximityEvent> proximityEvent = new Conversion<ProximityEvent>() {
         @Override
         public String toSSF(long timestamp, String device, ProximityEvent proximityEvent) {
-            return objects.toSSF(SSF_PPROXIMITY, proximityEvent.time, device, new Object[]{proximityEvent.key, getName(proximityEvent.proximity)});
+            return objects.toSSF(SSF_PPROXIMITY, proximityEvent.time, device, new Object[]{proximityEvent.key, proximityEvent.proximity});
         }
 
-        private String getName(Proximity proximity) {
-            switch (proximity) {
-                case IN_PROXIMITY:
-                    return "IN_PROXIMITY";
-                case NO_DECISION:
-                    return "UNKNOWN";
-                case NOT_IN_PROXIMITY:
-                    return "NOT_IN_PROXIMITY";
-            }
+        @Override
+        public SSE<ProximityEvent> fromSSF(String ssf) {
+            final Scanner scanner = new Scanner(ssf);
 
-            throw new IllegalArgumentException();
+            final String type = scanner.next(manyNotComma).trim();
+            scanner.skip(comma);
+            final long timestamp = Long.valueOf(scanner.next(manyNotComma));
+            scanner.skip(comma);
+            final String device = scanner.next(manyNotComma).trim();
+            scanner.skip(comma);
+
+            final String key = scanner.next().trim();
+            final Proximity proximity = Proximity.valueOf(scanner.next());
+
+            return new SSE<ProximityEvent>(type, timestamp, device, new ProximityEvent(timestamp, key, proximity));
         }
     };
 
