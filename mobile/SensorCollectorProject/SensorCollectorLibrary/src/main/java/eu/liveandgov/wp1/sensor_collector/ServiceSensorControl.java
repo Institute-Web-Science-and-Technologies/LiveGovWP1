@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.sensor_collector;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -41,7 +42,7 @@ import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionO
 
 public class ServiceSensorControl extends Service {
     // CONSTANTS
-    static final String LOG_TAG =  "SCS";
+    static final String LOG_TAG = "SCS";
     public static final String SENSOR_FILENAME = "sensor.ssf";
     public static final String STAGE_FILENAME = "sensor.stage.ssf";
 
@@ -88,21 +89,21 @@ public class ServiceSensorControl extends Service {
 
         // INITIALIZATIONS
         // Warning: getFilesDir is only available after onCreate was called.
-        File sensorFile   = new File(getFilesDir(), SENSOR_FILENAME);
-        File stageFile    = new File(getFilesDir(), STAGE_FILENAME);
+        File sensorFile = new File(getFilesDir(), SENSOR_FILENAME);
+        File stageFile = new File(getFilesDir(), STAGE_FILENAME);
 
         // Init sensor consumers
         harPipeline = new HarAdapter();
-        gpsCache    = new GpsCache();
-        persistor   = ZIPPED_PERSISTOR ?
-                new ZipFilePersistor(sensorFile):
+        gpsCache = new GpsCache();
+        persistor = ZIPPED_PERSISTOR ?
+                new ZipFilePersistor(sensorFile) :
                 new FilePersistor(sensorFile);
         publisher = new PublicationPipeline(); // for external communication
 
         // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
         transferManager = new TransferThreadPost(persistor, stageFile);
-        monitorThread   = new MonitorThread();
+        monitorThread = new MonitorThread();
 
         // Restore user id from shared preferences
         restoreUserId();
@@ -348,6 +349,7 @@ public class ServiceSensorControl extends Service {
         }
 
     };
+
     //Access to the Service.
     public class LocalBinder extends Binder {
         public ServiceSensorControl getService() {
@@ -355,9 +357,9 @@ public class ServiceSensorControl extends Service {
             return ServiceSensorControl.this;
         }
     }
+
     //Callback for deleting samples
-    public interface SensorServiceListener
-    {
+    public interface SensorServiceListener {
         public static final SensorServiceListener NULL_LISTENER = new SensorServiceListener() {
             @Override
             public void onDeletionCompleted() {
@@ -367,9 +369,9 @@ public class ServiceSensorControl extends Service {
 
         public void onDeletionCompleted();
     }
+
     //Callback for transfer
-    public interface TransferListener
-    {
+    public interface TransferListener {
         public static final TransferListener NULL_LISTENER = new TransferListener() {
             @Override
             public void onTransferCompleted(boolean success) {
@@ -379,31 +381,35 @@ public class ServiceSensorControl extends Service {
 
         public void onTransferCompleted(boolean success);
     }
+
     //When gpsData is received (for current route of the user)
-    private void onGpsSampleReceived (String gpsSample)
-    {
+    private void onGpsSampleReceived(String gpsSample) {
         //Dont visualize all gpsSamples on the map (memory issues). Skip 4 out of 5
-        if(counter%5 == 0)
-        {
+        if (counter % 5 == 0) {
             String[] gpsData = gpsSample.split(",")[3].split("\\s+");
             currentRoute.add(new LatLng(Double.parseDouble(gpsData[0]), Double.parseDouble(gpsData[1])));
         }
         counter++;
     }
+
     //Get the user's current route
-    public ArrayList<LatLng> getCurrentRoute()
-    {
+    public ArrayList<LatLng> getCurrentRoute() {
         return currentRoute;
     }
 
     //Called when the transfering has started - Show notification to the user
-    private void onStartTransfering()
-    {
+    private void onStartTransfering() {
         final NotificationManager mNotifyManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        PendingIntent contentIntent = PendingIntent.getActivity(
+                getApplicationContext(),
+                0,
+                new Intent(),
+                PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentTitle("Recordings")
                 .setContentText("Uploading samples")
+                .setContentIntent(contentIntent)
                 .setSmallIcon(R.drawable.ic_stat_logo)
                 .setProgress(0, 0, true);
         mNotifyManager.notify(transferringNotificationID, mBuilder.build());
@@ -411,33 +417,28 @@ public class ServiceSensorControl extends Service {
 
             @Override
             public void onTransferCompleted(boolean success) {
-                if(success)
-                {
+                if (success) {
                     mBuilder.setContentText("Upload completed successfully").setProgress(0, 0, false);
                     mNotifyManager.notify(transferringNotificationID, mBuilder.build());
                     transferManager.deleteStagedSamples();
                     persistor.deleteSamples();
                     publisher.deleteSamples();
-                    if(listener != null)
+                    if (listener != null)
                         listener.onDeletionCompleted();
-                }
-                else
-                {
+                } else {
                     mBuilder.setContentText("Upload failed").setProgress(0, 0, false);
-                    mNotifyManager.notify(transferringNotificationID, mBuilder.build());
-//					if(listener!= null)
-//						listener.onDeletionCompleted();
+                    mNotifyManager.notify(transferringNotificationID, mBuilder.build());//     if(listener!= null)//      listener.onDeletionCompleted();
                 }
             }
         };
     }
+
     //Register the listener by an activity
-    public void setOnSamplesDeletedListener(SensorServiceListener l)
-    {
+    public void setOnSamplesDeletedListener(SensorServiceListener l) {
         listener = l;
     }
-    public boolean samplesStored()
-    {
+
+    public boolean samplesStored() {
         //Possible bug : persistor.hasSamples() returns true always
         return persistor.hasSamples() || transferManager.hasStagedSamples();
     }
