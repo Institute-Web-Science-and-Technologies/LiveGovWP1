@@ -14,7 +14,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang3.text.StrBuilder;
+import org.apache.commons.lang.text.StrBuilder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

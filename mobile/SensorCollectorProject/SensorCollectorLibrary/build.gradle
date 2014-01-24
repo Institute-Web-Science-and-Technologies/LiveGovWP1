@@ -38,7 +38,6 @@ dependencies {
     compile 'org.apache.httpcomponents:httpcore:4.3-beta2'
     compile 'junit:junit:3.8'
     compile 'org.apache.commons:commons-math3:3.2'
-    compile 'org.apache.commons:commons-lang3:3.1'
     compile 'commons-lang:commons-lang:2.3'
     compile 'eu.liveandgov.wp1:HumanActivityRecognitionLibrary:1.0'
 }
