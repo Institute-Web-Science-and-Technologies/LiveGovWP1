@@ -80,7 +80,7 @@ public class ZipFilePersistor implements Persistor {
 
     @Override
     public boolean hasSamples() {
-        return logFile.length() > 0;
+        return sampleCount > 0;
     }
 
     @Override
@@ -92,6 +92,7 @@ public class ZipFilePersistor implements Persistor {
         // Deleted, the valid length is now zero
         logFile.delete();
         putValidLength(0);
+        sampleCount = 0;
 
         if(wasOpen) {
             // We can override here because we do in fact want to delete the samples

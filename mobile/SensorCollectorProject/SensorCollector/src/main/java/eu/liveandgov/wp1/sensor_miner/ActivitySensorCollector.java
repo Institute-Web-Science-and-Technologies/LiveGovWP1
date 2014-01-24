@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
@@ -172,10 +173,13 @@ public class ActivitySensorCollector extends Activity {
     }
 
     public void onSendButtonClick(View view) {
+        String annotation = annotationText.getText().toString();
+
         Intent intent = new Intent(this, ServiceSensorControl.class);
         intent.setAction(ACTION_ANNOTATE);
-        intent.putExtra(FIELD_ANNOTATION, annotationText.getText().toString());
+        intent.putExtra(FIELD_ANNOTATION, annotation);
         startService(intent);
+        Toast.makeText(this, "Adding annotation: " + annotation, 3).show();
     }
 
     public void onIdButtonClick(View view) {
