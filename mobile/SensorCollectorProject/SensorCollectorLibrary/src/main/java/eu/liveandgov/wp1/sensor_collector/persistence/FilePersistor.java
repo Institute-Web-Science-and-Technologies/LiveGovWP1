@@ -21,6 +21,8 @@ public class FilePersistor implements Persistor {
 
     protected boolean disabled = false;
 
+    // TODO: Protect from filling up all memory: Max Sampels? Set fixed file size?
+
     public FilePersistor(File logFile) {
         this.logFile = logFile;
         try {
@@ -78,7 +80,12 @@ public class FilePersistor implements Persistor {
         if (disabled) return;
         try {
             closeLogFile();
-            if (logFile.exists()) logFile.delete();
+
+            if (logFile.exists()) {
+                boolean suc = logFile.delete();
+                if (!suc) throw new IOException("logFile.delete failed");
+            }
+
             openLogFileOverwrite();
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error deleting samples", e);
