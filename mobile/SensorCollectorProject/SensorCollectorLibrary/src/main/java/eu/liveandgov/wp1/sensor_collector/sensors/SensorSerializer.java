@@ -125,7 +125,7 @@ public class SensorSerializer {
      * Escapes a string and puts it into quotes
      */
     private static String escape(String s) {
-        return '"' + StringEscapeUtils.escapeCsv(s) + '"';
+        return '"' + StringEscapeUtils.escapeJava(s) + '"';
     }
 
     /**
