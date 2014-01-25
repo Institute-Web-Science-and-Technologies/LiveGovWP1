@@ -238,6 +238,7 @@ public class ServiceSensorControl extends Service {
         publisher.deleteSamples();
         transferManager.deleteStagedSamples();
 
+        // Also delete index files
         new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE).delete();
         new File(getFilesDir(), PPSOptions.OSMIPPS_INDEX_FILE).delete();
     }
@@ -248,12 +249,14 @@ public class ServiceSensorControl extends Service {
 
         isHAR = false;
 
+        // On har-stop, save indices
         staticIPS.trySave(new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE));
         osmIPPS.trySave(new File(getFilesDir(), PPSOptions.OSMIPPS_INDEX_FILE));
 
     }
 
     private void doStartHAR() {
+        // On har-start, load indices
         staticIPS.tryLoad(new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE));
         osmIPPS.tryLoad(new File(getFilesDir(), PPSOptions.OSMIPPS_INDEX_FILE));
 
