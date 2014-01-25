@@ -20,7 +20,7 @@ public class OOAPITest extends TestCase {
         int tp = 0;
 
         for (double[] p : POSITIVE) {
-            tp += ips.calculate(p[0], p[1]) == Proximity.IN_PROXIMITY ? 1 : 0;
+            tp += ips.calculate(p[1], p[0]) == Proximity.IN_PROXIMITY ? 1 : 0;
         }
 
         // Negative count/true negative
@@ -28,7 +28,7 @@ public class OOAPITest extends TestCase {
         int tn = 0;
 
         for (double[] n : NEGATIVE) {
-            tn += ips.calculate(n[0], n[1]) == Proximity.NOT_IN_PROXIMITY ? 1 : 0;
+            tn += ips.calculate(n[1], n[0]) == Proximity.NOT_IN_PROXIMITY ? 1 : 0;
         }
 
         int fp = nc - tn;

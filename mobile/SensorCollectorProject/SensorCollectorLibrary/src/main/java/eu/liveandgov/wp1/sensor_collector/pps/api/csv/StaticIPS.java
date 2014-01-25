@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.sensor_collector.pps.api.helsinki;
+package eu.liveandgov.wp1.sensor_collector.pps.api.csv;
 
 import android.content.Context;
 import android.util.Log;
@@ -13,27 +13,39 @@ import eu.liveandgov.wp1.sensor_collector.pps.api.Proximity;
 import eu.liveandgov.wp1.sensor_collector.pps.api.gi.GridIndexPS;
 
 /**
- * Helsinki Indexed Platform Proximity Service
+ * Static Indexed Proximity Service, indexes by a given CSV file proxmities
  *
  * @author lukashaertel
  */
-public class HelsinkiIPPS extends GridIndexPS {
-    private final static String LOG_TAG = "HIPS";
+public class StaticIPS extends GridIndexPS {
+    private final static String LOG_TAG = "SIPS";
     private final Context context;
 
     private final String asset;
 
+    private final boolean universal;
+
+    private final int lonField;
+
+    private final int latField;
+
     private final double distance;
 
-    public HelsinkiIPPS(double horizontalResultion, double verticalResulution, boolean byCentroid, int storeDegree, Context context, String asset, double distance) {
+    public StaticIPS(double horizontalResultion, double verticalResulution, boolean byCentroid, int storeDegree, Context context, String asset, boolean universal, int latField, int lonField, double distance) {
         super(horizontalResultion, verticalResulution, byCentroid, storeDegree);
 
         this.context = context;
         this.asset = asset;
+        this.universal = universal;
+        this.lonField = lonField;
+        this.latField = latField;
         this.distance = distance;
     }
 
-    private static double haversine(final double lon1, double lat1, final double lon2, double lat2) {
+    /**
+     * We might have this functions everywhere around this project
+     */
+    private static double haversine(double lat1, final double lon1, double lat2, final double lon2) {
         final double R = 6371000.785;
         final double dLat = Math.toRadians(lat2 - lat1);
         final double dLon = Math.toRadians(lon2 - lon1);
@@ -47,30 +59,40 @@ public class HelsinkiIPPS extends GridIndexPS {
     }
 
     @Override
-    protected Proximity calculateContains(double lon, double lat) {
+    protected Proximity calculateContains(double lat, double lon) {
         try {
+            // Open asset and stream thereon
             final InputStream inputStream = context.getAssets().open(asset);
             final InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            final CSVParser p = new CSVParser(inputStreamReader);
 
-            CSVParser p = new CSVParser(inputStreamReader);
+            // Read every line
             String[] line;
             while ((line = p.getLine()) != null) {
-                final double clon = Double.valueOf(line[4]);
-                final double clat = Double.valueOf(line[5]);
+                // Get item coordinates
+                final double cLat = Double.valueOf(line[latField]);
+                final double cLon = Double.valueOf(line[lonField]);
 
-                if (haversine(lon, lat, clon, clat) < distance) {
-
+                // Test distance
+                if (haversine(lat, lon, cLat, cLon) < distance) {
+                    // If in range, close file and return in-proximity
                     inputStreamReader.close();
                     inputStream.close();
                     return Proximity.IN_PROXIMITY;
                 }
             }
+            // Else return value corresponding to the exhaustiveness of this PS
             inputStreamReader.close();
             inputStream.close();
-            return Proximity.NO_DECISION; //TODO: Negative-tests
+            return universal ? Proximity.NOT_IN_PROXIMITY : Proximity.NO_DECISION;
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error in calculation of proximity", e);
             return Proximity.ERROR;
         }
+    }
+
+    @Override
+    public boolean isUniversal() {
+        return universal;
     }
 }

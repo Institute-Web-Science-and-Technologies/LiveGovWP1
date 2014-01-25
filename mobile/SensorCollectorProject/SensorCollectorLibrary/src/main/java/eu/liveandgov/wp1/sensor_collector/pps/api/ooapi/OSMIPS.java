@@ -46,32 +46,29 @@ public abstract class OSMIPS extends GridIndexPS {
     }
 
     @Override
-    protected Proximity calculateContains(double lon, double lat) {
+    protected Proximity calculateContains(double lat, double lon) {
         try {
             // Create cache builder
             final StringBuilder builder = new StringBuilder();
 
             // Obtain URL
-            final URL url = new URL(baseURL + createQueryString(lon, lat));
+            final URL url = new URL(baseURL + createQueryString(lat, lon));
 
             // Process response
             final InputStreamReader isr = new InputStreamReader(url.openConnection().getInputStream());
             int c;
-            while((c =isr.read()) != -1)
-            {
-                builder.append((char)c);
+            while ((c = isr.read()) != -1) {
+                builder.append((char) c);
             }
             isr.close();
 
             final JSONObject response = new JSONObject(builder.toString());
             final JSONArray elements = response.getJSONArray("elements");
 
+            Log.v(LOG_TAG, url + " ~> " + response);
+
             // Find out if in range of element satisfying criteria
-            final boolean result = elements.length() > 0;
-
-
-            // Return result
-            return result ? Proximity.IN_PROXIMITY : Proximity.NOT_IN_PROXIMITY;
+            return elements.length() > 0 ? Proximity.IN_PROXIMITY : Proximity.NOT_IN_PROXIMITY;
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error in calculation of proximity", e);
             // On exception, set error as result
@@ -81,6 +78,12 @@ public abstract class OSMIPS extends GridIndexPS {
             // On exception, set error as result
             return Proximity.ERROR;
         }
+    }
+
+    @Override
+    public boolean isUniversal() {
+        // Assume that OSM contains the complete list of stations and is thereby universal
+        return true;
     }
 
     protected abstract String createQueryString(double lat, double lon);

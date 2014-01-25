@@ -26,7 +26,7 @@ import eu.liveandgov.wp1.sensor_collector.persistence.PublicationPipeline;
 import eu.liveandgov.wp1.sensor_collector.persistence.ZipFilePersistor;
 import eu.liveandgov.wp1.sensor_collector.pps.PPSAdapter;
 import eu.liveandgov.wp1.sensor_collector.pps.api.AggregatingPS;
-import eu.liveandgov.wp1.sensor_collector.pps.api.helsinki.HelsinkiIPPS;
+import eu.liveandgov.wp1.sensor_collector.pps.api.csv.StaticIPS;
 import eu.liveandgov.wp1.sensor_collector.pps.api.ooapi.OSMIPPS;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorSerializer;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorThread;
@@ -60,7 +60,7 @@ public class ServiceSensorControl extends Service {
     // from a static context.
 
     // INDICES
-    public HelsinkiIPPS helsinkiIPPS;
+    public StaticIPS staticIPS;
     public OSMIPPS osmIPPS;
     public AggregatingPS aggregatorPS;
 
@@ -96,14 +96,17 @@ public class ServiceSensorControl extends Service {
         File sensorFile   = new File(getFilesDir(), SENSOR_FILENAME);
         File stageFile    = new File(getFilesDir(), STAGE_FILENAME);
 
-        // Init index
-        helsinkiIPPS = new HelsinkiIPPS(
+        // Init indices
+        staticIPS = new StaticIPS(
                 PPSOptions.INDEX_HORIZONTAL_RESOLUTION,
                 PPSOptions.INDEX_VERTICAL_RESOLUTION,
                 PPSOptions.INDEX_BY_CENTROID,
                 PPSOptions.INDEX_STORE_DEGREE,
                 this,
                 PPSOptions.HELSINKIIPPS_ASSET,
+                false,
+                PPSOptions.HELSINKI_LAT_FIELD,
+                PPSOptions.HELSINKI_LON_FIELD,
                 PPSOptions.PROXIMITY);
 
         osmIPPS = new OSMIPPS(
@@ -115,7 +118,7 @@ public class ServiceSensorControl extends Service {
                 PPSOptions.PROXIMITY);
 
         aggregatorPS = new AggregatingPS();
-        aggregatorPS.getProximityServices().add(helsinkiIPPS);
+        aggregatorPS.getProximityServices().add(staticIPS);
         aggregatorPS.getProximityServices().add(osmIPPS);
 
         // Init sensor consumers
@@ -234,6 +237,9 @@ public class ServiceSensorControl extends Service {
         persistor.deleteSamples();
         publisher.deleteSamples();
         transferManager.deleteStagedSamples();
+
+        new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE).delete();
+        new File(getFilesDir(), PPSOptions.OSMIPPS_INDEX_FILE).delete();
     }
 
     private void doStopHAR() {
@@ -242,13 +248,13 @@ public class ServiceSensorControl extends Service {
 
         isHAR = false;
 
-        helsinkiIPPS.trySave(new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE));
+        staticIPS.trySave(new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE));
         osmIPPS.trySave(new File(getFilesDir(), PPSOptions.OSMIPPS_INDEX_FILE));
 
     }
 
     private void doStartHAR() {
-        helsinkiIPPS.tryLoad(new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE));
+        staticIPS.tryLoad(new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE));
         osmIPPS.tryLoad(new File(getFilesDir(), PPSOptions.OSMIPPS_INDEX_FILE));
 
         isHAR = true;

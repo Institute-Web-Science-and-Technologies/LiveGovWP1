@@ -150,17 +150,17 @@ public abstract class GridIndexPS implements ProximityService {
     }
 
     @Override
-    public Proximity calculate(double lon, double lat) {
+    public Proximity calculate(double lat, double lon) {
         if (byCentroid) {
-            lon = Math.round(lon / horizontalResultion) * horizontalResultion + horizontalResultion / 2.0;
-            lat = Math.round(lat / verticalResulution) * verticalResulution + verticalResulution / 2.0;
+            lon = Math.round(lon / verticalResulution) * verticalResulution + verticalResulution / 2.0;
+            lat = Math.round(lat / horizontalResultion) * horizontalResultion + horizontalResultion / 2.0;
         }
 
-        final Field at = new Field((long) Math.round(lon / horizontalResultion), (long) Math.round(lat / verticalResulution));
+        final Field at = new Field((long) Math.round(lat / horizontalResultion), (long) Math.round(lon / verticalResulution));
 
         Proximity result = calculated.get(at);
         if (result == null) {
-            result = calculateContains(lon, lat);
+            result = calculateContains(lat, lon);
             if (result != Proximity.ERROR) {
                 calculated.put(at, result);
 
@@ -174,5 +174,5 @@ public abstract class GridIndexPS implements ProximityService {
     /**
      * This method calculated the proximity status of the given values, unindexed.
      */
-    protected abstract Proximity calculateContains(double lon, double lat);
+    protected abstract Proximity calculateContains(double lat, double lon);
 }

@@ -1,6 +1,5 @@
 package eu.liveandgov.wp1.sensor_collector.pps.api;
 
-import java.security.spec.PSSParameterSpec;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,22 +20,22 @@ public class AggregatingPS implements ProximityService {
     }
 
     @Override
-    public Proximity calculate(double lon, double lat) {
-        Proximity result = Proximity.NO_DECISION;
+    public Proximity calculate(double lat, double lon) {
+        Proximity result;
 
-        search:
         for (ProximityService s : proximityServices) {
-            result = s.calculate(lon, lat);
+            result = s.calculate(lat, lon);
 
             switch (result) {
                 case IN_PROXIMITY:
                 case NOT_IN_PROXIMITY:
                     // Do not continue after full positive and full negative
-                    break search;
+                    return result;
             }
         }
 
-        return result;
+        // Do not return error from this one
+        return Proximity.NO_DECISION;
     }
 
     public static AggregatingPS create(ProximityService... from) {
@@ -46,5 +45,14 @@ public class AggregatingPS implements ProximityService {
         }
 
         return result;
+    }
+
+    @Override
+    public boolean isUniversal() {
+        for (ProximityService ps : proximityServices) {
+            if (ps.isUniversal()) return true;
+        }
+
+        return false;
     }
 }

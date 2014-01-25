@@ -3,13 +3,9 @@ package eu.liveandgov.wp1.sensor_collector.pps;
 import android.util.Log;
 
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Pipeline;
-import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
-import eu.liveandgov.wp1.sensor_collector.pps.ProximityEvent;
 import eu.liveandgov.wp1.sensor_collector.pps.api.Proximity;
 import eu.liveandgov.wp1.sensor_collector.pps.api.ProximityService;
-import eu.liveandgov.wp1.sensor_collector.sensors.SensorSerializer;
-import eu.liveandgov.wp1.sensor_collector.sensors.sensor_producers.SensorHolder;
 import eu.liveandgov.wp1.sensor_collector.sensors.sensor_value_objects.GpsSensorValue;
 
 /**
@@ -42,7 +38,7 @@ public class PPSPipeline extends Pipeline<GpsSensorValue, ProximityEvent> implem
 
     @Override
     public void push(final GpsSensorValue gpsSensorValue) {
-        final Proximity prox = proximityService.calculate(gpsSensorValue.lon, gpsSensorValue.lat);
+        final Proximity prox = proximityService.calculate(gpsSensorValue.lat, gpsSensorValue.lon);
 
         if (!prox.equals(lastProximity)) {
             lastProximity = prox;

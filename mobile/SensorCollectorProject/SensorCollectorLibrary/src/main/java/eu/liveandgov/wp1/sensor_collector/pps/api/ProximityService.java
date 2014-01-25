@@ -7,5 +7,7 @@ public interface ProximityService {
      * @return Returns the proximity or NO_DECISION if the proximity could not be evaluated with
      * this service
      */
-    public Proximity calculate(double lon, double lat);
+    public Proximity calculate(double lat, double lon);
+
+    public boolean isUniversal();
 }
