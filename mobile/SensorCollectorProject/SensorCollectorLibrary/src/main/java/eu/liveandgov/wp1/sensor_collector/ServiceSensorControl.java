@@ -3,7 +3,9 @@ package eu.liveandgov.wp1.sensor_collector;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -13,6 +15,7 @@ import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 import eu.liveandgov.wp1.sensor_collector.activity_recognition.HarAdapter;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
+import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.implementations.ConnectorThread;
 import eu.liveandgov.wp1.sensor_collector.connectors.implementations.GpsCache;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.LinkedSensorQueue;
@@ -64,6 +67,8 @@ public class ServiceSensorControl extends Service {
     public MonitorThread monitorThread;
     // Rem: Also SensorThread would belong here, but it is realized via static methods
 
+    public Handler mainHandler;
+
     /* CONSTRUCTOR */
     public ServiceSensorControl() {
         // Register this object globally
@@ -95,6 +100,9 @@ public class ServiceSensorControl extends Service {
         transferManager = new TransferThreadPost(persistor, stageFile);
         monitorThread   = new MonitorThread();
 
+        // INIT SCHEDULER
+        mainHandler = new Handler(Looper.getMainLooper());
+
         // Restore user id from shared preferences
         restoreUserId();
 
@@ -124,11 +132,16 @@ public class ServiceSensorControl extends Service {
         connectorThread.start();
         monitorThread.start();
         SensorThread.start();
+
+        // Create the initial termination signal
+        mainHandler.postDelayed(keepAliveCallback, SensorCollectionOptions.CLIENT_TIMEOUT);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        Log.d(LOG_TAG, "Destroying SSC");
 
         persistor.close();
     }
@@ -138,6 +151,26 @@ public class ServiceSensorControl extends Service {
         return null;
     }
 
+    /**
+     * This runnable is used by the handler to be scheduled and cancelled for keep-alive handling
+     */
+    public final Runnable keepAliveCallback = new Runnable() {
+        @Override
+        public void run() {
+            // If service is recording, no external action is required for keep-alive
+            if(isRecording)
+            {
+                Log.v(LOG_TAG, "Rescheduling keep alive because of service status");
+                mainHandler.postDelayed(keepAliveCallback, SensorCollectionOptions.CLIENT_TIMEOUT);
+            }
+            else
+            {
+                Log.v(LOG_TAG, "Stopping service because of no action and not recording");
+                stopSelf();
+            }
+        }
+    };
+
     /* INTENT API */
 
     /**
@@ -146,6 +179,11 @@ public class ServiceSensorControl extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // Postpone shutdown one more time
+        Log.v(LOG_TAG, "Postponing keep alive because of client request");
+        mainHandler.removeCallbacks(keepAliveCallback);
+        mainHandler.postDelayed(keepAliveCallback, SensorCollectionOptions.CLIENT_TIMEOUT);
+
         if (intent == null) {
             Log.i(LOG_TAG, "No intent received.");
             return START_STICKY;
@@ -270,6 +308,7 @@ public class ServiceSensorControl extends Service {
         intent.putExtra(IntentAPI.FIELD_USER_ID, userId);
         sendBroadcast(intent);
     }
+
 
     private void doSendGps() {
         if (gpsCache == null) Log.w(LOG_TAG, "gpsCache not initialized!");
