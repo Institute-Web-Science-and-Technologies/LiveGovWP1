@@ -54,11 +54,14 @@ public class ActivitySensorCollector extends Activity {
     private static final String LOG_TAG = "ASC";
     private BroadcastReceiver universalBroadcastReceiver;
 
-    // FLAGS
+    // MIRRORED FLAGS
     private boolean isRecording = false;
     private boolean isTransferring = false;
     private boolean isStreaming = false;
     private boolean isHAR = false;
+
+    // FLAGS
+    public boolean isForeground = false;
 
     // UI Elements
     private ToggleButton    recordingToggleButton;
@@ -143,12 +146,14 @@ public class ActivitySensorCollector extends Activity {
     public void onPause(){
         super.onPause();
         unregisterListeners();
+        isForeground = false;
     }
 
     @Override
     public void onResume(){
         super.onResume();
         registerListeners();
+        isForeground = true;
     }
 
     /* BUTTON HANDLER */
@@ -335,7 +340,12 @@ public class ActivitySensorCollector extends Activity {
             @Override
             public void run() {
                 while (true) {
-                    requestStatus();
+                    // Do not unnecessarily keep service alive with background thread
+                    // TODO: This should be realized with a handle and a delayed runnable
+                    if(isForeground)
+                    {
+                        requestStatus();
+                    }
 
                     // wait 1 sec.
                     try {
