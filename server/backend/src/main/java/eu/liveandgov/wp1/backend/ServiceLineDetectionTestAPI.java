@@ -51,9 +51,15 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+		String username = request.getHeader("username");
+		if(username == null){
+			PrintWriter out = response.getWriter();
+			out.println("{\"error\":\"username required\"}");
+			Util.SLDLogger.log().warn("Test API request without username");
+			return;
+		}
 		
-		
-		coordinates = new ArrayList<LatLonTsDayTuple>();  
+		coordinates = new ArrayList<LatLonTsDayTuple>(); 
 		String line = null;
 		  try {
 		    BufferedReader reader = request.getReader();
@@ -64,10 +70,12 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
 		  } catch (Exception e) { 
 			  e.getMessage();
         }
-		  
+		  String logmsg = "Test API call username: " + username;
+		  if(coordinates.size() > 0) {
+			  logmsg += " " + coordinates.get(0).getLonLatPoint();
+		  }
+		  Util.SLDLogger.log().info(logmsg);
 		try {
-			System.out.println(coordinates.get(0)
-					.getDaytimeDigitsOnly());
 			int lastDigitOfTimestamp = Integer.parseInt(coordinates.get(0)
 					.getDaytimeDigitsOnly().substring(5, 6));
 			if (lastDigitOfTimestamp < 9) {
@@ -85,6 +93,7 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
 
 		} catch (ParseException e) {
 			e.printStackTrace();
+			Util.SLDLogger.log().error(e);
 		}
  
   String routcodeSelect = ""
@@ -97,7 +106,7 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
   for (int i = 0; i < coordinates.size(); i++) {
 	  
 	  String p = coordinates.get(i).getLonLatPoint();
-	  String betweenTimeClause = coordinates.get(i).getBetweenTimeClause2("arrival_time",2);
+	  String betweenTimeClause = coordinates.get(i).getBetweenTimeClause("arrival_time",2);
 	  String d = coordinates.get(i).getISO8601Date();
 	  String day = coordinates.get(i).getWeekdayName();
 	  String bb = coordinates.get(i).getBoundingBox(5);
@@ -123,7 +132,6 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
 	  + "          suball.shape_id \n"
 	  + "ORDER  BY score DESC "
 	  + "LIMIT 10;";
-  System.out.println(routcodeSelect);
   
 	try {
 		Statement stm = db.connection.createStatement();
@@ -150,6 +158,7 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
 	} catch (SQLException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
+		Util.SLDLogger.log().error(e);
 	}
 	}
 	private void initTransportationMeans(){
@@ -169,6 +178,7 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			Util.SLDLogger.log().error(e);
 		}
 
 	}
