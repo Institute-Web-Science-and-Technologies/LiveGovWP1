@@ -106,7 +106,7 @@ public class FeatureHelper {
         return output;
     }
 
-    public static float[] FFTAbsolute(float[] input){
+    public static float[] FTAbsolute(float[] input){
         return Abs(FT(input));
     }
 

@@ -71,12 +71,12 @@ public class BinDistributor {
         }
     }
 
-    public int[] getBinsForAxis(float[] axis) {
+    public Integer [] getBinsForAxis(float[] axis) {
         for (float value : axis) {
             int i = 0;
             while(!bins[i].addIfInside(value)) i++;
         }
-        int counts[] = new int[bins.length];
+        Integer counts[] = new Integer[bins.length];
         for (int i = 0; i < bins.length; i++) {
             counts[i] = bins[i].getCount();
             bins[i].clear();

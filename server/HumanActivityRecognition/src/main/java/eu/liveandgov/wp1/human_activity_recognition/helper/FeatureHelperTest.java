@@ -62,8 +62,8 @@ public class FeatureHelperTest {
 
     @Test
     public void testAFFT() throws Exception {
-        float [] result =  FeatureHelper.FFTAbsolute(new float[]{
-                0,0,0,1,1,1,-1,-1,-1
+        float [] result =  FeatureHelper.FTAbsolute(new float[]{
+                0, 0, 0, 1, 1, 1, -1, -1, -1
         });
     }
 }
