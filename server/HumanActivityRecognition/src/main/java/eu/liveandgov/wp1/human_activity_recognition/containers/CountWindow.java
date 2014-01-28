@@ -10,6 +10,7 @@ package eu.liveandgov.wp1.human_activity_recognition.containers;
 public class CountWindow {
     public String type;
     public String id;
+    public String tag;
     public long startTime;
     public long endTime;
     public float[] x;
@@ -18,7 +19,10 @@ public class CountWindow {
     public double frequency;
 
     public String toString() {
-        String result = "";
+        String result = id;
+        if (tag != null && tag.length() != 0) {
+            result += ",\"" + tag + "\",";
+        }
         for (int i = 0; i < x.length; i++) {
             result += x[i] + "," + y[i] + "," + z[i];
             if ((i + 1) != x.length) {

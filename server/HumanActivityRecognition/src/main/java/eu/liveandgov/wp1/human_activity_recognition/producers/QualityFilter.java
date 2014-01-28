@@ -47,7 +47,7 @@ public class QualityFilter extends Producer<TaggedWindow> implements Consumer<Ta
 
         // Check if the frequency matches our desired frame
         if (windowFreq < this.minFreq) {
-            logger.info("< Frequency: " + windowFreq + " StartTime: " + tw.startTime + " EndTime: " + tw.endTime + " Samples: " + tw.x.length);
+//            logger.info("< Frequency: " + windowFreq + " StartTime: " + tw.startTime + " EndTime: " + tw.endTime + " Samples: " + tw.x.length);
             return;
         }
 
