@@ -46,7 +46,7 @@ public class FeatureHelper {
     public static float[] S2(float[] x, float[] y, float[] z){
         float[] out = new float[x.length];
         for (int i =0; i< x.length; i++){
-            out[i] = x[i]*x[i] + y[i]*y[i] + z[i]*z[i];
+            out[i] = (float)Math.sqrt(x[i]*x[i] + y[i]*y[i] + z[i]*z[i]);
         }
         return out;
     }

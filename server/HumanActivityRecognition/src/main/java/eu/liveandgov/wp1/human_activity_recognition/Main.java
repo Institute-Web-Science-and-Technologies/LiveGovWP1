@@ -2,6 +2,7 @@ package eu.liveandgov.wp1.human_activity_recognition;
 
 import eu.liveandgov.wp1.human_activity_recognition.containers.CountWindow;
 import eu.liveandgov.wp1.human_activity_recognition.containers.FeatureVector;
+import eu.liveandgov.wp1.human_activity_recognition.containers.FeatureVector_FFT;
 import eu.liveandgov.wp1.human_activity_recognition.containers.TaggedWindow;
 import eu.liveandgov.wp1.human_activity_recognition.helper.Persistor;
 import eu.liveandgov.wp1.human_activity_recognition.producers.*;
@@ -41,10 +42,10 @@ public class Main {
         FeatureProducer featureProducer = new FeatureProducer();
         interpolator.setConsumer(featureProducer);
 
-        Persistor<FeatureVector> pers = new Persistor<FeatureVector>("out.csv");
+        Persistor<FeatureVector_FFT> pers = new Persistor<FeatureVector_FFT>("out.csv");
         featureProducer.setConsumer(pers);
 
-        csvReader.readDir("/Users/cehlen/TrainingData", true);
+        csvReader.readDir("/Users/cehlen/Downloads/new_split/TEST", true);
     }
 
 }

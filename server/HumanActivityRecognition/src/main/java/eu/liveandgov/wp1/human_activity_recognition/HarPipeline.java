@@ -30,7 +30,7 @@ public class HarPipeline extends Pipeline<MotionSensorValue, String> {
 
         // Classify
         classifyProducer = new ClassifyProducer();
-        featureProducer.setConsumer(classifyProducer);
+        //featureProducer.setConsumer(classifyProducer);
     }
 
     public void push(MotionSensorValue message) {

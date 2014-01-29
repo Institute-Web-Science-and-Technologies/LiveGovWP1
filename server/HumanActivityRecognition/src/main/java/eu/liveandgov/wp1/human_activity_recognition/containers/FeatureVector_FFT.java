@@ -58,10 +58,10 @@ public class FeatureVector_FFT {
         energy = FeatureHelper.sum(S2);
         kurtosis = FeatureHelper.kurtosis(S2);
 
-        BinDistributor BD = new BinDistributor(-10,10,5);
+        BinDistributor BD = new BinDistributor(0,20,10);
         S2Bins = BD.getBinsForAxis(S2);
 
-        BinDistributor FBD = new BinDistributor(-15,15,5);
+        BinDistributor FBD = new BinDistributor(0,100,10);
         S2FTBins = FBD.getBinsForAxis(FeatureHelper.FTAbsolute(S2));
     }
 
