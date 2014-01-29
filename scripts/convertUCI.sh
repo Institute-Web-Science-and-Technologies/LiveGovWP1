@@ -2,8 +2,8 @@
 
 #Variables
 FILES=(`ls | grep total_acc_`)
-Y_TRAIN=../y_train.txt
-ACTIVITY_LABELS=(WALKING WALKING_DOWNSTAIRS WALKING_UPSTAIRS SITTING STANDING LAYING)
+Y_TRAIN=../`ls .. | grep y_`
+ACTIVITY_LABELS=(WALKING STAIRS SITTING STANDING LAYING)
 TEMP_FILES=()
 NUM_FILES=${#FILES[@]}
 
@@ -17,19 +17,19 @@ echo "Converting files..."
 # Create separate file for each axis
 for (( i = 0; i < $NUM_FILES; i++ )); do
   TEMP_FILES+=(${i}_convert.temp)
-  `cat ${FILES[$i]} | tr -s ' ' | awk -F" " '{for (c=1; c <= 64; c++) print $c*9.81}' > ${TEMP_FILES[$i]}`
+  `cat ${FILES[$i]} | tr -s ' ' > ${TEMP_FILES[$i]}.clean`
+  `pr -m -t -s" " -w4096 ${Y_TRAIN} ${TEMP_FILES[$i]}.clean | tr -s ' ' | awk -F" " '{for (c=2; c <= 65; c++) printf "%u,%g\n",$1,$c*9.81}' > ${TEMP_FILES[$i]}`
 done
 
 echo "Merging files..."
-
 # merge files
-`pr -m -t -s, ${Y_TRAIN} ${TEMP_FILES[0]} ${TEMP_FILES[1]} ${TEMP_FILES[2]} | awk -F, 'BEGIN {
+`pr -m -t -s, ${TEMP_FILES[0]} ${TEMP_FILES[1]} ${TEMP_FILES[2]} | awk -F, 'BEGIN {
     al[1]="WALKING"
-    al[2]="WALKING_DOWNSTAIRS"
-    al[3]="WALKING_UPSTAIRS"
+    al[2]="STAIRS"
+    al[3]="STAIRS"
     al[4]="SITTING"
     al[5]="STANDING"
-    al[6]="LAYING";ts=1386680000000}; {printf "%s,UCI_HAR,%s,%g,%g,%g\n",al[$1],ts,$2,$3,$4; ts+=20}' > out.csv`
+    al[6]="LAYING";ts=1386680000000}; {printf "%s,UCI_HAR,%s,%g,%g,%g\n",al[$1],ts,$2,$4,$6; ts+=20}' > out.csv`
 
 echo "Building directory tree"
 
@@ -43,6 +43,6 @@ echo "Cleanup..."
 
 # remove temp files
 for (( i = 0; i < $NUM_FILES; i++ )); do
-  `rm ${TEMP_FILES[$i]}`
+  `rm ${TEMP_FILES[$i]} ${TEMP_FILES[$i]}.clean`
 done
 echo "Done!"
