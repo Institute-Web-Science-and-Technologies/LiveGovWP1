@@ -10,10 +10,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import eu.liveandgov.wp1.sensor_collector.pps.api.Proximity;
+import eu.liveandgov.wp1.sensor_collector.pps.api.ProximityType;
 import eu.liveandgov.wp1.sensor_collector.pps.api.gi.GridIndexPS;
 
 /**
- * Static Indexed Proximity Service, indexes by a given CSV file proxmities
+ * Static Indexed ProximityType Service, indexes by a given CSV file proxmities
  *
  * @author lukashaertel
  */
@@ -25,18 +26,21 @@ public class StaticIPS extends GridIndexPS {
 
     private final boolean universal;
 
+    private final int idField;
+
     private final int lonField;
 
     private final int latField;
 
     private final double distance;
 
-    public StaticIPS(double horizontalResultion, double verticalResulution, boolean byCentroid, int storeDegree, Context context, String asset, boolean universal, int latField, int lonField, double distance) {
+    public StaticIPS(double horizontalResultion, double verticalResulution, boolean byCentroid, int storeDegree, Context context, String asset, boolean universal, int idField, int latField, int lonField, double distance) {
         super(horizontalResultion, verticalResulution, byCentroid, storeDegree);
 
         this.context = context;
         this.asset = asset;
         this.universal = universal;
+        this.idField = idField;
         this.lonField = lonField;
         this.latField = latField;
         this.distance = distance;
@@ -75,19 +79,24 @@ public class StaticIPS extends GridIndexPS {
 
                 // Test distance
                 if (haversine(lat, lon, cLat, cLon) < distance) {
-                    // If in range, close file and return in-proximity
+                    // If in range, close file and return in-proximityType
                     inputStreamReader.close();
                     inputStream.close();
-                    return Proximity.IN_PROXIMITY;
+                    return new Proximity(ProximityType.IN_PROXIMITY, line[idField].trim());
                 }
             }
             // Else return value corresponding to the exhaustiveness of this PS
             inputStreamReader.close();
             inputStream.close();
-            return universal ? Proximity.NOT_IN_PROXIMITY : Proximity.NO_DECISION;
+
+            if (universal) {
+                return new Proximity(ProximityType.NOT_IN_PROXIMITY, "");
+            } else {
+                return new Proximity(ProximityType.NO_DECISION, "");
+            }
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Error in calculation of proximity", e);
-            return Proximity.ERROR;
+            Log.e(LOG_TAG, "Error in calculation of proximityType", e);
+            return null;
         }
     }
 

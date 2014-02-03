@@ -17,6 +17,7 @@ public class PPSOptions {
     public static final String OSMIPPS_INDEX_FILE = "osmipps.index";
 
     public static final String HELSINKIIPPS_ASSET = "helsinki-stops.csv";
+    public static final int HELSINKI_ID_FIELD = 2;
     public static final int HELSINKI_LON_FIELD = 5;
     public static final int HELSINKI_LAT_FIELD = 4;
     public static final String HELSINKIIPPS_INDEX_FILE = "helsinkiipps.index";

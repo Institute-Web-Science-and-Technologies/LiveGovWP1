@@ -5,54 +5,72 @@ import java.io.Serializable;
 /**
  * Two-dimensional, serializable and comparable index
  */
-public class Field implements Comparable<Field>, Serializable {
-    /**
-     * Index in the horizontal dimension
-     */
-    public final long x;
+public class Field implements Comparable<Field>, Serializable
+{
+	private static final long serialVersionUID = -6051494591313716015L;
 
-    /**
-     * Index in the vertical dimension
-     */
-    public final long y;
+	/**
+	 * Index in the horizontal dimension
+	 */
+	private long x;
 
-    public Field(long x, long y) {
-        this.x = x;
-        this.y = y;
-    }
+	/**
+	 * Index in the vertical dimension
+	 */
+	private long y;
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (x ^ (x >>> 32));
-        result = prime * result + (int) (y ^ (y >>> 32));
-        return result;
-    }
+	public Field(long x, long y)
+	{
+		this.x = x;
+		this.y = y;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if(!(obj instanceof  Field)) return false;
+	public long getX()
+	{
+		return x;
+	}
 
-        Field other = (Field) obj;
-        if (x != other.x) return false;
-        if (y != other.y) return false;
-        return true;
-    }
+	public long getY()
+	{
+		return y;
+	}
 
-    @Override
-    public String toString() {
-        return "(" + x + ", " + y + ")";
-    }
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (x ^ (x >>> 32));
+		result = prime * result + (int) (y ^ (y >>> 32));
+		return result;
+	}
 
-    @Override
-    public int compareTo(Field o) {
-        final int r = Long.signum(y - o.y);
-        if (r != 0) return r;
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (!(obj instanceof Field)) return false;
 
-        return Long.signum(x - o.x);
-    }
+		Field other = (Field) obj;
+		if (x != other.x) return false;
+		if (y != other.y) return false;
+		return true;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "(" + x + ", " + y + ")";
+	}
+
+	@Override
+	public int compareTo(Field o)
+	{
+		final int r = Long.signum(y - o.y);
+		if (r != 0) return r;
+
+		return Long.signum(x - o.x);
+	}
 
 }

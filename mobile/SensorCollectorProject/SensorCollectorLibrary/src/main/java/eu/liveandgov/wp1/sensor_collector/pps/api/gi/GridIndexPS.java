@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
@@ -13,10 +14,11 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import eu.liveandgov.wp1.sensor_collector.pps.api.Proximity;
+import eu.liveandgov.wp1.sensor_collector.pps.api.ProximityType;
 import eu.liveandgov.wp1.sensor_collector.pps.api.ProximityService;
 
 /**
- * Grid Index Proximity Service, stores calculated values in a two-dimensional index. Acts as a
+ * Grid Index ProximityType Service, stores calculated values in a two-dimensional index. Acts as a
  * database for calculation results approximated to the nearest field of the specified resolution.
  * Stores no more than `storeDegree` values, old values are truncated.
  *
@@ -99,7 +101,7 @@ public abstract class GridIndexPS implements ProximityService {
             final Proximity proximity = (Proximity) objectInputStream.readObject();
             calculated.put(field, proximity);
 
-            Log.d(LOG_TAG, field + " => " + proximity);
+            Log.v(LOG_TAG, field + " => " + proximity);
         }
 
         objectInputStream.close();
@@ -109,6 +111,8 @@ public abstract class GridIndexPS implements ProximityService {
     public void tryLoad(File file) {
         try {
             load(file);
+        } catch (InvalidClassException e) {
+            file.delete();
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error loading index", e);
         } catch (ClassNotFoundException e) {
@@ -161,7 +165,7 @@ public abstract class GridIndexPS implements ProximityService {
         Proximity result = calculated.get(at);
         if (result == null) {
             result = calculateContains(lat, lon);
-            if (result != Proximity.ERROR) {
+            if (result != null) {
                 calculated.put(at, result);
 
                 assertStoreDegree();
@@ -172,7 +176,7 @@ public abstract class GridIndexPS implements ProximityService {
     }
 
     /**
-     * This method calculated the proximity status of the given values, unindexed.
+     * This method calculated the proximityType status of the given values, unindexed.
      */
     protected abstract Proximity calculateContains(double lat, double lon);
 }

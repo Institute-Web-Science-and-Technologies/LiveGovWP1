@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.sensor_collector.pps;
 
 import eu.liveandgov.wp1.sensor_collector.pps.api.Proximity;
+import eu.liveandgov.wp1.sensor_collector.pps.api.ProximityType;
 
 /**
  * Created by lukashaertel on 18.01.14.
@@ -25,7 +26,8 @@ public class ProximityEvent {
 
         if (time != that.time) return false;
         if (key != null ? !key.equals(that.key) : that.key != null) return false;
-        if (proximity != that.proximity) return false;
+        if (proximity != null ? !proximity.equals(that.proximity) : that.proximity != null)
+            return false;
 
         return true;
     }

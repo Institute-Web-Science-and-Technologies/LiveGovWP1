@@ -42,74 +42,53 @@ public class BluetoothHolder implements SensorHolder {
      */
     private static final Map<Integer, String> DEVICE_CLASS_MAP = new TreeMap<Integer, String>();
 
-    static
-    {
-        for(Field field : BluetoothClass.Device.Major.class.getFields())
-        {
-            if((field.getModifiers() & Modifier.STATIC) == 0)continue;
-            if((field.getModifiers() & Modifier.PUBLIC) == 0)continue;
+    static {
+        for (Field field : BluetoothClass.Device.Major.class.getFields()) {
+            if ((field.getModifiers() & Modifier.STATIC) == 0) continue;
+            if ((field.getModifiers() & Modifier.PUBLIC) == 0) continue;
 
-            if(field.getType().isAssignableFrom(int.class))
-            {
-                try
-                {
+            if (field.getType().isAssignableFrom(int.class)) {
+                try {
                     // Insert inverse mapping
                     DEVICE_MAJOR_CLASS_MAP.put(field.getInt(null), field.getName().replace('_', ' ').toLowerCase());
-                }
-                catch(IllegalAccessException e)
-                {
+                } catch (IllegalAccessException e) {
                     // Do nothing
                 }
             }
         }
 
         // Apply the same pattern to the composed class
-        for(Field field : BluetoothClass.Device.class.getFields())
-        {
-            if((field.getModifiers() & Modifier.STATIC) == 0)continue;
-            if((field.getModifiers() & Modifier.PUBLIC) == 0)continue;
+        for (Field field : BluetoothClass.Device.class.getFields()) {
+            if ((field.getModifiers() & Modifier.STATIC) == 0) continue;
+            if ((field.getModifiers() & Modifier.PUBLIC) == 0) continue;
 
-            if(field.getType().isAssignableFrom(int.class))
-            {
-                try
-                {
+            if (field.getType().isAssignableFrom(int.class)) {
+                try {
                     // Insert inverse mapping
                     DEVICE_CLASS_MAP.put(field.getInt(null), field.getName().replace('_', ' ').toLowerCase());
-                }
-                catch(IllegalAccessException e)
-                {
+                } catch (IllegalAccessException e) {
                     // Do nothing
                 }
             }
         }
     }
 
-    public static String getDeviceMajorClassName(int i)
-    {
+    public static String getDeviceMajorClassName(int i) {
         return DEVICE_MAJOR_CLASS_MAP.get(i);
     }
 
-    public static String getDeviceClassName(int i)
-    {
+    public static String getDeviceClassName(int i) {
         return DEVICE_CLASS_MAP.get(i);
     }
 
-    public static String getBondName(int i)
-    {
-        if(i == BluetoothDevice.BOND_NONE)
-        {
+    public static String getBondName(int i) {
+        if (i == BluetoothDevice.BOND_NONE) {
             return "none";
-        }
-        else if(i == BluetoothDevice.BOND_BONDING)
-        {
+        } else if (i == BluetoothDevice.BOND_BONDING) {
             return "bonding";
-        }
-        else if(i == BluetoothDevice.BOND_BONDED)
-        {
+        } else if (i == BluetoothDevice.BOND_BONDED) {
             return "bonded";
-        }
-        else
-        {
+        } else {
             return "unknown";
         }
     }
@@ -121,8 +100,7 @@ public class BluetoothHolder implements SensorHolder {
     private final StrBuilder bluetoothIntermediateBuilder;
     private long lastScanRequest;
 
-    public BluetoothHolder(SensorQueue sensorQueue,int delay, Handler handler)
-    {
+    public BluetoothHolder(SensorQueue sensorQueue, int delay, Handler handler) {
         this.sensorQueue = sensorQueue;
         this.delay = delay;
         this.handler = handler;
@@ -161,14 +139,11 @@ public class BluetoothHolder implements SensorHolder {
     }
 
     private void startNextScan() {
-        if(bluetoothAdapter.startDiscovery())
-        {
+        if (bluetoothAdapter != null && bluetoothAdapter.startDiscovery()) {
             lastScanRequest = SystemClock.uptimeMillis();
 
             Log.d(LOG_TAG, "Scan successfully started");
-        }
-        else
-        {
+        } else {
             Log.w(LOG_TAG, "Bluetooth scan could not be started (Is bluetooth activated?)");
         }
     }
@@ -188,12 +163,9 @@ public class BluetoothHolder implements SensorHolder {
 
     @Override
     public void stopRecording() {
-        try
-        {
+        try {
             GlobalContext.context.unregisterReceiver(bluetoothEndpoint);
-        }
-        catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             Log.w(LOG_TAG, "Receiver already unregistered");
         }
     }
@@ -201,23 +173,17 @@ public class BluetoothHolder implements SensorHolder {
     private final BroadcastReceiver bluetoothEndpoint = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(intent.getAction()))
-            {
+            if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(intent.getAction())) {
                 // On start of the discovery, reset the pending push
                 bluetoothIntermediateBuilder.clear();
-            }
-            else if(BluetoothDevice.ACTION_FOUND.equals(intent.getAction()))
-            {
-                if(!bluetoothIntermediateBuilder.isEmpty())
-                {
+            } else if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
+                if (!bluetoothIntermediateBuilder.isEmpty()) {
                     // We are operating on a tail element, so separate
                     bluetoothIntermediateBuilder.append(';');
                 }
 
                 bluetoothIntermediateBuilder.append(intermediateFromBTFound(intent));
-            }
-            else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()))
-            {
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
                 // Get receive-time of the intent in system uptime
                 long scanEndtime = SystemClock.uptimeMillis();
 
@@ -225,36 +191,30 @@ public class BluetoothHolder implements SensorHolder {
                 sensorQueue.push(SensorSerializer.bluetoothIntermediate.toSSFDefault(bluetoothIntermediateBuilder.toString()));
 
                 // If results are on time, schedule the next scan at the handler with the given delay
-                if(lastScanRequest + delay > scanEndtime)
-                {
-                    if(!handler.postAtTime(new Runnable() {
+                if (lastScanRequest + delay > scanEndtime) {
+                    if (!handler.postAtTime(new Runnable() {
                         @Override
                         public void run() {
                             startNextScan();
                         }
-                    }, lastScanRequest + delay))
-                    {
+                    }, lastScanRequest + delay)) {
                         // If failed to schedule, scan immediately
                         startNextScan();
                     }
-                }
-                else
-                {
+                } else {
                     // Else, scan immediately
                     startNextScan();
                 }
-            }
-            else
-            {
+            } else {
                 throw new IllegalStateException("Illegal configuration of broadcast receiver");
             }
         }
     };
 
-    private void checkEnableBluetooth(){
-        if(!SensorCollectionOptions.ASK_BLT) return;
+    private void checkEnableBluetooth() {
+        if (!SensorCollectionOptions.ASK_BLT) return;
 
-        if( bluetoothAdapter != null && !bluetoothAdapter.isEnabled()) {
+        if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled()) {
             Toast toast = Toast.makeText(GlobalContext.context, "Please enable Bluetooth.", Toast.LENGTH_SHORT);
             toast.show();
 

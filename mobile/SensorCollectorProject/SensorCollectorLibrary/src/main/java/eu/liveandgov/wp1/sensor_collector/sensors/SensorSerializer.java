@@ -26,6 +26,7 @@ import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.pps.ProximityEvent;
 import eu.liveandgov.wp1.sensor_collector.pps.api.Proximity;
+import eu.liveandgov.wp1.sensor_collector.pps.api.ProximityType;
 import eu.liveandgov.wp1.sensor_collector.sensors.sensor_producers.TelephonyHolder;
 import eu.liveandgov.wp1.sensor_collector.sensors.sensor_value_objects.GpsSensorValue;
 
@@ -395,7 +396,7 @@ public class SensorSerializer {
     public static final Conversion<ProximityEvent> proximityEvent = new Conversion<ProximityEvent>() {
         @Override
         public String toSSF(long timestamp, String device, ProximityEvent proximityEvent) {
-            return objects.toSSF(SSF_PPROXIMITY, proximityEvent.time, device, new Object[]{proximityEvent.key, proximityEvent.proximity});
+            return objects.toSSF(SSF_PPROXIMITY, proximityEvent.time, device, new Object[]{proximityEvent.key, proximityEvent.proximity.getProximityType(), proximityEvent.proximity.getObjectIdentity()});
         }
 
         @Override
@@ -410,9 +411,10 @@ public class SensorSerializer {
             scanner.skip(comma);
 
             final String key = scanner.next().trim();
-            final Proximity proximity = Proximity.valueOf(scanner.next());
+            final ProximityType proximityType = ProximityType.valueOf(scanner.next());
+            final String objectIdentity = scanner.nextLine();
 
-            return new SSE<ProximityEvent>(type, timestamp, device, new ProximityEvent(timestamp, key, proximity));
+            return new SSE<ProximityEvent>(type, timestamp, device, new ProximityEvent(timestamp, key, new Proximity(proximityType, objectIdentity)));
         }
     };
 

@@ -2,7 +2,7 @@ package eu.liveandgov.wp1.sensor_collector.tests;
 
 import junit.framework.TestCase;
 
-import eu.liveandgov.wp1.sensor_collector.pps.api.Proximity;
+import eu.liveandgov.wp1.sensor_collector.pps.api.ProximityType;
 import eu.liveandgov.wp1.sensor_collector.pps.api.ooapi.OSMIPPS;
 
 public class OOAPITest extends TestCase {
@@ -20,7 +20,7 @@ public class OOAPITest extends TestCase {
         int tp = 0;
 
         for (double[] p : POSITIVE) {
-            tp += ips.calculate(p[1], p[0]) == Proximity.IN_PROXIMITY ? 1 : 0;
+            tp += ips.calculate(p[1], p[0]) == ProximityType.IN_PROXIMITY ? 1 : 0;
         }
 
         // Negative count/true negative
@@ -28,7 +28,7 @@ public class OOAPITest extends TestCase {
         int tn = 0;
 
         for (double[] n : NEGATIVE) {
-            tn += ips.calculate(n[1], n[0]) == Proximity.NOT_IN_PROXIMITY ? 1 : 0;
+            tn += ips.calculate(n[1], n[0]) == ProximityType.NOT_IN_PROXIMITY ? 1 : 0;
         }
 
         int fp = nc - tn;

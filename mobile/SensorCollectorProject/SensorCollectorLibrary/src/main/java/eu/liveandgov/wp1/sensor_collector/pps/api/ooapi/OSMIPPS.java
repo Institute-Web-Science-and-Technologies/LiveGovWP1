@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.sensor_collector.pps.api.ooapi;
 
 /**
- * Openstreetmaps Indexed Platform Proximity Service
+ * Openstreetmaps Indexed Platform ProximityType Service
  *
  * @author lukashaertel
  */

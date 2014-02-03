@@ -24,7 +24,7 @@ import eu.liveandgov.wp1.sensor_collector.sensors.SensorSerializer;
 /**
  * Created by lukashaertel on 18.01.14.
  */
-public class PPSAdapter implements Consumer<String>, Monitorable {
+public class PPSAdapter implements Consumer<String> {
 
     private final ScheduledExecutorService executor;
 
@@ -44,9 +44,7 @@ public class PPSAdapter implements Consumer<String>, Monitorable {
         filter.setConsumer(parseProd);
 
         // PPS
-        ppsPipeline = new PPSPipeline();
-        ppsPipeline.setKey(key);
-        ppsPipeline.setProximityService(service);
+        ppsPipeline = new PPSPipeline(key, service);
         parseProd.setConsumer(ppsPipeline);
 
         // Publish samples as Sensor Sample.
@@ -61,10 +59,5 @@ public class PPSAdapter implements Consumer<String>, Monitorable {
                 filter.push(s);
             }
         });
-    }
-
-    @Override
-    public String getStatus() {
-        return ppsPipeline.getStatus();
     }
 }

@@ -105,6 +105,7 @@ public class ServiceSensorControl extends Service {
                 this,
                 PPSOptions.HELSINKIIPPS_ASSET,
                 false,
+                PPSOptions.HELSINKI_ID_FIELD,
                 PPSOptions.HELSINKI_LAT_FIELD,
                 PPSOptions.HELSINKI_LON_FIELD,
                 PPSOptions.PROXIMITY);
@@ -160,7 +161,6 @@ public class ServiceSensorControl extends Service {
         monitorThread.registerMonitorable(persistor, "Persitor");
         monitorThread.registerMonitorable(transferManager, "Transfer");
         monitorThread.registerMonitorable(sensorQueue, "Queue");
-        monitorThread.registerMonitorable((Monitorable)ppsPipeline, "PPS");
 
         // Start threads
         connectorThread.start();
