@@ -19,7 +19,8 @@ public class SsfFileFormat {
     public static String SSF_GOOGLE_ACTIVITY       = "ACTG";
     public static String SSF_ACTIVITY              = "ACT";
 
-    public static String SSF_PPROXIMITY            = "PPX";
+    public static String SSF_PPROXIMITY            = "PRX";
+    public static String SSF_WAITING               = "WTN";
 
     public static String SSF_TAG                   = "TAG";
     public static String SSF_ERROR                 = "ERR";

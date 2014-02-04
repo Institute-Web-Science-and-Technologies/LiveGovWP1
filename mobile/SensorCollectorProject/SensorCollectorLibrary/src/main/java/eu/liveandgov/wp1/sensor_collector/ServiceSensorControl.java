@@ -14,6 +14,7 @@ import eu.liveandgov.wp1.sensor_collector.activity_recognition.HarAdapter;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.PPSOptions;
+import eu.liveandgov.wp1.sensor_collector.configuration.WaitingOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.implementations.ConnectorThread;
 import eu.liveandgov.wp1.sensor_collector.connectors.implementations.GpsCache;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.LinkedSensorQueue;
@@ -33,13 +34,14 @@ import eu.liveandgov.wp1.sensor_collector.sensors.SensorThread;
 import eu.liveandgov.wp1.sensor_collector.streaming.ZmqStreamer;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferManager;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferThreadPost;
+import eu.liveandgov.wp1.sensor_collector.waiting.WaitingAdapter;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.API_EXTENSIONS;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
 
 public class ServiceSensorControl extends Service {
     // CONSTANTS
-    static final String LOG_TAG =  "SCS";
+    static final String LOG_TAG = "SCS";
     public static final String SENSOR_FILENAME = "sensor.ssf";
     public static final String STAGE_FILENAME = "sensor.stage.ssf";
 
@@ -70,6 +72,7 @@ public class ServiceSensorControl extends Service {
     public Consumer<String> streamer;
     public Consumer<String> harPipeline;
     public Consumer<String> ppsPipeline;
+    public Consumer<String> waitingPipeline;
     public GpsCache gpsCache;
 
     // THREADS
@@ -93,8 +96,8 @@ public class ServiceSensorControl extends Service {
 
         // INITIALIZATIONS
         // Warning: getFilesDir is only available after onCreate was called.
-        File sensorFile   = new File(getFilesDir(), SENSOR_FILENAME);
-        File stageFile    = new File(getFilesDir(), STAGE_FILENAME);
+        File sensorFile = new File(getFilesDir(), SENSOR_FILENAME);
+        File stageFile = new File(getFilesDir(), STAGE_FILENAME);
 
         // Init indices
         staticIPS = new StaticIPS(
@@ -126,16 +129,17 @@ public class ServiceSensorControl extends Service {
         streamer = new ZmqStreamer();
         harPipeline = new HarAdapter();
         ppsPipeline = new PPSAdapter("platform", aggregatorPS);
-        gpsCache    = new GpsCache();
-        persistor   = ZIPPED_PERSISTOR ?
-                new ZipFilePersistor(sensorFile):
+        waitingPipeline = new WaitingAdapter("platform", WaitingOptions.WAITING_TRESHOLD);
+        gpsCache = new GpsCache();
+        persistor = ZIPPED_PERSISTOR ?
+                new ZipFilePersistor(sensorFile) :
                 new FilePersistor(sensorFile);
         publisher = new PublicationPipeline(); // for external communication
 
         // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
         transferManager = new TransferThreadPost(persistor, stageFile);
-        monitorThread   = new MonitorThread();
+        monitorThread = new MonitorThread();
 
         // Restore user id from shared preferences
         restoreUserId();
@@ -161,6 +165,8 @@ public class ServiceSensorControl extends Service {
         monitorThread.registerMonitorable(persistor, "Persitor");
         monitorThread.registerMonitorable(transferManager, "Transfer");
         monitorThread.registerMonitorable(sensorQueue, "Queue");
+
+        monitorThread.registerMonitorable((Monitorable) waitingPipeline, "Waiting Pipeline");
 
         // Start threads
         connectorThread.start();
@@ -239,6 +245,7 @@ public class ServiceSensorControl extends Service {
         transferManager.deleteStagedSamples();
 
         // Also delete index files
+        Log.d(LOG_TAG, "Deleting indices");
         new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE).delete();
         new File(getFilesDir(), PPSOptions.OSMIPPS_INDEX_FILE).delete();
     }
@@ -246,6 +253,7 @@ public class ServiceSensorControl extends Service {
     private void doStopHAR() {
         connectorThread.removeConsumer(harPipeline);
         connectorThread.removeConsumer(ppsPipeline);
+        connectorThread.removeConsumer(waitingPipeline);
 
         isHAR = false;
 
@@ -261,6 +269,7 @@ public class ServiceSensorControl extends Service {
         osmIPPS.tryLoad(new File(getFilesDir(), PPSOptions.OSMIPPS_INDEX_FILE));
 
         isHAR = true;
+        connectorThread.addConsumer(waitingPipeline);
         connectorThread.addConsumer(ppsPipeline);
         connectorThread.addConsumer(harPipeline);
     }

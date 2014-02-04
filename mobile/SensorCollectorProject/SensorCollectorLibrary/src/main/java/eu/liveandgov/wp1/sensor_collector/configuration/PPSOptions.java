@@ -4,8 +4,8 @@ package eu.liveandgov.wp1.sensor_collector.configuration;
  * Created by lukashaertel on 18.01.14.
  */
 public class PPSOptions {
-    public static final double PROXIMITY = 20.0;
-    public static final double INDEX_PROXIMITY_SUBDIVISIONS = 4.0;
+    public static final double PROXIMITY = 25.0;
+    public static final double INDEX_PROXIMITY_SUBDIVISIONS = 5.0;
 
     public static final double INDEX_HORIZONTAL_RESOLUTION = (PROXIMITY / INDEX_PROXIMITY_SUBDIVISIONS) / 111132.954;
     public static final double INDEX_VERTICAL_RESOLUTION = (PROXIMITY / INDEX_PROXIMITY_SUBDIVISIONS) / 111132.954;

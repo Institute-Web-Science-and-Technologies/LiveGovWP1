@@ -53,6 +53,7 @@ public class PPSAdapter implements Consumer<String> {
 
     @Override
     public void push(final String s) {
+        // Hack, that could make it into another pipeline element
         executor.execute(new Runnable() {
             @Override
             public void run() {

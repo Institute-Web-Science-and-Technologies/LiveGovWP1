@@ -29,6 +29,7 @@ import eu.liveandgov.wp1.sensor_collector.pps.api.Proximity;
 import eu.liveandgov.wp1.sensor_collector.pps.api.ProximityType;
 import eu.liveandgov.wp1.sensor_collector.sensors.sensor_producers.TelephonyHolder;
 import eu.liveandgov.wp1.sensor_collector.sensors.sensor_value_objects.GpsSensorValue;
+import eu.liveandgov.wp1.sensor_collector.waiting.WaitingEvent;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_ACCELEROMETER;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_BLUETOOTH;
@@ -43,6 +44,7 @@ import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF
 import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_PPROXIMITY;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_ROTATION;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_TAG;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_WAITING;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF_WIFI;
 
 /**
@@ -51,8 +53,8 @@ import static eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat.SSF
  * Created by hartmann on 9/15/13.
  */
 public class SensorSerializer {
-    private static final Pattern manyNotComma = Pattern.compile("[^,]*");
-    private static final Pattern comma = Pattern.compile(",");
+    private static final Pattern headDelimiter = Pattern.compile("\\s*,\\s*");
+    private static final Pattern tailDelimiter = Pattern.compile("\\s+");
 
     public static final class SSE<T> {
         public final String type;
@@ -93,7 +95,7 @@ public class SensorSerializer {
 
         @Override
         public String toString() {
-            return "Parse{" +
+            return "SSE{" +
                     "type='" + type + '\'' +
                     ", timestamp=" + timestamp +
                     ", device='" + device + '\'' +
@@ -237,13 +239,15 @@ public class SensorSerializer {
         @Override
         public SSE<String> fromSSF(String ssf) {
             final Scanner scanner = new Scanner(ssf);
+            scanner.useDelimiter(headDelimiter);
 
-            final String type = scanner.next(manyNotComma).trim();
-            scanner.skip(comma);
-            final long timestamp = Long.valueOf(scanner.next(manyNotComma));
-            scanner.skip(comma);
-            final String device = scanner.next(manyNotComma).trim();
-            scanner.skip(comma);
+            final String type = scanner.next();
+            final long timestamp = Long.valueOf(scanner.next());
+            final String device = scanner.next();
+
+            scanner.skip(headDelimiter);
+            scanner.useDelimiter(tailDelimiter);
+
             final String value = scanner.nextLine();
 
             return new SSE<String>(type, timestamp, device, value);
@@ -263,13 +267,15 @@ public class SensorSerializer {
         @Override
         public SSE<String> fromSSF(String ssf) {
             final Scanner scanner = new Scanner(ssf);
+            scanner.useDelimiter(headDelimiter);
 
-            final String type = scanner.next(manyNotComma).trim();
-            scanner.skip(comma);
-            final long timestamp = Long.valueOf(scanner.next(manyNotComma));
-            scanner.skip(comma);
-            final String device = scanner.next(manyNotComma).trim();
-            scanner.skip(comma);
+            final String type = scanner.next();
+            final long timestamp = Long.valueOf(scanner.next());
+            final String device = scanner.next();
+
+            scanner.skip(headDelimiter);
+            scanner.useDelimiter(tailDelimiter);
+
             final String value = unescape(scanner.nextLine());
 
             return new SSE<String>(type, timestamp, device, value);
@@ -301,13 +307,14 @@ public class SensorSerializer {
         @Override
         public SSE<float[]> fromSSF(String ssf) {
             final Scanner scanner = new Scanner(ssf);
+            scanner.useDelimiter(headDelimiter);
 
-            final String type = scanner.next(manyNotComma).trim();
-            scanner.skip(comma);
-            final long timestamp = Long.valueOf(scanner.next(manyNotComma));
-            scanner.skip(comma);
-            final String device = scanner.next(manyNotComma).trim();
-            scanner.skip(comma);
+            final String type = scanner.next();
+            final long timestamp = Long.valueOf(scanner.next());
+            final String device = scanner.next();
+
+            scanner.skip(headDelimiter);
+            scanner.useDelimiter(tailDelimiter);
 
             final List<Float> buffer = new ArrayList<Float>();
             while (scanner.hasNextFloat()) {
@@ -348,13 +355,14 @@ public class SensorSerializer {
         @Override
         public SSE<double[]> fromSSF(String ssf) {
             final Scanner scanner = new Scanner(ssf);
+            scanner.useDelimiter(headDelimiter);
 
-            final String type = scanner.next(manyNotComma).trim();
-            scanner.skip(comma);
-            final long timestamp = Long.valueOf(scanner.next(manyNotComma));
-            scanner.skip(comma);
-            final String device = scanner.next(manyNotComma).trim();
-            scanner.skip(comma);
+            final String type = scanner.next();
+            final long timestamp = Long.valueOf(scanner.next());
+            final String device = scanner.next();
+
+            scanner.skip(headDelimiter);
+            scanner.useDelimiter(tailDelimiter);
 
             final List<Double> buffer = new ArrayList<Double>();
             while (scanner.hasNextDouble()) {
@@ -402,19 +410,46 @@ public class SensorSerializer {
         @Override
         public SSE<ProximityEvent> fromSSF(String ssf) {
             final Scanner scanner = new Scanner(ssf);
+            scanner.useDelimiter(headDelimiter);
 
-            final String type = scanner.next(manyNotComma).trim();
-            scanner.skip(comma);
-            final long timestamp = Long.valueOf(scanner.next(manyNotComma));
-            scanner.skip(comma);
-            final String device = scanner.next(manyNotComma).trim();
-            scanner.skip(comma);
+            final String type = scanner.next();
+            final long timestamp = Long.valueOf(scanner.next());
+            final String device = scanner.next();
+
+            scanner.skip(headDelimiter);
+            scanner.useDelimiter(tailDelimiter);
 
             final String key = scanner.next().trim();
             final ProximityType proximityType = ProximityType.valueOf(scanner.next());
-            final String objectIdentity = scanner.nextLine();
+            final String objectIdentity = scanner.nextLine().trim();
 
             return new SSE<ProximityEvent>(type, timestamp, device, new ProximityEvent(timestamp, key, new Proximity(proximityType, objectIdentity)));
+        }
+    };
+
+    public static final Conversion<WaitingEvent> waitingEvent = new Conversion<WaitingEvent>() {
+        @Override
+        public String toSSF(long timestamp, String device, WaitingEvent waitingEvent) {
+            return objects.toSSF(SSF_WAITING, waitingEvent.time, device, new Object[]{waitingEvent.key, waitingEvent.duration, waitingEvent.objectIdentity});
+        }
+
+        @Override
+        public SSE<WaitingEvent> fromSSF(String ssf) {
+            final Scanner scanner = new Scanner(ssf);
+            scanner.useDelimiter(headDelimiter);
+
+            final String type = scanner.next();
+            final long timestamp = Long.valueOf(scanner.next());
+            final String device = scanner.next();
+
+            scanner.skip(headDelimiter);
+            scanner.useDelimiter(tailDelimiter);
+
+            final String key = scanner.next().trim();
+            final long duration = scanner.nextLong();
+            final String objectIdentity = scanner.nextLine();
+
+            return new SSE<WaitingEvent>(type, timestamp, device, new WaitingEvent(timestamp, key, duration, objectIdentity));
         }
     };
 
