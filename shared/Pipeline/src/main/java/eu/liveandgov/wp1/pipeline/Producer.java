@@ -1,0 +1,37 @@
+package eu.liveandgov.wp1.pipeline;
+
+/**
+ * Created by Lukas Härtel on 08.02.14.
+ */
+public class Producer<Item> {
+    /**
+     * Consumer that handles the items created by this producer
+     */
+    private Consumer<? super Item> consumer = Consumer.EMPTY_CONSUMER;
+
+    /**
+     * Returns the current consumer
+     */
+    protected final Consumer<? super Item> getConsumer() {
+        return consumer;
+    }
+
+    /**
+     * Sets the consumer for this producer
+     *
+     * @param consumer The new consumer
+     */
+    public final void setConsumer(Consumer<? super Item> consumer) {
+        // Handle null-parameters
+        if (consumer == null) consumer = Consumer.EMPTY_CONSUMER;
+
+        this.consumer = consumer;
+    }
+
+    /**
+     * Hands the given item to the consumer
+     */
+    protected final void produce(Item item) {
+        consumer.push(item);
+    }
+}
