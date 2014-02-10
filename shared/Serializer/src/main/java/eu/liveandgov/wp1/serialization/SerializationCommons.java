@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 /**
  * Created by Lukas Härtel on 08.02.14.
  */
-public final class SerializationCommons {
+public class SerializationCommons {
     public static final String COMMA = ",";
 
     public static final Pattern COMMA_SEPARATED = Pattern.compile("\\s*,\\s*");

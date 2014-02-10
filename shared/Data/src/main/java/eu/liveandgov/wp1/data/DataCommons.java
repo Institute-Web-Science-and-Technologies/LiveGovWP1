@@ -4,7 +4,7 @@ package eu.liveandgov.wp1.data;
  * <p>Contains common constants and functions for data creation and manipulation</p>
  * Created by Lukas Härtel on 08.02.14.
  */
-public final class DataCommons {
+public class DataCommons {
     public static final String TYPE_GPS = "GPS";
     public static final String TYPE_ACCELEROMETER = "ACC";
     public static final String TYPE_LINEAR_ACCELERATION = "LAC";

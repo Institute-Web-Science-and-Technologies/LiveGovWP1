@@ -16,39 +16,55 @@ public class SerTest {
         final Item<?> prx = ItemSwitch.ITEM_SWITCH.deSerialize("PRX,1391515681876,mrazr,platform/in proximity/Anschützstraße");
         final Item<?> wtn = ItemSwitch.ITEM_SWITCH.deSerialize("WTN,1391515649824,mrazr,platform/40981/Anschützstraße");
 
+
         System.out.println(acc);
         System.out.println(ItemSwitch.ITEM_SWITCH.serialize(acc));
         System.out.println(ItemSwitch.ITEM_SWITCH.deSerialize(ItemSwitch.ITEM_SWITCH.serialize(acc)));
         System.out.println();
+
+        assert acc.equals(ItemSwitch.ITEM_SWITCH.deSerialize(ItemSwitch.ITEM_SWITCH.serialize(acc)));
 
         System.out.println(gps);
         System.out.println(ItemSwitch.ITEM_SWITCH.serialize(gps));
         System.out.println(ItemSwitch.ITEM_SWITCH.deSerialize(ItemSwitch.ITEM_SWITCH.serialize(gps)));
         System.out.println();
 
+        assert gps.equals(ItemSwitch.ITEM_SWITCH.deSerialize(ItemSwitch.ITEM_SWITCH.serialize(gps)));
+
         System.out.println(wifi);
         System.out.println(ItemSwitch.ITEM_SWITCH.serialize(wifi));
         System.out.println(ItemSwitch.ITEM_SWITCH.deSerialize(ItemSwitch.ITEM_SWITCH.serialize(wifi)));
         System.out.println();
+
+        assert wifi.equals(ItemSwitch.ITEM_SWITCH.deSerialize(ItemSwitch.ITEM_SWITCH.serialize(wifi)));
 
         System.out.println(tag);
         System.out.println(ItemSwitch.ITEM_SWITCH.serialize(tag));
         System.out.println(ItemSwitch.ITEM_SWITCH.deSerialize(ItemSwitch.ITEM_SWITCH.serialize(tag)));
         System.out.println();
 
+        assert tag.equals(ItemSwitch.ITEM_SWITCH.deSerialize(ItemSwitch.ITEM_SWITCH.serialize(tag)));
+
         System.out.println(blt);
         System.out.println(ItemSwitch.ITEM_SWITCH.serialize(blt));
         System.out.println(ItemSwitch.ITEM_SWITCH.deSerialize(ItemSwitch.ITEM_SWITCH.serialize(blt)));
         System.out.println();
+
+        assert blt.equals(ItemSwitch.ITEM_SWITCH.deSerialize(ItemSwitch.ITEM_SWITCH.serialize(blt)));
 
         System.out.println(prx);
         System.out.println(ItemSwitch.ITEM_SWITCH.serialize(prx));
         System.out.println(ItemSwitch.ITEM_SWITCH.deSerialize(ItemSwitch.ITEM_SWITCH.serialize(prx)));
         System.out.println();
 
+        assert prx.equals(ItemSwitch.ITEM_SWITCH.deSerialize(ItemSwitch.ITEM_SWITCH.serialize(prx)));
+
         System.out.println(wtn);
         System.out.println(ItemSwitch.ITEM_SWITCH.serialize(wtn));
         System.out.println(ItemSwitch.ITEM_SWITCH.deSerialize(ItemSwitch.ITEM_SWITCH.serialize(wtn)));
         System.out.println();
+
+        assert wtn.equals(ItemSwitch.ITEM_SWITCH.deSerialize(ItemSwitch.ITEM_SWITCH.serialize(wtn)));
+
     }
 }
