@@ -1,0 +1,68 @@
+package eu.liveandgov.wp1.data.impl;
+
+import eu.liveandgov.wp1.data.AbstractItem;
+import eu.liveandgov.wp1.data.DataCommons;
+import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.data.annotations.Unit;
+
+/**
+ * Created by Lukas Härtel on 09.02.14.
+ */
+public class Waiting extends AbstractItem {
+    public final String key;
+
+    @Unit("ms")
+    public final long duration;
+
+    public final String at;
+
+    public Waiting(long timestamp, String device, String key, long duration, String at) {
+        super(timestamp, device);
+        this.key = key;
+        this.duration = duration;
+        this.at = at;
+    }
+
+    public Waiting(Item header, String key, long duration, String at) {
+        super(header);
+        this.key = key;
+        this.duration = duration;
+        this.at = at;
+    }
+
+    @Override
+    public String getType() {
+        return DataCommons.TYPE_WAITING;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Waiting waiting = (Waiting) o;
+
+        if (duration != waiting.duration) return false;
+        if (at != null ? !at.equals(waiting.at) : waiting.at != null) return false;
+        if (key != null ? !key.equals(waiting.key) : waiting.key != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = key != null ? key.hashCode() : 0;
+        result = 31 * result + (int) (duration ^ (duration >>> 32));
+        result = 31 * result + (at != null ? at.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Waiting{" +
+                "key='" + key + '\'' +
+                ", duration=" + duration +
+                ", at='" + at + '\'' +
+                '}';
+    }
+}
