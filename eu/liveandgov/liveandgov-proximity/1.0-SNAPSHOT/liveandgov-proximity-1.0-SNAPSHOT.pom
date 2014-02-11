@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>eu.liveandgov</groupId>
+    <artifactId>liveandgov-proximity</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <packaging>jar</packaging>
+    <name>Live &amp; Gov - Proximity and Waiting</name>
+    <description>Proximity and waiting pipelines</description>
+
+    <url>https://github.com/HeinrichHartmann/LiveGovWP1</url>
+
+    <licenses>
+        <license>
+            <name>The MIT License (MIT)</name>
+            <url>https://raw.github.com/HeinrichHartmann/LiveGovWP1/feature/platformProximity/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://raw.github.com/HeinrichHartmann/LiveGovWP1</url>
+        <connection>scm:git:git://github.com/HeinrichHartmann/LiveGovWP1.git</connection>
+        <developerConnection>scm:git:git@github.com:HeinrichHartmann/LiveGovWP1.git</developerConnection>
+    </scm>
+
+    <developers>
+        <developer>
+            <email>lukashaertel@gmail.com</email>
+            <name>Lukas Härtel</name>
+            <url>https://github.com/lukashaertel</url>
+            <id>lukashaertel</id>
+        </developer>
+    </developers>
+
+    <dependencies>
+        <dependency>
+            <groupId>eu.liveandgov</groupId>
+            <artifactId>liveandgov-commons</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20131018</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.commons-csv</artifactId>
+            <version>1.0-r706900_3</version>
+        </dependency>
+    </dependencies>
+
+</project>
