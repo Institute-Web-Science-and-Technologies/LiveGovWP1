@@ -1,8 +1,7 @@
 package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.DataCommons;
-import eu.liveandgov.wp1.data.impl.Arbitrary;
-import eu.liveandgov.wp1.data.impl.Motion;
+import eu.liveandgov.wp1.data.impl.*;
 
 import eu.liveandgov.wp1.serialization.Wrapper;
 import eu.liveandgov.wp1.serialization.SerializationCommons;
@@ -54,24 +53,20 @@ public class MotionSerialization extends Wrapper<Motion, Arbitrary> {
             values[i] = floatList.get(i);
         }
 
-        final Motion.Type type;
         if (DataCommons.TYPE_ACCELEROMETER.equals(item.getType())) {
-            type = Motion.Type.ACCELEROMETER;
+            return new Acceleration(item, values);
         } else if (DataCommons.TYPE_LINEAR_ACCELERATION.equals(item.getType())) {
-            type = Motion.Type.LINEAR_ACCELERATION;
+            return new LinearAcceleration(item, values);
         } else if (DataCommons.TYPE_GRAVITY.equals(item.getType())) {
-            type = Motion.Type.GRAVITY;
+            return new Gravity(item, values);
         } else if (DataCommons.TYPE_GYROSCOPE.equals(item.getType())) {
-            type = Motion.Type.GYROSCOPE;
+            return new Gyroscope(item, values);
         } else if (DataCommons.TYPE_MAGNETOMETER.equals(item.getType())) {
-            type = Motion.Type.MAGNETOMETER;
+            return new MagneticField(item, values);
         } else if (DataCommons.TYPE_ROTATION.equals(item.getType())) {
-            type = Motion.Type.ROTATION;
+            return new Rotation(item, values);
         } else {
             throw new IllegalArgumentException();
         }
-
-
-        return new Motion(item, type, values);
     }
 }

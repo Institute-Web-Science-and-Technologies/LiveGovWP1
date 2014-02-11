@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.pipeline.impl;
 
-import org.jeromq.ZMQ;
+
+import org.zeromq.ZMQ;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +40,7 @@ public class ZMQServerPipeline extends ZMQPipeline {
         this.mode = mode;
         this.boundAddress = boundAddress;
 
-        context = ZMQ.context();
+        context = ZMQ.context(1);
         socket = context.socket(mode);
         socket.setHWM(HWM);
         socket.bind(boundAddress);
