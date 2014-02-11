@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <packaging>jar</packaging>
-    <name>Live and Gov Commons</name>
+    <name>Live &amp; Gov - Commons</name>
     <description>Common functions and structures for the Live and Gov project</description>
 
     <url>https://github.com/HeinrichHartmann/LiveGovWP1</url>
