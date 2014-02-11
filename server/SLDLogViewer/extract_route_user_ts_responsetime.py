@@ -15,7 +15,7 @@ with open('ServiceLineDetection.log', 'r') as f:
 		if line[49:57] == "response":
 			jso = json.loads(line[47:])
 			out = ""
-			if jso["username"] <> "test_user":
+			if jso["username"] <> "test_user" and jso["username"].strip() <> "":
 				if len(jso["response"]["routes"]) > 0:
 					out += jso["response"]["routes"][0]["route_id"] + ";"
 				else:
