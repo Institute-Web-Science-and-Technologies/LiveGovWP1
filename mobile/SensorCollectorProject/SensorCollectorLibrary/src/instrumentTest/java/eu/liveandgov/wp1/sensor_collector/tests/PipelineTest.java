@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 
 import java.util.Collections;
 
-import eu.liveandgov.wp1.sensor_collector.connectors.implementations.PrefixFilter;
+import eu.liveandgov.wp1.pipeline.impl.StartsWithPipeline;
 import eu.liveandgov.wp1.sensor_collector.tests.utils.PipeHelper;
 
 /**
@@ -100,9 +100,9 @@ public class PipelineTest extends TestCase {
         helper.expectFrom("DEF").exactly(1).toBeEqual();
 
         // Create prefix filter, add filters and set helper as consumer
-        final PrefixFilter filter = new PrefixFilter();
-        filter.addFilter("CD");
-        filter.addFilter("DE");
+        final StartsWithPipeline filter = new StartsWithPipeline();
+        filter.getPrefixes().add("CD");
+        filter.getPrefixes().add("DE");
         filter.setConsumer(helper);
 
         // Push test-set

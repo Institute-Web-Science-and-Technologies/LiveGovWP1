@@ -7,7 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
+import eu.liveandgov.wp1.pipeline.Consumer;
+
 import static eu.liveandgov.wp1.sensor_collector.tests.utils.StringHelper.*;
 
 /**

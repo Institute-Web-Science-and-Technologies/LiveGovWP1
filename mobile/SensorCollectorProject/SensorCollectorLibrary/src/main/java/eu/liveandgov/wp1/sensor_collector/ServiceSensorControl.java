@@ -8,8 +8,14 @@ import android.provider.Settings;
 import android.util.Log;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.Callable;
 
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
+import eu.liveandgov.wp1.pps.api.AggregatingPS;
+import eu.liveandgov.wp1.pps.api.csv.StaticIPS;
+import eu.liveandgov.wp1.pps.api.ooapi.OSMIPPS;
 import eu.liveandgov.wp1.sensor_collector.activity_recognition.HarAdapter;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
@@ -26,15 +32,11 @@ import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
 import eu.liveandgov.wp1.sensor_collector.persistence.PublicationPipeline;
 import eu.liveandgov.wp1.sensor_collector.persistence.ZipFilePersistor;
 import eu.liveandgov.wp1.sensor_collector.pps.PPSAdapter;
-import eu.liveandgov.wp1.sensor_collector.pps.api.AggregatingPS;
-import eu.liveandgov.wp1.sensor_collector.pps.api.csv.StaticIPS;
-import eu.liveandgov.wp1.sensor_collector.pps.api.ooapi.OSMIPPS;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorSerializer;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorThread;
 import eu.liveandgov.wp1.sensor_collector.streaming.ZmqStreamer;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferManager;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferThreadPost;
-import eu.liveandgov.wp1.sensor_collector.waiting.WaitingAdapter;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.API_EXTENSIONS;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
@@ -105,8 +107,12 @@ public class ServiceSensorControl extends Service {
                 PPSOptions.INDEX_VERTICAL_RESOLUTION,
                 PPSOptions.INDEX_BY_CENTROID,
                 PPSOptions.INDEX_STORE_DEGREE,
-                this,
-                PPSOptions.HELSINKIIPPS_ASSET,
+                new Callable<InputStream>() {
+                    @Override
+                    public InputStream call() throws IOException {
+                        return getAssets().open(PPSOptions.HELSINKIIPPS_ASSET);
+                    }
+                },
                 false,
                 PPSOptions.HELSINKI_ID_FIELD,
                 PPSOptions.HELSINKI_LAT_FIELD,

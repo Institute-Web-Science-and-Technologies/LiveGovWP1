@@ -7,8 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
-import eu.liveandgov.wp1.sensor_collector.connectors.MultiProducer;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
 

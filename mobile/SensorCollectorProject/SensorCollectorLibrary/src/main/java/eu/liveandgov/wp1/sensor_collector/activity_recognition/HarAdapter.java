@@ -16,7 +16,7 @@ import eu.liveandgov.wp1.sensor_collector.connectors.implementations.SampleEmitt
  *
  * Created by hartmann on 10/20/13.
  */
-public class HarAdapter implements Consumer<String> {
+public class HarAdapter implements eu.liveandgov.wp1.pipeline.Consumer<String> {
 
     private final PrefixFilter filter;
     private final MotionSensorValueProducer parseProd;
