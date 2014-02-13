@@ -44,5 +44,4 @@ dependencies {
     compile 'eu.liveandgov:liveandgov-proximity:1.0'
     compile 'eu.liveandgov:liveandgov-commons:1.0'
     compile 'eu.liveandgov.wp1:HumanActivityRecognitionLibrary:1.0'
-    compile 'org.jeromq:jeromq:0.2.0'
 }

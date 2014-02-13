@@ -20,7 +20,6 @@ import eu.liveandgov.wp1.serialization.impl.ActivitySerialization;
  * Created by hartmann on 10/20/13.
  */
 public class HARAdapter implements Consumer<String> {
-
     private final StartsWith filter;
     private final MotionSensorValueProducer parseProd;
     private final Pipeline<MotionSensorValue, String> harPipeline;

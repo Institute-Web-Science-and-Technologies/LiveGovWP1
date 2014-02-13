@@ -188,8 +188,6 @@ public class ServiceSensorControl extends Service {
         monitorThread.registerMonitorable(transferManager, "Transfer");
         monitorThread.registerMonitorable(sensorQueue, "Queue");
 
-        monitorThread.registerMonitorable((Monitorable) waitingPipeline, "Waiting Pipeline");
-
         // Start threads
         connectorThread.start();
         monitorThread.start();
