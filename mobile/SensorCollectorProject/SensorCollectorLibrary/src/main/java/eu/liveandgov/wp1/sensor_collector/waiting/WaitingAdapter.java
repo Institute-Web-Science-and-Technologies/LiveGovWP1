@@ -1,44 +1,43 @@
-package eu.liveandgov.wp1.sensor_collector.pps;
+package eu.liveandgov.wp1.sensor_collector.waiting;
 
 import eu.liveandgov.wp1.data.DataCommons;
-import eu.liveandgov.wp1.data.impl.GPS;
 import eu.liveandgov.wp1.data.impl.Proximity;
+import eu.liveandgov.wp1.data.impl.Waiting;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.impl.DeSerializer;
 import eu.liveandgov.wp1.pipeline.impl.Serializer;
 import eu.liveandgov.wp1.pipeline.impl.StartsWith;
-import eu.liveandgov.wp1.pps.PPSPipeline;
-import eu.liveandgov.wp1.pps.api.AggregatingPS;
 import eu.liveandgov.wp1.sensor_collector.connectors.impl.SensorEmitter;
-import eu.liveandgov.wp1.serialization.impl.GPSSerialization;
 import eu.liveandgov.wp1.serialization.impl.ProximitySerialization;
+import eu.liveandgov.wp1.serialization.impl.WaitingSerialization;
+import eu.liveandgov.wp1.waiting.WaitingPipeline;
 
 /**
  * Created by lukashaertel on 11.02.14.
  */
-public class PPSAdapter implements Consumer<String> {
+public class WaitingAdapter implements Consumer<String> {
     private final StartsWith filter;
 
-    private final DeSerializer<GPS> deSerializer;
+    private final DeSerializer<Proximity> deSerializer;
 
-    private final PPSPipeline pps;
+    private final WaitingPipeline waitingPipeline;
 
-    private final Serializer<Proximity> serializer;
+    private final Serializer<Waiting> serializer;
 
     private final SensorEmitter sensorEmitter;
 
-    public PPSAdapter(String key, AggregatingPS ps) {
+    public WaitingAdapter(String key, long waitTreshold) {
         filter = new StartsWith();
         filter.addPrefix(DataCommons.TYPE_GPS);
 
-        deSerializer = new DeSerializer<GPS>(GPSSerialization.GPS_SERIALIZATION);
+        deSerializer = new DeSerializer<Proximity>(ProximitySerialization.PROXIMITY_SERIALIZATION);
         filter.setConsumer(deSerializer);
 
-        pps = new PPSPipeline(key, ps);
-        deSerializer.setConsumer(pps);
+        waitingPipeline = new WaitingPipeline(key, waitTreshold);
+        deSerializer.setConsumer(waitingPipeline);
 
-        serializer = new Serializer<Proximity>(ProximitySerialization.PROXIMITY_SERIALIZATION);
-        pps.setConsumer(serializer);
+        serializer = new Serializer<Waiting>(WaitingSerialization.WAITING_SERIALIZATION);
+        waitingPipeline.setConsumer(serializer);
 
         sensorEmitter = new SensorEmitter();
         serializer.setConsumer(sensorEmitter);

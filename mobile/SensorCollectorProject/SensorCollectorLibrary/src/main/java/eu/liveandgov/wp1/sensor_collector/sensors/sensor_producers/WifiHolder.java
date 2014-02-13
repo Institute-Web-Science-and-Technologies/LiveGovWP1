@@ -14,10 +14,11 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import eu.liveandgov.wp1.data.impl.WiFi;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.sensor_collector.sensors.SensorSerializer;
+import eu.liveandgov.wp1.serialization.impl.WiFiSerialization;
 
 /**
  * Created by lukashaertel on 27.11.13.
@@ -75,8 +76,26 @@ public class WifiHolder implements SensorHolder {
 
                 // If scan results are not null, push
                 if (scanResults != null) {
+                    final WiFi.Item[] items = new WiFi.Item[scanResults.size()];
+                    for (int i = 0; i < scanResults.size(); i++) {
+                        final ScanResult sr = scanResults.get(i);
+
+                        items[i] = new WiFi.Item(
+                                sr.SSID,
+                                sr.BSSID,
+                                sr.frequency,
+                                sr.level
+                        );
+                    }
+
+                    final String message = WiFiSerialization.WI_FI_SERIALIZATION.serialize(new WiFi(
+                            System.currentTimeMillis(),
+                            GlobalContext.getUserId(),
+                            items
+                    ));
+
                     // Push converted scan results to queue
-                    sensorQueue.push(SensorSerializer.scanResults.toSSFDefault(scanResults));
+                    sensorQueue.push(message);
                 }
 
                 // If results are on time, schedule the next scan at the handler with the given delay

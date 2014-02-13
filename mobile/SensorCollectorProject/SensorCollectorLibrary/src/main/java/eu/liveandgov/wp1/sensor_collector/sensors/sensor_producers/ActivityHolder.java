@@ -9,22 +9,21 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.ActivityRecognitionClient;
+import com.google.android.gms.location.DetectedActivity;
 
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 
 /**
  * Created by cehlen on 9/26/13.
  */
-public class ActivityHolder
-        implements
-        GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener, SensorHolder {
+public class ActivityHolder implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener, SensorHolder {
+    public static final String LOG_TAG = "ACTH";
 
     public static final int DETECTION_INTERVAL_SECONDS = 20;
 
     public static final int MILLISECONDS_PER_SECOND = 1000;
     public static final int DETECTION_INTERVAL = MILLISECONDS_PER_SECOND * DETECTION_INTERVAL_SECONDS;
 
-    public static final String LOG_TAG = "ACTH";
     private PendingIntent activityRecognitionPendingIntent;
     private ActivityRecognitionClient activityRecognitionClient;
 
@@ -52,7 +51,7 @@ public class ActivityHolder
     }
 
     private void init() {
-        if(!playServicesAvailable()) return;
+        if (!playServicesAvailable()) return;
         available = true;
         activityRecognitionClient = new ActivityRecognitionClient(GlobalContext.context, this, this);
         Intent intent = new Intent(GlobalContext.context, ActivityIntentService.class);
@@ -63,7 +62,7 @@ public class ActivityHolder
     @Override
     public void onConnected(Bundle bundle) {
         connected = true;
-        if(startImmediate) {
+        if (startImmediate) {
             activityRecognitionClient.requestActivityUpdates(DETECTION_INTERVAL, activityRecognitionPendingIntent);
             startImmediate = false;
         }
@@ -82,10 +81,10 @@ public class ActivityHolder
 
     @Override
     public void startRecording() {
-        if(!available) {
+        if (!available) {
             return;
         }
-        if(!connected) {
+        if (!connected) {
             startImmediate = true;
         } else {
             activityRecognitionClient.requestActivityUpdates(DETECTION_INTERVAL, activityRecognitionPendingIntent);
@@ -94,11 +93,11 @@ public class ActivityHolder
 
     @Override
     public void stopRecording() {
-        if(!available) {
+        if (!available) {
             return;
         }
         startImmediate = false;
-        if(activityRecognitionClient.isConnected()) {
+        if (activityRecognitionClient.isConnected()) {
             activityRecognitionClient.removeActivityUpdates(activityRecognitionPendingIntent);
         }
     }

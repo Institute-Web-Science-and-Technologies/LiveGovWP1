@@ -2,56 +2,26 @@ package eu.liveandgov.wp1.sensor_collector.streaming;
 
 import android.util.Log;
 
-import org.jeromq.ZContext;
-import org.jeromq.ZMQ;
 
-import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
+import eu.liveandgov.wp1.pipeline.impl.ZMQClient;
+import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
+import zmq.ZMQ;
 
 /**
-* String-Consumer that sends samples to a remote server using ZMQ message queue system.
-*
-* Created by hartmann on 10/2/13.
-*/
-public class ZmqStreamer implements Monitorable, Consumer<String> {
-    public final static String LOG_TAG = "ZMQStreamer";
+ * String-Consumer that sends samples to a remote server using ZMQ message queue system.
+ * <p/>
+ * Created by hartmann on 10/2/13.
+ */
+public class ZMQStreamer extends ZMQClient implements Monitorable {
+    /**
+     * Pull interval can be really slow because we don't expect responses
+     */
+    private static final int PULL_INTERVAL = 5000;
 
-    public final static int MESSAGE_RETRY_COUNT = 10;
-
-    private final ZContext context;
-
-    private ZMQ.Socket socket;
-
-    public ZmqStreamer(){
-        context = new ZContext();
-        context.setHWM(1000);
-    }
-
-    @Override
-    public void push(String m)
-    {
-        for(int i=0;i<MESSAGE_RETRY_COUNT;i++)
-        {
-            if(socket == null)
-            {
-                socket = context.createSocket(ZMQ.PUSH);
-                socket.connect(SensorCollectionOptions.STREAMING_ZMQ_SOCKET);
-            }
-
-            if(!socket.send(m, ZMQ.DONTWAIT))
-            {
-                Log.w(LOG_TAG, "ZMQ connection transmission failed, invalidating socket");
-
-                context.destroySocket(socket);
-                socket = null;
-            }
-
-            if(socket != null)
-            {
-                return;
-            }
-        }
+    public ZMQStreamer() {
+        super(GlobalContext.getExecutorService(), PULL_INTERVAL, ZMQ.ZMQ_PUSH, SensorCollectionOptions.STREAMING_ZMQ_SOCKET);
     }
 
     @Override

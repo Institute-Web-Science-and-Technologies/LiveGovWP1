@@ -18,13 +18,16 @@ import org.apache.commons.lang3.text.StrBuilder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import eu.liveandgov.wp1.data.impl.Bluetooth;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.sensor_collector.sensors.SensorSerializer;
+import eu.liveandgov.wp1.serialization.impl.BluetoothSerialization;
 
 /**
  * Created by lukashaertel on 30.11.13.
@@ -97,7 +100,7 @@ public class BluetoothHolder implements SensorHolder {
     private final int delay;
     private final Handler handler;
     private final BluetoothAdapter bluetoothAdapter;
-    private final StrBuilder bluetoothIntermediateBuilder;
+    private final List<Bluetooth.Item> items;
     private long lastScanRequest;
 
     public BluetoothHolder(SensorQueue sensorQueue, int delay, Handler handler) {
@@ -105,37 +108,7 @@ public class BluetoothHolder implements SensorHolder {
         this.delay = delay;
         this.handler = handler;
         this.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        this.bluetoothIntermediateBuilder = new StrBuilder();
-    }
-
-    public static String intermediateFromBTFound(Intent intent) {
-        final StringBuilder builder = new StringBuilder();
-
-        // Extract the stored data from the bundle of the intent
-        final BluetoothDevice bluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-        final BluetoothClass bluetoothClass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
-        final String name = intent.hasExtra(BluetoothDevice.EXTRA_NAME) ? intent.getStringExtra(BluetoothDevice.EXTRA_NAME) : null;
-        final Short rssi = intent.hasExtra(BluetoothDevice.EXTRA_RSSI) ? intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE) : null;
-
-        // Write the values as a tuple of Escaped Address/Device Major Class/Device Class/Bond State/Optional Escaped Name/Optional RSSI
-        builder.append("\"" + StringEscapeUtils.escapeJava(bluetoothDevice.getAddress()) + "\"");
-        builder.append('/');
-        builder.append(getDeviceMajorClassName(bluetoothClass.getMajorDeviceClass()));
-        builder.append('/');
-        builder.append(getDeviceClassName(bluetoothClass.getDeviceClass()));
-        builder.append('/');
-        builder.append(getBondName(bluetoothDevice.getBondState()));
-        builder.append('/');
-        if (name != null) {
-            builder.append("\"" + StringEscapeUtils.escapeJava(name) + "\"");
-        }
-        builder.append('/');
-        if (rssi != null) {
-            builder.append(rssi);
-        }
-
-        // Return the created value
-        return builder.toString();
+        this.items = new ArrayList<Bluetooth.Item>();
     }
 
     private void startNextScan() {
@@ -175,20 +148,53 @@ public class BluetoothHolder implements SensorHolder {
         public void onReceive(Context context, Intent intent) {
             if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(intent.getAction())) {
                 // On start of the discovery, reset the pending push
-                bluetoothIntermediateBuilder.clear();
-            } else if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
-                if (!bluetoothIntermediateBuilder.isEmpty()) {
-                    // We are operating on a tail element, so separate
-                    bluetoothIntermediateBuilder.append(';');
+                items.clear();
+            } else if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {// Extract the stored data from the bundle of the intent
+                final BluetoothDevice bluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                final BluetoothClass bluetoothClass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
+                final String name = intent.hasExtra(BluetoothDevice.EXTRA_NAME) ? intent.getStringExtra(BluetoothDevice.EXTRA_NAME) : null;
+                final Short rssi = intent.hasExtra(BluetoothDevice.EXTRA_RSSI) ? intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE) : null;
+
+                final Bluetooth.BondState bondState;
+                switch (bluetoothDevice.getBondState()) {
+                    case BluetoothDevice.BOND_NONE:
+                        bondState = Bluetooth.BondState.NONE;
+                        break;
+
+                    case BluetoothDevice.BOND_BONDING:
+                        bondState = Bluetooth.BondState.BONDING;
+                        break;
+
+                    case BluetoothDevice.BOND_BONDED:
+                        bondState = Bluetooth.BondState.BONDED;
+                        break;
+
+                    default:
+                        bondState = Bluetooth.BondState.UNKNOWN;
+                        break;
                 }
 
-                bluetoothIntermediateBuilder.append(intermediateFromBTFound(intent));
+                items.add(new Bluetooth.Item(
+                        bluetoothDevice.getAddress(),
+                        getDeviceMajorClassName(bluetoothClass.getMajorDeviceClass()),
+                        getDeviceClassName(bluetoothClass.getDeviceClass()),
+                        bondState,
+                        bluetoothDevice.getName(),
+                        rssi
+                ));
+
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
                 // Get receive-time of the intent in system uptime
                 long scanEndtime = SystemClock.uptimeMillis();
 
+                final String message = BluetoothSerialization.BLUETOOTH_SERIALIZATION.serialize(new Bluetooth(
+                        System.currentTimeMillis(),
+                        GlobalContext.getUserId(),
+                        items.toArray(Bluetooth.Item.EMPTY_ARRAY)
+                ));
+
                 // On end of the discovery, push the results to the pipeline
-                sensorQueue.push(SensorSerializer.bluetoothIntermediate.toSSFDefault(bluetoothIntermediateBuilder.toString()));
+                sensorQueue.push(message);
 
                 // If results are on time, schedule the next scan at the handler with the given delay
                 if (lastScanRequest + delay > scanEndtime) {

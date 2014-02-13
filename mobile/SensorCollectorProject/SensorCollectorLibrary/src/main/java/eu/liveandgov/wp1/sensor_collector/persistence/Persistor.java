@@ -2,7 +2,7 @@ package eu.liveandgov.wp1.sensor_collector.persistence;
 
 import java.io.File;
 
-import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
+import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
 
 /**
