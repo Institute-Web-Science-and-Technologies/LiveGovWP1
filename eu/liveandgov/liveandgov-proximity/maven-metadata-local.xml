@@ -2,11 +2,11 @@
 <metadata>
   <groupId>eu.liveandgov</groupId>
   <artifactId>liveandgov-proximity</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <versioning>
     <versions>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
     </versions>
-    <lastUpdated>20140211180526</lastUpdated>
+    <lastUpdated>20140213134240</lastUpdated>
   </versioning>
 </metadata>
