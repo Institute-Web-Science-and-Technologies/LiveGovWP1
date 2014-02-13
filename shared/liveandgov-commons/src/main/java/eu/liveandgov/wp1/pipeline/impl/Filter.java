@@ -5,7 +5,7 @@ import eu.liveandgov.wp1.pipeline.Pipeline;
 /**
  * Created by Lukas Härtel on 10.02.14.
  */
-public abstract class PredicatePipeline<Item> extends Pipeline<Item, Item> {
+public abstract class Filter<Item> extends Pipeline<Item, Item> {
     protected abstract boolean filter(Item item);
 
     @Override

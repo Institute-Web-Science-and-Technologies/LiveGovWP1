@@ -15,6 +15,7 @@ public interface Consumer<Item> {
 
     /**
      * Handles a produced item
+     *
      * @param item The item to handle
      */
     public void push(Item item);

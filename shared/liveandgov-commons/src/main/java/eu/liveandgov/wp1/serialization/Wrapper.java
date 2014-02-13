@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.serialization;
 
-/**4
+/**
+ * 4
  * Created by Lukas Härtel on 08.02.14.
  */
 public abstract class Wrapper<Data, HostData> implements Serialization<Data> {

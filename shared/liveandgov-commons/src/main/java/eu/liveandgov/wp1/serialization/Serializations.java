@@ -9,8 +9,9 @@ import com.google.common.base.Function;
 public class Serializations {
     /**
      * This method converts a eu.liveandgov.wp1.serialization object into a eu.liveandgov.wp1.serialization functor
+     *
      * @param serialization The eu.liveandgov.wp1.serialization object to convert
-     * @param <T> The type of the input items
+     * @param <T>           The type of the input items
      * @return Returns a functor that maps T to String
      */
     public static <T> Function<T, String> serialization(final Serialization<T> serialization) {
@@ -24,8 +25,9 @@ public class Serializations {
 
     /**
      * This method converts a eu.liveandgov.wp1.serialization object into a de-eu.liveandgov.wp1.serialization functor
+     *
      * @param serialization The eu.liveandgov.wp1.serialization object to convert
-     * @param <T> The type of the output items
+     * @param <T>           The type of the output items
      * @return Returns a functor that maps String to T
      */
     public static <T> Function<String, T> deSerialization(final Serialization<T> serialization) {

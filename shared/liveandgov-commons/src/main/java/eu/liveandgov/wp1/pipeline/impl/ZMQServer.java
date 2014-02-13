@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.pipeline.impl;
 
 
+import eu.liveandgov.wp1.pipeline.Pipeline;
 import org.zeromq.ZMQ;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -10,7 +11,8 @@ import java.util.concurrent.TimeUnit;
  * <p>Pipeline element that uses a ZMQ socket for Network transportation</p>
  * Created by Lukas Härtel on 10.02.14.
  */
-public class ZMQServerPipeline extends ZMQPipeline {
+public class ZMQServer extends Pipeline<String, String> {
+    public static int HWM = 1000;
 
     public final ScheduledExecutorService scheduledExecutorService;
 
@@ -34,7 +36,7 @@ public class ZMQServerPipeline extends ZMQPipeline {
      * @param mode
      * @param boundAddress
      */
-    public ZMQServerPipeline(ScheduledExecutorService scheduledExecutorService, long interval, int mode, String boundAddress) {
+    public ZMQServer(ScheduledExecutorService scheduledExecutorService, long interval, int mode, String boundAddress) {
         this.scheduledExecutorService = scheduledExecutorService;
         this.interval = interval;
         this.mode = mode;

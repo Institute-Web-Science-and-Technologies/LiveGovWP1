@@ -1,20 +1,25 @@
 package eu.liveandgov.wp1.pipeline.impl;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by Lukas Härtel on 10.02.14.
  */
-public class StartsWithPipeline extends PredicatePipeline<String> {
-    private final Set<String> prefixes;
+public class StartsWith extends Filter<String> {
+    private final Set<String> prefixes = new HashSet<String>();
 
-    public Set<String> getPrefixes() {
-        return prefixes;
+    public final Set<String> getPrefixes() {
+        return Collections.unmodifiableSet(prefixes);
     }
 
-    public StartsWithPipeline() {
-        prefixes = new HashSet<String>();
+    public final void addPrefix(String prefix) {
+        prefixes.add(prefix);
+    }
+
+    public final void removePrefix(String prefix) {
+        prefixes.add(prefix);
     }
 
 

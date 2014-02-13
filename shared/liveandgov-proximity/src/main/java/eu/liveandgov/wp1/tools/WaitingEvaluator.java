@@ -4,9 +4,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import eu.liveandgov.wp1.data.impl.GPS;
 import eu.liveandgov.wp1.data.impl.Waiting;
-import eu.liveandgov.wp1.pipeline.impl.FunctionalPipeline;
-import eu.liveandgov.wp1.pipeline.impl.LineInProducer;
-import eu.liveandgov.wp1.pipeline.impl.LineOutConsumer;
+import eu.liveandgov.wp1.pipeline.impl.LinesIn;
+import eu.liveandgov.wp1.pipeline.impl.LinesOut;
+import eu.liveandgov.wp1.pipeline.impl.Transformation;
 import eu.liveandgov.wp1.pps.PPSPipeline;
 import eu.liveandgov.wp1.pps.api.AggregatingPS;
 import eu.liveandgov.wp1.pps.api.csv.StaticIPS;
@@ -114,10 +114,10 @@ public class WaitingEvaluator {
         }
 
         // Setup input
-        final LineInProducer input = new LineInProducer();
+        final LinesIn input = new LinesIn();
 
         // Setup parser
-        final FunctionalPipeline<String, GPS> deSerializer = new FunctionalPipeline<String, GPS>(Serializations.deSerialization(GPSSerialization.GPS_SERIALIZATION));
+        final Transformation<String, GPS> deSerializer = new Transformation<String, GPS>(Serializations.deSerialization(GPSSerialization.GPS_SERIALIZATION));
         input.setConsumer(deSerializer);
 
         // Setup proximity eu.liveandgov.wp1.pipeline
@@ -129,11 +129,11 @@ public class WaitingEvaluator {
         ppsPipeline.setConsumer(waitingPipeline);
 
         // Setup serializer
-        final FunctionalPipeline<Waiting, String> serializer = new FunctionalPipeline<Waiting, String>(Serializations.serialization(WaitingSerialization.WAITING_SERIALIZATION));
+        final Transformation<Waiting, String> serializer = new Transformation<Waiting, String>(Serializations.serialization(WaitingSerialization.WAITING_SERIALIZATION));
         waitingPipeline.setConsumer(serializer);
 
         // Setup output
-        final LineOutConsumer output = new LineOutConsumer(System.out);
+        final LinesOut output = new LinesOut(System.out);
         serializer.setConsumer(output);
 
         // Begin transaction

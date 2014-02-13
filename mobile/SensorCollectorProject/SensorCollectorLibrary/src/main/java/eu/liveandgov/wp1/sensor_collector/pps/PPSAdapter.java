@@ -8,7 +8,7 @@ import eu.liveandgov.wp1.pipeline.impl.FunctionalPipeline;
 import eu.liveandgov.wp1.pipeline.impl.StartsWithPipeline;
 import eu.liveandgov.wp1.pps.PPSPipeline;
 import eu.liveandgov.wp1.pps.api.AggregatingPS;
-import eu.liveandgov.wp1.sensor_collector.connectors.implementations.Emitter;
+import eu.liveandgov.wp1.sensor_collector.connectors.impl.SensorEmitter;
 import eu.liveandgov.wp1.serialization.Serializations;
 import eu.liveandgov.wp1.serialization.impl.GPSSerialization;
 import eu.liveandgov.wp1.serialization.impl.ProximitySerialization;
@@ -25,7 +25,7 @@ public class PPSAdapter implements Consumer<String> {
 
     private final FunctionalPipeline<Proximity, String> serialize;
 
-    private final Emitter emitter;
+    private final SensorEmitter sensorEmitter;
 
     public PPSAdapter(String key, AggregatingPS ps) {
         filter = new StartsWithPipeline();
@@ -40,8 +40,8 @@ public class PPSAdapter implements Consumer<String> {
         serialize = new FunctionalPipeline<Proximity, String>(Serializations.serialization(ProximitySerialization.PROXIMITY_SERIALIZATION));
         pps.setConsumer(serialize);
 
-        emitter = new Emitter();
-        serialize.setConsumer(emitter);
+        sensorEmitter = new SensorEmitter();
+        serialize.setConsumer(sensorEmitter);
     }
 
     @Override

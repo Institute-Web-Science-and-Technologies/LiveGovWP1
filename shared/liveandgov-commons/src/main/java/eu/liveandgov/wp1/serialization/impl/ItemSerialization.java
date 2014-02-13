@@ -12,10 +12,10 @@ import java.util.Scanner;
 /**
  * Created by Lukas Härtel on 09.02.14.
  */
-public final class ItemSwitch implements Serialization<Item> {
-    public static final ItemSwitch ITEM_SWITCH = new ItemSwitch();
+public final class ItemSerialization implements Serialization<Item> {
+    public static final ItemSerialization ITEM_SERIALIZATION = new ItemSerialization();
 
-    private ItemSwitch() {
+    private ItemSerialization() {
 
     }
 

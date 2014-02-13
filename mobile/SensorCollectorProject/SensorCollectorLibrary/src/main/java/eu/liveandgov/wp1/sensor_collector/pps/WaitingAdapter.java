@@ -6,7 +6,7 @@ import eu.liveandgov.wp1.data.impl.Waiting;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.impl.FunctionalPipeline;
 import eu.liveandgov.wp1.pipeline.impl.StartsWithPipeline;
-import eu.liveandgov.wp1.sensor_collector.connectors.implementations.Emitter;
+import eu.liveandgov.wp1.sensor_collector.connectors.impl.SensorEmitter;
 import eu.liveandgov.wp1.serialization.Serializations;
 import eu.liveandgov.wp1.serialization.impl.ProximitySerialization;
 import eu.liveandgov.wp1.serialization.impl.WaitingSerialization;
@@ -24,7 +24,7 @@ public class WaitingAdapter implements Consumer<String> {
 
     private final FunctionalPipeline<Waiting, String> serialize;
 
-    private final Emitter emitter;
+    private final SensorEmitter sensorEmitter;
 
     public WaitingAdapter(String key, long waitTreshold) {
         filter = new StartsWithPipeline();
@@ -39,8 +39,8 @@ public class WaitingAdapter implements Consumer<String> {
         serialize = new FunctionalPipeline<Waiting, String>(Serializations.serialization(WaitingSerialization.WAITING_SERIALIZATION));
         waitingPipeline.setConsumer(serialize);
 
-        emitter = new Emitter();
-        serialize.setConsumer(emitter);
+        sensorEmitter = new SensorEmitter();
+        serialize.setConsumer(sensorEmitter);
     }
 
     @Override

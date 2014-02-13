@@ -2,9 +2,9 @@ package eu.liveandgov.wp1.tools;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import eu.liveandgov.wp1.pipeline.impl.LineInProducer;
-import eu.liveandgov.wp1.pipeline.impl.LineOutConsumer;
-import eu.liveandgov.wp1.pipeline.impl.ZMQClientPipeline;
+import eu.liveandgov.wp1.pipeline.impl.LinesIn;
+import eu.liveandgov.wp1.pipeline.impl.LinesOut;
+import eu.liveandgov.wp1.pipeline.impl.ZMQClient;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -39,9 +39,9 @@ public class ZMQC {
 
             final ScheduledThreadPoolExecutor ex = new ScheduledThreadPoolExecutor(1);
 
-            LineInProducer lip = new LineInProducer();
-            ZMQClientPipeline zcp = new ZMQClientPipeline(ex, interval, mode, address);
-            LineOutConsumer loc = new LineOutConsumer(System.out);
+            LinesIn lip = new LinesIn();
+            ZMQClient zcp = new ZMQClient(ex, interval, mode, address);
+            LinesOut loc = new LinesOut(System.out);
 
             lip.setConsumer(zcp);
             zcp.setConsumer(loc);

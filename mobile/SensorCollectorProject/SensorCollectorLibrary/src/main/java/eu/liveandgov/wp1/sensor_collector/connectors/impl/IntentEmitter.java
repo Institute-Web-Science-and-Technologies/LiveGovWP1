@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.sensor_collector.connectors.implementations;
+package eu.liveandgov.wp1.sensor_collector.connectors.impl;
 
 import android.content.Intent;
 import android.util.Log;

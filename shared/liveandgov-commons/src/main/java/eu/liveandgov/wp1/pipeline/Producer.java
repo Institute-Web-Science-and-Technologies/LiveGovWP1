@@ -3,7 +3,7 @@ package eu.liveandgov.wp1.pipeline;
 /**
  * Created by Lukas Härtel on 08.02.14.
  */
-public class Producer<Item> {
+public abstract class Producer<Item> {
     /**
      * Consumer that handles the items created by this producer
      */
@@ -12,7 +12,7 @@ public class Producer<Item> {
     /**
      * Returns the current consumer
      */
-    protected final Consumer<? super Item> getConsumer() {
+    public final Consumer<? super Item> getConsumer() {
         return consumer;
     }
 

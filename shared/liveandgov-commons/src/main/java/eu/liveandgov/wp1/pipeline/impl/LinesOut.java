@@ -8,10 +8,10 @@ import java.io.PrintStream;
  * <p>The line-out consumer consumes objects and prints them with a print stream</p>
  * Created by Lukas Härtel on 10.02.14.
  */
-public class LineOutConsumer implements Consumer<Object> {
+public class LinesOut implements Consumer<Object> {
     public final PrintStream printStream;
 
-    public LineOutConsumer(PrintStream printStream) {
+    public LinesOut(PrintStream printStream) {
         this.printStream = printStream;
     }
 

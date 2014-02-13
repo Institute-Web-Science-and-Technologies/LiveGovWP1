@@ -1,9 +1,11 @@
-package eu.liveandgov.wp1.sensor_collector.connectors.implementations;
+package eu.liveandgov.wp1.sensor_collector.connectors.impl;
 
 import java.util.ArrayList;
 
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 import eu.liveandgov.wp1.human_activity_recognition.helper.TimedQueue;
+import eu.liveandgov.wp1.pipeline.impl.Multiplexer;
+import eu.liveandgov.wp1.pipeline.impl.StartsWith;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorSerializer;
@@ -14,7 +16,7 @@ import eu.liveandgov.wp1.sensor_collector.sensors.sensor_value_objects.GpsSensor
  */
 public class GpsCache implements Consumer<String> {
 
-    PrefixFilter filter;
+    StartsWith filter;
     GpsCacheImpl cacheImpl;
     Multiplexer<String> mpx;
     IntentEmitter gpsBroadcast;
@@ -24,8 +26,8 @@ public class GpsCache implements Consumer<String> {
         mpx       = new Multiplexer<String>();
         gpsBroadcast = new IntentEmitter(ExtendedIntentAPI.RETURN_GPS_SAMPLE, ExtendedIntentAPI.FIELD_GPS_ENTRY);
 
-        filter = new PrefixFilter();
-        filter.addFilter(SsfFileFormat.SSF_GPS);
+        filter = new StartsWith();
+        filter.getPrefixes().add(SsfFileFormat.SSF_GPS);
         filter.setConsumer(mpx);
         mpx.addConsumer(cacheImpl);
         mpx.addConsumer(gpsBroadcast);

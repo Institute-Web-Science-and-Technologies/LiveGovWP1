@@ -7,7 +7,6 @@ import java.io.File;
 
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
 import eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat;
-import eu.liveandgov.wp1.sensor_collector.connectors.implementations.PrefixFilter;
 
 /**
  * Created by hartmann on 11/12/13.
