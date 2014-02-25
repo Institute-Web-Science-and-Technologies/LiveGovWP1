@@ -1,19 +1,20 @@
 package eu.liveandgov.wp1.pipeline.impl;
 
 
+import eu.liveandgov.wp1.data.CallbackSet;
+import eu.liveandgov.wp1.data.Stoppable;
 import eu.liveandgov.wp1.pipeline.Pipeline;
 import org.zeromq.ZMQ;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * <p>Pipeline element that uses a ZMQ socket for Network transportation</p>
  * Created by Lukas Härtel on 10.02.14.
  */
-public class ZMQServer extends Pipeline<String, String> {
+public class ZMQServer extends Pipeline<String, String> implements Stoppable {
+    private static final int BULK_SIZE = 128;
+
     public static int HWM = 1000;
 
     public final ScheduledExecutorService scheduledExecutorService;
@@ -24,11 +25,15 @@ public class ZMQServer extends Pipeline<String, String> {
 
     public final String boundAddress;
 
+    public final CallbackSet<Void> bulkPullComplete = new CallbackSet<Void>();
+
     private ZMQ.Context context;
 
     private ZMQ.Socket socket;
 
     private Future<?> connection;
+
+    private ScheduledFuture<?> responder;
 
     /**
      * Creates the ZMQ eu.liveandgov.wp1.pipeline element with the given scheduled executor service, a delegator that polls the socket
@@ -54,13 +59,14 @@ public class ZMQServer extends Pipeline<String, String> {
                 socket.setHWM(HWM);
                 socket.bind(boundAddress);
 
-                scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+                responder = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
                     @Override
                     public void run() {
                         String item;
-                        while ((item = socket.recvStr(ZMQ.DONTWAIT)) != null) {
+                        for (int i = 0; i < BULK_SIZE && ((item = socket.recvStr(ZMQ.DONTWAIT)) != null); i++) {
                             produce(item);
                         }
+                        bulkPullComplete.invoke(null);
                     }
                 }, 0L, interval, TimeUnit.MILLISECONDS);
             }
@@ -73,15 +79,25 @@ public class ZMQServer extends Pipeline<String, String> {
             @Override
             public void run() {
                 try {
-                    connection.get();
+                    connection.get(1000L, TimeUnit.MILLISECONDS);
                     socket.send(s);
 
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
+                } catch (TimeoutException e) {
+                    e.printStackTrace();
                 }
             }
         });
+    }
+
+    @Override
+    public void stop() {
+        if (responder != null)
+            responder.cancel(true);
+        if (connection != null)
+            connection.cancel(true);
     }
 }

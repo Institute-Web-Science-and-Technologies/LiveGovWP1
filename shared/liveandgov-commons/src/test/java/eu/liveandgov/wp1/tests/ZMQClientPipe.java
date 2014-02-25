@@ -15,7 +15,13 @@ public class ZMQClientPipe {
         final ScheduledThreadPoolExecutor ex = new ScheduledThreadPoolExecutor(1);
 
         LinesIn lip = new LinesIn();
-        ZMQClient zcp = new ZMQClient(ex, 50, ZMQ.PUSH, "tcp://127.0.0.1:5555");
+        ZMQClient zcp = new ZMQClient(ex, 50, ZMQ.PUSH) {
+
+            @Override
+            protected String getAddress() {
+                return "tcp://lg:5555";
+            }
+        };
         LinesOut loc = new LinesOut(System.out);
 
         lip.setConsumer(zcp);

@@ -28,7 +28,7 @@ public class WaitingAdapter implements Consumer<String> {
 
     public WaitingAdapter(String key, long waitTreshold) {
         filter = new StartsWith();
-        filter.addPrefix(DataCommons.TYPE_GPS);
+        filter.addPrefix(DataCommons.TYPE_PROXIMITY);
 
         deSerializer = new DeSerializer<Proximity>(ProximitySerialization.PROXIMITY_SERIALIZATION);
         filter.setConsumer(deSerializer);

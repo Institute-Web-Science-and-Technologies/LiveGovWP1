@@ -1,18 +1,21 @@
 package eu.liveandgov.wp1.pipeline.impl;
 
+import eu.liveandgov.wp1.data.CallbackSet;
+import eu.liveandgov.wp1.data.Stoppable;
 import eu.liveandgov.wp1.pipeline.Pipeline;
 import org.zeromq.ZMQ;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * <p>Pipeline element that uses a ZMQ socket for Network transportation</p>
  * Created by Lukas Härtel on 10.02.14.
  */
-public class ZMQClient extends Pipeline<String, String> {
+public abstract class ZMQClient extends Pipeline<String, String> implements Stoppable {
+    private static final int BULK_SIZE = 128;
+
+    public static long TAXI_INTERVAL = 5000L;
+
     public static int HWM = 1000;
 
     public final ScheduledExecutorService scheduledExecutorService;
@@ -21,13 +24,21 @@ public class ZMQClient extends Pipeline<String, String> {
 
     public final int mode;
 
-    public final String address;
+    public final CallbackSet<String> addressUpdated = new CallbackSet<String>();
+
+    public final CallbackSet<Void> bulkPullComplete = new CallbackSet<Void>();
 
     private ZMQ.Context context;
 
     private ZMQ.Socket socket;
 
+    private String lastAddress;
+
     private Future<?> connection;
+
+    private ScheduledFuture<?> taxi;
+
+    private ScheduledFuture<?> responder;
 
     /**
      * Creates the ZMQ eu.liveandgov.wp1.pipeline element with the given scheduled executor service, a delegator that polls the socket
@@ -37,13 +48,11 @@ public class ZMQClient extends Pipeline<String, String> {
      * @param scheduledExecutorService
      * @param interval
      * @param mode
-     * @param address
      */
-    public ZMQClient(final ScheduledExecutorService scheduledExecutorService, final long interval, final int mode, final String address) {
+    public ZMQClient(final ScheduledExecutorService scheduledExecutorService, final long interval, final int mode) {
         this.scheduledExecutorService = scheduledExecutorService;
         this.interval = interval;
         this.mode = mode;
-        this.address = address;
 
         connection = scheduledExecutorService.submit(new Runnable() {
             @Override
@@ -51,21 +60,37 @@ public class ZMQClient extends Pipeline<String, String> {
                 context = ZMQ.context(1);
                 socket = context.socket(mode);
                 socket.setHWM(HWM);
-                socket.connect(address);
+                socket.connect(lastAddress = getAddress());
+                addressUpdated.invoke(lastAddress);
 
-                scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+                taxi = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+                    @Override
+                    public void run() {
+                        final String nextAddress = getAddress();
+
+                        if (!nextAddress.equals(lastAddress)) {
+                            socket.disconnect(lastAddress);
+                            socket.connect(lastAddress = nextAddress);
+                            addressUpdated.invoke(lastAddress);
+                        }
+                    }
+                }, 0L, TAXI_INTERVAL, TimeUnit.MILLISECONDS);
+
+                responder = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
                     @Override
                     public void run() {
                         String item;
-                        while ((item = socket.recvStr(ZMQ.DONTWAIT)) != null) {
+                        for (int i = 0; i < BULK_SIZE && ((item = socket.recvStr(ZMQ.DONTWAIT)) != null); i++) {
                             produce(item);
                         }
+                        bulkPullComplete.invoke(null);
                     }
                 }, 0L, interval, TimeUnit.MILLISECONDS);
             }
         });
-
     }
+
+    protected abstract String getAddress();
 
     @Override
     public void push(final String s) {
@@ -73,15 +98,27 @@ public class ZMQClient extends Pipeline<String, String> {
             @Override
             public void run() {
                 try {
-                    connection.get();
+                    connection.get(1000L, TimeUnit.MILLISECONDS);
                     socket.send(s);
 
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
+                } catch (TimeoutException e) {
+                    e.printStackTrace();
                 }
             }
         });
+    }
+
+    @Override
+    public void stop() {
+        if (taxi != null)
+            taxi.cancel(true);
+        if (responder != null)
+            responder.cancel(true);
+        if (connection != null)
+            connection.cancel(true);
     }
 }

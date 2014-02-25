@@ -40,7 +40,13 @@ public class ZMQC {
             final ScheduledThreadPoolExecutor ex = new ScheduledThreadPoolExecutor(1);
 
             LinesIn lip = new LinesIn();
-            ZMQClient zcp = new ZMQClient(ex, interval, mode, address);
+            ZMQClient zcp = new ZMQClient(ex, interval, mode){
+
+                @Override
+                protected String getAddress() {
+                    return address;
+                }
+            };
             LinesOut loc = new LinesOut(System.out);
 
             lip.setConsumer(zcp);
