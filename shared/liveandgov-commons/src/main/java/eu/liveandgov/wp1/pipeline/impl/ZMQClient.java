@@ -45,7 +45,7 @@ public abstract class ZMQClient extends Pipeline<String, String> implements Stop
     /**
      * Creates the ZMQ eu.liveandgov.wp1.pipeline element with the given scheduled executor service, a delegator that polls the socket
      * on a regular basis. For this eu.liveandgov.wp1.pipeline element, a socket is created with the given ZMQ mode, which in turn is
-     * bound to a given address
+     * bound to a given address. Sends are executed on the calling pipeline elements thread.
      *
      * @param scheduledExecutorService
      * @param interval
@@ -97,20 +97,15 @@ public abstract class ZMQClient extends Pipeline<String, String> implements Stop
 
     @Override
     public void push(final String s) {
-        scheduledExecutorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    connection.get();
-                    sent.call(socket.send(s));
+        try {
+            connection.get();
+            sent.call(socket.send(s));
 
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

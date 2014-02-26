@@ -3,11 +3,7 @@ package eu.liveandgov.wp1.sensor_collector.streaming;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-
 import eu.liveandgov.wp1.data.Callback;
-import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.impl.ZMQClient;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.R;
@@ -41,14 +37,11 @@ public class ZMQStreamer extends ZMQClient implements Monitorable {
         sent.register(new Callback<Boolean>() {
             @Override
             public void call(Boolean s) {
-                if (s)
-                    Log.d(LOG_TAG, "ZMQ Streamer sent successfully");
-                else
+                if (!s)
                     Log.d(LOG_TAG, "ZMQ Streamer send failed");
 
             }
         });
-
 
         addressUpdated.register(new Callback<String>() {
             @Override
@@ -72,11 +65,6 @@ public class ZMQStreamer extends ZMQClient implements Monitorable {
             else
                 return "tcp://" + streamingAddressValue + ":5555";
         }
-    }
-
-    @Override
-    public void push(String s) {
-        super.push(s);
     }
 
     @Override
