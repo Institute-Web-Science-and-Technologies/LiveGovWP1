@@ -39,7 +39,7 @@ public abstract class MultiProducer<Item> {
      */
     public final void addConsumer(Consumer<? super Item> consumer) {
         if (consumers.isEmpty()) {
-            nonEmpty.invoke(consumer);
+            nonEmpty.call(consumer);
         }
 
         consumers.add(consumer);
@@ -52,7 +52,7 @@ public abstract class MultiProducer<Item> {
         consumers.remove(consumer);
 
         if (consumers.isEmpty()) {
-            empty.invoke(consumer);
+            empty.call(consumer);
         }
     }
 

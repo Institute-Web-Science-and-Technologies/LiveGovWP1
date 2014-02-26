@@ -13,7 +13,7 @@ import java.util.concurrent.*;
  * Created by Lukas Härtel on 10.02.14.
  */
 public class ZMQServer extends Pipeline<String, String> implements Stoppable {
-    private static final int BULK_SIZE = 128;
+    private static final int BULK_SIZE = 512;
 
     public static int HWM = 1000;
 
@@ -25,7 +25,9 @@ public class ZMQServer extends Pipeline<String, String> implements Stoppable {
 
     public final String boundAddress;
 
-    public final CallbackSet<Void> bulkPullComplete = new CallbackSet<Void>();
+    public final CallbackSet<Integer> pulled = new CallbackSet<Integer>();
+
+    public final CallbackSet<Boolean> sent = new CallbackSet<Boolean>();
 
     private ZMQ.Context context;
 
@@ -59,14 +61,15 @@ public class ZMQServer extends Pipeline<String, String> implements Stoppable {
                 socket.setHWM(HWM);
                 socket.bind(boundAddress);
 
-                responder = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+                responder = scheduledExecutorService.scheduleWithFixedDelay(new Runnable() {
                     @Override
                     public void run() {
                         String item;
-                        for (int i = 0; i < BULK_SIZE && ((item = socket.recvStr(ZMQ.DONTWAIT)) != null); i++) {
+                        int i;
+                        for (i = 0; i < BULK_SIZE && ((item = socket.recvStr(ZMQ.DONTWAIT)) != null); i++) {
                             produce(item);
                         }
-                        bulkPullComplete.invoke(null);
+                        pulled.call(i);
                     }
                 }, 0L, interval, TimeUnit.MILLISECONDS);
             }
@@ -79,14 +82,13 @@ public class ZMQServer extends Pipeline<String, String> implements Stoppable {
             @Override
             public void run() {
                 try {
-                    connection.get(1000L, TimeUnit.MILLISECONDS);
-                    socket.send(s);
+                    connection.get();
+                    sent.call(socket.send(s));
+
 
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (TimeoutException e) {
                     e.printStackTrace();
                 }
             }

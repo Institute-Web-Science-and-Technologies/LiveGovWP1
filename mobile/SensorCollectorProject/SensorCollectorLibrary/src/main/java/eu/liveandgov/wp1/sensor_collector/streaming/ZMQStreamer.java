@@ -4,6 +4,8 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+
 import eu.liveandgov.wp1.data.Callback;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.impl.ZMQClient;
@@ -29,12 +31,24 @@ public class ZMQStreamer extends ZMQClient implements Monitorable {
     public ZMQStreamer() {
         super(GlobalContext.getExecutorService(), PULL_INTERVAL, ZMQ.ZMQ_PUSH);
 
-        bulkPullComplete.register(new Callback<Void>() {
+        pulled.register(new Callback<Integer>() {
             @Override
-            public void call(Void aVoid) {
-                Log.d(LOG_TAG, "ZQM Streamer responses pulled");
+            public void call(Integer c) {
+                Log.d(LOG_TAG, "ZQM Streamer pulled " + c + " responses");
             }
         });
+
+        sent.register(new Callback<Boolean>() {
+            @Override
+            public void call(Boolean s) {
+                if (s)
+                    Log.d(LOG_TAG, "ZMQ Streamer sent successfully");
+                else
+                    Log.d(LOG_TAG, "ZMQ Streamer send failed");
+
+            }
+        });
+
 
         addressUpdated.register(new Callback<String>() {
             @Override
@@ -58,6 +72,11 @@ public class ZMQStreamer extends ZMQClient implements Monitorable {
             else
                 return "tcp://" + streamingAddressValue + ":5555";
         }
+    }
+
+    @Override
+    public void push(String s) {
+        super.push(s);
     }
 
     @Override

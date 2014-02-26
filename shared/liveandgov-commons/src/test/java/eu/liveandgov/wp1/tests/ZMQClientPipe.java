@@ -19,7 +19,7 @@ public class ZMQClientPipe {
 
             @Override
             protected String getAddress() {
-                return "tcp://lg:5555";
+                return "tcp://lg:5556";
             }
         };
         LinesOut loc = new LinesOut(System.out);

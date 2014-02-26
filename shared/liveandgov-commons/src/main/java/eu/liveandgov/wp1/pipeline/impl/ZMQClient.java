@@ -12,7 +12,7 @@ import java.util.concurrent.*;
  * Created by Lukas Härtel on 10.02.14.
  */
 public abstract class ZMQClient extends Pipeline<String, String> implements Stoppable {
-    private static final int BULK_SIZE = 128;
+    private static final int BULK_SIZE = 512;
 
     public static long TAXI_INTERVAL = 5000L;
 
@@ -26,7 +26,9 @@ public abstract class ZMQClient extends Pipeline<String, String> implements Stop
 
     public final CallbackSet<String> addressUpdated = new CallbackSet<String>();
 
-    public final CallbackSet<Void> bulkPullComplete = new CallbackSet<Void>();
+    public final CallbackSet<Integer> pulled = new CallbackSet<Integer>();
+
+    public final CallbackSet<Boolean> sent = new CallbackSet<Boolean>();
 
     private ZMQ.Context context;
 
@@ -61,9 +63,9 @@ public abstract class ZMQClient extends Pipeline<String, String> implements Stop
                 socket = context.socket(mode);
                 socket.setHWM(HWM);
                 socket.connect(lastAddress = getAddress());
-                addressUpdated.invoke(lastAddress);
+                addressUpdated.call(lastAddress);
 
-                taxi = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+                taxi = scheduledExecutorService.scheduleWithFixedDelay(new Runnable() {
                     @Override
                     public void run() {
                         final String nextAddress = getAddress();
@@ -71,19 +73,20 @@ public abstract class ZMQClient extends Pipeline<String, String> implements Stop
                         if (!nextAddress.equals(lastAddress)) {
                             socket.disconnect(lastAddress);
                             socket.connect(lastAddress = nextAddress);
-                            addressUpdated.invoke(lastAddress);
+                            addressUpdated.call(lastAddress);
                         }
                     }
                 }, 0L, TAXI_INTERVAL, TimeUnit.MILLISECONDS);
 
-                responder = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+                responder = scheduledExecutorService.scheduleWithFixedDelay(new Runnable() {
                     @Override
                     public void run() {
                         String item;
-                        for (int i = 0; i < BULK_SIZE && ((item = socket.recvStr(ZMQ.DONTWAIT)) != null); i++) {
+                        int i;
+                        for (i = 0; i < BULK_SIZE && ((item = socket.recvStr(ZMQ.DONTWAIT)) != null); i++) {
                             produce(item);
                         }
-                        bulkPullComplete.invoke(null);
+                        pulled.call(i);
                     }
                 }, 0L, interval, TimeUnit.MILLISECONDS);
             }
@@ -98,14 +101,12 @@ public abstract class ZMQClient extends Pipeline<String, String> implements Stop
             @Override
             public void run() {
                 try {
-                    connection.get(1000L, TimeUnit.MILLISECONDS);
-                    socket.send(s);
+                    connection.get();
+                    sent.call(socket.send(s));
 
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (TimeoutException e) {
                     e.printStackTrace();
                 }
             }

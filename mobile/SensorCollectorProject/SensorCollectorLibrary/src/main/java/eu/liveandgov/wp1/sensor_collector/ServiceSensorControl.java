@@ -14,6 +14,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import eu.liveandgov.wp1.data.Callback;
 import eu.liveandgov.wp1.data.Callbacks;
 import eu.liveandgov.wp1.data.impl.Tag;
 import eu.liveandgov.wp1.pipeline.Consumer;
@@ -169,18 +170,20 @@ public class ServiceSensorControl extends Service {
 
         // Start Recording once the first consumers connects to connector thread.
         // This should be done once the SensorThread is already running.
-        connectorThread.nonEmpty.register(Callbacks.convert(new Runnable() {
+        connectorThread.nonEmpty.register(new Callback<Consumer<? super String>>() {
             @Override
-            public void run() {
+            public void call(Consumer<? super String> consumer) {
+                Log.d(LOG_TAG, "Start recording sensors");
                 SensorThread.startAllRecording();
             }
-        }));
-        connectorThread.empty.register(Callbacks.convert(new Runnable() {
+        });
+        connectorThread.empty.register(new Callback<Consumer<? super String>>() {
             @Override
-            public void run() {
+            public void call(Consumer<? super String> consumer) {
+                Log.d(LOG_TAG, "Stop recording sensors");
                 SensorThread.stopAllRecording();
             }
-        }));
+        });
 
         // Setup monitoring thread
         monitorThread.registerMonitorable(connectorThread, "SampleCount");

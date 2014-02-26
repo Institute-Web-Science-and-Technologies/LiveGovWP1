@@ -46,13 +46,13 @@ public class ActivityIntentService extends IntentService {
 
     public ActivityIntentService() {
         super("ActivityIntentService");
-        this.sensorQueue = GlobalContext.context.sensorQueue;
+        this.sensorQueue = GlobalContext.getSensorQueue();
     }
 
     public ActivityIntentService(String name) {
         super(name);
         Log.d("AIS", "Constructor");
-        this.sensorQueue = GlobalContext.context.sensorQueue;
+        this.sensorQueue = GlobalContext.getSensorQueue();
     }
 
     @Override
