@@ -12,7 +12,7 @@ import android.util.Log;
 import java.io.File;
 
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
-import eu.liveandgov.wp1.sensor_collector.activity_recognition.HarAdapter;
+import eu.liveandgov.wp1.sensor_collector.activity_recognition.HARAdapter;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
@@ -27,6 +27,7 @@ import eu.liveandgov.wp1.sensor_collector.persistence.PublicationPipeline;
 import eu.liveandgov.wp1.sensor_collector.persistence.ZipFilePersistor;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorSerializer;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorThread;
+import eu.liveandgov.wp1.sensor_collector.streaming.ZMQStreamer;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferManager;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferThreadPost;
 
@@ -60,6 +61,7 @@ public class ServiceSensorControl extends Service {
     public PublicationPipeline publisher;
     public Consumer<String> harPipeline;
     public GpsCache gpsCache;
+    public Consumer<String> streamer;
 
     // THREADS
     public ConnectorThread connectorThread;
@@ -89,6 +91,8 @@ public class ServiceSensorControl extends Service {
 
         // Init sensor consumers
         harPipeline = new HarAdapter();
+        streamer = new ZMQStreamer();
+        harPipeline = new HARAdapter();
         gpsCache    = new GpsCache();
         persistor   = ZIPPED_PERSISTOR ?
                 new ZipFilePersistor(sensorFile):
