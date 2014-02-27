@@ -1,0 +1,139 @@
+.modal-backdrop.am-fade {
+  opacity: 0.5;
+  transition: opacity 0.15s linear;
+}
+.modal-backdrop.am-fade.ng-enter {
+  opacity: 0;
+}
+.modal-backdrop.am-fade.ng-enter.ng-enter-active {
+  opacity: 0.5;
+}
+.modal-backdrop.am-fade.ng-leave {
+  opacity: 0.5;
+}
+.modal-backdrop.am-fade.ng-leave.ng-leave-active {
+  opacity: 0;
+}
+body {
+  padding-top: 50px;
+}
+.triangle {
+  font-size: 0.8em;
+  color: #428bca;
+}
+#raw-data {
+  height: 400px;
+  width: 96%;
+  margin: 0 auto;
+}
+tr.selected {
+  background-color: #eef;
+}
+tr.selected:hover {
+  background-color: #ccf;
+}
+a.unselected {
+  color: #cd5c5c !important;
+}
+a.selected {
+  color: #98fb98 !important;
+}
+tbody tr:hover {
+  background-color: #ffc;
+}
+td.name {
+  width: 200px;
+}
+td.destroy {
+  text-align: center;
+  font-weight: bold;
+  color: #cd5c5c;
+  width: 2.2em;
+}
+td.destroy:hover {
+  background-color: #cd5c5c;
+  color: #fff;
+}
+li .disabled a .red {
+  color: #cd5c5c !important;
+}
+#map {
+  height: 400px;
+}
+svg {
+  font: 10px sans-serif;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 0.75px;
+}
+.line.line0 {
+  stroke: #4682b4;
+}
+.line1 {
+  stroke: #cd5c5c;
+}
+.line2 {
+  stroke: #2e8b57;
+}
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: 0.125;
+  shape-rendering: crispEdges;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.line {
+  stroke: #000;
+  fill: none;
+  stroke-width: 0.75px;
+}
+.line.line0 {
+  stroke: #4682b4;
+}
+.line.line1 {
+  stroke: #cd5c5c;
+}
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+.focus circle {
+  fill: none;
+}
+.focus circle.y0 {
+  stroke: #00f;
+}
+.focus circle.y1 {
+  stroke: #f00;
+}
+.focus line {
+  stroke: #800080;
+  shape-rendering: crispEdges;
+}
+.focus line.y0 {
+  stroke: #4682b4;
+  stroke-dasharray: 3 3;
+  opacity: 0.5;
+}
+.focus line.y1 {
+  stroke: #cd5c5c;
+  stroke-dasharray: 3 3;
+  opacity: 0.5;
+}
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: 0.125;
+  shape-rendering: crispEdges;
+}
