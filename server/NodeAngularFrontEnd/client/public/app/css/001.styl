@@ -1,0 +1,153 @@
+// modal
+
+.modal-backdrop.am-fade {
+  opacity: .5;
+  transition: opacity .15s linear;
+  &.ng-enter {
+    opacity: 0;
+    &.ng-enter-active {
+      opacity: .5;
+    }
+  }
+  &.ng-leave {
+    opacity: .5;
+    &.ng-leave-active {
+      opacity: 0;
+    }
+  }
+}
+
+// global
+
+body
+	padding-top 50px // menu bar
+
+.triangle
+	font-size 0.8em
+	color #428bca
+
+#raw-data
+	height 400px
+	width 96%
+	margin 0 auto
+
+// table view
+
+tr.selected
+	background-color #eef
+
+tr.selected:hover
+	background-color #ccf
+
+a.unselected
+	color indianred !important
+
+a.selected
+	color palegreen !important
+
+
+tbody tr:hover
+	background-color #ffc
+
+td.name
+	width 200px
+
+td.destroy
+	text-align center
+	font-weight bold
+	color indianred
+	width 2.2em
+
+td.destroy:hover
+	background-color indianred
+	color white
+
+li .disabled
+	a .red
+		color indianred !important
+
+// Focus+Context via Brushing
+
+#map
+	height 400px
+
+svg
+	font 10px sans-serif
+
+// path
+// 	fill steelblue
+
+.axis path,
+.axis line
+	fill none
+	stroke #000
+	shape-rendering crispEdges
+
+// .x.axis path
+// 	display none
+
+.line
+	fill none
+	stroke black
+	stroke-width 0.75px
+
+.line.line0
+	stroke steelblue
+
+.line1
+	stroke indianred
+
+.line2
+	stroke seagreen
+
+.brush .extent
+	stroke #fff
+	fill-opacity .125
+	shape-rendering crispEdges
+
+// from d3 example
+
+.axis path,
+.axis line
+	fill none
+	stroke #000
+	shape-rendering crispEdges
+
+.line
+	stroke black
+	fill none
+	stroke-width 0.75px
+	&.line0
+		stroke steelblue
+	&.line1
+		stroke indianred
+
+.overlay
+	fill none
+	pointer-events all
+
+.focus
+	circle
+		fill none
+		&.y0
+			stroke blue
+		&.y1
+			stroke red
+	line
+		stroke purple
+		shape-rendering crispEdges
+		&.y0
+			stroke steelblue
+			stroke-dasharray 3 3
+			opacity .5
+		&.y1
+			stroke indianred
+			stroke-dasharray 3 3
+			opacity .5
+
+.brush
+	.extent
+		stroke #fff
+		fill-opacity .125
+		shape-rendering crispEdges
+
