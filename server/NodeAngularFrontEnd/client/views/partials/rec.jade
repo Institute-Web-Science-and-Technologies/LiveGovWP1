@@ -23,8 +23,6 @@ table#rec.table
 					td(ng-click="selectTrip(trip)") {{ trip.start_ts | duration:trip.stop_ts | date:'HH:mm:ss .sss' }}
 					td
 					td.name(editable-text="trip.name", onaftersave="updateName(trip, $data)", buttons="no", e-style="width: 200px; height: 37px") {{ trip.name }}
-					//- td.destroy(data-template="/app/partials/modal/del-confirm.html", bs-modal="clickDelete") DEL
-					//- td.destroy(data-animation="am-fade-and-scale" data-placement="center" bs-modal="clickDelete") DEL
 					td.destroy(ng-click="destroy(trip)") DEL
 
 // ex:ft=jade
