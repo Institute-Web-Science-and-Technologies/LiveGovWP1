@@ -1,55 +1,55 @@
-// modal
 
-.modal-backdrop.am-fade {
-  opacity: .5;
-  transition: opacity .15s linear;
-  &.ng-enter {
-    opacity: 0;
-    &.ng-enter-active {
-      opacity: .5;
-    }
-  }
-  &.ng-leave {
-    opacity: .5;
-    &.ng-leave-active {
-      opacity: 0;
-    }
-  }
-}
 
-// global
 
+
+
+/*   GLOBAL   */
+
+// mind the navbar
 body
-	padding-top 50px // menu bar
+	padding-top 50px
 
+// little triangles to indicate table sorting
 .triangle
 	font-size 0.8em
 	color #428bca
 
-#raw-data
-	height 400px
-	width 96%
-	margin 0 auto
+// angular strap modal
+.modal-backdrop.am-fade
+	opacity .5
+	transition opacity .15s linear
+	&.ng-enter
+		opacity 0
+		&.ng-enter-active
+			opacity .5
+	&.ng-leave
+		opacity .5
+		&.ng-leave-active
+			opacity 0
 
-// table view
+
+
+
+
+
+/*   REC TABLE   */
 
 tr.selected
-	background-color #eef
+	background-color lighten(gold, 70%)
 
 tr.selected:hover
-	background-color #ccf
+	background-color lighten(gold, 50%)
 
-a.unselected
+a.trip-indicator
 	color indianred !important
 
-a.selected
-	color palegreen !important
-
+a.trip-indicator.selected
+	color gold !important
 
 tbody tr:hover
-	background-color #ffc
+	background-color lighten(rgb(66, 139, 202), 90%)
 
-td.name
+td.name // editable
 	width 200px
 
 td.destroy
@@ -62,20 +62,63 @@ td.destroy:hover
 	background-color indianred
 	color white
 
-li .disabled
-	a .red
+li.disabled
+	a.red
 		color indianred !important
 
-// Focus+Context via Brushing
+
+
+
+
+/*   RAW DATA VIEW   */
+
+BORDER_SIZE = 24px
+
+#raw
+	margin BORDER_SIZE
+
+#left
+	display table-cell
+	width 100% // min-width?
+	white-space nowrap
+	padding 0 BORDER_SIZE 0 0
+
+#right
+	display table-cell
+	min-width 500px
+	vertical-align top
 
 #map
-	height 400px
+	height 500px
+	width 100%
+
+.legend
+	line-height 18px
+	color #555
+	background white
+	padding 8px
+
+.legend i
+	width 18px
+	height 18px
+	float left
+	margin-right 8px
+	opacity 0.7
+
+raw
+	&h2
+		width 100%
+		background-color #ccc
+		padding-top BORDER_SIZE
+
+
+
+
+
+/*   D3 CHARTS   */
 
 svg
 	font 10px sans-serif
-
-// path
-// 	fill steelblue
 
 .axis path,
 .axis line
@@ -83,71 +126,19 @@ svg
 	stroke #000
 	shape-rendering crispEdges
 
-// .x.axis path
-// 	display none
+.x.axis path
+	display none
 
 .line
-	fill none
 	stroke black
 	stroke-width 0.75px
-
-.line.line0
-	stroke steelblue
-
-.line1
-	stroke indianred
-
-.line2
-	stroke seagreen
+	fill none
+	&.line1
+		stroke crimson
+	&.line2
+		stroke dodgerblue
 
 .brush .extent
 	stroke #fff
 	fill-opacity .125
 	shape-rendering crispEdges
-
-// from d3 example
-
-.axis path,
-.axis line
-	fill none
-	stroke #000
-	shape-rendering crispEdges
-
-.line
-	stroke black
-	fill none
-	stroke-width 0.75px
-	&.line0
-		stroke steelblue
-	&.line1
-		stroke indianred
-
-.overlay
-	fill none
-	pointer-events all
-
-.focus
-	circle
-		fill none
-		&.y0
-			stroke blue
-		&.y1
-			stroke red
-	line
-		stroke purple
-		shape-rendering crispEdges
-		&.y0
-			stroke steelblue
-			stroke-dasharray 3 3
-			opacity .5
-		&.y1
-			stroke indianred
-			stroke-dasharray 3 3
-			opacity .5
-
-.brush
-	.extent
-		stroke #fff
-		fill-opacity .125
-		shape-rendering crispEdges
-

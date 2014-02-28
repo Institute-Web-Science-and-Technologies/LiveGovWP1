@@ -1,17 +1,39 @@
-har-map(data="data")
-	#map
-	#legend
+//- #raw
+//- 	#left
+//- 		raw(data="data.acc", sensor="'acc'")
+//- 			h2 Accelerometer
+//- 			#chart.acc
 
-raw-chart(data="data.acc")
-	h2 Accelerometer
-	#chart
+//- 		raw(data="data.lac", sensor="'lac'")
+//- 			h2 Linear Acceleration
+//- 			#chart.lac
 
-raw-chart(data="data.lac")
-	h2 Linear Acceleration
-	#chart
+//- 		raw(data="data.gra", sensor="'gra'")
+//- 			h2 Gravity
+//- 			#chart.gra
 
-raw-chart(data="data.gra")
-	h2 Gravity
-	#chart
+//- 	#right
+//- 		map(data="data")
+//- 		#map
+//- 		#legend
+
+
+
+#raw
+	map(data="data")
+		#legend
+		#map
+
+	raw(data="data.acc", sensor="'acc'")
+		h2 Accelerometer
+		#chart.acc
+
+	raw(data="data.lac", sensor="'lac'")
+		h2 Linear Acceleration
+		#chart.lac
+
+	raw(data="data.gra", sensor="'gra'")
+		h2 Gravity
+		#chart.gra
 
 // ex:ft=jade

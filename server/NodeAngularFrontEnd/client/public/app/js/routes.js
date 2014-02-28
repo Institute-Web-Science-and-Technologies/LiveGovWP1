@@ -10,6 +10,7 @@ app.config(function($routeProvider, $locationProvider) {
 		.when('/rec', {
 			templateUrl: '/partials/rec',
 			controller: 'recCtrl'
+			// reloadOnSearch: false
 		})
 
 		.when('/rec/:trip_id', {

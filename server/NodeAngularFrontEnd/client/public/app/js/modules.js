@@ -10,6 +10,7 @@ var app = angular.module('nodeInspectionFrontEnd', [
 	// 'mgcrea.ngStrap.aside', // change trip without returning to record table
 	// 'mgcrea.ngStrap.popover', // record table -> editable name-colum
 	// 'mgcrea.ngStrap.tooltip', // on disabled navbar elements, when there's no trip selected (and required by popover)
+	'mgcrea.ngStrap.navbar',
 	'mgcrea.ngStrap.modal',
 	// 'mgcrea.ngMotion.fade',
 	'xeditable'
