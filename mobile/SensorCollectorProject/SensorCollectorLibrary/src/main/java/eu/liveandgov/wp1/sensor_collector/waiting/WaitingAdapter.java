@@ -38,4 +38,9 @@ public class WaitingAdapter implements Consumer<Item> {
     public void push(Item item) {
         filter.push(item);
     }
+
+    @Override
+    public String toString() {
+        return "Waiting Adapter";
+    }
 }

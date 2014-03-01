@@ -102,7 +102,7 @@ public class ServiceSensorControl extends Service {
         // Register this object globally
         GlobalContext.set(this);
 
-        executorService = new ScheduledThreadPoolExecutor(4);
+        executorService = new ScheduledThreadPoolExecutor(1);
     }
 
     /* ANDROID LIFECYCLE */
@@ -149,12 +149,7 @@ public class ServiceSensorControl extends Service {
 
         // Init sensor consumers
         final ZMQStreamer zmqStreamer = new ZMQStreamer();
-        streamer = new Consumer<Item>() {
-            @Override
-            public void push(Item item) {
-                zmqStreamer.push(item.toSerializedForm());
-            }
-        };
+        streamer = zmqStreamer.itemNode;
 
         harPipeline = new HARAdapter();
         ppsPipeline = new PPSAdapter("platform", aggregatorPS);

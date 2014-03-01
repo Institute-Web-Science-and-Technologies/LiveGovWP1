@@ -3,10 +3,7 @@ package eu.liveandgov.wp1.pipeline;
 
 import eu.liveandgov.wp1.data.CallbackSet;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -66,5 +63,20 @@ public abstract class MultiProducer<Item> {
         for (Consumer<? super Item> consumer : consumers) {
             consumer.push(item);
         }
+    }
+
+    /**
+     * Hands the given item to the consumers, returns the diagnostics as consumer -> seconds in pipe
+     */
+    protected final Map<Consumer<? super Item>, Double> produceDiag(Item item) {
+        final Map<Consumer<? super Item>, Double> result = new HashMap<Consumer<? super Item>, Double>();
+        for (Consumer<? super Item> consumer : consumers) {
+            final long st = System.nanoTime();
+            consumer.push(item);
+            final long et = System.nanoTime();
+            result.put(consumer, (et - st) / 1.0e+9);
+        }
+
+        return result;
     }
 }

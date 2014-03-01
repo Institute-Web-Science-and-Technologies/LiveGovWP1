@@ -89,8 +89,10 @@ public class HARAdapter implements Consumer<Item> {
         activityPipeline.setConsumer(new Consumer<Tuple<Long, String>>() {
             @Override
             public void push(Tuple<Long, String> longStringTuple) {
-                sensorEmitter.push(new Activity(System.currentTimeMillis(), GlobalContext.getUserId(), longStringTuple.right));
-                intentEmitter.push(longStringTuple.right);
+                final Activity activity = new Activity(System.currentTimeMillis(), GlobalContext.getUserId(), longStringTuple.right);
+
+                sensorEmitter.push(activity);
+                intentEmitter.push(activity.activity);
             }
         });
     }
@@ -100,4 +102,8 @@ public class HARAdapter implements Consumer<Item> {
         filter.push(item);
     }
 
+    @Override
+    public String toString() {
+        return "HAR Adapter";
+    }
 }

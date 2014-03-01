@@ -13,7 +13,7 @@ import eu.liveandgov.wp1.data.Item;
  * Created by hartmann on 9/29/13.
  */
 public class LinkedSensorQueue implements SensorQueue {
-    public static final int capacity = 4096;
+    public static final int capacity = 1024;
 
     public final Queue<Item> queue = new ConcurrentLinkedQueue<Item>();
 
@@ -36,12 +36,12 @@ public class LinkedSensorQueue implements SensorQueue {
 
     @Override
     public Item blockingPull() {
-        Item m;
+        Item item;
 
         while (true) {
-            m = pull();
+            item = pull();
 
-            if (m != null) break;
+            if (item != null) break;
 
             try {
                 Thread.sleep(100);
@@ -49,7 +49,7 @@ public class LinkedSensorQueue implements SensorQueue {
                 Thread.currentThread().interrupt();
             }
         }
-        return m;
+        return item;
     }
 
     @Override

@@ -29,6 +29,8 @@ public class PPSAdapter implements Consumer<Item> {
     private static final String LOG_TAG = "PPSA";
     private final ClassFilter<GPS> filter;
 
+    private final Player<GPS> player;
+
     private final PPSPipeline pps;
 
     private final SensorEmitter sensorEmitter;
@@ -36,8 +38,13 @@ public class PPSAdapter implements Consumer<Item> {
     public PPSAdapter(String key, AggregatingPS ps) {
         filter = new ClassFilter<GPS>(GPS.class);
 
+        // So apparently the PPS takes quite some time, so we use a Player to play all GPS samples
+        // to the pipeline on the global executor services
+        player = new Player<GPS>(GlobalContext.getExecutorService(), -1, -1, 100L);
+        filter.setConsumer(player);
+
         pps = new PPSPipeline(key, ps);
-        filter.setConsumer(pps);
+        player.setConsumer(pps);
 
         sensorEmitter = new SensorEmitter();
         pps.setConsumer(sensorEmitter);
@@ -46,5 +53,10 @@ public class PPSAdapter implements Consumer<Item> {
     @Override
     public void push(Item item) {
         filter.push(item);
+    }
+
+    @Override
+    public String toString() {
+        return "PPS Adapter";
     }
 }

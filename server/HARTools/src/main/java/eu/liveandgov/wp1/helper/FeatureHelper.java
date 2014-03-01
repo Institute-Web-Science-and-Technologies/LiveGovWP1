@@ -18,42 +18,44 @@ public class FeatureHelper {
 
     private static DescriptiveStatistics stats = new DescriptiveStatistics();
 
+    private static float[] lastInput = null;
+
+    private static void use(float[] input) {
+        if (input != lastInput) {
+            stats.clear();
+            for (float v : input) {
+                stats.addValue(v);
+            }
+        }
+    }
 
     public static float mean(float[] input) {
-        stats.clear();
-        for(float v: input) {
-            stats.addValue(v);
-        }
-        return (float)stats.getMean();
+        use(input);
+
+        return (float) stats.getMean();
     }
 
     public static float var(float[] input) {
-        stats.clear();
-        for(float v: input) {
-            stats.addValue(v);
-        }
-        return (float)stats.getVariance();
+        use(input);
+        return (float) stats.getVariance();
     }
 
     public static float kurtosis(float[] input) {
-        stats.clear();
-        for(float v: input) {
-            stats.addValue(v);
-        }
-        return (float)stats.getKurtosis();
+        use(input);
+        return (float) stats.getKurtosis();
     }
 
-    public static float[] S2(float[] x, float[] y, float[] z){
+    public static float[] S2(float[] x, float[] y, float[] z) {
         float[] out = new float[x.length];
-        for (int i =0; i< x.length; i++){
-            out[i] = (float)Math.sqrt(x[i]*x[i] + y[i]*y[i] + z[i]*z[i]);
+        for (int i = 0; i < x.length; i++) {
+            out[i] = (float) Math.sqrt(x[i] * x[i] + y[i] * y[i] + z[i] * z[i]);
         }
         return out;
     }
 
     public static float sum(float[] xv) {
         float sum = 0;
-        for (float x: xv){
+        for (float x : xv) {
             sum += x;
         }
         return sum;
@@ -63,18 +65,22 @@ public class FeatureHelper {
     // 1 if Mobile is pointing to sky or ground
     // 0 if lying flat
     // arccos of return value gives tilting angle
-    public static float tilt(float x,float y,float z){
-        double abs = Math.sqrt(Math.pow(x,2) + Math.pow(y,2) + Math.pow(x,2));
+    public static float tilt(float x, float y, float z) {
+        double abs = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(x, 2));
         return (float) (Math.abs(y) / abs);
     }
 
-    public static float [] padZero(float[] input) {
-        if (input == null) { return null; }
-        if (input.length == 0) { return new float [0]; }
+    public static float[] padZero(float[] input) {
+        if (input == null) {
+            return null;
+        }
+        if (input.length == 0) {
+            return new float[0];
+        }
         int nextPowerOf2 = (int) Math.pow(2, 32 - Integer.numberOfLeadingZeros(input.length - 1));
 
-        float [] output = new float[nextPowerOf2];
-        for (int i = 0; i < nextPowerOf2; i++){
+        float[] output = new float[nextPowerOf2];
+        for (int i = 0; i < nextPowerOf2; i++) {
             if (i < input.length) {
                 output[i] = input[i];
             } else {
@@ -84,13 +90,13 @@ public class FeatureHelper {
         return output;
     }
 
-    public static Complex[] FT(float[] input){
+    public static Complex[] FT(float[] input) {
         return FFT(padZero(input));
     }
 
-    public static Complex[] FFT(float[] input){
+    public static Complex[] FFT(float[] input) {
         double[] dinput = new double[input.length];
-        for (int i = 0; i < input.length; i++){
+        for (int i = 0; i < input.length; i++) {
             dinput[i] = (double) input[i];
         }
 
@@ -98,15 +104,15 @@ public class FeatureHelper {
         return fT.transform(dinput, TransformType.FORWARD);
     }
 
-    public static float[] Abs(Complex [] input){
-        float [] output = new float [input.length];
+    public static float[] Abs(Complex[] input) {
+        float[] output = new float[input.length];
         for (int i = 0; i < input.length; i++) {
             output[i] = (float) input[i].abs();
         }
         return output;
     }
 
-    public static float[] FTAbsolute(float[] input){
+    public static float[] FTAbsolute(float[] input) {
         return Abs(FT(input));
     }
 

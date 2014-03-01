@@ -4,6 +4,8 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import eu.liveandgov.wp1.data.Callback;
+import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.impl.ZMQClient;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.R;
@@ -80,4 +82,21 @@ public class ZMQStreamer extends ZMQClient implements Monitorable {
     public String getStatus() {
         return "ZMQ Streaming";
     }
+
+    @Override
+    public String toString() {
+        return "ZMQ Streamer";
+    }
+
+    public final Consumer<Item> itemNode = new Consumer<Item>() {
+        @Override
+        public void push(Item item) {
+            ZMQStreamer.this.push(item.toSerializedForm());
+        }
+
+        @Override
+        public String toString() {
+            return ZMQStreamer.this.toString() + ".itemNode";
+        }
+    };
 }
