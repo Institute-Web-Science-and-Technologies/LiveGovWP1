@@ -1,5 +1,7 @@
 package eu.liveandgov.wp1.data;
 
+import eu.liveandgov.wp1.serialization.Serialization;
+
 /**
  * Created by Lukas Härtel on 11.02.14.
  */
@@ -27,4 +29,16 @@ public abstract class AbstractItem implements Item {
     public String getDevice() {
         return device;
     }
+
+    private String cacheSerializedForm = null;
+
+    @Override
+    public String toSerializedForm() {
+        if (cacheSerializedForm == null) {
+            cacheSerializedForm = createSerializedForm();
+        }
+        return cacheSerializedForm;
+    }
+
+    protected abstract String createSerializedForm();
 }

@@ -21,7 +21,7 @@ public final class BasicSerialization implements Serialization<Arbitrary> {
     @Override
     public String serialize(Arbitrary item) {
         final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(item.type);
+        stringBuilder.append(item.getType());
         stringBuilder.append(COMMA);
         stringBuilder.append(item.getTimestamp());
         stringBuilder.append(COMMA);

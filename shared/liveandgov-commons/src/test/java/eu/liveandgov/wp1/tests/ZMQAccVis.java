@@ -28,6 +28,7 @@ public class ZMQAccVis {
         StartsWith swa = new StartsWith();
         swa.addPrefix("ACC");
 
+
         DeSerializer<Motion> mds = new DeSerializer<Motion>(MotionSerialization.MOTION_SERIALIZATION);
 
         Transformation<Motion, String> out = new Transformation<Motion, String>(new Function<Motion, String>() {
