@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.data.impl;
 import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.serialization.impl.ActivitySerialization;
 
 /**
  * Created by Lukas Härtel on 09.02.14.
@@ -47,5 +48,10 @@ public class Activity extends AbstractItem {
         return "Activity{" +
                 "activity='" + activity + '\'' +
                 '}';
+    }
+
+    @Override
+    public String createSerializedForm() {
+        return ActivitySerialization.ACTIVITY_SERIALIZATION.serialize(this);
     }
 }

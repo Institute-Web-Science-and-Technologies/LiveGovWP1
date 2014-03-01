@@ -62,15 +62,12 @@ public class ActivityIntentService extends IntentService {
 
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
 
-            final String message = GoogleActivitySerialization.GOOGLE_ACTIVITY_SERIALIZATION.serialize(new GoogleActivity(
+            sensorQueue.push(new GoogleActivity(
                     System.currentTimeMillis(),
                     GlobalContext.getUserId(),
                     getActivityNameFromType(result.getMostProbableActivity().getType()),
                     result.getMostProbableActivity().getConfidence()
             ));
-
-
-            sensorQueue.push(message);
         }
     }
 }

@@ -88,14 +88,12 @@ public class WifiHolder implements SensorHolder {
                         );
                     }
 
-                    final String message = WiFiSerialization.WI_FI_SERIALIZATION.serialize(new WiFi(
+                    // Push converted scan results to queue
+                    sensorQueue.push(new WiFi(
                             System.currentTimeMillis(),
                             GlobalContext.getUserId(),
                             items
                     ));
-
-                    // Push converted scan results to queue
-                    sensorQueue.push(message);
                 }
 
                 // If results are on time, schedule the next scan at the handler with the given delay

@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.data.impl;
 import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.annotations.Unit;
+import eu.liveandgov.wp1.serialization.impl.WiFiSerialization;
 
 import java.util.Arrays;
 
@@ -104,5 +105,10 @@ public class WiFi extends AbstractItem {
         return "WiFi{" +
                 "items=" + Arrays.toString(items) +
                 '}';
+    }
+
+    @Override
+    public String createSerializedForm() {
+        return WiFiSerialization.WI_FI_SERIALIZATION.serialize(this);
     }
 }

@@ -3,10 +3,13 @@ package eu.liveandgov.wp1.sensor_collector.connectors.impl;
 import java.util.ArrayList;
 
 import eu.liveandgov.wp1.data.DataCommons;
+import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.impl.GPS;
 import eu.liveandgov.wp1.human_activity_recognition.helper.TimedQueue;
 import eu.liveandgov.wp1.pipeline.Consumer;
+import eu.liveandgov.wp1.pipeline.impl.ClassFilter;
 import eu.liveandgov.wp1.pipeline.impl.Multiplexer;
+import eu.liveandgov.wp1.pipeline.impl.Serializer;
 import eu.liveandgov.wp1.pipeline.impl.StartsWith;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.serialization.impl.GPSSerialization;
@@ -14,28 +17,34 @@ import eu.liveandgov.wp1.serialization.impl.GPSSerialization;
 /**
  * Created by hartmann on 11/14/13.
  */
-public class GpsCache implements Consumer<String> {
+public class GpsCache implements Consumer<Item> {
 
-    StartsWith filter;
+    ClassFilter<GPS> filter;
+    Serializer<GPS> serializer;
     GpsCacheImpl cacheImpl;
     Multiplexer<String> mpx;
     IntentEmitter gpsBroadcast;
 
     public GpsCache() {
-        cacheImpl = new GpsCacheImpl();
-        mpx = new Multiplexer<String>();
-        gpsBroadcast = new IntentEmitter(ExtendedIntentAPI.RETURN_GPS_SAMPLE, ExtendedIntentAPI.FIELD_GPS_ENTRY);
 
-        filter = new StartsWith();
-        filter.addPrefix(DataCommons.TYPE_GPS);
-        filter.setConsumer(mpx);
+        filter = new ClassFilter<GPS>(GPS.class);
+
+        serializer = new Serializer<GPS>(GPSSerialization.GPS_SERIALIZATION);
+        filter.setConsumer(serializer);
+
+        mpx = new Multiplexer<String>();
+        serializer.setConsumer(mpx);
+
+        cacheImpl = new GpsCacheImpl();
         mpx.addConsumer(cacheImpl);
+        
+        gpsBroadcast = new IntentEmitter(ExtendedIntentAPI.RETURN_GPS_SAMPLE, ExtendedIntentAPI.FIELD_GPS_ENTRY);
         mpx.addConsumer(gpsBroadcast);
     }
 
     @Override
-    public void push(String message) {
-        filter.push(message);
+    public void push(Item item) {
+        filter.push(item);
     }
 
     public ArrayList<String> getSamples() {

@@ -178,7 +178,7 @@ public class TelephonyHolder implements SensorHolder {
             );
         }
 
-        final String message = GSMSerialization.GSM_SERIALIZATION.serialize(new GSM(
+        sensorQueue.push(new GSM(
                 System.currentTimeMillis(),
                 GlobalContext.getUserId(),
                 serviceState,
@@ -188,8 +188,6 @@ public class TelephonyHolder implements SensorHolder {
                 getSignalStrengthText(lastSignalStrength),
                 items
         ));
-
-        sensorQueue.push(message);
     }
 
     private final PhoneStateListener phoneStateEndpoint = new PhoneStateListener() {

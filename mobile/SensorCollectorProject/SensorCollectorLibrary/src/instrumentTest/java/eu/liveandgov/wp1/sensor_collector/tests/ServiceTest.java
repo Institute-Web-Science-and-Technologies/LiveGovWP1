@@ -14,10 +14,12 @@ import java.util.concurrent.Exchanger;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import eu.liveandgov.wp1.data.impl.Tag;
 import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.persistence.FilePersistor;
 import eu.liveandgov.wp1.sensor_collector.persistence.ZipFilePersistor;
+import eu.liveandgov.wp1.sensor_collector.tests.utils.ItemPipeHelper;
 import eu.liveandgov.wp1.sensor_collector.tests.utils.Matcher;
 import eu.liveandgov.wp1.sensor_collector.tests.utils.PipeHelper;
 
@@ -184,12 +186,12 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
      */
     public void testAnnotation() {
         // Setup pipeline with expected regular expression
-        final PipeHelper<String> helper = new PipeHelper<String>();
+        final ItemPipeHelper helper = new ItemPipeHelper();
         helper.expectFrom("TAG,[^,]+,[^,]+,\"ANONYTATION\"").exactly(1).toMatch(Matcher.PATTERN_MATCHER);
 
         // Initialize service, add the pipeline tester to the pipeline
         final ServiceSensorControl service = initialize();
-        service.connectorThread.addConsumer(helper);
+        service.connectorThread.addConsumer(helper.itemNode);
 
         // Send recording enable intent
         final Intent iaRecordingEnable = new Intent(getContext(), ServiceSensorControl.class);
@@ -241,13 +243,13 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
         startService(iaRecordingDisable);
     }
 
-    public void testHAR(){
+    public void testHAR() {
         // Setup pipeline with always matcher
-        final PipeHelper<String> helper = new PipeHelper<String>();
+        final ItemPipeHelper helper = new ItemPipeHelper();
 
         // Initialize service, set the pipeline tester as the HAR
         final ServiceSensorControl service = initialize();
-        service.harPipeline = helper;
+        service.harPipeline = helper.itemNode;
 
         // Send recording enable intent
         final Intent iaRecordingEnable = new Intent(getContext(), ServiceSensorControl.class);
@@ -261,7 +263,7 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
 
         // Setup helper, push some stuff, don't care for format, then assert stuff reaches HAR
         helper.expectFrom(null).atLeast(1).toMatch(Matcher.ALWAYS);
-        service.sensorQueue.push("NOT EMPTY");
+        service.sensorQueue.push(new Tag(0, "NO DEVICE", "NOT EMPTY"));
         helper.assertStatusIn(1L, TimeUnit.SECONDS);
 
         // Stop HAR
@@ -273,7 +275,7 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
         // HAR
         helper.clear();
         helper.expectFrom(null).exactly(0).toMatch(Matcher.ALWAYS);
-        service.sensorQueue.push("NOT EMPTY");
+        service.sensorQueue.push(new Tag(0, "NO DEVICE", "NOT EMPTY"));
         helper.assertStatusIn(1L, TimeUnit.SECONDS);
 
         // Send recording disable intent
@@ -311,7 +313,7 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
 
         // Create FP with this file and close it, so it has no samples
         final FilePersistor filePersistor = new FilePersistor(file);
-        filePersistor.push("SAMPLE");
+        service.sensorQueue.push(new Tag(0, "NO DEVICE", "SAMPLE"));
         filePersistor.close();
 
         // Assert that sample is reported
@@ -347,7 +349,7 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
 
         // Create ZFP with this file and close it, so it has no samples
         final ZipFilePersistor zipFilePersistor = new ZipFilePersistor(file);
-        zipFilePersistor.push("SAMPLE");
+        service.sensorQueue.push(new Tag(0, "NO DEVICE", "SAMPLE"));
         zipFilePersistor.close();
 
         // Assert that sample is reported

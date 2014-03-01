@@ -5,6 +5,8 @@ import android.util.Log;
 import java.io.File;
 import java.io.IOException;
 
+import eu.liveandgov.wp1.data.Item;
+
 /**
  * Created by hartmann on 11/12/13.
  */
@@ -15,11 +17,11 @@ public class FilePublisher extends FilePersistor {
     }
 
     @Override
-    public synchronized void push(String s) {
+    public synchronized void push(Item item) {
         if (disabled) return;
 
-        super.push(s);
-        Log.d("PUBF", "Writing messsage:" + s);
+        super.push(item);
+        Log.d("PUBF", "Writing messsage:" + item);
 
         try {
             super.fileWriter.flush();

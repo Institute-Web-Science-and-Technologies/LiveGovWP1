@@ -3,6 +3,8 @@ package eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import eu.liveandgov.wp1.data.Item;
+
 /**
  * Simple queue class of a fixed maximal capacity.
  * If the capacity is reached further messages are dropped.
@@ -13,29 +15,28 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class LinkedSensorQueue implements SensorQueue {
     public static final int capacity = 4096;
 
-    public final Queue<String> queue = new ConcurrentLinkedQueue<String>();
+    public final Queue<Item> queue = new ConcurrentLinkedQueue<Item>();
 
     /**
      * Push message to the queue.
      * Drop message if queue is full.
      *
-     * @param m
+     * @param item
      */
     @Override
-    public void push(String m) {
-        queue.offer(m);
-        while (queue.size() >= capacity) {
-            queue.poll();
+    public void push(Item item) {
+        if (queue.size() + 1 < capacity) {
+            queue.offer(item);
         }
     }
 
-    private String pull() {
+    private Item pull() {
         return queue.poll();
     }
 
     @Override
-    public String blockingPull() {
-        String m;
+    public Item blockingPull() {
+        Item m;
 
         while (true) {
             m = pull();
@@ -43,7 +44,7 @@ public class LinkedSensorQueue implements SensorQueue {
             if (m != null) break;
 
             try {
-                Thread.sleep(10);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

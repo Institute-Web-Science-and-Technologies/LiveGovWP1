@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.data.impl;
 import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.annotations.Optional;
+import eu.liveandgov.wp1.serialization.impl.BluetoothSerialization;
 
 import java.util.Arrays;
 
@@ -124,5 +125,10 @@ public class Bluetooth extends AbstractItem {
         return "Bluetooth{" +
                 "items=" + Arrays.toString(items) +
                 '}';
+    }
+
+    @Override
+    public String createSerializedForm() {
+        return BluetoothSerialization.BLUETOOTH_SERIALIZATION.serialize(this);
     }
 }

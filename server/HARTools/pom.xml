@@ -4,9 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>HARTools</groupId>
-    <artifactId>HARTools</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>eu.liveandgov</groupId>
+    <artifactId>liveandgov-har-tools</artifactId>
+    <version>1.0</version>
+
+    <packaging>jar</packaging>
+    <name>Live &amp; Gov - HAR Tools</name>
+    <description>Library for Human Activity Recognition</description>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -17,6 +22,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
             <version>3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.liveandgov</groupId>
+            <artifactId>liveandgov-commons</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 

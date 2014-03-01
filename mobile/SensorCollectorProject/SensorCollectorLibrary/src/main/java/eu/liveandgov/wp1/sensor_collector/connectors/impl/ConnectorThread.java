@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.pipeline.MultiProducer;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
@@ -15,7 +16,7 @@ import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
  * <p/>
  * Created by hartmann on 9/15/13.
  */
-public class ConnectorThread extends MultiProducer<String> implements Runnable, Monitorable {
+public class ConnectorThread extends MultiProducer<Item> implements Runnable, Monitorable {
     private static final String LOG_TAG = "CT";
 
     private final SensorQueue sensorQueue;

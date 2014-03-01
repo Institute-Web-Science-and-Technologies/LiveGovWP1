@@ -18,14 +18,15 @@ import zmq.ZMQ;
  */
 public class ZMQStreamer extends ZMQClient implements Monitorable {
     {
-        HWM= 2048;
+        HWM = 2048;
     }
+
     public static final String LOG_TAG = "ZST";
 
     /**
      * Pull interval can be slow because we don't expect responses
      */
-    private static final int PULL_INTERVAL = 500;
+    private static final int PULL_INTERVAL = 5000;
 
     public ZMQStreamer() {
         super(GlobalContext.getExecutorService(), PULL_INTERVAL, ZMQ.ZMQ_PUSH);
@@ -52,6 +53,11 @@ public class ZMQStreamer extends ZMQClient implements Monitorable {
                 Log.d(LOG_TAG, "ZMQ Streamer destination now " + s);
             }
         });
+    }
+
+    @Override
+    public void push(String s) {
+        super.push(s + "\r\n");
     }
 
     @Override

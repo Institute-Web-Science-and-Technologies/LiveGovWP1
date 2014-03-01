@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.data.impl;
 import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.serialization.impl.TagSerialization;
 
 /**
  * Created by Lukas Härtel on 08.02.14.
@@ -47,5 +48,10 @@ public class Tag extends AbstractItem {
         return "Tag{" +
                 "tag='" + tag + '\'' +
                 '}';
+    }
+
+    @Override
+    public String createSerializedForm() {
+        return TagSerialization.TAG_SERIALIZATION.serialize(this);
     }
 }

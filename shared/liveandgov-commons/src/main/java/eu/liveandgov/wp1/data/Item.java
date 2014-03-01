@@ -19,4 +19,9 @@ public interface Item {
      * Device of the item
      */
     public String getDevice();
+
+    /**
+     * Returns the serialized form of this item, has to have a corresponding reconstruction in the serializer package
+     */
+    public String toSerializedForm();
 }

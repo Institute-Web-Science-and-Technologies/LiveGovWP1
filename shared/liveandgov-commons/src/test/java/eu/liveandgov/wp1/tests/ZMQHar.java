@@ -31,7 +31,7 @@ public class ZMQHar {
         ZMQServer zcp = new ZMQServer(ex, 50, ZMQ.PULL, "tcp://*:5555");
 
         StartsWith swa = new StartsWith();
-        swa.addPrefix(DataCommons.TYPE_ACTIVITY);
+        swa.addPrefix(DataCommons.TYPE_ACTIVITY + ",");
 
         DeSerializer<Activity> ads = new DeSerializer<Activity>(ActivitySerialization.ACTIVITY_SERIALIZATION);
 
@@ -39,12 +39,10 @@ public class ZMQHar {
             @Override
             public void push(Activity activity) {
                 try {
-                    if (activity.getType() == DataCommons.TYPE_ACTIVITY) {
-                        System.out.println(activity.activity);
-                        PrintStream p = new PrintStream("data.txt");
-                        p.print(activity.activity);
-                        p.close();
-                    }
+                    System.out.println(activity.activity);
+                    PrintStream p = new PrintStream("data.txt");
+                    p.print(activity.activity);
+                    p.close();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }

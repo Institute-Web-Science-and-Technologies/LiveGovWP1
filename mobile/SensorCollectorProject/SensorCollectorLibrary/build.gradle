@@ -43,5 +43,6 @@ dependencies {
     compile 'commons-lang:commons-lang:2.3'
     compile 'eu.liveandgov:liveandgov-proximity:1.0'
     compile 'eu.liveandgov:liveandgov-commons:1.0'
+    compile 'eu.liveandgov:liveandgov-har-tools:1.0'
     compile 'eu.liveandgov.wp1:HumanActivityRecognitionLibrary:1.0'
 }

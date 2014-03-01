@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.data.impl;
 import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.annotations.Unit;
+import eu.liveandgov.wp1.serialization.impl.GSMSerialization;
 
 import java.util.Arrays;
 
@@ -152,6 +153,11 @@ public class GSM extends AbstractItem {
                 ", signalStrength='" + signalStrength + '\'' +
                 ", items=" + Arrays.toString(items) +
                 '}';
+    }
+
+    @Override
+    public String createSerializedForm() {
+        return GSMSerialization.GSM_SERIALIZATION.serialize(this);
     }
 }
 

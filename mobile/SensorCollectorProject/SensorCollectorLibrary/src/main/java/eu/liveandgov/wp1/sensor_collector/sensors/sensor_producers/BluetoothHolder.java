@@ -187,14 +187,12 @@ public class BluetoothHolder implements SensorHolder {
                 // Get receive-time of the intent in system uptime
                 long scanEndtime = SystemClock.uptimeMillis();
 
-                final String message = BluetoothSerialization.BLUETOOTH_SERIALIZATION.serialize(new Bluetooth(
+                // On end of the discovery, push the results to the pipeline
+                sensorQueue.push(new Bluetooth(
                         System.currentTimeMillis(),
                         GlobalContext.getUserId(),
                         items.toArray(Bluetooth.Item.EMPTY_ARRAY)
                 ));
-
-                // On end of the discovery, push the results to the pipeline
-                sensorQueue.push(message);
 
                 // If results are on time, schedule the next scan at the handler with the given delay
                 if (lastScanRequest + delay > scanEndtime) {

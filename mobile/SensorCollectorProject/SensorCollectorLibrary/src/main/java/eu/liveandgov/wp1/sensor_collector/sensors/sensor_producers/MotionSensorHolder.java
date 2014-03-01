@@ -100,9 +100,7 @@ public class MotionSensorHolder implements SensorHolder, SensorEventListener {
                 throw new IllegalArgumentException();
         }
 
-        final String message = MotionSerialization.MOTION_SERIALIZATION.serialize(motion);
-
-        sensorQueue.push(message);
+        sensorQueue.push(motion);
     }
 
     @Override

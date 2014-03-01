@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.data.impl;
 import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.serialization.impl.ProximitySerialization;
 
 /**
  * Created by Lukas Härtel on 09.02.14.
@@ -67,5 +68,10 @@ public class Proximity extends AbstractItem {
                 ", in=" + in +
                 ", of='" + of + '\'' +
                 '}';
+    }
+
+    @Override
+    public String createSerializedForm() {
+        return ProximitySerialization.PROXIMITY_SERIALIZATION.serialize(this);
     }
 }

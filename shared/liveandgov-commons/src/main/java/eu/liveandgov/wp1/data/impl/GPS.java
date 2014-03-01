@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.data.impl;
 import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.serialization.impl.GPSSerialization;
 
 /**
  * Created by Lukas Härtel on 09.02.14.
@@ -66,5 +67,10 @@ public class GPS extends AbstractItem {
                 ", lon=" + lon +
                 ", alt=" + alt +
                 '}';
+    }
+
+    @Override
+    public String createSerializedForm() {
+        return GPSSerialization.GPS_SERIALIZATION.serialize(this);
     }
 }
