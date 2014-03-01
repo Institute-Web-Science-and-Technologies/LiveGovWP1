@@ -7,7 +7,7 @@ import android.hardware.SensorManager;
  */
 public class SensorCollectionOptions {
     // CONNECTIVITY //
-    public static String REMOTE_HOST = "141.26.71.84"; // LG Server
+    public static String REMOTE_HOST = "141.26.248.40"; // LG Server
     public static String UPLOAD_URL = "http://" + REMOTE_HOST + ":8080/UploadServlet/";
     public static String STREAMING_ZMQ_SOCKET = "tcp://" + REMOTE_HOST + ":5555";
 
