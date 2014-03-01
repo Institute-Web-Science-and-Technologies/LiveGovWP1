@@ -17,6 +17,9 @@ import zmq.ZMQ;
  * Created by hartmann on 10/2/13.
  */
 public class ZMQStreamer extends ZMQClient implements Monitorable {
+    {
+        HWM= 2048;
+    }
     public static final String LOG_TAG = "ZST";
 
     /**

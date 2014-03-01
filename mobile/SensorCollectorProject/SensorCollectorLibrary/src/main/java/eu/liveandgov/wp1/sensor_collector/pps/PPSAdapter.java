@@ -1,10 +1,13 @@
 package eu.liveandgov.wp1.sensor_collector.pps;
 
+import java.util.concurrent.Executor;
+
 import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.impl.GPS;
 import eu.liveandgov.wp1.data.impl.Proximity;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.impl.DeSerializer;
+import eu.liveandgov.wp1.pipeline.impl.Detachment;
 import eu.liveandgov.wp1.pipeline.impl.Serializer;
 import eu.liveandgov.wp1.pipeline.impl.StartsWith;
 import eu.liveandgov.wp1.pps.PPSPipeline;

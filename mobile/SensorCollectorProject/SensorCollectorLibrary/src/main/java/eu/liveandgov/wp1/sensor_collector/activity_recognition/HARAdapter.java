@@ -1,11 +1,16 @@
 package eu.liveandgov.wp1.sensor_collector.activity_recognition;
 
+import android.util.Log;
+
+import java.util.concurrent.Executor;
+
 import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.impl.Activity;
 import eu.liveandgov.wp1.human_activity_recognition.HarPipeline;
 import eu.liveandgov.wp1.human_activity_recognition.connectors.Pipeline;
 import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
 import eu.liveandgov.wp1.pipeline.Consumer;
+import eu.liveandgov.wp1.pipeline.impl.Detachment;
 import eu.liveandgov.wp1.pipeline.impl.StartsWith;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
@@ -20,11 +25,13 @@ import eu.liveandgov.wp1.serialization.impl.ActivitySerialization;
  * Created by hartmann on 10/20/13.
  */
 public class HARAdapter implements Consumer<String> {
+    private static final String LOG_TAG = "HARP";
     private final StartsWith filter;
     private final MotionSensorValueProducer parseProd;
     private final Pipeline<MotionSensorValue, String> harPipeline;
 
     public HARAdapter() {
+
         // ACC filter
         filter = new StartsWith();
         filter.addPrefix(DataCommons.TYPE_ACCELEROMETER);
@@ -42,14 +49,15 @@ public class HARAdapter implements Consumer<String> {
             }
         });
 
-        final IntentEmitter intentEmitter = new IntentEmitter(IntentAPI.RETURN_ACTIVITY, IntentAPI.FIELD_ACTIVITY);
         final SensorEmitter sensorEmitter = new SensorEmitter();
+        final IntentEmitter intentEmitter = new IntentEmitter(IntentAPI.RETURN_ACTIVITY, IntentAPI.FIELD_ACTIVITY);
 
         harPipeline.setConsumer(new eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer<String>() {
             @Override
             public void push(String s) {
-                intentEmitter.push(s);
                 sensorEmitter.push(ActivitySerialization.ACTIVITY_SERIALIZATION.serialize(new Activity(System.currentTimeMillis(), GlobalContext.getUserId(), s)));
+                intentEmitter.push(s);
+
             }
         });
     }

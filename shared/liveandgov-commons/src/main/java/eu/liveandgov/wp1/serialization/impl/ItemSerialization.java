@@ -41,12 +41,12 @@ public final class ItemSerialization implements Serialization<Item> {
             return GSMSerialization.GSM_SERIALIZATION.serialize((GSM) item);
         }
 
-        if (item instanceof GoogleActivity) {
-            return GoogleActivitySerialization.GOOGLE_ACTIVITY_SERIALIZATION.serialize((GoogleActivity) item);
-        }
-
         if (item instanceof Activity) {
             return ActivitySerialization.ACTIVITY_SERIALIZATION.serialize((Activity) item);
+        }
+
+        if (item instanceof GoogleActivity) {
+            return GoogleActivitySerialization.GOOGLE_ACTIVITY_SERIALIZATION.serialize((GoogleActivity) item);
         }
 
         if (item instanceof Tag) {
@@ -96,12 +96,12 @@ public final class ItemSerialization implements Serialization<Item> {
             return GSMSerialization.GSM_SERIALIZATION.deSerialize(string);
         }
 
-        if (DataCommons.TYPE_GOOGLE_ACTIVITY.equals(type)) {
-            return GoogleActivitySerialization.GOOGLE_ACTIVITY_SERIALIZATION.deSerialize(string);
-        }
-
         if (DataCommons.TYPE_ACTIVITY.equals(type)) {
             return ActivitySerialization.ACTIVITY_SERIALIZATION.deSerialize(string);
+        }
+
+        if (DataCommons.TYPE_GOOGLE_ACTIVITY.equals(type)) {
+            return GoogleActivitySerialization.GOOGLE_ACTIVITY_SERIALIZATION.deSerialize(string);
         }
 
         if (DataCommons.TYPE_TAG.equals(type)) {

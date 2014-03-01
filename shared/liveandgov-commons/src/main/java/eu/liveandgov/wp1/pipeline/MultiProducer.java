@@ -4,8 +4,11 @@ package eu.liveandgov.wp1.pipeline;
 import eu.liveandgov.wp1.data.CallbackSet;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Created by Lukas Härtel on 11.02.14.
@@ -25,13 +28,13 @@ public abstract class MultiProducer<Item> {
     /**
      * Consumers that handles the items created by this multi-producer
      */
-    private final List<Consumer<? super Item>> consumers = new CopyOnWriteArrayList<Consumer<? super Item>>();
+    private final Set<Consumer<? super Item>> consumers = new CopyOnWriteArraySet<Consumer<? super Item>>();
 
     /**
      * Returns the current consumers
      */
-    public final List<Consumer<? super Item>> getConsumers() {
-        return Collections.unmodifiableList(consumers);
+    public final Set<Consumer<? super Item>> getConsumers() {
+        return Collections.unmodifiableSet(consumers);
     }
 
     /**

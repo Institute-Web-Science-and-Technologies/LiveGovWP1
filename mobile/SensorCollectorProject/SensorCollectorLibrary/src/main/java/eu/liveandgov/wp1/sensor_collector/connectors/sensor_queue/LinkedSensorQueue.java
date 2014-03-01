@@ -7,34 +7,34 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Simple queue class of a fixed maximal capacity.
  * If the capacity is reached further messages are dropped.
  * The class provides a blockinPull() method, that blocks until new messages are available.
- *
+ * <p/>
  * Created by hartmann on 9/29/13.
  */
 public class LinkedSensorQueue implements SensorQueue {
-    public  static final int capacity = 1000;
+    public static final int capacity = 4096;
 
-    private int size = 0;
-    public  final Queue<String> Q = new ConcurrentLinkedQueue<String>();
+    public final Queue<String> queue = new ConcurrentLinkedQueue<String>();
 
     /**
      * Push message to the queue.
      * Drop message if queue is full.
+     *
      * @param m
      */
     @Override
-    public void push(String m){
-        if (size++ < capacity) {
-            Q.add(m);
+    public void push(String m) {
+        queue.offer(m);
+        while (queue.size() >= capacity) {
+            queue.poll();
         }
     }
 
-    private String pull(){
-        size = Math.max(size - 1, 0);
-        return Q.poll();
+    private String pull() {
+        return queue.poll();
     }
 
     @Override
-    public String blockingPull(){
+    public String blockingPull() {
         String m;
 
         while (true) {
@@ -43,9 +43,9 @@ public class LinkedSensorQueue implements SensorQueue {
             if (m != null) break;
 
             try {
-                Thread.sleep(100);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
         return m;
@@ -53,6 +53,6 @@ public class LinkedSensorQueue implements SensorQueue {
 
     @Override
     public String getStatus() {
-        return "Queue Size: " + Q.size();
+        return "Queue Size: " + queue.size();
     }
 }

@@ -101,7 +101,7 @@ public class ServiceSensorControl extends Service {
         // Register this object globally
         GlobalContext.set(this);
 
-        executorService = new ScheduledThreadPoolExecutor(3);
+        executorService = new ScheduledThreadPoolExecutor(2);
     }
 
     /* ANDROID LIFECYCLE */
