@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.pipeline;
 
 import eu.liveandgov.wp1.classifier.UCIClassifier;
+import eu.liveandgov.wp1.classifier.UKOBClassifier;
 import eu.liveandgov.wp1.data.FeatureVector;
 import eu.liveandgov.wp1.data.Tuple;
 
@@ -28,7 +29,16 @@ public class ActivityPipeline extends Pipeline<Tuple<Long, FeatureVector>, Tuple
                     e.printStackTrace();
                 }
                 break;
-
+            case 1:
+                try {
+                    double a = UKOBClassifier.classify(longFeatureVectorTuple.right.toWekaObjArr());
+                    System.out.println(a);
+                    String activity = UKOBClassifier.getActivityName((int)a);
+                    Tuple<Long, String> t = new Tuple<Long, String>(longFeatureVectorTuple.left, activity);
+                    produce(t);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
         }
     }
 }

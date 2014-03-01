@@ -72,7 +72,13 @@ public class BinDistributor {
     public Integer [] getBinsForAxis(float[] axis) {
         for (float value : axis) {
             int i = 0;
-            while(!bins[i].addIfInside(value)) i++;
+            try {
+                while(!bins[i].addIfInside(value)) i++;
+            } catch (ArrayIndexOutOfBoundsException e) {
+                System.out.println(value);
+                e.printStackTrace();
+            }
+
         }
         Integer counts[] = new Integer[bins.length];
         for (int i = 0; i < bins.length; i++) {
