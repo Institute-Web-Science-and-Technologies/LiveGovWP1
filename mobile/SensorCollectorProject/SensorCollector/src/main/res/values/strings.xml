@@ -4,4 +4,13 @@
     <string name="app_name">SensorMiner</string>
     <string name="action_settings">Settings</string>
 
+    <!-- Shared Preferences Store -->
+    <string name="spn">SensorCollectorPreferences</string>
+    <string name="prf_streaming_address">streaming_address</string>
+
+    <!-- Values for the Settings activity -->
+    <string name="streaming_address">Streaming address</string>
+    <string name="default_streaming_address">141.26.248.40:5555</string>
+    <string name="title_activity_activity_settings">Settings</string>
+
 </resources>
