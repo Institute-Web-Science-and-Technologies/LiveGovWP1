@@ -40,21 +40,9 @@ public class PPSAdapter implements Consumer<Item> {
         filter = new ClassFilter<GPS>(GPS.class);
 
         // So apparently the PPS takes quite some time, so we use a Player to play all GPS samples
-        // to the pipeline on the global executor services
-        player = new Player<GPS>(GlobalContext.getExecutorService(), -1, -1, 100L);
-        player.suspended.register(new Callback<Boolean>() {
-            @Override
-            public void call(Boolean aBoolean) {
-                Log.d(LOG_TAG, "Data playback suspended");
-            }
-        });
-        player.resumed.register(new Callback<Boolean>() {
-            @Override
-            public void call(Boolean aBoolean) {
-                Log.d(LOG_TAG, "Data playback resumed");
-            }
-        });
-
+        // to the pipeline on the global executor services, assuming that the last 16 will be
+        // sufficient, as GPS is only occurring about once a second
+        player = new Player<GPS>(GlobalContext.getExecutorService(), 16);
         filter.setConsumer(player);
 
         pps = new PPSPipeline(key, ps);
