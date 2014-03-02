@@ -41,21 +41,27 @@ public class ConnectorThread extends MultiProducer<Item> implements Runnable, Mo
 
     @Override
     public void run() {
-        Log.i(LOG_TAG, "Running Connection Loop.");
+        // If the diagnostics are enabled
         if (DIAG_EVERY_NTH != -1) {
+            // Loop
             while (true) {
+                // Produce all the undiagnosed items
                 for (int i = 1; i < DIAG_EVERY_NTH; i++) {
                     produce(sensorQueue.blockingPull());
                     messageCount++;
                 }
+
+                // Then produce one diagnosed item
                 final Map<Consumer<? super Item>, Double> diag = produceDiag(sensorQueue.blockingPull());
                 messageCount++;
 
-                Log.d(LOG_TAG, "Diagnostics: " + diag);
+                // Print it to the diagnostics
+                Log.d(LOG_TAG, this + " diagnostics: " + diag);
             }
         } else {
+            // Else, just loop
             while (true) {
-
+                // Then produce one undiagnosed item
                 produce(sensorQueue.blockingPull());
                 messageCount++;
             }
@@ -74,5 +80,10 @@ public class ConnectorThread extends MultiProducer<Item> implements Runnable, Mo
     @Override
     public String getStatus() {
         return "Throughput: " + messageCount;
+    }
+
+    @Override
+    public String toString() {
+        return "Connector thread";
     }
 }

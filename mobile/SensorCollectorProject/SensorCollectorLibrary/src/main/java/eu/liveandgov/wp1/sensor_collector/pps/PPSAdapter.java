@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.util.concurrent.Executor;
 
+import eu.liveandgov.wp1.data.Callback;
 import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.impl.GPS;
@@ -41,6 +42,19 @@ public class PPSAdapter implements Consumer<Item> {
         // So apparently the PPS takes quite some time, so we use a Player to play all GPS samples
         // to the pipeline on the global executor services
         player = new Player<GPS>(GlobalContext.getExecutorService(), -1, -1, 100L);
+        player.suspended.register(new Callback<Boolean>() {
+            @Override
+            public void call(Boolean aBoolean) {
+                Log.d(LOG_TAG, "Data playback suspended");
+            }
+        });
+        player.resumed.register(new Callback<Boolean>() {
+            @Override
+            public void call(Boolean aBoolean) {
+                Log.d(LOG_TAG, "Data playback resumed");
+            }
+        });
+
         filter.setConsumer(player);
 
         pps = new PPSPipeline(key, ps);
