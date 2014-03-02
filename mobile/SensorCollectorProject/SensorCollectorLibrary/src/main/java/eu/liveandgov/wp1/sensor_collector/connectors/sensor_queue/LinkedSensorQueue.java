@@ -1,7 +1,9 @@
 package eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue;
 
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import eu.liveandgov.wp1.data.Item;
 
@@ -13,9 +15,13 @@ import eu.liveandgov.wp1.data.Item;
  * Created by hartmann on 9/29/13.
  */
 public class LinkedSensorQueue implements SensorQueue {
-    public static final int capacity = 1024;
+    public static final int CAPACITY = 1024;
 
-    public final Queue<Item> queue = new ConcurrentLinkedQueue<Item>();
+    private final BlockingQueue<Item> queue;
+
+    public LinkedSensorQueue() {
+        queue = new LinkedBlockingQueue<Item>();
+    }
 
     /**
      * Push message to the queue.
@@ -25,31 +31,23 @@ public class LinkedSensorQueue implements SensorQueue {
      */
     @Override
     public void push(Item item) {
-        if (queue.size() + 1 < capacity) {
-            queue.offer(item);
-        }
-    }
-
-    private Item pull() {
-        return queue.poll();
-    }
-
-    @Override
-    public Item blockingPull() {
-        Item item;
-
-        while (true) {
-            item = pull();
-
-            if (item != null) break;
-
+        if (queue.size() < CAPACITY) {
             try {
-                Thread.sleep(100);
+                queue.put(item);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
-        return item;
+    }
+
+    @Override
+    public Item blockingPull() {
+        try {
+            return queue.take();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        }
     }
 
     @Override
