@@ -63,8 +63,6 @@ public class ServiceSensorControl extends Service {
     private static final String SHARED_PREFS_NAME = "SensorCollectorPrefs";
     private static final String PREF_ID = "userid";
 
-    private static final int EXECUTOR_THREADS = 3;
-
     // MAIN EXECUTION SERVICE
     public final ScheduledThreadPoolExecutor executorService;
 

@@ -128,4 +128,8 @@ public class FilePersistor implements Persistor {
         fileWriter = null;
     }
 
+    @Override
+    public String toString() {
+        return "File persistor";
+    }
 }
