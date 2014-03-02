@@ -1,8 +1,10 @@
 package eu.liveandgov.wp1.sensor_collector;
 
+import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
@@ -13,6 +15,7 @@ import java.io.InputStream;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import eu.liveandgov.wp1.data.Callback;
 import eu.liveandgov.wp1.data.Callbacks;
@@ -61,7 +64,7 @@ public class ServiceSensorControl extends Service {
     private static final int EXECUTOR_THREADS = 3;
 
     // MAIN EXECUTION SERVICE
-    public final ScheduledExecutorService executorService;
+    public final ScheduledThreadPoolExecutor executorService;
 
     // STATUS FLAGS
     public boolean isRecording = false;
@@ -102,7 +105,14 @@ public class ServiceSensorControl extends Service {
         // Register this object globally
         GlobalContext.set(this);
 
-        executorService = new ScheduledThreadPoolExecutor(1);
+        // Create the executor service, keep two threads in the pool
+        executorService = new ScheduledThreadPoolExecutor(2);
+
+        // If feature is available, enable core thread timeout with five seconds
+        if (Build.VERSION.SDK_INT >= 9) {
+            executorService.setKeepAliveTime(5L, TimeUnit.SECONDS);
+            executorService.allowCoreThreadTimeOut(true);
+        }
     }
 
     /* ANDROID LIFECYCLE */
