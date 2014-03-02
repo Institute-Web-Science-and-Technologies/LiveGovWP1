@@ -1,7 +1,6 @@
 package eu.liveandgov.wp1.pipeline;
 
 import com.google.common.base.Function;
-import eu.liveandgov.wp1.data.Callback;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;

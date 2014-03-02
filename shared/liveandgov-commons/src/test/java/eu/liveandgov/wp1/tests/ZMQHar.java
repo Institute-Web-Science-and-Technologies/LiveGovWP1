@@ -1,14 +1,13 @@
 package eu.liveandgov.wp1.tests;
 
-import com.google.common.base.Function;
 import eu.liveandgov.wp1.data.DataCommons;
-import eu.liveandgov.wp1.data.impl.Acceleration;
 import eu.liveandgov.wp1.data.impl.Activity;
-import eu.liveandgov.wp1.data.impl.Motion;
 import eu.liveandgov.wp1.pipeline.Consumer;
-import eu.liveandgov.wp1.pipeline.impl.*;
+import eu.liveandgov.wp1.pipeline.impl.DeSerializer;
+import eu.liveandgov.wp1.pipeline.impl.LinesIn;
+import eu.liveandgov.wp1.pipeline.impl.StartsWith;
+import eu.liveandgov.wp1.pipeline.impl.ZMQServer;
 import eu.liveandgov.wp1.serialization.impl.ActivitySerialization;
-import eu.liveandgov.wp1.serialization.impl.MotionSerialization;
 import org.zeromq.ZMQ;
 
 import java.io.FileNotFoundException;

@@ -3,7 +3,6 @@ package eu.liveandgov.wp1.data;
 import com.google.common.base.Function;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 

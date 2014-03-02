@@ -1,11 +1,6 @@
 package eu.liveandgov.wp1.pipeline.impl;
 
-import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.MultiPipeline;
-import eu.liveandgov.wp1.pipeline.MultiProducer;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * <p>This pipeline element provides a mutable consumer-set. On receiving an item on its input, it distributes

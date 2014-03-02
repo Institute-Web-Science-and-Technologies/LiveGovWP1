@@ -7,6 +7,11 @@ import android.os.Build;
  * Created by hartmann on 9/26/13.
  */
 public class SensorCollectionOptions {
+    // SERVICE
+    public static final int MAIN_EXECUTOR_CORE_POOL = 2;
+
+    public static final long MAIN_EXECUTOR_CORE_TIMEOUT = 5000L;
+
     // CONNECTIVITY //
     public static String REMOTE_HOST = "141.26.248.40"; // LG Server
     public static String UPLOAD_URL = "http://" + REMOTE_HOST + ":8080/UploadServlet/";

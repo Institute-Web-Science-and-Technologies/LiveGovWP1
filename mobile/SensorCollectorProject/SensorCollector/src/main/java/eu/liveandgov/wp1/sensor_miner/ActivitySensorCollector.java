@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -18,8 +19,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
+import eu.liveandgov.wp1.sensor_miner.configuration.SensorMinerOptions;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.FIELD_MESSAGE;
 import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.FIELD_STREAMING;
@@ -62,6 +67,9 @@ public class ActivitySensorCollector extends Activity {
     private boolean isStreaming = false;
     private boolean isHAR = false;
 
+    // UI EXECUTION SERVICE
+    public final ScheduledThreadPoolExecutor executorService;
+
     // UI Elements
     private ToggleButton recordingToggleButton;
     private ProgressBar recordingProgressBar;
@@ -76,9 +84,18 @@ public class ActivitySensorCollector extends Activity {
     private ToggleButton streamButton;
     private ToggleButton harButton;
 
+    public ActivitySensorCollector() {
+        // Create the executor service, keep two threads in the pool
+        executorService = new ScheduledThreadPoolExecutor(SensorMinerOptions.UI_EXECUTOR_CORE_POOL);
+
+        // If feature is available, enable core thread timeout with five seconds
+        if (Build.VERSION.SDK_INT >= 9) {
+            executorService.setKeepAliveTime(SensorMinerOptions.UI_EXECUTOR_CORE_TIMEOUT, TimeUnit.MILLISECONDS);
+            executorService.allowCoreThreadTimeOut(true);
+        }
+    }
 
     /* ANDROID LIFECYCLE MANAGEMENT */
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -138,19 +155,31 @@ public class ActivitySensorCollector extends Activity {
 
         setupIntentListeners();
 
-        runStatusLoop();
+        executorService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                requestStatus();
+            }
+        }, 0L, SensorMinerOptions.REQUEST_STATUS_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        unregisterListeners();
-    }
 
     @Override
     public void onResume() {
         super.onResume();
         registerListeners();
+    }
+
+    @Override
+    public void onPause() {
+        unregisterListeners();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        executorService.shutdown();
+        super.onDestroy();
     }
 
     /* BUTTON HANDLER */
@@ -325,29 +354,6 @@ public class ActivitySensorCollector extends Activity {
         Log.d("STATUS", "SAMPLES_STORED: " + intent.getBooleanExtra(FIELD_SAMPLES_STORED, false));
         Log.d("STATUS", "HAR:            " + intent.getBooleanExtra(FIELD_HAR, false));
         Log.d("STATUS", "ID:             " + intent.getStringExtra(FIELD_ID));
-    }
-
-    /**
-     * Spawn new thread that request status updates in regular intervals.
-     */
-    private void runStatusLoop() {
-        final int INTERVAL = 2000; // in ms;
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    requestStatus();
-
-                    // wait 1 sec.
-                    try {
-                        Thread.sleep(INTERVAL);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
     }
 
 

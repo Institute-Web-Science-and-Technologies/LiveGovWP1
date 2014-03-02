@@ -1,13 +1,14 @@
 package eu.liveandgov.wp1.serialization.impl;
 
-import eu.liveandgov.wp1.data.*;
+import eu.liveandgov.wp1.data.DataCommons;
+import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.impl.*;
 import eu.liveandgov.wp1.serialization.Serialization;
 
-import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
-
 import java.util.Locale;
 import java.util.Scanner;
+
+import static eu.liveandgov.wp1.serialization.SerializationCommons.COMMA_SEPARATED;
 
 /**
  * Created by Lukas Härtel on 09.02.14.

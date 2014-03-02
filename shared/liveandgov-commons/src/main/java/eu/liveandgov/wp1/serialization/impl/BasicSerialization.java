@@ -3,10 +3,10 @@ package eu.liveandgov.wp1.serialization.impl;
 import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.serialization.Serialization;
 
-import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
-
 import java.util.Locale;
 import java.util.Scanner;
+
+import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
 
 /**
  * Created by Lukas Härtel on 08.02.14.

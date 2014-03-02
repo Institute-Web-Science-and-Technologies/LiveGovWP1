@@ -2,9 +2,7 @@ package eu.liveandgov.wp1.pipeline.impl;
 
 import com.sun.rowset.JdbcRowSetImpl;
 import eu.liveandgov.wp1.data.Callback;
-import eu.liveandgov.wp1.pipeline.Pipeline;
 import eu.liveandgov.wp1.pipeline.Producer;
-import javafx.util.Pair;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.JdbcRowSet;
@@ -12,7 +10,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by Lukas Härtel on 24.02.14.

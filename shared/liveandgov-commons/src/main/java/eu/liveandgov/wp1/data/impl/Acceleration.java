@@ -2,7 +2,6 @@ package eu.liveandgov.wp1.data.impl;
 
 import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.Item;
-import eu.liveandgov.wp1.serialization.impl.MotionSerialization;
 
 /**
  * Created by Lukas Härtel on 11.02.14.

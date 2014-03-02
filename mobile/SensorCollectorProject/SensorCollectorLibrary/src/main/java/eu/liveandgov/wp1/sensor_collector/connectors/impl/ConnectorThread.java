@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import eu.liveandgov.wp1.data.Diagnostics;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.MultiProducer;
@@ -52,7 +53,7 @@ public class ConnectorThread extends MultiProducer<Item> implements Runnable, Mo
                 }
 
                 // Then produce one diagnosed item
-                final Map<Consumer<? super Item>, Double> diag = produceDiag(sensorQueue.blockingPull());
+                final Diagnostics<Consumer<? super Item>> diag = produceDiag(sensorQueue.blockingPull());
                 messageCount++;
 
                 // Print it to the diagnostics

@@ -1,10 +1,12 @@
 package eu.liveandgov.wp1.pipeline.impl;
 
-import eu.liveandgov.wp1.data.CallbackSet;
 import eu.liveandgov.wp1.data.Stoppable;
 import eu.liveandgov.wp1.pipeline.Pipeline;
 
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by Lukas Härtel on 01.03.14.

@@ -2,9 +2,8 @@ package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.data.impl.WiFi;
-
-import eu.liveandgov.wp1.serialization.Wrapper;
 import eu.liveandgov.wp1.serialization.SerializationCommons;
+import eu.liveandgov.wp1.serialization.Wrapper;
 
 import java.util.ArrayList;
 import java.util.List;

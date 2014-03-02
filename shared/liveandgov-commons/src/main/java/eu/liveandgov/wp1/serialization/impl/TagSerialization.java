@@ -2,10 +2,10 @@ package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.data.impl.Tag;
-
-import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
-
 import eu.liveandgov.wp1.serialization.Wrapper;
+
+import static eu.liveandgov.wp1.serialization.SerializationCommons.escape;
+import static eu.liveandgov.wp1.serialization.SerializationCommons.unescape;
 
 /**
  * Created by Lukas Härtel on 08.02.14.

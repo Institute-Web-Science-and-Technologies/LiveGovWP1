@@ -29,6 +29,7 @@ import eu.liveandgov.wp1.sensor_collector.activity_recognition.HARAdapter;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.PPSOptions;
+import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.configuration.WaitingOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.impl.ConnectorThread;
 import eu.liveandgov.wp1.sensor_collector.connectors.impl.GpsCache;
@@ -49,6 +50,7 @@ import eu.liveandgov.wp1.sensor_collector.waiting.WaitingAdapter;
 import eu.liveandgov.wp1.serialization.impl.TagSerialization;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.API_EXTENSIONS;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.MAIN_EXECUTOR_CORE_TIMEOUT;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
 
 public class ServiceSensorControl extends Service {
@@ -106,11 +108,11 @@ public class ServiceSensorControl extends Service {
         GlobalContext.set(this);
 
         // Create the executor service, keep two threads in the pool
-        executorService = new ScheduledThreadPoolExecutor(2);
+        executorService = new ScheduledThreadPoolExecutor(SensorCollectionOptions.MAIN_EXECUTOR_CORE_POOL);
 
         // If feature is available, enable core thread timeout with five seconds
         if (Build.VERSION.SDK_INT >= 9) {
-            executorService.setKeepAliveTime(5L, TimeUnit.SECONDS);
+            executorService.setKeepAliveTime(MAIN_EXECUTOR_CORE_TIMEOUT, TimeUnit.MILLISECONDS);
             executorService.allowCoreThreadTimeOut(true);
         }
     }

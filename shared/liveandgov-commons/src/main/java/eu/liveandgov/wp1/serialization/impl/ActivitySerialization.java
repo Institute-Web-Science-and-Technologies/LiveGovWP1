@@ -7,7 +7,8 @@ import eu.liveandgov.wp1.serialization.Wrapper;
 import java.util.Locale;
 import java.util.Scanner;
 
-import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
+import static eu.liveandgov.wp1.serialization.SerializationCommons.appendString;
+import static eu.liveandgov.wp1.serialization.SerializationCommons.nextString;
 
 /**
  * Created by Lukas Härtel on 09.02.14.
