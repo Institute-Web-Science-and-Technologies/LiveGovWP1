@@ -8,6 +8,7 @@
 // mind the navbar
 body
 	padding-top 50px
+	// zoom 90%
 
 // little triangles to indicate table sorting
 .triangle
@@ -89,7 +90,8 @@ BORDER_SIZE = 24px
 	vertical-align top
 
 #map
-	height 500px
+	height ((796px - BORDER_SIZE - 4px) / 2)px
+	// height 500px
 	width 100%
 
 .legend
@@ -111,6 +113,16 @@ raw
 		background-color #ccc
 		padding-top BORDER_SIZE
 
+
+
+
+
+/*   HAR VIEW   */
+
+#har
+	margin BORDER_SIZE
+	#map
+		height 796px - BORDER_SIZE - 4px
 
 
 

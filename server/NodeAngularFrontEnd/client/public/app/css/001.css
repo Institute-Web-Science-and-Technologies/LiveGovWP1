@@ -70,7 +70,7 @@ li.disabled a.red {
   vertical-align: top;
 }
 #map {
-  height: 500px;
+  height: 384px;
   width: 100%;
 }
 .legend {
@@ -90,6 +90,13 @@ rawh2 {
   width: 100%;
   background-color: #ccc;
   padding-top: 24px;
+}
+/*   HAR VIEW   */
+#har {
+  margin: 24px;
+}
+#har #map {
+  height: 768px;
 }
 /*   D3 CHARTS   */
 svg {

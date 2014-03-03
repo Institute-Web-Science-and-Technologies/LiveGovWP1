@@ -1,4 +1,7 @@
-"use strict";
+/* jshint -W097 */
+'use strict';
+
+/* global app:true, console:true, confirm:true, d3:true */
 
 var startTime, endTime, newQuery;
 
@@ -94,7 +97,7 @@ app.directive("raw", function() {
 				var brush = d3.svg.brush().x(x2).on("brush", brushed);
 
 				// prepare the data (move to controller!)
-				if (!data[0].ts) { // ts only exists if data was already prepared (dirty hack)
+				if (!data[0].ts) { // ts only exists if data was already prepared (FIXME dirty hack)
 					data.forEach(function(d) {
 						d.ts = new Date((parseInt(d.starttime) + parseInt(d.endtime)) / 2);
 						d.starttime = new Date(parseInt(d.starttime));
@@ -181,11 +184,11 @@ app.directive("raw", function() {
 					focus.select(".x.axis").call(xAxis);
 				}
 
-        // var moreData = Sensor.sensor({
-        // 	trip_id: $rootScope.trip.trip_id,
-        // 	startTime: new Date(brush.extent()[0]).getTime(),
-        // 	endTime: new Date(brush.extent()[1]).getTime(),
-        // });
+				var moreData = Sensor.sensor({
+				 trip_id: $rootScope.trip.trip_id,
+				 startTime: new Date(brush.extent()[0]).getTime(),
+				 endTime: new Date(brush.extent()[1]).getTime(),
+				});
 
 			}); // end watch
 		} // end link
