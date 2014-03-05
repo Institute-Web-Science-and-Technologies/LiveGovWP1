@@ -9,7 +9,7 @@
     <version>1.0</version>
 
     <packaging>jar</packaging>
-    <name>Live &amp; Gov - Commons</name>
+    <name>Live and Gov - Commons</name>
     <description>Common functions and structures for the Live and Gov project</description>
 
     <url>https://github.com/HeinrichHartmann/LiveGovWP1</url>
@@ -37,6 +37,10 @@
         </developer>
     </developers>
 
+    <properties>
+        <github.global.server>github</github.global.server>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -57,8 +61,43 @@
         </dependency>
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>internal.repo</id>
+            <name>Temporary Staging Repository</name>
+            <url>file://${project.build.directory}/mvn-repo</url>
+        </repository>
+    </distributionManagement>
+
     <build>
         <plugins>
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>0.9</version>
+                <configuration>
+                    <message>Maven artifacts for ${project.version}</message>
+                    <noJekyll>true</noJekyll>
+                    <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
+                    <branch>refs/heads/mvn-repo</branch>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                    <merge>true</merge>
+                    <repositoryName>LiveGovWp1</repositoryName>
+                    <repositoryOwner>HeinrichHartmann</repositoryOwner>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>deploy</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
