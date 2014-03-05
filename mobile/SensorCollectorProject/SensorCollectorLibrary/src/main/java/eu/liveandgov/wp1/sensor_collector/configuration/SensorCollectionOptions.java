@@ -12,6 +12,10 @@ public class SensorCollectionOptions {
 
     public static final long MAIN_EXECUTOR_CORE_TIMEOUT = 5000L;
 
+    // MONITORING
+
+    public static final long MONITORING_RATE = 1000L;
+
     // CONNECTIVITY //
     public static String REMOTE_HOST = "141.26.248.40"; // LG Server
     public static String UPLOAD_URL = "http://" + REMOTE_HOST + ":8080/UploadServlet/";

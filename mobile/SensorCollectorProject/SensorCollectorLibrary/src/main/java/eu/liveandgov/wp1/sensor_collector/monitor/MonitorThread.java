@@ -2,54 +2,61 @@ package eu.liveandgov.wp1.sensor_collector.monitor;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
+import eu.liveandgov.wp1.data.Startable;
+import eu.liveandgov.wp1.data.Stoppable;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
+import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 
 /**
  * Monitors objects that implement the {@link eu.liveandgov.wp1.sensor_collector.monitor.Monitorable}
  * interface.
- *
+ * <p/>
  * Each object is periodically polled for status updates. These updates are distributed
  * using the GlobalContext.sendLog(String) method.
- *
+ * <p/>
  * Created by hartmann on 9/22/13.
  */
-public class MonitorThread implements Runnable {
-    private static MonitorThread instance;
-    private Thread thread;
-
+public class MonitorThread implements Startable, Stoppable {
     private Set<MonitorItem> observables = new HashSet<MonitorItem>();
 
-    public MonitorThread(){
-        thread = new Thread(this);
+    private ScheduledFuture<?> reportTask = null;
+
+    public MonitorThread() {
+
     }
 
-    public void registerMonitorable(Monitorable m, String name){
+    private final Runnable reportMethod = new Runnable() {
+        @Override
+        public void run() {
+            GlobalContext.sendLog(getLogMessage());
+        }
+    };
+
+    public void registerMonitorable(Monitorable m, String name) {
         observables.add(new MonitorItem(m, name));
     }
 
+    @Override
     public void start() {
-        thread.start();
+        if (reportTask == null) {
+            reportTask = GlobalContext.getExecutorService().scheduleAtFixedRate(reportMethod, 0L, SensorCollectionOptions.MONITORING_RATE, TimeUnit.MILLISECONDS);
+        }
     }
 
     @Override
-    public void run() {
-        while(true) {
-
-        GlobalContext.sendLog(getLogMessage());
-
-        // sleep 1 sec.
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            }
+    public void stop() {
+        if (reportTask != null) {
+            reportTask.cancel(true);
+            reportTask = null;
         }
     }
 
     private String getLogMessage() {
         StringBuilder s = new StringBuilder();
-        for (MonitorItem m : observables){
+        for (MonitorItem m : observables) {
             s.append(m.render());
         }
         s.append("User ID: " + GlobalContext.getUserId());
@@ -59,7 +66,8 @@ public class MonitorThread implements Runnable {
     private class MonitorItem {
         public Monitorable monitorable;
         public String name;
-        public MonitorItem(Monitorable m, String n){
+
+        public MonitorItem(Monitorable m, String n) {
             this.monitorable = m;
             this.name = n;
         }

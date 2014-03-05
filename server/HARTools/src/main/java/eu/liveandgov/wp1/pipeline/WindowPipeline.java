@@ -1,6 +1,5 @@
 package eu.liveandgov.wp1.pipeline;
 
-import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.Tuple;
 import eu.liveandgov.wp1.data.Window;
 import eu.liveandgov.wp1.data.impl.Acceleration;

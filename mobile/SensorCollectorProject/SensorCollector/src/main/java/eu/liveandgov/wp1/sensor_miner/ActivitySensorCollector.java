@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -83,6 +84,7 @@ public class ActivitySensorCollector extends Activity {
     private Button idButton;
     private ToggleButton streamButton;
     private ToggleButton harButton;
+    private ScheduledFuture<?> statusTask;
 
     public ActivitySensorCollector() {
         // Create the executor service, keep two threads in the pool
@@ -154,13 +156,6 @@ public class ActivitySensorCollector extends Activity {
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         setupIntentListeners();
-
-        executorService.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                requestStatus();
-            }
-        }, 0L, SensorMinerOptions.REQUEST_STATUS_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
 
@@ -168,10 +163,19 @@ public class ActivitySensorCollector extends Activity {
     public void onResume() {
         super.onResume();
         registerListeners();
+
+        if (statusTask == null) {
+            statusTask = executorService.scheduleAtFixedRate(statusMethod, 0L, SensorMinerOptions.REQUEST_STATUS_INTERVAL, TimeUnit.MILLISECONDS);
+        }
     }
 
     @Override
     public void onPause() {
+        if (statusTask != null) {
+            statusTask.cancel(true);
+            statusTask = null;
+        }
+
         unregisterListeners();
         super.onPause();
     }
@@ -305,6 +309,14 @@ public class ActivitySensorCollector extends Activity {
         activityView.setText(activityName);
     }
 
+    private final Runnable statusMethod = new Runnable() {
+        @Override
+        public void run() {
+            requestStatus();
+        }
+    };
+
+
     private void requestStatus() {
         Intent requestIntent = new Intent(this, ServiceSensorControl.class);
         requestIntent.setAction(ACTION_GET_STATUS);
@@ -377,5 +389,4 @@ public class ActivitySensorCollector extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

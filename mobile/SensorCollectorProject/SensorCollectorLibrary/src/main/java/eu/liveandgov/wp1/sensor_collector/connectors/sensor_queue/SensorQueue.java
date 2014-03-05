@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue;
 
 import eu.liveandgov.wp1.data.Item;
-import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
+import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
 
 /**

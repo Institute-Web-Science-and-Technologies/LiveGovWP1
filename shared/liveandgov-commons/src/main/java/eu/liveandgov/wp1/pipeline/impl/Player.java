@@ -28,9 +28,9 @@ public class Player<Item> extends Pipeline<Item, Item> implements Stoppable {
     private final BlockingQueue<Item> queue;
 
     /**
-     * The task handling the playback
+     * The playerTask handling the playback
      */
-    private final Future<?> task;
+    private final Future<?> playerTask;
 
     /**
      * Creates a new player with the given parameters
@@ -43,7 +43,7 @@ public class Player<Item> extends Pipeline<Item, Item> implements Stoppable {
         this.limit = limit;
 
         queue = new LinkedBlockingQueue<Item>();
-        task = executorService.submit(playerJob);
+        playerTask = executorService.submit(playerMethod);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class Player<Item> extends Pipeline<Item, Item> implements Stoppable {
             }
     }
 
-    private final Runnable playerJob = new Runnable() {
+    private final Runnable playerMethod = new Runnable() {
         @Override
         public void run() {
             while (true) {
@@ -72,6 +72,6 @@ public class Player<Item> extends Pipeline<Item, Item> implements Stoppable {
 
     @Override
     public void stop() {
-        task.cancel(true);
+        playerTask.cancel(true);
     }
 }

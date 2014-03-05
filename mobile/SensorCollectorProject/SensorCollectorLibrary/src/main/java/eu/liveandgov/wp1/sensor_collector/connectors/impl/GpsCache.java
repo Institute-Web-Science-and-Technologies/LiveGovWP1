@@ -2,19 +2,14 @@ package eu.liveandgov.wp1.sensor_collector.connectors.impl;
 
 import java.util.ArrayList;
 
-import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.impl.GPS;
-import eu.liveandgov.wp1.human_activity_recognition.helper.TimedQueue;
+import eu.liveandgov.wp1.helper.TimedQueue;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.impl.ClassFilter;
 import eu.liveandgov.wp1.pipeline.impl.ItemSerializer;
 import eu.liveandgov.wp1.pipeline.impl.Multiplexer;
-import eu.liveandgov.wp1.pipeline.impl.Serializer;
-import eu.liveandgov.wp1.pipeline.impl.StartsWith;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
-import eu.liveandgov.wp1.serialization.impl.GPSSerialization;
-import eu.liveandgov.wp1.serialization.impl.ItemSerialization;
 
 /**
  * Created by hartmann on 11/14/13.

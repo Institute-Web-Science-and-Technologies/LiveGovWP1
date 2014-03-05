@@ -1,16 +1,11 @@
 package eu.liveandgov.wp1.sensor_collector.activity_recognition;
 
-import android.util.Log;
-
 import com.google.common.base.Function;
 
-import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.Tuple;
-import eu.liveandgov.wp1.data.Window;
 import eu.liveandgov.wp1.data.impl.Acceleration;
 import eu.liveandgov.wp1.data.impl.Activity;
-import eu.liveandgov.wp1.data.impl.Motion;
 import eu.liveandgov.wp1.pipeline.ActivityPipeline;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.FeaturePipeline;
@@ -18,18 +13,11 @@ import eu.liveandgov.wp1.pipeline.InterpolationPipeline;
 import eu.liveandgov.wp1.pipeline.QualityPipeline;
 import eu.liveandgov.wp1.pipeline.WindowPipeline;
 import eu.liveandgov.wp1.pipeline.impl.ClassFilter;
-import eu.liveandgov.wp1.pipeline.impl.DeSerializer;
-import eu.liveandgov.wp1.pipeline.impl.Detachment;
-import eu.liveandgov.wp1.pipeline.impl.Multiplexer;
-import eu.liveandgov.wp1.pipeline.impl.Player;
-import eu.liveandgov.wp1.pipeline.impl.StartsWith;
 import eu.liveandgov.wp1.pipeline.impl.Transformation;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
 import eu.liveandgov.wp1.sensor_collector.connectors.impl.IntentEmitter;
 import eu.liveandgov.wp1.sensor_collector.connectors.impl.SensorEmitter;
-import eu.liveandgov.wp1.serialization.impl.ActivitySerialization;
-import eu.liveandgov.wp1.serialization.impl.MotionSerialization;
 
 /**
  * Pipeline class that consumes accelerometer values and produces an activity stream.
