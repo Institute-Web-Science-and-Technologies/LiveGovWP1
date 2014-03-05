@@ -12,41 +12,61 @@ app.config(function ($routeProvider, $locationProvider) {
 	$routeProvider
 		.when('/rec', {
 			templateUrl: '/partials/rec',
-			controller: 'recCtrl'
-			// reloadOnSearch: false
+			controller: 'recCtrl',
+			controllerAs: 'rec',
+			name: 'rec'
 		})
 
-	.when('/rec/:trip_id', {
-		templateUrl: '/partials/rec',
-		controller: 'recCtrl'
-	})
+		.when('/rec/:trip_id', {
+			templateUrl: '/partials/rec',
+			controller: 'recCtrl',
+			controllerAs: 'rec',
+			name: 'rec'
+		})
 
-	.when('/raw', {
-		templateUrl: '/partials/raw',
-		controller: 'rawCtrl'
-	})
+		.when('/raw', {
+			templateUrl: '/partials/raw',
+			controller: 'rawCtrl',
+			controllerAs: 'raw',
+			name: 'raw'
+		})
 
-	.when('/raw/:trip_id', {
-		templateUrl: '/partials/raw',
-		controller: 'rawCtrl'
-	})
+		.when('/raw/:trip_id', {
+			templateUrl: '/partials/raw',
+			controller: 'rawCtrl',
+			controllerAs: 'raw',
+			name: 'raw'
+		})
 
-	.when('/har', {
-		templateUrl: '/partials/har',
-		controller: 'harCtrl'
-	})
+		.when('/har', {
+			templateUrl: '/partials/har',
+			controller: 'harCtrl',
+			controllerAs: 'har',
+			name: 'har'
+		})
 
-	.when('/har/:trip_id', {
-		templateUrl: '/partials/har',
-		controller: 'harCtrl'
-	})
+		.when('/har/:trip_id', {
+			templateUrl: '/partials/har',
+			controller: 'harCtrl',
+			controllerAs: 'har',
+			name: 'har'
+		})
 
-	.when('/sld', {
-		templateUrl: '/partials/sld',
-		controller: 'sldCtrl'
-	})
+		.when('/sld', {
+			templateUrl: '/partials/sld',
+			controller: 'sldCtrl',
+			controllerAs: 'sld',
+			name: 'sld'
+		})
 
-	.otherwise({
-		redirectTo: '/rec'
+		.when('/sld/:trip_id', {
+			templateUrl: '/partials/sld',
+			controller: 'sldCtrl',
+			controllerAs: 'sld',
+			name: 'sld'
+		})
+
+		.otherwise({
+			redirectTo: '/rec'
 	});
 });

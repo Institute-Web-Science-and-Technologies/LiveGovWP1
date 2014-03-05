@@ -18,28 +18,19 @@ app.directive('map', function () {
 							scrollWheelZoom: false
 						});
 
-						// OpenStreetMap
-						L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-								attribution: '&copy; OpenStreetMap'
-						}).addTo(map);
-
 						// CloudMade
-						// L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png', {
-						// 	attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-						// 	key: 'bc9a493b41014caabb98f0471d759707' // uni
-						// 	key: 'a04e905a7d8448d8b412b7371dfa21be' // rene
-						// }).addTo(map);
-
-						// MapBox
-						// L.tileLayer('http://{s}.tiles.mapbox.com/v3/mapbox.mapbox-light/{z}/{x}/{y}.png', {
-		    		// attribution: '',
-						// }).addTo(map);
+						L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png?token={token}', {
+							attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+							key: 'a04e905a7d8448d8b412b7371dfa21be', // rene
+							token: '88fd62dfa481446aa8ac3c22bcb64d21'
+						}).addTo(map);
 
 						var gps = scope.data.gps;
 						var har = scope.data.har;
+						var data = scope.data;
 
-						scope.$watchCollection('data', function (data, oldData) {
-								// exit if there"s no data or data object at all (that's no trip selected)
+						// scope.$watchCollection('data', function (data, oldData) {
+								// exit if there's no data or data object at all (that's no trip selected)
 								if (!data.gps || data.gps.length === 0) {
 										return;
 								}
@@ -295,8 +286,8 @@ app.directive('map', function () {
 												return "driving"
 										} else return null;
 								}
-						});
 
+						// }); //end watch
 				} // end link
 		} // end return
 }); // end directive

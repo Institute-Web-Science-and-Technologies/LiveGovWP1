@@ -55,6 +55,7 @@ html(lang="en", ng-app="nodeInspectionFrontEnd")
 		script(src="/app/js/routes.js")
 		script(src="/app/js/services.js")
 		script(src="/app/js/filters.js")
+		script(src="/app/js/directives/brush.js")
 		script(src="/app/js/directives/chart.js")
 		script(src="/app/js/directives/map.js")
 
@@ -63,19 +64,20 @@ html(lang="en", ng-app="nodeInspectionFrontEnd")
 
 		body
 			header
-				nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation" ng-controller="navbarCtrl" bs-navbar)
+				nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation" ng-controller="navCtrl as nav")
 					ul.nav.navbar-nav
-
-						li(data-match-route="/rec")
+						li(ng-class='{active:nav.is("rec")}')
 							a(href="/#/rec") Recordings
-						li(data-match-route="/raw", ng-class="{'disabled':!trip}")
+						li(ng-class='{active:nav.is("raw"), disabled:!$root.trip}')
 							a(href="/#/raw") Raw Data
-						li(data-match-route="/har", ng-class="{'disabled':!trip}")
+						li(ng-class='{active:nav.is("har"), disabled:!$root.trip}')
 							a(href="/#/har") Activity Recognition
 
 					ul.nav.navbar-nav.pull-right
+						li(ng-class="{'hidden':!data.selection}")
+							a {{ data.selection[0] | date:'HH:mm' }} — {{ data.selection[1] | date:'HH:mm' }} ({{ data.selection[0] | duration:data.selection[1] | date:'mm' }} minutes)
 						li
-							a.trip-indicator(ng-class="{'selected':trip}") {{ trip.trip_id || "PLEASE SELECT A TRIP" }}
+							a.trip-indicator(ng-class="{'selected':$root.trip}") {{ $root.trip.trip_id || "PLEASE SELECT A TRIP" }}
 		#body
 			div(ng-view)
 
