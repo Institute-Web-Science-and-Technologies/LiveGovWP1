@@ -90,7 +90,6 @@ public class ServiceSensorControl extends Service {
         File stageFile    = new File(getFilesDir(), STAGE_FILENAME);
 
         // Init sensor consumers
-        harPipeline = new HarAdapter();
         streamer = new ZMQStreamer();
         harPipeline = new HARAdapter();
         gpsCache    = new GpsCache();
@@ -222,6 +221,10 @@ public class ServiceSensorControl extends Service {
             doSendGps();
         } else if (action.equals(ExtendedIntentAPI.ACTION_DELETE_SAMPLES)) {
             doDeleteSamples();
+        } else if (action.equals(ExtendedIntentAPI.START_STREAMING)) {
+            doStartStreaming();
+        } else if (action.equals(ExtendedIntentAPI.STOP_STREAMING)) {
+            doStopStreaming();
         } else {
             Log.i(LOG_TAG, "Received unknown action " + action);
         }
@@ -323,6 +326,16 @@ public class ServiceSensorControl extends Service {
         sendBroadcast(intent);
 
         Log.i(LOG_TAG, "Sent gps message " + gpsCache.getEntryString());
+    }
+
+    private void doStopStreaming() {
+        isStreaming = false;
+        connectorThread.removeConsumer(streamer);
+    }
+
+    private void doStartStreaming() {
+        isStreaming = true;
+        connectorThread.addConsumer(streamer);
     }
 
     // HELPER METHODS
