@@ -1,0 +1,10 @@
+## BETTER API
+
+- plural
+- prefix /api
+
+	/api/trips/177
+	/api/trips/177/gps
+	/api/trips/177/acc
+	/api/trips/177/lac
+	/api/trips/177/gra

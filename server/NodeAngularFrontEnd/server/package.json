@@ -1,0 +1,28 @@
+{
+  "name": "har",
+  "version": "0.9.0",
+  "description": "har ===",
+  "main": "server.js",
+  "dependencies": {
+    "express": "~3.4.8",
+    "jade": "~1.1.5",
+    "pg": "~2.11.1",
+    "express-csv": "~0.6.0",
+    "stylus": "~0.42.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rwilhelm/har.git"
+  },
+  "author": "René Wilhelm",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rwilhelm/har/issues"
+  },
+  "homepage": "https://github.com/rwilhelm/har"
+}

@@ -1,0 +1,28 @@
+table#rec.table
+	thead
+		tr
+			th
+				a(ng-click="predicate='trip_id'; reverse=!reverse") id
+			th
+				a(ng-click="predicate='user_id'; reverse=!reverse") user
+			th
+				a(ng-click="predicate='start_ts'; reverse=!reverse") start
+			th
+				a(ng-click="predicate='duration'; reverse=!reverse") duration
+			th
+				a(ng-click="predicate='name'; reverse=!reverse") tags
+			th
+				a(ng-click="predicate='name'; reverse=!reverse") name
+			th
+
+			tbody
+				tr(ng-repeat="trip in data.trips | orderBy:predicate:reverse", ng-class="isSelected(trip)")
+					td(ng-click="selectTrip(trip)") {{ trip.trip_id }}
+					td(ng-click="selectTrip(trip)") {{ trip.user_id }}
+					td(ng-click="selectTrip(trip)") {{ trip.start_ts | date:'yyyy-MM-dd HH:mm:ss Z' }}
+					td(ng-click="selectTrip(trip)") {{ trip.start_ts | duration:trip.stop_ts | date:'HH:mm:ss .sss' }}
+					td
+					td.name(editable-text="trip.name", onaftersave="updateName(trip, $data)", buttons="no", e-style="width: 200px; height: 37px") {{ trip.name }}
+					td.destroy(ng-click="destroy(trip)") DEL
+
+// ex:ft=jade
