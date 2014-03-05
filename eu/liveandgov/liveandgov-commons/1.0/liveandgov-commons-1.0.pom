@@ -9,7 +9,7 @@
     <version>1.0</version>
 
     <packaging>jar</packaging>
-    <name>Live &amp; Gov - Commons</name>
+    <name>Live and Gov - Commons</name>
     <description>Common functions and structures for the Live and Gov project</description>
 
     <url>https://github.com/HeinrichHartmann/LiveGovWP1</url>
@@ -36,6 +36,10 @@
             <id>lukashaertel</id>
         </developer>
     </developers>
+
+    <properties>
+        <github.global.server>github</github.global.server>
+    </properties>
 
     <dependencies>
         <dependency>
