@@ -9,7 +9,7 @@
     <version>1.0</version>
 
     <packaging>jar</packaging>
-    <name>Live and Gov - HAR Tools</name>
+    <name>Live &amp; Gov - HAR Tools</name>
     <description>Library for Human Activity Recognition</description>
 
     <dependencies>
