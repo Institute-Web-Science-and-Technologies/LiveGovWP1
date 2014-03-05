@@ -16,6 +16,17 @@
         <github.global.server>github</github.global.server>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>LiveGovWp1-mvn-repo</id>
+            <url>https://raw.github.com/HeinrichHartmann/LiveGovWP1/mvn-repo</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.commons</groupId>
