@@ -1,0 +1,18 @@
+{
+  "name": "hardemo",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "zmq": "~2.6.0",
+    "sockjs": "~0.3.8",
+    "rbytes": "~1.0.0",
+    "underscore": "~1.6.0",
+    "node-static": "~0.7.3"
+  }
+}
