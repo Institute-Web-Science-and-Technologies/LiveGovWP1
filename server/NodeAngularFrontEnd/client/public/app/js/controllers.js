@@ -7,7 +7,7 @@
 /* CONTROLLERS */
 
 // records tab
-app.controller('recCtrl', function ($scope, $rootScope, $routeParams, $location, Data, Trip, Sensor, Map, sensorData) {
+app.controller('recCtrl', function ($scope, $rootScope, $routeParams, $location, Data, Trip, Sensor, Map) { // sensorData
 
 	// initialize our shared data scope
 	$scope.data = Data;
@@ -43,8 +43,8 @@ app.controller('recCtrl', function ($scope, $rootScope, $routeParams, $location,
 		$rootScope.trip = trip;
 
 
-		$rootScope.fuck = sensorData(trip.trip_id);
-		console.log($rootScope.fuck);
+		// $rootScope.fuck = sensorData(trip.trip_id);
+		// console.log($rootScope.fuck);
 
 
 		$routeParams.trip_id = trip.trip_id; // FIXME rewrite and react on $locationParams (if possible)
@@ -93,7 +93,7 @@ app.controller('rawCtrl', function ($scope, $rootScope, $location, Sensor, Data,
 	var starttime = function(ts, data) {
 		for (var i=0; i<data.length; i++) {
 			if (data[i].starttime >= +ts) {
-				return data[i].starttime;
+				return [i, data[i].starttime];
 			}
 		}
 	};
@@ -102,7 +102,7 @@ app.controller('rawCtrl', function ($scope, $rootScope, $location, Sensor, Data,
 	var endtime = function(ts, data) {
 		for (var i=data.length-1; i>0; i--) {
 			if (data[i].endtime <= +ts) {
-				return data[i].endtime;
+				return [i, data[i].endtime];
 			}
 		}
 	};
@@ -123,21 +123,26 @@ app.controller('rawCtrl', function ($scope, $rootScope, $location, Sensor, Data,
 		if (newVal !== oldVal) {
 			console.log("RAW:   " + newVal);
 
+			// TODO
+
 			var start = starttime(newVal[0], $scope.data.acc);
 			var end = endtime(newVal[1], $scope.data.acc);
 
 			// load more data for a specific sensor
 			Sensor.acc({
 				trip_id: $rootScope.trip.trip_id,
-				startTime: start,
-				endTime: end
+				startTime: start[1],
+				endTime: end[1]
 			}).$promise.then(function(data) {
 				// merge old and new data and remove obsolete values
 				// $scope.data.acc.splice(start, end-start, data);
-				var args = [start, end-start].concat(data);
-				sortData(Array.prototype.splice.apply($scope.data.acc, args));
+				var args = [start[0]+1, end[0]-start[0]].concat(data);
+				console.log(args);
+				Array.prototype.splice.apply($scope.data.acc, args));
+				// sortData(Array.prototype.splice.apply($scope.data.acc, args));
+
 				console.log('PUSHED NEW DATA ' + $scope.data.acc.length);
-				// console.log($scope.data.acc);
+				console.log($scope.data.acc);
 			});
 
 			Sensor.lac({
@@ -153,7 +158,7 @@ app.controller('rawCtrl', function ($scope, $rootScope, $location, Sensor, Data,
 
 			Sensor.gra({
 				trip_id: $rootScope.trip.trip_id,
-				startTime: start,
+				startTime: start,w
 				endTime: end
 			}).$promise.then(function(data) {
 				var args = [start, end-start].concat(data);

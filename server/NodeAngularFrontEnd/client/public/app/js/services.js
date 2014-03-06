@@ -1,5 +1,5 @@
 /* jshint -W097 */
-/* global app:true, console:true */
+/* global app:true, console:true, angular:true */
 
 'use strict';
 
@@ -23,31 +23,6 @@ app.factory('Sensor', function($resource) {
 });
 
 // TODO rewrite using $http, so we can get data at once and prepare it
-
-app.factory('sensorData', function(trip_id, $http) {
-  var acc = $http.get('/trips/:trip_id/' + trip_id + '/window', {cache: true })
-    .success(function (data) {
-      console.log(data);
-      data;
-    })
-    .error(function (data, status, headers, config) {
-      console.log("FAILED FETCHING DATA")
-    });
-});
-
-// CHANGEME do all d3 data preparation in the service
-
-// $scope.data.acc.$promise.then(function(data) {
-//  data.forEach(function(d) {
-//    d.ts         = new Date((+d.starttime + +d.endtime) / 2);
-//    d.starttime  = +d.starttime;
-//    d.endtime    = +d.endtime;
-//  })
-
-//  $scope.selection = d3.extent([].concat.apply([], data.map(function(d) { return [d.starttime, d.endtime]; })));
-// });
-
-
 
 app.factory('Map', function($resource) {
 	return $resource(
