@@ -1,0 +1,35 @@
+.square {
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+}
+
+.CYCLING {
+  background-color: #ff7f00;
+  font-size: 20px;
+}
+
+.RUNNING {
+  background-color: #e41a1c;
+  font-size: 20px;
+}
+
+.SITTING {
+  background-color: #4daf4a;
+  font-size: 20px;
+}
+
+.STAIRS {
+  background-color: #984ea3;
+  font-size: 20px;
+}
+
+.WALKING {
+  background-color: #a65628;
+  font-size: 20px;
+}
+
+.UNKNOWN {
+  background-color: #777777;
+  font-size: 20px;
+}
