@@ -36,6 +36,8 @@ public class FeatureVector {
     public Integer [] S2Bins = new Integer[0];
     public Integer [] S2FTBins = new Integer[0];
 
+    public long startTime = 0;
+
     // TODO: FFT Features
 
     // TODO: Historgram Features
@@ -65,6 +67,8 @@ public class FeatureVector {
 
         BinDistributor FBD = new BinDistributor(0,100,S2_FT_BINS_NUM);
         S2FTBins = FBD.getBinsForAxis(FeatureHelper.FTAbsolute(S2));
+
+        startTime = m.startTime;
     }
 
 

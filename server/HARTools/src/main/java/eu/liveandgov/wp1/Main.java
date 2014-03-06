@@ -10,7 +10,7 @@ public class Main {
     public static void main(String args[]) {
         DatabaseProducer dp = new DatabaseProducer("liveandgov", "liveandgov", "liveandgov");
 
-        WindowPipeline wp = new WindowPipeline(20000, 1000);
+        WindowPipeline wp = new WindowPipeline(20000, 19000);
         dp.setConsumer(wp);
 
         QualityPipeline qp = new QualityPipeline(40);
@@ -25,10 +25,11 @@ public class Main {
         ActivityPipeline ap = new ActivityPipeline(1);
         fp.setConsumer(ap);
 
-        TestConsumer tc = new TestConsumer();
-        ap.setConsumer(tc);
+        DBConsumer dbc = new DBConsumer("liveandgov", "liveandgov", "liveandgov");
+        ap.setConsumer(dbc);
 
         dp.start();
+        dbc.executeQuery();
         System.out.println("Done");
     }
 }

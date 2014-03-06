@@ -40,7 +40,7 @@ public class TimedQueue<V> {
     public void push(long time, V value) {
         if (time < maxTime) {
             clear();
-            System.out.println("Reseting Window");
+            System.out.println("Resetting Window");
             // throw new IllegalArgumentException("time has to be greater than maximum: " + time + " vs " + maxTime);
         }
 
