@@ -14,7 +14,7 @@ public class SensorCollectionOptions {
 
     // MONITORING
 
-    public static final long MONITORING_RATE = 1000L;
+    public static final long MONITORING_RATE = 2000L;
 
     // CONNECTIVITY //
     public static String REMOTE_HOST = "141.26.248.40"; // LG Server
@@ -54,7 +54,7 @@ public class SensorCollectionOptions {
     /**
      * Record Activity using the new Google Activity API
      */
-    public static final boolean REC_G_ACT = true;
+    public static final boolean REC_G_ACT = false;
 
     public static class SensorOptions {
         public static int OFF = -1;

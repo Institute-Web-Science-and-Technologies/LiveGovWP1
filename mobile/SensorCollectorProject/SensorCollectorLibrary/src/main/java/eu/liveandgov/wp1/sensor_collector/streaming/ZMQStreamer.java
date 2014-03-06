@@ -31,7 +31,7 @@ public class ZMQStreamer extends ZMQClient implements Monitorable {
     private static final int PULL_INTERVAL = 5000;
 
     public ZMQStreamer() {
-        super(GlobalContext.getExecutorService(), PULL_INTERVAL, ZMQ.ZMQ_PUSH);
+        super(GlobalContext.getExecutorService(), PULL_INTERVAL, ZMQ.ZMQ_PUB);
 
         pulled.register(new Callback<Integer>() {
             @Override
