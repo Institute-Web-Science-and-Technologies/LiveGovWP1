@@ -49,7 +49,7 @@ public class HARAdapter implements Consumer<Item> {
         filter.setConsumer(tupleTransformation);
 
         // Windowing
-        windowPipeline = new WindowPipeline(20000, 19000);
+        windowPipeline = new WindowPipeline(5000, 4500);
         tupleTransformation.setConsumer(windowPipeline);
 
         // Quality check
@@ -67,7 +67,7 @@ public class HARAdapter implements Consumer<Item> {
 
 
         // Activity recognition
-        activityPipeline = new ActivityPipeline(1);
+        activityPipeline = new ActivityPipeline(0);
         featurePipeline.setConsumer(activityPipeline);
 
         // Emission
