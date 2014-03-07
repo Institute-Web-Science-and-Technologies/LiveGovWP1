@@ -11,6 +11,8 @@ import java.io.*;
  */
 public class CSVReader extends Producer<Tuple<Long, Acceleration>> {
     private WindowPipeline wp;
+    public String currentTag = "UNKNOWN";
+
 
     public CSVReader(WindowPipeline wp) {
         this.wp = wp;
@@ -26,6 +28,7 @@ public class CSVReader extends Producer<Tuple<Long, Acceleration>> {
         for (File file : files) {
             if (file.isDirectory()) {
                 System.out.println("Changing Tag to " + file.getName());
+                currentTag = file.getName();
                 readFiles(file.listFiles(), file.getName(), tagged);
             } else {
                 System.out.println("Reading file " + file.getPath());

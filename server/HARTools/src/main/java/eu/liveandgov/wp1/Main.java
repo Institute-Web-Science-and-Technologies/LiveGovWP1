@@ -1,5 +1,9 @@
 package eu.liveandgov.wp1;
 
+import eu.liveandgov.wp1.data.FeatureVector;
+import eu.liveandgov.wp1.data.Triple;
+import eu.liveandgov.wp1.data.Tuple;
+import eu.liveandgov.wp1.helper.Persistor;
 import eu.liveandgov.wp1.pipeline.*;
 
 /**
@@ -33,19 +37,22 @@ public class Main {
         InterpolationPipeline ip = new InterpolationPipeline(NO_SAMPLES_PER_WINDOW);
         qp.setConsumer(ip);
 
-        FeaturePipeline fp = new FeaturePipeline();
+        FeaturePipeline fp = new FeaturePipeline(csvReader);
         ip.setConsumer(fp);
 
-        ActivityPipeline ap = new ActivityPipeline(1);
-        fp.setConsumer(ap);
+//        ActivityPipeline ap = new ActivityPipeline(1);
+//        fp.setConsumer(ap);
 
-        DBConsumer dbc = new DBConsumer("liveandgov", "liveandgov", "liveandgov");
-        ap.setConsumer(dbc);
+//        DBConsumer dbc = new DBConsumer("liveandgov", "liveandgov", "liveandgov");
+//        ap.setConsumer(dbc);
 
+        Persistor pers = new Persistor("out.csv");
+        fp.setConsumer(pers);
 
-
+        csvReader.readDir("/Users/cehlen/Downloads/srv/TrainingData/UKOB_ALL", true);
 //        dp.start();
 //        dbc.executeQuery();
-//        System.out.println("Done");
+        pers.flush();
+        System.out.println("Done");
     }
 }
