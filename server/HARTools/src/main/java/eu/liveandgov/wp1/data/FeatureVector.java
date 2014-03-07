@@ -109,7 +109,6 @@ public class FeatureVector {
 //        for (float f : S2Bins){
 //            R.addLast((double) f);
 //        }
-
         for (float f : S2FTBins){
             R.addLast((double) f);
         }
