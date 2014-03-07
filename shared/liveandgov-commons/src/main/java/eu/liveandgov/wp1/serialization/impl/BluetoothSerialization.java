@@ -1,6 +1,5 @@
 package eu.liveandgov.wp1.serialization.impl;
 
-import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.data.impl.Bluetooth;
 import eu.liveandgov.wp1.serialization.Wrapper;
 import eu.liveandgov.wp1.util.LocalBuilder;
@@ -15,17 +14,15 @@ import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
 /**
  * Created by Lukas Härtel on 08.02.14.
  */
-public class BluetoothSerialization extends Wrapper<Bluetooth, Arbitrary> {
+public class BluetoothSerialization extends AbstractSerialization<Bluetooth> {
     public static final BluetoothSerialization BLUETOOTH_SERIALIZATION = new BluetoothSerialization();
 
     private BluetoothSerialization() {
-        super(BasicSerialization.BASIC_SERIALIZATION);
     }
 
-    @Override
-    protected Arbitrary transform(Bluetooth bluetooth) {
-        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
 
+    @Override
+    protected void serializeRest(StringBuilder stringBuilder, Bluetooth bluetooth) {
         if (bluetooth.items.length > 0) {
             appendBluetoothItem(bluetooth, stringBuilder, 0);
 
@@ -35,8 +32,6 @@ public class BluetoothSerialization extends Wrapper<Bluetooth, Arbitrary> {
                 appendBluetoothItem(bluetooth, stringBuilder, i);
             }
         }
-
-        return new Arbitrary(bluetooth, bluetooth.getType(), stringBuilder.toString());
     }
 
     private static void appendBluetoothItem(Bluetooth bluetooth, StringBuilder stringBuilder, int i) {
@@ -56,9 +51,7 @@ public class BluetoothSerialization extends Wrapper<Bluetooth, Arbitrary> {
     }
 
     @Override
-    protected Bluetooth invertTransform(Arbitrary item) {
-        final Scanner scanner = new Scanner(item.value);
-        scanner.useLocale(Locale.ENGLISH);
+    protected Bluetooth deSerializeRest(String type, long timestamp, String device, Scanner scanner) {
         scanner.useDelimiter(SLASH_SEMICOLON_SEPARATED);
 
         final List<Bluetooth.Item> itemList = new ArrayList<Bluetooth.Item>();
@@ -73,6 +66,6 @@ public class BluetoothSerialization extends Wrapper<Bluetooth, Arbitrary> {
             itemList.add(new Bluetooth.Item(address, deviceMajorClass, deviceMinorClass, bondState, name, rssi));
         }
 
-        return new Bluetooth(item, itemList.toArray(Bluetooth.Item.EMPTY_ARRAY));
+        return new Bluetooth(timestamp, device, itemList.toArray(Bluetooth.Item.EMPTY_ARRAY));
     }
 }

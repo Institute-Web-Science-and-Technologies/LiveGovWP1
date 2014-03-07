@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.impl.Activity;
-import eu.liveandgov.wp1.data.impl.Arbitrary;
+import eu.liveandgov.wp1.serialization.Serialization;
 import eu.liveandgov.wp1.serialization.Wrapper;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
@@ -14,28 +14,22 @@ import static eu.liveandgov.wp1.serialization.SerializationCommons.nextString;
 /**
  * Created by Lukas Härtel on 09.02.14.
  */
-public class ActivitySerialization extends Wrapper<Activity, Arbitrary> {
+public class ActivitySerialization extends AbstractSerialization<Activity> {
     public static final ActivitySerialization ACTIVITY_SERIALIZATION = new ActivitySerialization();
 
     private ActivitySerialization() {
-        super(BasicSerialization.BASIC_SERIALIZATION);
     }
 
     @Override
-    protected Arbitrary transform(Activity activity) {
-        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+    protected void serializeRest(StringBuilder stringBuilder, Activity activity) {
         appendString(stringBuilder, activity.activity);
-
-        return new Arbitrary(activity, activity.getType(), stringBuilder.toString());
     }
 
-    @Override
-    protected Activity invertTransform(Arbitrary item) {
-        final Scanner scanner = new Scanner(item.value);
-        scanner.useLocale(Locale.ENGLISH);
 
+    @Override
+    protected Activity deSerializeRest(String type, long timestamp, String device, Scanner scanner) {
         final String activity = nextString(scanner);
 
-        return new Activity(item, activity);
+        return new Activity(timestamp, device, activity);
     }
 }

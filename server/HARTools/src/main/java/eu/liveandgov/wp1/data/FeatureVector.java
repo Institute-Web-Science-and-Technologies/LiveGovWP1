@@ -2,7 +2,7 @@ package eu.liveandgov.wp1.data;
 
 import eu.liveandgov.wp1.helper.BinDistributor;
 import eu.liveandgov.wp1.helper.FeatureHelper;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

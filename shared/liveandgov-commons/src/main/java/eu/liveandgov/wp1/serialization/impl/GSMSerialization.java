@@ -1,6 +1,5 @@
 package eu.liveandgov.wp1.serialization.impl;
 
-import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.data.impl.GSM;
 import eu.liveandgov.wp1.serialization.Wrapper;
 import eu.liveandgov.wp1.util.LocalBuilder;
@@ -15,17 +14,14 @@ import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
 /**
  * Created by Lukas Härtel on 09.02.14.
  */
-public class GSMSerialization extends Wrapper<GSM, Arbitrary> {
+public class GSMSerialization extends AbstractSerialization<GSM> {
     public static final GSMSerialization GSM_SERIALIZATION = new GSMSerialization();
 
     private GSMSerialization() {
-        super(BasicSerialization.BASIC_SERIALIZATION);
     }
 
     @Override
-    protected Arbitrary transform(GSM gsm) {
-        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
-
+    protected void serializeRest(StringBuilder stringBuilder, GSM gsm) {
         stringBuilder.append(toText(gsm.serviceState));
         stringBuilder.append(SLASH);
         stringBuilder.append(toText(gsm.roamingState));
@@ -46,8 +42,6 @@ public class GSMSerialization extends Wrapper<GSM, Arbitrary> {
                 appendGSMItem(gsm, stringBuilder, 0);
             }
         }
-
-        return new Arbitrary(gsm, gsm.getType(), stringBuilder.toString());
     }
 
     private static void appendGSMItem(GSM gsm, StringBuilder stringBuilder, int i) {
@@ -61,9 +55,7 @@ public class GSMSerialization extends Wrapper<GSM, Arbitrary> {
     }
 
     @Override
-    protected GSM invertTransform(Arbitrary item) {
-        final Scanner scanner = new Scanner(item.value);
-        scanner.useLocale(Locale.ENGLISH);
+    protected GSM deSerializeRest(String type, long timestamp, String device, Scanner scanner) {
         scanner.useDelimiter(SLASH_SEMICOLON_SEPARATED);
 
         final GSM.ServiceState serviceState = fromText(GSM.ServiceState.class, nextString(scanner));
@@ -84,6 +76,8 @@ public class GSMSerialization extends Wrapper<GSM, Arbitrary> {
             itemList.add(new GSM.Item(cellIdentity, cellType, rssi));
         }
 
-        return new GSM(item, serviceState, roamingState, carrierSelection, carrierName, signalStrength, itemList.toArray(GSM.Item.EMPTY_ARRAY));
+        return new GSM(timestamp, device, serviceState, roamingState, carrierSelection, carrierName, signalStrength, itemList.toArray(GSM.Item.EMPTY_ARRAY));
     }
+
+
 }

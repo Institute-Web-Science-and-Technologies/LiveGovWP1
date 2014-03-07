@@ -1,6 +1,5 @@
 package eu.liveandgov.wp1.serialization.impl;
 
-import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.data.impl.GPS;
 import eu.liveandgov.wp1.serialization.Wrapper;
 import eu.liveandgov.wp1.util.LocalBuilder;
@@ -14,17 +13,14 @@ import static eu.liveandgov.wp1.serialization.SerializationCommons.SPACE_SEPARAT
 /**
  * Created by Lukas Härtel on 08.02.14.
  */
-public class GPSSerialization extends Wrapper<GPS, Arbitrary> {
+public class GPSSerialization extends AbstractSerialization<GPS> {
     public static final GPSSerialization GPS_SERIALIZATION = new GPSSerialization();
 
     private GPSSerialization() {
-        super(BasicSerialization.BASIC_SERIALIZATION);
     }
 
     @Override
-    protected Arbitrary transform(GPS gps) {
-        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
-
+    protected void serializeRest(StringBuilder stringBuilder, GPS gps) {
         stringBuilder.append(gps.lat);
         stringBuilder.append(SPACE);
         stringBuilder.append(gps.lon);
@@ -33,20 +29,17 @@ public class GPSSerialization extends Wrapper<GPS, Arbitrary> {
             stringBuilder.append(SPACE);
             stringBuilder.append(gps.alt);
         }
-
-        return new Arbitrary(gps, gps.getType(), stringBuilder.toString());
     }
 
+
     @Override
-    protected GPS invertTransform(Arbitrary item) {
-        final Scanner scanner = new Scanner(item.value);
-        scanner.useLocale(Locale.ENGLISH);
+    protected GPS deSerializeRest(String type, long timestamp, String device, Scanner scanner) {
         scanner.useDelimiter(SPACE_SEPARATED);
 
         final double lat = scanner.nextDouble();
         final double lon = scanner.nextDouble();
         final Double alt = scanner.hasNextDouble() ? scanner.nextDouble() : null;
 
-        return new GPS(item, lat, lon, alt);
+        return new GPS(timestamp, device, lat, lon, alt);
     }
 }

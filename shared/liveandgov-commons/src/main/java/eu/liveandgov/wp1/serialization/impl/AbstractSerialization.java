@@ -1,6 +1,6 @@
 package eu.liveandgov.wp1.serialization.impl;
 
-import eu.liveandgov.wp1.data.impl.Arbitrary;
+import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.serialization.Serialization;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
@@ -8,19 +8,15 @@ import java.util.Locale;
 import java.util.Scanner;
 
 import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
+import static eu.liveandgov.wp1.serialization.SerializationCommons.COMMA_SEPARATED;
 
 /**
- * Created by Lukas Härtel on 08.02.14.
+ * Created by Lukas Härtel on 07.03.14.
  */
-public final class BasicSerialization implements Serialization<Arbitrary> {
-    public static final BasicSerialization BASIC_SERIALIZATION = new BasicSerialization();
-
-    private BasicSerialization() {
-
-    }
+public abstract class AbstractSerialization<Data extends Item> implements Serialization<Data> {
 
     @Override
-    public String serialize(Arbitrary item) {
+    public String serialize(Data item) {
         final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
         stringBuilder.append(item.getType());
         stringBuilder.append(COMMA);
@@ -28,13 +24,16 @@ public final class BasicSerialization implements Serialization<Arbitrary> {
         stringBuilder.append(COMMA);
         appendString(stringBuilder, item.getDevice());
         stringBuilder.append(COMMA);
-        stringBuilder.append(item.value);
+
+        serializeRest(stringBuilder, item);
 
         return stringBuilder.toString();
     }
 
+    protected abstract void serializeRest(StringBuilder stringBuilder, Data item);
+
     @Override
-    public Arbitrary deSerialize(String string) {
+    public Data deSerialize(String string) {
         final Scanner scanner = new Scanner(string);
         scanner.useLocale(Locale.ENGLISH);
         scanner.useDelimiter(COMMA_SEPARATED);
@@ -45,8 +44,8 @@ public final class BasicSerialization implements Serialization<Arbitrary> {
 
         scanner.skip(COMMA_SEPARATED);
 
-        final String line = scanner.nextLine();
-
-        return new Arbitrary(timestamp, device, type, line);
+        return deSerializeRest(type, timestamp, device, scanner);
     }
+
+    protected abstract Data deSerializeRest(String type, long timestamp, String device, Scanner scanner);
 }

@@ -3,17 +3,11 @@ package eu.liveandgov.wp1.helper;
 import eu.liveandgov.wp1.data.FeatureVector;
 import eu.liveandgov.wp1.data.Tuple;
 import eu.liveandgov.wp1.pipeline.Consumer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import org.apache.commons.lang.StringUtils;
-
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-
 /**
  * Created with IntelliJ IDEA.
  * User: cehlen

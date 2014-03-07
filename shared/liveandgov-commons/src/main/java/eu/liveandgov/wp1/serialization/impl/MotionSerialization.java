@@ -14,17 +14,14 @@ import java.util.Scanner;
 /**
  * Created by Lukas Härtel on 08.02.14.
  */
-public class MotionSerialization extends Wrapper<Motion, Arbitrary> {
+public class MotionSerialization extends AbstractSerialization<Motion> {
     public static final MotionSerialization MOTION_SERIALIZATION = new MotionSerialization();
 
     private MotionSerialization() {
-        super(BasicSerialization.BASIC_SERIALIZATION);
     }
 
     @Override
-    protected Arbitrary transform(Motion motion) {
-        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
-
+    protected void serializeRest(StringBuilder stringBuilder, Motion motion) {
         if (motion.values.length > 0) {
             stringBuilder.append(motion.values[0]);
 
@@ -33,14 +30,10 @@ public class MotionSerialization extends Wrapper<Motion, Arbitrary> {
                 stringBuilder.append(motion.values[i]);
             }
         }
-
-        return new Arbitrary(motion, motion.getType(), stringBuilder.toString());
     }
 
     @Override
-    protected Motion invertTransform(Arbitrary item) {
-        final Scanner scanner = new Scanner(item.value);
-        scanner.useLocale(Locale.ENGLISH);
+    protected Motion deSerializeRest(String type, long timestamp, String device, Scanner scanner) {
         scanner.useDelimiter(SerializationCommons.SPACE_SEPARATED);
 
         final List<Float> floatList = new ArrayList<Float>();
@@ -53,18 +46,18 @@ public class MotionSerialization extends Wrapper<Motion, Arbitrary> {
             values[i] = floatList.get(i);
         }
 
-        if (DataCommons.TYPE_ACCELEROMETER.equals(item.getType())) {
-            return new Acceleration(item, values);
-        } else if (DataCommons.TYPE_LINEAR_ACCELERATION.equals(item.getType())) {
-            return new LinearAcceleration(item, values);
-        } else if (DataCommons.TYPE_GRAVITY.equals(item.getType())) {
-            return new Gravity(item, values);
-        } else if (DataCommons.TYPE_GYROSCOPE.equals(item.getType())) {
-            return new Gyroscope(item, values);
-        } else if (DataCommons.TYPE_MAGNETOMETER.equals(item.getType())) {
-            return new MagneticField(item, values);
-        } else if (DataCommons.TYPE_ROTATION.equals(item.getType())) {
-            return new Rotation(item, values);
+        if (DataCommons.TYPE_ACCELEROMETER.equals(type)) {
+            return new Acceleration(timestamp, device, values);
+        } else if (DataCommons.TYPE_LINEAR_ACCELERATION.equals(type)) {
+            return new LinearAcceleration(timestamp, device, values);
+        } else if (DataCommons.TYPE_GRAVITY.equals(type)) {
+            return new Gravity(timestamp, device, values);
+        } else if (DataCommons.TYPE_GYROSCOPE.equals(type)) {
+            return new Gyroscope(timestamp, device, values);
+        } else if (DataCommons.TYPE_MAGNETOMETER.equals(type)) {
+            return new MagneticField(timestamp, device, values);
+        } else if (DataCommons.TYPE_ROTATION.equals(type)) {
+            return new Rotation(timestamp, device, values);
         } else {
             throw new IllegalArgumentException();
         }
