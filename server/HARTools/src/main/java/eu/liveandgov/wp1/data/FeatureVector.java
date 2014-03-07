@@ -2,6 +2,7 @@ package eu.liveandgov.wp1.data;
 
 import eu.liveandgov.wp1.helper.BinDistributor;
 import eu.liveandgov.wp1.helper.FeatureHelper;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayDeque;
@@ -33,8 +34,8 @@ public class FeatureVector {
     // public float energy = 0F;
     // public float kurtosis = 0F;
 
-    // public Integer [] S2Bins = new Integer[0];
-    public Integer [] S2FTBins = new Integer[0];
+    // public int [] S2Bins = new Integer[0];
+    public int [] S2FTBins = new int[0];
 
     public long startTime = 0;
 
@@ -74,9 +75,9 @@ public class FeatureVector {
                 // ,kurtosis
         );
 
-//        out += "," + StringUtils.join(S2Bins, ',');
+//        out += "," + StringUtils.join(ArrayUtils.toObject(S2Bins), ',');
 
-        out += "," + StringUtils.join(S2FTBins, ',');
+        out += "," + StringUtils.join(ArrayUtils.toObject(S2FTBins), ',');
 
         return out;
     }
