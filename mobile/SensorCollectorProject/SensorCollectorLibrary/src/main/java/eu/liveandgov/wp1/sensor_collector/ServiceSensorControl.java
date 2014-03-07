@@ -29,6 +29,7 @@ import eu.liveandgov.wp1.sensor_collector.transfer.TransferThreadPost;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.API_EXTENSIONS;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
+import eu.liveandgov.wp1.sensor_collector.streaming.ZmqStreamer;
 
 public class ServiceSensorControl extends Service {
     // CONSTANTS
@@ -55,6 +56,7 @@ public class ServiceSensorControl extends Service {
     // SENSOR CONSUMERS
     public Persistor persistor;
     public PublicationPipeline publisher;
+    public Consumer<String> streamer;
     public Consumer<String> harPipeline;
     public GpsCache gpsCache;
 
@@ -83,6 +85,7 @@ public class ServiceSensorControl extends Service {
         File stageFile    = new File(getFilesDir(), STAGE_FILENAME);
 
         // Init sensor consumers
+        streamer    = new ZmqStreamer();
         harPipeline = new HarAdapter();
         gpsCache    = new GpsCache();
         persistor   = ZIPPED_PERSISTOR ?
@@ -174,6 +177,10 @@ public class ServiceSensorControl extends Service {
             doStartHAR();
         } else if (action.equals(IntentAPI.ACTION_STOP_HAR)) {
             doStopHAR();
+        } else if (action.equals(ExtendedIntentAPI.START_STREAMING)) {
+            doStartStreaming();
+        } else if (action.equals(ExtendedIntentAPI.STOP_STREAMING)) {
+            doStopStreaming();
         } else if (action.equals(IntentAPI.ACTION_SET_ID)) {
             doSetId(intent.getStringExtra(IntentAPI.FIELD_USER_ID));
         } else if (action.equals(ExtendedIntentAPI.ACTION_GET_GPS)) {
@@ -280,6 +287,18 @@ public class ServiceSensorControl extends Service {
         sendBroadcast(intent);
 
         Log.i(LOG_TAG, "Sent gps message " + gpsCache.getEntryString());
+    }
+
+    private void doStopStreaming() {
+        isStreaming = false;
+        connectorThread.removeConsumer(streamer);
+    }
+
+    private void doStartStreaming() {
+        isStreaming = true;
+        // make sure we do not add the consumer twice
+        connectorThread.removeConsumer(streamer);
+        connectorThread.addConsumer(streamer);
     }
 
     // HELPER METHODS

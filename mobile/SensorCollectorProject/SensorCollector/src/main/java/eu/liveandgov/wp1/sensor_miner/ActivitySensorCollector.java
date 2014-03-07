@@ -72,6 +72,9 @@ public class ActivitySensorCollector extends Activity {
     private EditText        idText;
     private Button          idButton;
     private ToggleButton    harButton;
+    private ToggleButton    streamButton;
+
+
 
 
     /* ANDROID LIFECYCLE MANAGEMENT */
@@ -124,6 +127,10 @@ public class ActivitySensorCollector extends Activity {
         // Setup harButton
         harButton = (ToggleButton) findViewById(R.id.harButton);
         harButton.setEnabled(true);
+
+        // Setup Stream Button
+        streamButton = (ToggleButton) findViewById(R.id.streamButton);
+        streamButton.setEnabled(true);
 
         // Prevent keyboard automatically popping up
         getWindow().setSoftInputMode(
@@ -280,6 +287,8 @@ public class ActivitySensorCollector extends Activity {
         isRecording = intent.getBooleanExtra(FIELD_SAMPLING, false );
         isTransferring = intent.getBooleanExtra(FIELD_TRANSFERRING, false );
         isHAR = intent.getBooleanExtra(FIELD_HAR, false );
+        isStreaming = intent.getBooleanExtra(FIELD_STREAMING, false );
+
 
         // Update Buttons
         if (isRecording) {
@@ -300,6 +309,12 @@ public class ActivitySensorCollector extends Activity {
             harButton.setChecked(true);
         } else {
             harButton.setChecked(false);
+        }
+
+        if (isStreaming) {
+            streamButton.setChecked(true);
+        } else {
+            streamButton.setChecked(false);
         }
 
         // logStatus(intent);
