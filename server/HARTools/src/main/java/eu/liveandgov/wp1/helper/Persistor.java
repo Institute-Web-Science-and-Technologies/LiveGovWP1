@@ -8,11 +8,6 @@ import org.apache.commons.lang.StringUtils;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import org.apache.commons.lang.StringUtils;
-
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,6 +20,7 @@ public class Persistor implements Consumer<Tuple<Long, FeatureVector>> {
 
     private PrintWriter writer;
     private boolean isFirst = true;
+    private String csvHead = null;
 
     public Persistor(String filePath) {
         try {
@@ -37,6 +33,8 @@ public class Persistor implements Consumer<Tuple<Long, FeatureVector>> {
     }
 
     public String generateTableHead(int length){
+        if (csvHead != null) { return csvHead; }
+
         String result = "";
         for (int i = 0; i < length; i++) {
             result += "x" + (i + 1); // start with x1
@@ -64,6 +62,10 @@ public class Persistor implements Consumer<Tuple<Long, FeatureVector>> {
 
     public void flush() {
         writer.flush();
+    }
+
+    public void setCsvHead(String csvHead) {
+        this.csvHead = csvHead;
     }
 }
 

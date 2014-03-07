@@ -1,6 +1,6 @@
 package eu.liveandgov.wp1.pipeline;
 
-import eu.liveandgov.wp1.classifier.UKOBClassifier2;
+import eu.liveandgov.wp1.classifier.UKOBClassifier3;
 import eu.liveandgov.wp1.data.FeatureVector;
 import eu.liveandgov.wp1.data.Triple;
 import eu.liveandgov.wp1.data.Tuple;
@@ -20,8 +20,8 @@ public class ActivityPipeline extends Pipeline<Tuple<Long, FeatureVector>, Tripl
         switch (this.classifier_id) {
             case 0:
                 try {
-                    double a = UKOBClassifier2.classify(longFeatureVectorTuple.right.toWekaObjArr());
-                    String activity = UKOBClassifier2.getActivityName((int)a);
+                    double a = UKOBClassifier3.classify(longFeatureVectorTuple.right);
+                    String activity = UKOBClassifier3.getActivityName((int)a);
                     Triple<Long, Long, String> t = new Triple<Long, Long, String>(longFeatureVectorTuple.left,
                             longFeatureVectorTuple.right.startTime,
                             activity);

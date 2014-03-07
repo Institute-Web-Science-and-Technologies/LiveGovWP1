@@ -16,7 +16,7 @@ apply plugin: 'android-library'
 repositories {
     // Need to add new repositories also here!
     mavenCentral()
-    // mavenLocal()
+    mavenLocal()
     maven {
         url 'https://raw.github.com/HeinrichHartmann/LiveGovWP1/mvn-repo'
     }
@@ -31,6 +31,7 @@ android {
     }
 
     packagingOptions {
+        exclude 'LICENSE.txt'
         exclude 'META-INF/DEPENDENCIES.txt'
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
@@ -45,7 +46,7 @@ android {
 
 configurations.all {
     // check for updates every build
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    // resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 dependencies {

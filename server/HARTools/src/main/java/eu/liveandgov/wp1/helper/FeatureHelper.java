@@ -117,4 +117,19 @@ public class FeatureHelper {
     }
 
 
+    public static float tiltArray(float[] x, float[] y, float[] z) {
+        float [] tilts = new float[x.length];
+        for (int i = 0; i < x.length; i++) {
+            tilts[i] = tilt(x[i],y[i],z[i]);
+        }
+        return mean(tilts);
+    }
+
+    public static int MaxIndex(int[] arr) {
+        int max_index = 0;
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > arr[max_index]) { max_index = i; }
+        }
+        return max_index;
+    }
 }

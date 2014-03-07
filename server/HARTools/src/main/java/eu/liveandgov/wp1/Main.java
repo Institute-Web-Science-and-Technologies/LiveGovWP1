@@ -1,5 +1,6 @@
 package eu.liveandgov.wp1;
 
+import eu.liveandgov.wp1.data.FeatureVector;
 import eu.liveandgov.wp1.helper.Persistor;
 import eu.liveandgov.wp1.pipeline.*;
 
@@ -36,6 +37,7 @@ public class Main {
         ip.setConsumer(fp);
 
         Persistor pers = new Persistor("/DATA/FEATURES.csv");
+        pers.setCsvHead(FeatureVector.getCsvHead());
         fp.setConsumer(pers);
 
         csvReader.readDir("/DATA/UKOB_ALL", true);

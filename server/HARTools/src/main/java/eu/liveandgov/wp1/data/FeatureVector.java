@@ -13,6 +13,9 @@ import java.util.Deque;
  */
 public class FeatureVector {
 
+    private static final int FFT_BIN_CNT = 5;
+    private static final int BIN_CNT = 10;
+
     public String tag = "";
     public String id = "";
 
@@ -54,19 +57,32 @@ public class FeatureVector {
         s2Mean = FeatureHelper.mean(S2);
         s2Var = FeatureHelper.var(S2);
 
-        tilt = FeatureHelper.tilt(xMean, yMean, zMean);
+        tilt = FeatureHelper.tilt(xMean,yMean,zMean);
+        // tilt = FeatureHelper.tiltArray(m.x,m.y,m.z);
+
         // energy = FeatureHelper.sum(S2); this is the same as s2Mean
         // kurtosis = FeatureHelper.kurtosis(S2);
 
-        // BinDistributor BD = new BinDistributor(0,20,10);
+        // BinDistributor BD = new BinDistributor(0,20,BIN_CNT);
         // S2Bins = BD.getBinsForAxis(S2);
 
-        BinDistributor FBD = new BinDistributor(0,100,5);
+        BinDistributor FBD = new BinDistributor(0,100, FFT_BIN_CNT);
         S2FTBins = FBD.getBinsForAxis(FeatureHelper.FTAbsolute(S2));
+
+        S2FTBins[0] = FeatureHelper.MaxIndex(S2FTBins);
 
         startTime = m.startTime;
     }
 
+    public static String getCsvHead() {
+        StringBuilder out = new StringBuilder("id, tag, xMean, yMean, zMean, xVar, yVar, zVar, s2Mean, s2Var, tilt,");
+        out.append("FT_MIN, ");
+        for (int i = 0; i < FFT_BIN_CNT; i++){
+            out.append("FT_" + i + ", ");
+        }
+        out.append("FT_MAX");
+        return out.toString();
+    }
 
     public String toCSV() {
         String out = String.format("%s,%s,%f,%f,%f,%f,%f,%f,%f,%f,%f",
