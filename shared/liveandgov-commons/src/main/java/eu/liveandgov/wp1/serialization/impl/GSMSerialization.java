@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.serialization.impl;
 import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.data.impl.GSM;
 import eu.liveandgov.wp1.serialization.Wrapper;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class GSMSerialization extends Wrapper<GSM, Arbitrary> {
 
     @Override
     protected Arbitrary transform(GSM gsm) {
-        final StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
 
         stringBuilder.append(toText(gsm.serviceState));
         stringBuilder.append(SLASH);

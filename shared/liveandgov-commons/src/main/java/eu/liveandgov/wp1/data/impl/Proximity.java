@@ -62,15 +62,6 @@ public class Proximity extends AbstractItem {
     }
 
     @Override
-    public String toString() {
-        return "Proximity{" +
-                "key='" + key + '\'' +
-                ", in=" + in +
-                ", of='" + of + '\'' +
-                '}';
-    }
-
-    @Override
     public String createSerializedForm() {
         return ProximitySerialization.PROXIMITY_SERIALIZATION.serialize(this);
     }

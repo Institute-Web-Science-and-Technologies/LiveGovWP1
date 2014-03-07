@@ -11,7 +11,8 @@ import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.R;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
-import zmq.ZMQ;
+
+import org.zeromq.ZMQ;
 
 /**
  * String-Consumer that sends samples to a remote server using ZMQ message queue system.
@@ -19,9 +20,6 @@ import zmq.ZMQ;
  * Created by hartmann on 10/2/13.
  */
 public class ZMQStreamer extends ZMQClient implements Monitorable {
-    {
-        HWM = 2048;
-    }
 
     public static final String LOG_TAG = "ZST";
 
@@ -31,23 +29,7 @@ public class ZMQStreamer extends ZMQClient implements Monitorable {
     private static final int PULL_INTERVAL = 5000;
 
     public ZMQStreamer() {
-        super(GlobalContext.getExecutorService(), PULL_INTERVAL, ZMQ.ZMQ_PUB);
-
-        pulled.register(new Callback<Integer>() {
-            @Override
-            public void call(Integer c) {
-                Log.d(LOG_TAG, "ZQM Streamer pulled " + c + " responses");
-            }
-        });
-
-        sent.register(new Callback<Boolean>() {
-            @Override
-            public void call(Boolean s) {
-                if (!s)
-                    Log.d(LOG_TAG, "ZMQ Streamer send failed");
-
-            }
-        });
+        super(GlobalContext.getExecutorService(), PULL_INTERVAL, ZMQ.PUB);
 
         addressUpdated.register(new Callback<String>() {
             @Override
@@ -58,8 +40,19 @@ public class ZMQStreamer extends ZMQClient implements Monitorable {
     }
 
     @Override
+    protected void configure(ZMQ.Socket socket) {
+        super.configure(socket);
+
+        // Reconnect starts with half a second
+        socket.setReconnectIVL(500L);
+        // Maximum rate is one minute
+        socket.setReconnectIVLMax(60L * 1000L);
+    }
+
+    @Override
     public void push(String s) {
-        super.push(s + "\r\n");
+        super.push(s);
+        super.push("\r\n");
     }
 
     @Override

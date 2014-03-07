@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.serialization.impl;
 import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.data.impl.GoogleActivity;
 import eu.liveandgov.wp1.serialization.Wrapper;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.util.Locale;
 import java.util.Scanner;
@@ -21,7 +22,7 @@ public class GoogleActivitySerialization extends Wrapper<GoogleActivity, Arbitra
 
     @Override
     protected Arbitrary transform(GoogleActivity googleActivity) {
-        final StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
 
         appendString(stringBuilder, googleActivity.activity);
         stringBuilder.append(SPACE);

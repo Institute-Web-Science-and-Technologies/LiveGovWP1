@@ -121,13 +121,6 @@ public class Bluetooth extends AbstractItem {
     }
 
     @Override
-    public String toString() {
-        return "Bluetooth{" +
-                "items=" + Arrays.toString(items) +
-                '}';
-    }
-
-    @Override
     public String createSerializedForm() {
         return BluetoothSerialization.BLUETOOTH_SERIALIZATION.serialize(this);
     }

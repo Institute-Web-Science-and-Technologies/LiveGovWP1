@@ -17,14 +17,15 @@ import java.io.IOException;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
  * Transfer sensor.log file to server using HTTP/POST request
- *
+ * <p/>
  * Use:
  * * .setup()      - setup instance
  * * .doTransfer() - trigger sample transfer
- *
+ * <p/>
  * Created by hartmann on 8/30/13.
  */
 public class TransferThreadPost implements Runnable, TransferManager {
@@ -42,11 +43,16 @@ public class TransferThreadPost implements Runnable, TransferManager {
         this.stageFile = stageFile;
         this.persistor = persistor;
         thread = new Thread(this);
-    };
+    }
+
+    ;
 
     @Override
-    public void doTransfer(){
-        if (thread.isAlive()) { Log.i(LOG_TAG, "Already running."); return; }
+    public void doTransfer() {
+        if (thread.isAlive()) {
+            Log.i(LOG_TAG, "Already running.");
+            return;
+        }
         if (thread.getState() == Thread.State.TERMINATED) thread = new Thread(this);
         thread.start();
     }
@@ -68,8 +74,17 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
     @Override
     public String getStatus() {
-        return "StageFile: " + stageFile.length()/1024 + "kb. " +
-               (isTransferring() ? "transferring" : "waiting");
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+        stringBuilder.append("StageFile: ");
+        stringBuilder.append(Math.round(stageFile.length() / 1024.0));
+        stringBuilder.append("kb. ");
+
+        if (isTransferring())
+            stringBuilder.append("transferring");
+        else
+            stringBuilder.append("waiting");
+
+        return stringBuilder.toString();
     }
 
     public void run() {
@@ -77,32 +92,41 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
         try {
 
-        // TODO: Check methods if with success return should rather throw an exception in
-        // order to make calleing more uniform.
+            // TODO: Check methods if with success return should rather throw an exception in
+            // order to make calleing more uniform.
 
 
-        // get stage file
-        if (stageFile.exists()){
-            Log.i(LOG_TAG, "Found old stage file.");
-        } else {
-            success = persistor.exportSamples(stageFile);
-            if (!success) { Log.i(LOG_TAG,"Staging failed");  return; }
-        }
+            // get stage file
+            if (stageFile.exists()) {
+                Log.i(LOG_TAG, "Found old stage file.");
+            } else {
+                success = persistor.exportSamples(stageFile);
+                if (!success) {
+                    Log.i(LOG_TAG, "Staging failed");
+                    return;
+                }
+            }
 
-        boolean isCompressed = infereCompressionStatusOf(stageFile);
+            boolean isCompressed = infereCompressionStatusOf(stageFile);
 
-        // transfer staged File
-        success = transferFile(stageFile, isCompressed);
-        if (!success) { Log.i(LOG_TAG,"Transfer failed");  return; }
+            // transfer staged File
+            success = transferFile(stageFile, isCompressed);
+            if (!success) {
+                Log.i(LOG_TAG, "Transfer failed");
+                return;
+            }
 
-        // delete local copy
-        success = stageFile.delete();
-        if (!success) { Log.i(LOG_TAG,"Deletion failed"); return; }
+            // delete local copy
+            success = stageFile.delete();
+            if (!success) {
+                Log.i(LOG_TAG, "Deletion failed");
+                return;
+            }
 
-        // terminate
-        Log.i(LOG_TAG, "Transfer finished successfully");
+            // terminate
+            Log.i(LOG_TAG, "Transfer finished successfully");
 
-        } catch (IOException e){
+        } catch (IOException e) {
             Log.e(LOG_TAG, "Error opening stage file", e);
         }
     }
@@ -126,8 +150,8 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
     public boolean transferFile(File file, boolean compressed) {
         try {
-            HttpClient      httpclient =    new DefaultHttpClient();
-            HttpPost        httppost =      new HttpPost(uploadUrl);
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost(uploadUrl);
 
             MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
             multipartEntityBuilder.addBinaryBody("upfile", file);
@@ -136,11 +160,11 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
             httppost.addHeader("COMPRESSED", String.valueOf(compressed));
             httppost.addHeader("CHECKSUM", String.valueOf(file.length()));
-            httppost.addHeader("ID", GlobalContext.getUserId() );
+            httppost.addHeader("ID", GlobalContext.getUserId());
 
             HttpResponse response = httpclient.execute(httppost);
             int status = response.getStatusLine().getStatusCode();
-            if(status != HttpStatus.SC_ACCEPTED) {
+            if (status != HttpStatus.SC_ACCEPTED) {
                 Log.i(LOG_TAG, "Upload failed w/ Status Code:" + status);
                 return false;
             }
@@ -156,7 +180,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
         return true;
     }
 
-    public boolean transferFile(File file){
+    public boolean transferFile(File file) {
         return transferFile(file, false);
     }
 

@@ -4,6 +4,7 @@ import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.data.impl.Waiting;
 import eu.liveandgov.wp1.serialization.SerializationCommons;
 import eu.liveandgov.wp1.serialization.Wrapper;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.util.Locale;
 import java.util.Scanner;
@@ -20,7 +21,7 @@ public class WaitingSerialization extends Wrapper<Waiting, Arbitrary> {
 
     @Override
     protected Arbitrary transform(Waiting waiting) {
-        final StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
 
         SerializationCommons.appendString(stringBuilder, waiting.key);
         stringBuilder.append(SerializationCommons.SLASH);

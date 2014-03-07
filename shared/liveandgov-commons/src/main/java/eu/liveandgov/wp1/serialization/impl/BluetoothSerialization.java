@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.serialization.impl;
 import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.data.impl.Bluetooth;
 import eu.liveandgov.wp1.serialization.Wrapper;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class BluetoothSerialization extends Wrapper<Bluetooth, Arbitrary> {
 
     @Override
     protected Arbitrary transform(Bluetooth bluetooth) {
-        final StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
 
         if (bluetooth.items.length > 0) {
             appendBluetoothItem(bluetooth, stringBuilder, 0);

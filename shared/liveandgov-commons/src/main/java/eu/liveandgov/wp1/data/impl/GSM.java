@@ -144,18 +144,6 @@ public class GSM extends AbstractItem {
     }
 
     @Override
-    public String toString() {
-        return "GSM{" +
-                "serviceState=" + serviceState +
-                ", roamingState=" + roamingState +
-                ", carrierSelection=" + carrierSelection +
-                ", carrierName='" + carrierName + '\'' +
-                ", signalStrength='" + signalStrength + '\'' +
-                ", items=" + Arrays.toString(items) +
-                '}';
-    }
-
-    @Override
     public String createSerializedForm() {
         return GSMSerialization.GSM_SERIALIZATION.serialize(this);
     }

@@ -4,6 +4,7 @@ import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.data.impl.WiFi;
 import eu.liveandgov.wp1.serialization.SerializationCommons;
 import eu.liveandgov.wp1.serialization.Wrapper;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public class WiFiSerialization extends Wrapper<WiFi, Arbitrary> {
 
     @Override
     protected Arbitrary transform(WiFi wiFi) {
-        final StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
 
         if (wiFi.items.length > 0) {
             appendWifiItem(wiFi, stringBuilder, 0);

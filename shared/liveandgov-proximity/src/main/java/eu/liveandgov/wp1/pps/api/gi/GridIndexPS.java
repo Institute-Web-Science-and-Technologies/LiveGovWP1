@@ -146,7 +146,7 @@ public abstract class GridIndexPS implements ProximityService {
             lat = Math.round(lat / horizontalResultion) * horizontalResultion + horizontalResultion / 2.0;
         }
 
-        final Field at = new Field((long) Math.round(lat / horizontalResultion), (long) Math.round(lon / verticalResulution));
+        final Field at = new Field( Math.round(lat / horizontalResultion), Math.round(lon / verticalResulution));
 
         CalculationResult result = calculated.get(at);
         if (result == null) {
@@ -154,6 +154,7 @@ public abstract class GridIndexPS implements ProximityService {
             switch (result.type) {
                 case NOT_IN_PROXIMITY:
                 case IN_PROXIMITY:
+                case NO_DECISION:
                     calculated.put(at, result);
                     assertStoreDegree();
                     break;

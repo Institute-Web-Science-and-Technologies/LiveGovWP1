@@ -101,13 +101,6 @@ public class WiFi extends AbstractItem {
     }
 
     @Override
-    public String toString() {
-        return "WiFi{" +
-                "items=" + Arrays.toString(items) +
-                '}';
-    }
-
-    @Override
     public String createSerializedForm() {
         return WiFiSerialization.WI_FI_SERIALIZATION.serialize(this);
     }

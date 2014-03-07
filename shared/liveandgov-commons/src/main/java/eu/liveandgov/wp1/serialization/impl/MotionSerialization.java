@@ -4,6 +4,7 @@ import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.impl.*;
 import eu.liveandgov.wp1.serialization.SerializationCommons;
 import eu.liveandgov.wp1.serialization.Wrapper;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public class MotionSerialization extends Wrapper<Motion, Arbitrary> {
 
     @Override
     protected Arbitrary transform(Motion motion) {
-        final StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
 
         if (motion.values.length > 0) {
             stringBuilder.append(motion.values[0]);

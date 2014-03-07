@@ -49,14 +49,6 @@ public class Arbitrary extends AbstractItem {
     }
 
     @Override
-    public String toString() {
-        return "Arbitrary{" +
-                "type='" + type + '\'' +
-                ", value='" + value + '\'' +
-                '}';
-    }
-
-    @Override
     public String createSerializedForm() {
         return BasicSerialization.BASIC_SERIALIZATION.serialize(this);
     }

@@ -59,15 +59,6 @@ public class Waiting extends AbstractItem {
     }
 
     @Override
-    public String toString() {
-        return "Waiting{" +
-                "key='" + key + '\'' +
-                ", duration=" + duration +
-                ", at='" + at + '\'' +
-                '}';
-    }
-
-    @Override
     public String createSerializedForm() {
         return WaitingSerialization.WAITING_SERIALIZATION.serialize(this);
     }

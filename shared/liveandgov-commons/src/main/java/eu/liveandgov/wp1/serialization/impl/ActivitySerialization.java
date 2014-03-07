@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.serialization.impl;
 import eu.liveandgov.wp1.data.impl.Activity;
 import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.serialization.Wrapper;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.util.Locale;
 import java.util.Scanner;
@@ -22,7 +23,7 @@ public class ActivitySerialization extends Wrapper<Activity, Arbitrary> {
 
     @Override
     protected Arbitrary transform(Activity activity) {
-        final StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
         appendString(stringBuilder, activity.activity);
 
         return new Arbitrary(activity, activity.getType(), stringBuilder.toString());

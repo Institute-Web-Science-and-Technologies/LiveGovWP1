@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.serialization.impl;
 import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.data.impl.GPS;
 import eu.liveandgov.wp1.serialization.Wrapper;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.util.Locale;
 import java.util.Scanner;
@@ -22,7 +23,7 @@ public class GPSSerialization extends Wrapper<GPS, Arbitrary> {
 
     @Override
     protected Arbitrary transform(GPS gps) {
-        final StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
 
         stringBuilder.append(gps.lat);
         stringBuilder.append(SPACE);

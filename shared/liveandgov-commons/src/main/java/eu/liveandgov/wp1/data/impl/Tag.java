@@ -44,13 +44,6 @@ public class Tag extends AbstractItem {
     }
 
     @Override
-    public String toString() {
-        return "Tag{" +
-                "tag='" + tag + '\'' +
-                '}';
-    }
-
-    @Override
     public String createSerializedForm() {
         return TagSerialization.TAG_SERIALIZATION.serialize(this);
     }

@@ -14,6 +14,7 @@ import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.MultiProducer;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
  * Thread that actively polls a blocking queue and sends samples to a list of consumers.
@@ -80,7 +81,11 @@ public class ConnectorThread extends MultiProducer<Item> implements Runnable, Mo
      */
     @Override
     public String getStatus() {
-        return "Throughput: " + messageCount;
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+        stringBuilder.append("Throughput: ");
+        stringBuilder.append(messageCount);
+
+        return stringBuilder.toString();
     }
 
     @Override

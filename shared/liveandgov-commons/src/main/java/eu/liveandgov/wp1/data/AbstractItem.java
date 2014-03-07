@@ -47,4 +47,9 @@ public abstract class AbstractItem implements Item {
     }
 
     protected abstract String createSerializedForm();
+
+    @Override
+    public String toString() {
+        return createSerializedForm();
+    }
 }

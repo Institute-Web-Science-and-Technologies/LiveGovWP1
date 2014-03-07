@@ -16,7 +16,7 @@ public abstract class ZMQClient extends Pipeline<String, String> implements Stop
 
     public static long TAXI_INTERVAL = 5000L;
 
-    public static int HWM = 1000;
+    public static final int DEFAULT_HWM = 1000;
 
     public final ScheduledExecutorService scheduledExecutorService;
 
@@ -25,10 +25,6 @@ public abstract class ZMQClient extends Pipeline<String, String> implements Stop
     public final int mode;
 
     public final CallbackSet<String> addressUpdated = new CallbackSet<String>();
-
-    public final CallbackSet<Integer> pulled = new CallbackSet<Integer>();
-
-    public final CallbackSet<Boolean> sent = new CallbackSet<Boolean>();
 
     private ZMQ.Context context;
 
@@ -61,7 +57,9 @@ public abstract class ZMQClient extends Pipeline<String, String> implements Stop
             public void run() {
                 context = ZMQ.context(1);
                 socket = context.socket(mode);
-                socket.setHWM(HWM);
+
+                configure(socket);
+
                 socket.connect(lastAddress = getAddress());
                 addressUpdated.call(lastAddress);
 
@@ -86,11 +84,14 @@ public abstract class ZMQClient extends Pipeline<String, String> implements Stop
                         for (i = 0; i < BULK_SIZE && ((item = socket.recvStr(ZMQ.DONTWAIT)) != null); i++) {
                             produce(item);
                         }
-                        pulled.call(i);
                     }
                 }, 0L, interval, TimeUnit.MILLISECONDS);
             }
         });
+    }
+
+    protected void configure(ZMQ.Socket socket) {
+        socket.setHWM(DEFAULT_HWM);
     }
 
     protected abstract String getAddress();
@@ -99,8 +100,7 @@ public abstract class ZMQClient extends Pipeline<String, String> implements Stop
     public void push(final String s) {
         try {
             connection.get();
-            sent.call(socket.send(s));
-
+            socket.send(s);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {

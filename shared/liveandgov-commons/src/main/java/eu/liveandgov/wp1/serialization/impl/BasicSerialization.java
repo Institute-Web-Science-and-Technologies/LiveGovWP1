@@ -2,6 +2,7 @@ package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.serialization.Serialization;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.util.Locale;
 import java.util.Scanner;
@@ -20,7 +21,7 @@ public final class BasicSerialization implements Serialization<Arbitrary> {
 
     @Override
     public String serialize(Arbitrary item) {
-        final StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
         stringBuilder.append(item.getType());
         stringBuilder.append(COMMA);
         stringBuilder.append(item.getTimestamp());

@@ -53,14 +53,6 @@ public class GoogleActivity extends AbstractItem {
     }
 
     @Override
-    public String toString() {
-        return "GoogleActivity{" +
-                "activity='" + activity + '\'' +
-                ", confidence=" + confidence +
-                '}';
-    }
-
-    @Override
     public String createSerializedForm() {
         return GoogleActivitySerialization.GOOGLE_ACTIVITY_SERIALIZATION.serialize(this);
     }

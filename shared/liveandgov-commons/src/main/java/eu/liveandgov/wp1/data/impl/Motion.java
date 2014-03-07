@@ -41,13 +41,6 @@ public abstract class Motion extends AbstractItem {
     }
 
     @Override
-    public String toString() {
-        return "Motion{" +
-                "values=" + Arrays.toString(values) +
-                '}';
-    }
-
-    @Override
     public String createSerializedForm() {
         return MotionSerialization.MOTION_SERIALIZATION.serialize(this);
     }

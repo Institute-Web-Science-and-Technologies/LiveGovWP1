@@ -61,15 +61,6 @@ public class GPS extends AbstractItem {
     }
 
     @Override
-    public String toString() {
-        return "GPS{" +
-                "lat=" + lat +
-                ", lon=" + lon +
-                ", alt=" + alt +
-                '}';
-    }
-
-    @Override
     public String createSerializedForm() {
         return GPSSerialization.GPS_SERIALIZATION.serialize(this);
     }

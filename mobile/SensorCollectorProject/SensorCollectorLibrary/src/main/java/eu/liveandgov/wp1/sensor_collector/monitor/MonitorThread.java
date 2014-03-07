@@ -9,6 +9,7 @@ import eu.liveandgov.wp1.data.Startable;
 import eu.liveandgov.wp1.data.Stoppable;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
  * Monitors objects that implement the {@link eu.liveandgov.wp1.sensor_collector.monitor.Monitorable}
@@ -55,12 +56,15 @@ public class MonitorThread implements Startable, Stoppable {
     }
 
     private String getLogMessage() {
-        StringBuilder s = new StringBuilder();
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
         for (MonitorItem m : observables) {
-            s.append(m.render());
+            stringBuilder.append(m.render());
         }
-        s.append("User ID: " + GlobalContext.getUserId());
-        return s.toString();
+
+        stringBuilder.append("User ID: ");
+        stringBuilder.append(GlobalContext.getUserId());
+
+        return stringBuilder.toString();
     }
 
     private class MonitorItem {
@@ -73,7 +77,13 @@ public class MonitorThread implements Startable, Stoppable {
         }
 
         public String render() {
-            return name + ": " + monitorable.getStatus() + "\n";
+            final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+            stringBuilder.append(name);
+            stringBuilder.append(": ");
+            stringBuilder.append(monitorable.getStatus());
+            stringBuilder.append("\r\n");
+
+            return stringBuilder.toString();
         }
     }
 

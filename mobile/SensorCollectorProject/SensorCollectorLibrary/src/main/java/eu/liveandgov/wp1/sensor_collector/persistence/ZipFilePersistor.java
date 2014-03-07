@@ -15,10 +15,11 @@ import java.util.zip.GZIPOutputStream;
 
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
  * Persistor class that writes samples into a zipped log file.
- *
+ * <p/>
  * Created by hartmann on 9/20/13.
  */
 public class ZipFilePersistor implements Persistor {
@@ -49,9 +50,9 @@ public class ZipFilePersistor implements Persistor {
 
         try {
             fileWriter.write(item.toSerializedForm() + "\n");
-            sampleCount ++;
+            sampleCount++;
         } catch (IOException e) {
-            Log.e(LOG_TAG,"Cannot write file.");
+            Log.e(LOG_TAG, "Cannot write file.");
             e.printStackTrace();
         }
     }
@@ -61,19 +62,31 @@ public class ZipFilePersistor implements Persistor {
         boolean suc = true;
 
         Log.i(LOG_TAG, "Exporting samples.");
-        if (stageFile.exists()) { Log.e(LOG_TAG, "Stage file exists."); return false; }
+        if (stageFile.exists()) {
+            Log.e(LOG_TAG, "Stage file exists.");
+            return false;
+        }
 
         suc = closeLogFile();
-        if (!suc) { Log.e(LOG_TAG, "Cosing LogFile failed."); return false; }
+        if (!suc) {
+            Log.e(LOG_TAG, "Cosing LogFile failed.");
+            return false;
+        }
 
         // Renamed, the valid length is now zero
         suc = logFile.renameTo(stageFile);
         putValidLength(0);
 
-        if (!suc) { Log.e(LOG_TAG, "Renaming failed."); return false; }
+        if (!suc) {
+            Log.e(LOG_TAG, "Renaming failed.");
+            return false;
+        }
 
         suc = openLogFileOverwrite();
-        if (!suc) { Log.e(LOG_TAG, "Opening new Log File failed."); return false; }
+        if (!suc) {
+            Log.e(LOG_TAG, "Opening new Log File failed.");
+            return false;
+        }
 
         sampleCount = 0;
         return true;
@@ -94,7 +107,7 @@ public class ZipFilePersistor implements Persistor {
         logFile.delete();
         putValidLength(0);
 
-        if(wasOpen) {
+        if (wasOpen) {
             // We can override here because we do in fact want to delete the samples
             openLogFileOverwrite();
         }
@@ -107,8 +120,13 @@ public class ZipFilePersistor implements Persistor {
 
     @Override
     public String getStatus() {
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+        stringBuilder.append("ZIP File size: ");
+        stringBuilder.append(Math.round(logFile.length() / 1024.0));
+        stringBuilder.append("kb. Samples written: ");
+        stringBuilder.append(sampleCount);
 
-        return "File size: " + logFile.length()/1024 + "kb. Samples written: " + sampleCount;
+        return stringBuilder.toString();
     }
 
     private boolean openLogFileAppend() {
@@ -116,7 +134,7 @@ public class ZipFilePersistor implements Persistor {
 
             truncateFileIfCorupted();
 
-            fileWriter = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream( new FileOutputStream(logFile,true)), "UTF8"));
+            fileWriter = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(logFile, true)), "UTF8"));
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -131,8 +149,7 @@ public class ZipFilePersistor implements Persistor {
 
         Log.d(LOG_TAG, "Valid zipfile length: " + validLength + ", actual length " + actualLength);
 
-        if(actualLength > validLength)
-        {
+        if (actualLength > validLength) {
             Log.w(LOG_TAG, "Erronous file size, truncating");
 
             // Truncate if mismatching
@@ -154,10 +171,8 @@ public class ZipFilePersistor implements Persistor {
     private long lastPutValidLength = -1;
 
     // Puts the next valid length if it differs from the last put value
-    private void putValidLength(long value)
-    {
-        if(lastPutValidLength == value)
-        {
+    private void putValidLength(long value) {
+        if (lastPutValidLength == value) {
             return;
         }
 
@@ -175,7 +190,7 @@ public class ZipFilePersistor implements Persistor {
 
     private boolean openLogFileOverwrite() {
         try {
-            fileWriter = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(logFile,false)), "UTF8"));
+            fileWriter = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(logFile, false)), "UTF8"));
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -185,7 +200,7 @@ public class ZipFilePersistor implements Persistor {
     }
 
     private boolean closeLogFile() {
-        if(fileWriter == null) return true;
+        if (fileWriter == null) return true;
 
         try {
             fileWriter.flush();

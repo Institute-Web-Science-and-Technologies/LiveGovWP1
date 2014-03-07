@@ -15,7 +15,7 @@ import java.util.concurrent.*;
 public class ZMQServer extends Pipeline<String, String> implements Stoppable {
     private static final int BULK_SIZE = 512;
 
-    public static int HWM = 1000;
+    public static final int DEFAULT_HWM = 1000;
 
     public final ScheduledExecutorService scheduledExecutorService;
 
@@ -24,10 +24,6 @@ public class ZMQServer extends Pipeline<String, String> implements Stoppable {
     public final int mode;
 
     public final String boundAddress;
-
-    public final CallbackSet<Integer> pulled = new CallbackSet<Integer>();
-
-    public final CallbackSet<Boolean> sent = new CallbackSet<Boolean>();
 
     private ZMQ.Context context;
 
@@ -58,7 +54,9 @@ public class ZMQServer extends Pipeline<String, String> implements Stoppable {
             public void run() {
                 context = ZMQ.context(1);
                 socket = context.socket(mode);
-                socket.setHWM(HWM);
+
+                configure(socket);
+
                 socket.bind(boundAddress);
 
                 responder = scheduledExecutorService.scheduleWithFixedDelay(new Runnable() {
@@ -69,20 +67,22 @@ public class ZMQServer extends Pipeline<String, String> implements Stoppable {
                         for (i = 0; i < BULK_SIZE && ((item = socket.recvStr(ZMQ.DONTWAIT)) != null); i++) {
                             produce(item);
                         }
-                        pulled.call(i);
                     }
                 }, 0L, interval, TimeUnit.MILLISECONDS);
             }
         });
     }
 
+    protected void configure(ZMQ.Socket socket) {
+        socket.setHWM(DEFAULT_HWM);
+    }
+
+
     @Override
     public void push(final String s) {
         try {
             connection.get();
-            sent.call(socket.send(s));
-
-
+            socket.send(s);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {

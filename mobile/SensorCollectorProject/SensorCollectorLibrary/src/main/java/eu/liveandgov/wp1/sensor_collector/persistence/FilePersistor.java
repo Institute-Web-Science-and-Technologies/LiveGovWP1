@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
  * Persistor class that writes samples into a log file.
@@ -110,7 +111,13 @@ public class FilePersistor implements Persistor {
 
     @Override
     public String getStatus() {
-        return "File size: " + logFile.length() / 1024 + "kb. Samples written: " + sampleCount;
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+        stringBuilder.append("File size: ");
+        stringBuilder.append(Math.round(logFile.length() / 1024.0));
+        stringBuilder.append("kb. Samples written: ");
+        stringBuilder.append(sampleCount);
+
+        return stringBuilder.toString();
     }
 
     private void openLogFileAppend() throws IOException {

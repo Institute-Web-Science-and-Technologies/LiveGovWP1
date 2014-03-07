@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
  * Simple queue class of a fixed maximal capacity.
@@ -52,6 +53,10 @@ public class LinkedSensorQueue implements SensorQueue {
 
     @Override
     public String getStatus() {
-        return "Queue Size: " + queue.size();
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+        stringBuilder.append("Queue Size: ");
+        stringBuilder.append(queue.size());
+
+        return stringBuilder.toString();
     }
 }

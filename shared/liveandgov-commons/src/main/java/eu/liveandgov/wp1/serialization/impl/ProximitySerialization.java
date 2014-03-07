@@ -4,6 +4,7 @@ import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.data.impl.Proximity;
 import eu.liveandgov.wp1.serialization.SerializationCommons;
 import eu.liveandgov.wp1.serialization.Wrapper;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.util.Locale;
 import java.util.Scanner;
@@ -20,7 +21,7 @@ public class ProximitySerialization extends Wrapper<Proximity, Arbitrary> {
 
     @Override
     protected Arbitrary transform(Proximity proximity) {
-        final StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
 
         SerializationCommons.appendString(stringBuilder, proximity.key);
         stringBuilder.append(SerializationCommons.SLASH);

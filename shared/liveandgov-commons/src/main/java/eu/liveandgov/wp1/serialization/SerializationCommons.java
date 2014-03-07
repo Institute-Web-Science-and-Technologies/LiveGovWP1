@@ -1,7 +1,9 @@
 package eu.liveandgov.wp1.serialization;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import eu.liveandgov.wp1.util.LocalBuilder;
+import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -29,10 +31,58 @@ public class SerializationCommons {
 
     public static final Pattern ESCAPED_STRING = Pattern.compile("\\\"(\\\\.|[^\\\"])*\\\"");
 
-    public static final String escape(String string) {
+    private static final void unicodeEscape(StringBuilder target, char c) {
+        target.append("\\u");
+        target.append(String.format(Locale.ENGLISH, "%04x", c));
+    }
+
+    public static final CharSequence escape(String string) {
         if (string == null) return "";
 
-        return "\"" + StringEscapeUtils.escapeJava(string) + "\"";
+        // Acquire the pair of builder and writer thereon
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+
+        stringBuilder.append('\"');
+
+        // Use manual escaping to pipe the escaped string into the string builder
+        final int l = string.length();
+        for (int i = 0; i < l; i++) {
+            final char c = string.charAt(i);
+            switch (c) {
+                // Catch special escape characters
+                case '\"':
+                    stringBuilder.append("\\\"");
+                    break;
+                case '\\':
+                    stringBuilder.append("\\\\");
+                    break;
+                case '\b':
+                    stringBuilder.append("\\b");
+                    break;
+                case '\n':
+                    stringBuilder.append("\\n");
+                    break;
+                case '\t':
+                    stringBuilder.append("\\t");
+                    break;
+                case '\f':
+                    stringBuilder.append("\\f");
+                    break;
+                case '\r':
+                    stringBuilder.append("\\r");
+                    break;
+                default:
+                    // Outside of the range, use unicode escaping
+                    if (c < 32 || c > 0x7f)
+                        unicodeEscape(stringBuilder, c);
+                    else
+                        stringBuilder.append(c);
+                    break;
+            }
+        }
+        stringBuilder.append('\"');
+
+        return stringBuilder;
     }
 
     public static final String unescape(String string) {

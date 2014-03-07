@@ -44,13 +44,6 @@ public class Activity extends AbstractItem {
     }
 
     @Override
-    public String toString() {
-        return "Activity{" +
-                "activity='" + activity + '\'' +
-                '}';
-    }
-
-    @Override
     public String createSerializedForm() {
         return ActivitySerialization.ACTIVITY_SERIALIZATION.serialize(this);
     }
