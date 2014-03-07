@@ -11,7 +11,7 @@ import org.apache.commons.lang.StringUtils;
 public class FeatureVector {
 
     private final int S2_BINS_NUM = 10;
-    private final int S2_FT_BINS_NUM = 10;
+    private final int S2_FT_BINS_NUM = 5;
 
     public String tag = "";
     public String id = "";
@@ -77,7 +77,7 @@ public class FeatureVector {
                 id, tag, xMean, yMean, zMean, xVar, yVar, zVar, s2Mean, s2Var, tilt, energy, kurtosis
         );
 
-        out += "," + StringUtils.join(S2Bins, ',');
+//        out += "," + StringUtils.join(S2Bins, ',');
         out += "," + StringUtils.join(S2FTBins, ',');
 
         return out;
@@ -90,7 +90,7 @@ public class FeatureVector {
 
     // Needed for classification
     public Object[] toWekaObjArr() {
-        int size = 11 + S2_BINS_NUM + S2_FT_BINS_NUM + 4;
+        int size = 11 + S2_FT_BINS_NUM + 2;
         Object r[] = new Object[size];
         r[0] = (double)xMean;
         // Currently we are using the SD because our first tree was using it
@@ -104,11 +104,11 @@ public class FeatureVector {
         r[8] = (double)tilt;
         r[9] = (double)energy;
         r[10] = (double)kurtosis;
-        for(int i = 0; i < S2_BINS_NUM+2; i++) {
-            r[i+10] = (double)S2Bins[i];
-        }
+//        for(int i = 0; i < S2_BINS_NUM+2; i++) {
+//            r[i+10] = (double)S2Bins[i];
+//        }
         for(int i = 0; i < S2_FT_BINS_NUM+2; i++) {
-            r[i+12+S2_BINS_NUM] = (double)S2FTBins[i];
+            r[i+S2_BINS_NUM] = (double)S2FTBins[i];
         }
 
         return r;
