@@ -108,7 +108,7 @@ public class FeatureVector {
 //            r[i+10] = (double)S2Bins[i];
 //        }
         for(int i = 0; i < S2_FT_BINS_NUM+2; i++) {
-            r[i+S2_BINS_NUM] = (double)S2FTBins[i];
+            r[i+11] = (double)S2FTBins[i];
         }
 
         return r;
