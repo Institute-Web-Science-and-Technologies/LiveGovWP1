@@ -10,9 +10,9 @@
 app.factory('Data', function () {
 	// return a at first empty object. will be populated.
 	return {
-		'gra': [],
-		'acc': [],
-		'lac': []
+		// 'gra': [],
+		// 'acc': [],
+		// 'lac': []
 	};
 });
 
@@ -43,23 +43,27 @@ app.factory('Map', function($resource) {
 
 app.factory('Sensor', ['$http', '$q', 'Data', function ($http, $q, Data) {
 
-// get closest starttime index of interpolated ts of sensor data
-	var startIdx = function(ts, data) {
-		for (var i=0; i<data.length; i++) {
-			if (data[i].starttime >= +ts) {
-				return i;
+	// Usage: si(oldData, data)
+	function merge(oldData, data) {
+		var len = oldData.length;
+		function index() {
+			for (var i = 0; i < len; i++) {
+				if (oldData[i].starttime >= data[0].starttime) return i;
 			}
 		}
-	};
-
-	// get closest endtime index of interpolated ts of sensor data
-	var endIdx = function(ts, data) {
-		for (var i=data.length-1; i>0; i--) {
-			if (data[i].endtime <= +ts) {
-				return i;
+		
+		function range() {
+			for (var i = len - 1; i >= 0; --i) {
+				if (oldData[i].starttime <= data[data.length - 1].starttime) {
+					var idx = index();
+					return [idx, i - idx + 1];
+				}
 			}
 		}
-	};
+		
+		Array.prototype.splice.apply(oldData, range().concat(data));
+		return oldData;
+	}
 
 	var sortData = function(data) {
 		// data.sort(function(a, b) { return d3.ascending(a.starttime, b.starttime); });
@@ -82,55 +86,41 @@ app.factory('Sensor', ['$http', '$q', 'Data', function ($http, $q, Data) {
 					windowSize = '';
 
 			if (value.sel) {
-				startTime = "?starttime=" + value.sel[0].getTime();
-				endTime   = "?endtime="   + value.sel[1].getTime();
+				startTime = value.sel[0].getTime();
+				endTime   = value.sel[1].getTime();
 			}
 
 			if (value.windowSize) {
-				windowSize = "?window=" + value.windowSize;
+				windowSize = value.windowSize;
 			}
 
 			var deferred = $q.defer();
 
-			console.log('asking for ' + sensor + ' data of trip ' + trip_id);
+			console.log('DB request for ' + sensor + ' data of trip ' + trip_id);
 			var queryStartTime = new Date();
 
-			$http({ method: "GET", url: '/trips/' + trip_id + '/' + sensor + '/window' + startTime + endTime + windowSize })
-				.success(function (data, status, headers, config) {
+			$http({
+				method: "GET",
+				url: '/trips/' + trip_id + '/' + sensor + '/window',
+				params: {
+					windowSize: windowSize,
+					startTime: startTime,
+					endTime: endTime
+				}}).success(function (data, status, headers, config) {
 					console.log("Success: received " + sensor + " data for trip " + trip_id + " after " + ((new Date() - queryStartTime) / 1000) + " ms");
 
 					data.forEach(function(d) {
-						d.ts         = new Date((+d.starttime + +d.endtime) / 2);
+						d.ts         = new Date((+d.starttime + (+d.endtime)) / 2);
 						d.starttime  = +d.starttime;
 						d.endtime    = +d.endtime;
 					});
 
-					if (oldData.length > 0) {
-
-						var start = startIdx(startTime, oldData);
-						var range = endIdx(endTime, oldData) - start;
-
-						// Array.prototype.splice.apply(oldData, [start, range].concat(data));
-						console.log("VVVoldData" + oldData.length);
-						console.log("WWWdata   " + data.length);
-						var args = [start, range].concat(data);
-						console.log(Array.prototype.splice.apply(oldData, args));
-						Array.prototype.splice.apply(oldData, args);
-						data = sortData(oldData);
-
-						// console.log(oldData.length);
-						// console.log(oldData);
-						// console.log(data.length);
-						// console.log(data);
-
+					if (oldData) {
+						data = merge(oldData, data);
 						console.log("Success: merged " + sensor + " data for trip " + trip_id + " after " + ((new Date() - queryStartTime) / 1000) + " ms");
 					}
 
-					// for (var i=1; i<a.length; i++) { a[i-1].starttime > a[i].starttime ? console.log(a[i-1].starttime + " " + a[i].starttime + " " + i) : ''; }
-
 					console.log("Success: prepared " + sensor + " data for trip " + trip_id + " after " + ((new Date() - queryStartTime) / 1000) + " ms");
-					console.log("YYY");
-					console.log(data); // FIXME undefined
 					deferred.resolve(data);
 					console.log("Success: serving " + sensor + " data for trip " + trip_id + " after " + ((new Date() - queryStartTime) / 1000) + " ms");
 				}).error(function (data, status, headers, config) {
