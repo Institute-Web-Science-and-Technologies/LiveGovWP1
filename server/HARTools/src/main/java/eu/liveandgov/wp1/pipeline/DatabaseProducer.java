@@ -28,6 +28,16 @@ public class DatabaseProducer extends Producer<Tuple<Long, Acceleration>> {
 
     public void start() {
         int current_offset = 0;
+        int numSamples = 0;
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT COUNT(*) AS c FROM sensor_accelerometer");
+            if (rs.next()) {
+                numSamples = rs.getInt("c");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         while (true) {
             try {
                 Statement stmt = connection.createStatement();
@@ -35,7 +45,7 @@ public class DatabaseProducer extends Producer<Tuple<Long, Acceleration>> {
                 boolean empty = true;
                 while (rs.next()) {
                     long ts = rs.getLong("ts");
-                    Long trip_id = rs.getLong("trip_id");
+                    Long trip_id = (long)rs.getInt("trip_id");
                     float x = rs.getFloat("x");
                     float y = rs.getFloat("y");
                     float z = rs.getFloat("z");
@@ -48,6 +58,7 @@ public class DatabaseProducer extends Producer<Tuple<Long, Acceleration>> {
                 if (empty) {
                     break;
                 }
+                System.out.println(current_offset + " rows done. (" + (Math.round(current_offset / (float) numSamples * 10000.0) / 100.0) + "%)");
                 current_offset += VALUES_PER_REQUEST;
             } catch (SQLException e) {
                 e.printStackTrace();

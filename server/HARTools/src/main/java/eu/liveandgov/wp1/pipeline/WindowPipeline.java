@@ -47,7 +47,7 @@ public class WindowPipeline extends Pipeline<Tuple<Long, Acceleration>, Tuple<Lo
         queue.push(time, longAccelerationTuple.right);
     }
 
-    private void clear() {
+    public void clear() {
         last_time = -1;
         next_window_end = -1;
         queue.clear();

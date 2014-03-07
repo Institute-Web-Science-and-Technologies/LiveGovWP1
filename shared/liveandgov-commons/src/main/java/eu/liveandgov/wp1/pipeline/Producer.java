@@ -21,7 +21,7 @@ public abstract class Producer<Item> {
      *
      * @param consumer The new consumer
      */
-    public final void setConsumer(Consumer<? super Item> consumer) {
+    public void setConsumer(Consumer<? super Item> consumer) {
         // Handle null-parameters
         if (consumer == null) consumer = Consumer.EMPTY_CONSUMER;
 

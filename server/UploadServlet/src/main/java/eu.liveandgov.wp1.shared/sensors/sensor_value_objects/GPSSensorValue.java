@@ -11,11 +11,17 @@ public class GPSSensorValue extends AbstractSensorValue implements SensorValueIn
         super(timestamp, id);
 
         String[] stringValues = value.split(" ");
-        if (stringValues.length != 3) throw new IllegalArgumentException("Cannot parse value " + value);
-
-        this.latitude  = Double.parseDouble(stringValues[0]);
-        this.longitude = Double.parseDouble(stringValues[1]);
-        this.altitude  = Double.parseDouble(stringValues[2]);
+        if (stringValues.length == 3) {
+            this.latitude  = Double.parseDouble(stringValues[0]);
+            this.longitude = Double.parseDouble(stringValues[1]);
+            this.altitude  = Double.parseDouble(stringValues[2]);
+        } else if (stringValues.length == 2){
+            this.latitude  = Double.parseDouble(stringValues[0]);
+            this.longitude = Double.parseDouble(stringValues[1]);
+            this.altitude  = new Double(0);
+        } else {
+            throw new IllegalArgumentException("Cannot parse value " + value);
+        }
     }
 
 	public String toSSF() {
