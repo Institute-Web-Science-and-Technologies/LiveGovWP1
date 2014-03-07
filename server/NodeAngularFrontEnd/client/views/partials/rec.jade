@@ -17,10 +17,10 @@ table#rec.table
 
 			tbody
 				tr(ng-repeat="trip in data.trips | orderBy:predicate:reverse", ng-class='{selected:rec.is(trip)}')
-					td(ng-click="rec.select(trip)") {{ trip.trip_id }}
-					td(ng-click="rec.select(trip)") {{ trip.user_id }}
-					td(ng-click="rec.select(trip)") {{ trip.start_ts | date:'yyyy-MM-dd HH:mm:ss Z' }}
-					td(ng-click="rec.select(trip)") {{ trip.start_ts | duration:trip.stop_ts | date:'HH:mm:ss .sss' }}
+					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.trip_id }}
+					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.user_id }}
+					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.start_ts | date:'yyyy-MM-dd HH:mm:ss Z' }}
+					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.start_ts | duration:trip.stop_ts | date:'HH:mm:ss .sss' }}
 					td
 					td.name(editable-text="trip.name", onaftersave="rec.updateName(trip, $data)", buttons="no", e-style="width: 200px; height: 37px") {{ trip.name }}
 					td.destroy(ng-click="rec.destroy(trip)") DEL

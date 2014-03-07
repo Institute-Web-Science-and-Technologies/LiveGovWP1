@@ -142,19 +142,17 @@ app.directive("chart", function(debounce) { // $timeout here
 
 			};
 
-			var clear_button;
-
-			function brushend(data) {
+			function brushend() {
 				scope.$apply(function() { scope.selection = brush.extent(); }); // put selection in scope
 
-				var get_button = d3.select(".clear-button");
-				if(get_button.empty() === true) {
-					clear_button = chart.append('text')
-						.attr("y", 460)
-						.attr("x", 825)
-						.attr("class", "clear-button")
-						.text("Clear Brush");
-				}
+				// var get_button = d3.select(".clear-button");
+				// if(get_button.empty() === true) {
+				// 	clear_button = chart.append('text')
+				// 		.attr("y", 460)
+				// 		.attr("x", 825)
+				// 		.attr("class", "clear-button")
+				// 		.text("Clear Brush");
+				// }
 
 				x.domain(brush.extent());
 				transition_data();
@@ -164,11 +162,11 @@ app.directive("chart", function(debounce) { // $timeout here
 				chart.select("brush").call(brush.clear());
 				chart.select("brush").call(brush);
 
-				clear_button.on('click', function(){
-					x.domain([0, 50]);
-					transition_data();
+				d3.select('.clear-button').on('click', function() {
+					x.domain(d3.extent([].concat.apply([], scope.data.map(function(d) {return [d.starttime, d.endtime]; }))));
+					transition_data(scope.data);
 					reset_axis();
-					clear_button.remove();
+					scope.selection = ''
 				});
 			}
 

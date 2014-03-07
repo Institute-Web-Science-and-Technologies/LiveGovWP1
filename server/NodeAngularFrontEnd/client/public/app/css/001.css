@@ -54,6 +54,12 @@ td.destroy:hover {
 li.disabled a.red {
   color: #cd5c5c !important;
 }
+td {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -ms-user-select: none;
+}
 /*   RAW DATA VIEW   */
 #raw {
   margin: 24px;

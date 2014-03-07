@@ -55,7 +55,7 @@ html(lang="en", ng-app="nodeInspectionFrontEnd")
 		script(src="/app/js/routes.js")
 		script(src="/app/js/services.js")
 		script(src="/app/js/filters.js")
-		script(src="/app/js/directives/brush.js")
+		//- script(src="/app/js/directives/brush.js")
 		script(src="/app/js/directives/chart.js")
 		script(src="/app/js/directives/map.js")
 
@@ -74,6 +74,8 @@ html(lang="en", ng-app="nodeInspectionFrontEnd")
 							a(href="/#/har") Activity Recognition
 
 					ul.nav.navbar-nav.pull-right
+						li(ng-class="{'hidden':!data.selection}")
+							a.clear-button Clear Brush
 						li(ng-class="{'hidden':!data.selection}")
 							a {{ data.selection[0] | date:'HH:mm' }} — {{ data.selection[1] | date:'HH:mm' }} ({{ data.selection[0] | duration:data.selection[1] | date:'mm' }} minutes)
 						li

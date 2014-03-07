@@ -41,9 +41,15 @@ app.controller('recCtrl', function ($scope, $rootScope, $routeParams, $location,
 		$rootScope.trip = trip;
 
 		// reset brush selection if trip changed
-		$scope.data.selection = '';
+		// $scope.data.selection = '';
 
-		$routeParams.trip_id = trip.trip_id; // CHANGEME rewrite and react on $locationParams (if possible)
+		// $routeParams.trip_id = trip.trip_id; // CHANGEME rewrite and react on $locationParams (if possible)
+	};
+
+	this.to = function(loc) {
+		if ($rootScope.trip) {
+			$location.path(loc);
+		}
 	};
 
 	// highlight the selected trip (see rec.jade)
