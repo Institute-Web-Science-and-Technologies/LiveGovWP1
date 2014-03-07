@@ -16,11 +16,7 @@ app.directive("chart", function(debounce) { // $timeout here
 		link: function(scope, element) {
 
 			var chart;
-
-			// NOTE
-			// 1. Selection via brush directive to $scope.selection.
-			// 2. Raw controller watches $scope.selection and loads more data to $scope.data.
-			// 3. Chart directive watches $scope.data and redraws graph.
+			var brush;
 
 			// TODO
 			// A. Focus brush must be retained during these actions.
@@ -28,20 +24,12 @@ app.directive("chart", function(debounce) { // $timeout here
 			// C. The brush domain must be calculated by min_ts and max_ts of all
 			// used sensors, as they are not necessarily the same for one trip.
 
-			// XXX
-			// X. We need a redraw function.
-			// Y. I need more sleep.
-			//
 			// http://mbostock.github.io/d3/tutorial/bar-2.html
 			// http://pothibo.com/2013/09/d3-js-how-to-handle-dynamic-json-data/
 			// http://www.d3noob.org/2013/02/update-d3js-data-dynamically-button.html
 
 			// https://stackoverflow.com/questions/15731409/how-to-call-a-brushs-on-function
 			// https://stackoverflow.com/questions/18204352/multiple-force-layout-graphs-with-d3-in-seperate-svg-divs
-
-			// .on("brushstart") -> repaint brush
-			// .on("brush") -> set the extent
-			// .on("brushend") ->
 
 			// VALUES FROM SCOPE (SEE CONTROLLER)
 			var data = scope.data;
@@ -79,22 +67,10 @@ app.directive("chart", function(debounce) { // $timeout here
 						.attr("width", width)
 						.attr("height", height);
 
-			var loadMoreData = function(selection) {
-
-				// NOTE Changing the 'selection' array on the shared data object in
-				// scope should trigger the watcher in the raw controller and load
-				// more sensor data from the sensor service. The watcher here should
-				// then recognize the changed data object in our shared scope and
-				// redraw the graph. Sounds easy. Apparently it is not.
-
-				// NOTE This shouldn't even happen here, but in the brush directive.
-				// You would do a selection on the brush, the brush directive would
-				// change the selection in scope, raw controller sees it, loads more
-				// data and chart directive sees that and redraws the graph. Either
-				// way, pretty hard.
-
-				scope.selection = brush.extent();
-			};
+			// NOTE Changing the 'selection' array on the shared data object in
+			// scope triggers the watcher in the raw controller and loads more
+			// sensor data from the sensor factory. The watcher here then recognizes
+			// the changed data object and redraws the graph.
 
 			var drawGraph = function(data) {
 				svg.selectAll("*").remove();
@@ -112,10 +88,14 @@ app.directive("chart", function(debounce) { // $timeout here
 						.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 						.attr("class", "chart");
 
-				var brush = d3.svg.brush().x(x).on("brush", brush);
-
 				// setup axis domain
-				x.domain(d3.extent([].concat.apply([], data.map(function(d) {return [d.starttime, d.endtime]; }))));
+
+				if (scope.selection) {
+					x.domain(scope.selection);
+				} else {
+					x.domain(d3.extent([].concat.apply([], data.map(function(d) {return [d.starttime, d.endtime]; }))));
+				}
+
 				y.domain(d3.extent([].concat.apply([], data.map(function(d) {return [d.minx, d.miny, d.minz, d.maxx, d.maxy, d.maxz]; }))));
 
 				// x-graph
@@ -147,39 +127,69 @@ app.directive("chart", function(debounce) { // $timeout here
 					.attr("class", "y axis")
 					.call(yAxis);
 
+				// BRUSH
+
+				brush = d3.svg.brush()
+					.x(x)
+					.on("brushend", brushend);
+
 				// brush
 				chart.append("g")
-					.attr("class", "x brush")
+					.attr("class", "brush")
 					.call(brush)
 					.selectAll("rect")
-					.attr("y", -6)
-					.attr("height", height + 7);
+					.attr("height", height);
+
 			};
 
-			function brush() {
-				x.domain(brush.empty() ? x.domain() : brush.extent());
-				scope.$apply(function() { scope.selection = brush.extent(); });
-				chart.select(".line0").attr("d", line(data.map(function(d) { return [d.ts, d.avgx]; })));
-				chart.select(".line1").attr("d", line(data.map(function(d) { return [d.ts, d.avgy]; })));
-				chart.select(".line2").attr("d", line(data.map(function(d) { return [d.ts, d.avgz]; })));
-				chart.select(".x.axis").call(xAxis);
+			var clear_button;
+
+			function brushend() {
+				scope.$apply(function() { scope.selection = brush.extent(); }); // put selection in scope
+
+				var get_button = d3.select(".clear-button");
+				if(get_button.empty() === true) {
+					clear_button = chart.append('text')
+						.attr("y", 460)
+						.attr("x", 825)
+						.attr("class", "clear-button")
+						.text("Clear Brush");
+				}
+
+				x.domain(brush.extent());
+				transition_data();
+				reset_axis();
+				brush.clear();
+
+				chart.select("brush").call(brush.clear());
+				chart.select("brush").call(brush);
+
+				clear_button.on('click', function(){
+					x.domain([0, 50]);
+					transition_data();
+					reset_axis();
+					clear_button.remove();
+				});
+			}
+
+			function transition_data() {
+				svg.selectAll(".line0").attr("d", line(data.map(function(d) { return [d.ts, d.avgx]; })));
+				svg.selectAll(".line1").attr("d", line(data.map(function(d) { return [d.ts, d.avgy]; })));
+				svg.selectAll(".line2").attr("d", line(data.map(function(d) { return [d.ts, d.avgz]; })));
+			}
+
+			function reset_axis() {
+				svg //.transition().duration(500)
+					.select(".x.axis")
+					.call(xAxis);
 			}
 
 			// WATCH FOR NEW DATA
-			scope.$watchCollection("data", debounce(function(data, oldData) {
-				if (!data || !data.$resolved) { return; }
-
+			scope.$watchCollection("data", function(data, oldData) {
+				if (!data) { console.log("Error: drawGraph() has no data!"); return; }
+				console.log("XXX " + data.length);
 				drawGraph(data);
-
-			}, 1000));
-
-			// WATCH FOR BRUSHES
-			scope.$watchCollection("selection", debounce(function(sel, oldsel) {
-				if (!sel) { return; }
-
-				svg.select(".brush").call(brush.extent(scope.selection));
-
-			}, 1000));
+			});
 
 		} // end link
 	}; // end return
