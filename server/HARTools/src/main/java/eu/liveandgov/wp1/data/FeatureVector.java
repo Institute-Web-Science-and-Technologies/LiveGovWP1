@@ -29,20 +29,16 @@ public class FeatureVector {
 
     // Tilting Angle
     public float tilt = 0F;
-    // public float energy = 0F;
-    public float kurtosis = 0F;
 
-    public Integer [] S2Bins = new Integer[0];
+    // public float energy = 0F;
+    // public float kurtosis = 0F;
+
+    // public Integer [] S2Bins = new Integer[0];
     public Integer [] S2FTBins = new Integer[0];
 
     public long startTime = 0;
 
-    // TODO: FFT Features
-
-    // TODO: Historgram Features
-
     public FeatureVector(){}
-
 
     public FeatureVector(Window m) {
 
@@ -59,7 +55,7 @@ public class FeatureVector {
 
         tilt = FeatureHelper.tilt(xMean, yMean, zMean);
         // energy = FeatureHelper.sum(S2); this is the same as s2Mean
-        kurtosis = FeatureHelper.kurtosis(S2);
+        // kurtosis = FeatureHelper.kurtosis(S2);
 
         // BinDistributor BD = new BinDistributor(0,20,10);
         // S2Bins = BD.getBinsForAxis(S2);
@@ -72,13 +68,14 @@ public class FeatureVector {
 
 
     public String toCSV() {
-        String out = String.format("%s,%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
-                id, tag, xMean, yMean, zMean, xVar, yVar, zVar, s2Mean, s2Var, tilt,
-                // energy,
-                kurtosis
+        String out = String.format("%s,%s,%f,%f,%f,%f,%f,%f,%f,%f,%f",
+                id, tag, xMean, yMean, zMean, xVar, yVar, zVar, s2Mean, s2Var, tilt
+                // ,energy
+                // ,kurtosis
         );
 
 //        out += "," + StringUtils.join(S2Bins, ',');
+
         out += "," + StringUtils.join(S2FTBins, ',');
 
         return out;
@@ -103,18 +100,19 @@ public class FeatureVector {
         R.addLast((double)s2Mean);
         R.addLast((double)s2Var);
         R.addLast((double)tilt);
+
 //        R.addLast((double)energy);
-        R.addLast((double)kurtosis);
+//        R.addLast((double)kurtosis);
 
 //        for (float f : S2Bins){
 //            R.addLast((double) f);
 //        }
+
         for (float f : S2FTBins){
             R.addLast((double) f);
         }
 
         return R.toArray();
-
     }
 
 }

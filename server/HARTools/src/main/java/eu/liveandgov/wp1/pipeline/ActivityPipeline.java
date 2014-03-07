@@ -22,7 +22,6 @@ public class ActivityPipeline extends Pipeline<Tuple<Long, FeatureVector>, Tripl
             case 0:
                 try {
                     double a = UKOB_NEW_Classifier.classify(longFeatureVectorTuple.right.toWekaObjArr());
-                    System.out.println(a);
                     String activity = UKOB_NEW_Classifier.getActivityName((int)a);
                     Triple<Long, Long, String> t = new Triple<Long, Long, String>(longFeatureVectorTuple.left,
                             longFeatureVectorTuple.right.startTime,
