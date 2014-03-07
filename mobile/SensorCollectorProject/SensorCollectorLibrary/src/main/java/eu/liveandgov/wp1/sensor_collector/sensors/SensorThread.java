@@ -30,12 +30,12 @@ import static junit.framework.Assert.assertNotNull;
 
 /**
  * Singleton class that holds the sensor thread.
- *
+ * <p/>
  * This thread is responsible for:
  * startRecording / unregister individual sensors
- *
+ * <p/>
  * The singleton property makes is easy to start/stop recording via static method calls.
- *
+ * <p/>
  * Created by hartmann on 9/22/13.
  */
 public class SensorThread implements Runnable {
@@ -49,7 +49,7 @@ public class SensorThread implements Runnable {
     /* Private Singleton */
     private static SensorThread instance;
 
-    private SensorThread(SensorQueue sensorQueue){
+    private SensorThread(SensorQueue sensorQueue) {
         assertNotNull(sensorQueue);
 
         this.sensorQueue = sensorQueue;
@@ -57,7 +57,7 @@ public class SensorThread implements Runnable {
     }
 
     /*  Static Methods */
-    public static void setup(SensorQueue sensorQueue){
+    public static void setup(SensorQueue sensorQueue) {
         instance = new SensorThread(sensorQueue);
     }
 
@@ -70,19 +70,14 @@ public class SensorThread implements Runnable {
         instance.thread.start();
     }
 
-    private static <T> Collection<T> rewrap(Collection<? extends  T> ts)
-    {
-        return new ArrayList<T>(ts);
-    }
-
-    public static void stopAllRecording(){
-        for (SensorHolder p : rewrap(instance.activeSensors)){
+    public static void stopAllRecording() {
+        for (SensorHolder p : instance.activeSensors) {
             p.stopRecording();
         }
     }
 
-    public static void startAllRecording(){
-        for (SensorHolder p : rewrap(instance.activeSensors)){
+    public static void startAllRecording() {
+        for (SensorHolder p : instance.activeSensors) {
             p.startRecording();
         }
     }
@@ -105,28 +100,30 @@ public class SensorThread implements Runnable {
     }
 
     private void setupSensorHolder() {
-        setupMotionSensor(Sensor.TYPE_ACCELEROMETER,        SensorCollectionOptions.REC_ACC);
-        setupMotionSensor(Sensor.TYPE_LINEAR_ACCELERATION,  SensorCollectionOptions.REC_LINEAR_ACC);
-        setupMotionSensor(Sensor.TYPE_GRAVITY,              SensorCollectionOptions.REC_GRAVITY_ACC);
-        setupMotionSensor(Sensor.TYPE_GYROSCOPE,            SensorCollectionOptions.REC_GYROSCOPE);
-        setupMotionSensor(Sensor.TYPE_MAGNETIC_FIELD,       SensorCollectionOptions.REC_MAGNETOMETER);
-        setupMotionSensor(Sensor.TYPE_ROTATION_VECTOR,      SensorCollectionOptions.REC_ROTATION);
+        setupMotionSensor(Sensor.TYPE_ACCELEROMETER, SensorCollectionOptions.REC_ACC);
+        setupMotionSensor(Sensor.TYPE_LINEAR_ACCELERATION, SensorCollectionOptions.REC_LINEAR_ACC);
+        setupMotionSensor(Sensor.TYPE_GRAVITY, SensorCollectionOptions.REC_GRAVITY_ACC);
+        setupMotionSensor(Sensor.TYPE_GYROSCOPE, SensorCollectionOptions.REC_GYROSCOPE);
+        setupMotionSensor(Sensor.TYPE_MAGNETIC_FIELD, SensorCollectionOptions.REC_MAGNETOMETER);
+        setupMotionSensor(Sensor.TYPE_ROTATION_VECTOR, SensorCollectionOptions.REC_ROTATION);
 
-        if (SensorCollectionOptions.REC_WIFI) setupWifiUpdate(SensorCollectionOptions.WIFI_SCAN_DELAY_MS);
-        if (SensorCollectionOptions.REC_BLT) setupBluetoothUpdate(SensorCollectionOptions.BLT_SCAN_DELAY_MS);
+        if (SensorCollectionOptions.REC_WIFI)
+            setupWifiUpdate(SensorCollectionOptions.WIFI_SCAN_DELAY_MS);
+        if (SensorCollectionOptions.REC_BLT)
+            setupBluetoothUpdate(SensorCollectionOptions.BLT_SCAN_DELAY_MS);
         if (SensorCollectionOptions.REC_GPS) setupLocationUpdate();
         if (SensorCollectionOptions.REC_G_ACT) setupActivityUpdate();
         if (SensorCollectionOptions.REC_GSM) setupTelephonyUpdate();
     }
 
 
-    private void setupMotionSensor(int sensorType, int delay){
+    private void setupMotionSensor(int sensorType, int delay) {
         if (delay == SensorCollectionOptions.SensorOptions.OFF) return;
 
         Sensor sensor = GlobalContext.getSensorManager().getDefaultSensor(sensorType);
 
         if (sensor == null) {
-            Log.i(LOG_TAG,"Sensor " + sensorType + " not available.");
+            Log.i(LOG_TAG, "Sensor " + sensorType + " not available.");
             // sensor not found
             return;
         }
@@ -140,7 +137,7 @@ public class SensorThread implements Runnable {
         // Check if Google Play Services are available
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(GlobalContext.context);
 
-        if(ConnectionResult.SUCCESS == resultCode) {
+        if (ConnectionResult.SUCCESS == resultCode) {
             Log.i(LOG_TAG, "Registering Listener for GPS using GooglePlayServices.");
             LocationHolderPlayServices holder = new LocationHolderPlayServices(sensorQueue, Looper.myLooper());
             activeSensors.add(holder);

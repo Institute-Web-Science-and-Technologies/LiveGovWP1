@@ -1,16 +1,15 @@
 package eu.liveandgov.wp1.pps.api.ooapi;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Locale;
-
-import eu.liveandgov.wp1.data.Tuple;
 import eu.liveandgov.wp1.pps.api.CalculationResult;
 import eu.liveandgov.wp1.pps.api.gi.GridIndexPS;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Locale;
 
 /**
  * Openstreetmaps Indexed ProximityType Service

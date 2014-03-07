@@ -2,15 +2,14 @@ package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.data.impl.Bluetooth;
-
-import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
-
 import eu.liveandgov.wp1.serialization.Wrapper;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
+
+import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
 
 /**
  * Created by Lukas Härtel on 08.02.14.

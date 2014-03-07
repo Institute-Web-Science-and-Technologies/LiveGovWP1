@@ -2,10 +2,11 @@ package eu.liveandgov.wp1.pipeline;
 
 
 import eu.liveandgov.wp1.data.CallbackSet;
+import eu.liveandgov.wp1.data.Diagnostics;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Created by Lukas Härtel on 11.02.14.
@@ -25,13 +26,13 @@ public abstract class MultiProducer<Item> {
     /**
      * Consumers that handles the items created by this multi-producer
      */
-    private final List<Consumer<? super Item>> consumers = new CopyOnWriteArrayList<Consumer<? super Item>>();
+    private final Set<Consumer<? super Item>> consumers = new CopyOnWriteArraySet<Consumer<? super Item>>();
 
     /**
      * Returns the current consumers
      */
-    public final List<Consumer<? super Item>> getConsumers() {
-        return Collections.unmodifiableList(consumers);
+    public final Set<Consumer<? super Item>> getConsumers() {
+        return Collections.unmodifiableSet(consumers);
     }
 
     /**
@@ -39,7 +40,7 @@ public abstract class MultiProducer<Item> {
      */
     public final void addConsumer(Consumer<? super Item> consumer) {
         if (consumers.isEmpty()) {
-            nonEmpty.invoke(consumer);
+            nonEmpty.call(consumer);
         }
 
         consumers.add(consumer);
@@ -52,7 +53,7 @@ public abstract class MultiProducer<Item> {
         consumers.remove(consumer);
 
         if (consumers.isEmpty()) {
-            empty.invoke(consumer);
+            empty.call(consumer);
         }
     }
 
@@ -63,5 +64,24 @@ public abstract class MultiProducer<Item> {
         for (Consumer<? super Item> consumer : consumers) {
             consumer.push(item);
         }
+    }
+
+    /**
+     * Hands the given item to the consumers, returns the diagnostics
+     */
+    protected final Diagnostics<Consumer<? super Item>> produceDiag(Item item) {
+        final Diagnostics<Consumer<? super Item>> result = new Diagnostics<Consumer<? super Item>>();
+
+        for (Consumer<? super Item> consumer : consumers) {
+            // Push and measure
+            final long st = System.nanoTime();
+            consumer.push(item);
+            final long et = System.nanoTime();
+
+            // Add to the diagnostics
+            result.put(st, et, consumer);
+        }
+
+        return result;
     }
 }

@@ -13,6 +13,7 @@ import java.io.OutputStreamWriter;
 import java.nio.channels.FileChannel;
 import java.util.zip.GZIPOutputStream;
 
+import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 
 /**
@@ -40,14 +41,14 @@ public class ZipFilePersistor implements Persistor {
     }
 
     @Override
-    public synchronized void push(String s) {
+    public synchronized void push(Item item) {
         if (fileWriter == null) {
             Log.v(LOG_TAG, "Blocked write event");
             return;
         }
 
         try {
-            fileWriter.write(s + "\n");
+            fileWriter.write(item.toSerializedForm() + "\n");
             sampleCount ++;
         } catch (IOException e) {
             Log.e(LOG_TAG,"Cannot write file.");

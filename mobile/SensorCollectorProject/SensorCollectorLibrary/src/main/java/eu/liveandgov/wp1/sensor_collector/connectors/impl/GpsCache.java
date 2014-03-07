@@ -2,51 +2,57 @@ package eu.liveandgov.wp1.sensor_collector.connectors.impl;
 
 import java.util.ArrayList;
 
-import eu.liveandgov.wp1.data.DataCommons;
+import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.impl.GPS;
-import eu.liveandgov.wp1.human_activity_recognition.helper.TimedQueue;
+import eu.liveandgov.wp1.helper.TimedQueue;
 import eu.liveandgov.wp1.pipeline.Consumer;
+import eu.liveandgov.wp1.pipeline.impl.ClassFilter;
+import eu.liveandgov.wp1.pipeline.impl.ItemSerializer;
 import eu.liveandgov.wp1.pipeline.impl.Multiplexer;
-import eu.liveandgov.wp1.pipeline.impl.StartsWith;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
-import eu.liveandgov.wp1.serialization.impl.GPSSerialization;
 
 /**
  * Created by hartmann on 11/14/13.
  */
-public class GpsCache implements Consumer<String> {
+public class GpsCache implements Consumer<Item> {
 
-    StartsWith filter;
+    ClassFilter<GPS> filter;
     GpsCacheImpl cacheImpl;
-    Multiplexer<String> mpx;
+    Multiplexer<GPS> mpx;
+    ItemSerializer itemSerializer;
     IntentEmitter gpsBroadcast;
 
     public GpsCache() {
-        cacheImpl = new GpsCacheImpl();
-        mpx = new Multiplexer<String>();
-        gpsBroadcast = new IntentEmitter(ExtendedIntentAPI.RETURN_GPS_SAMPLE, ExtendedIntentAPI.FIELD_GPS_ENTRY);
 
-        filter = new StartsWith();
-        filter.addPrefix(DataCommons.TYPE_GPS);
+        filter = new ClassFilter<GPS>(GPS.class);
+
+        mpx = new Multiplexer<GPS>();
         filter.setConsumer(mpx);
+
+        cacheImpl = new GpsCacheImpl();
         mpx.addConsumer(cacheImpl);
-        mpx.addConsumer(gpsBroadcast);
+
+        itemSerializer = new ItemSerializer();
+        mpx.addConsumer(itemSerializer);
+
+        gpsBroadcast = new IntentEmitter(ExtendedIntentAPI.RETURN_GPS_SAMPLE, ExtendedIntentAPI.FIELD_GPS_ENTRY);
+        itemSerializer.setConsumer(gpsBroadcast);
     }
 
     @Override
-    public void push(String message) {
-        filter.push(message);
+    public void push(Item item) {
+        filter.push(item);
     }
 
-    public ArrayList<String> getSamples() {
+    public ArrayList<GPS> getSamples() {
         return cacheImpl.getSamples();
     }
 
     public String getEntryString() {
         StringBuilder out = new StringBuilder(10000);
 
-        for (String line : getSamples()) {
-            out.append(line + "\n");
+        for (GPS line : getSamples()) {
+            out.append(line.toSerializedForm() + "\n");
         }
 
         return out.toString();
@@ -57,20 +63,18 @@ public class GpsCache implements Consumer<String> {
      * <p/>
      * The queued messages can be received by another tread using the getSamples() method.
      */
-    private static class GpsCacheImpl implements Consumer<String> {
+    private static class GpsCacheImpl implements Consumer<GPS> {
         private static int LENGTH_IN_MINUTES = 5;
         private static long LENGTH_IN_MS = LENGTH_IN_MINUTES * 60 * 1000;
 
-        TimedQueue<String> Q = new TimedQueue<String>(LENGTH_IN_MS);
+        TimedQueue<GPS> Q = new TimedQueue<GPS>(LENGTH_IN_MS);
 
         @Override
-        public synchronized void push(String message) {
-            final GPS gps = GPSSerialization.GPS_SERIALIZATION.deSerialize(message);
-
-            Q.push(gps.getTimestamp(), message);
+        public synchronized void push(GPS gps) {
+            Q.push(gps.getTimestamp(), gps);
         }
 
-        public synchronized ArrayList<String> getSamples() {
+        public synchronized ArrayList<GPS> getSamples() {
             return Q.toArrayList();
         }
     }

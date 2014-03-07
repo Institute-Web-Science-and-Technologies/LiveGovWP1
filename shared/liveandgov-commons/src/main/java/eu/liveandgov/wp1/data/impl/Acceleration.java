@@ -19,4 +19,5 @@ public class Acceleration extends Motion {
     public String getType() {
         return DataCommons.TYPE_ACCELEROMETER;
     }
+
 }

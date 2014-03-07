@@ -19,4 +19,5 @@ public class Gravity extends Motion {
     public String getType() {
         return DataCommons.TYPE_GRAVITY;
     }
+
 }

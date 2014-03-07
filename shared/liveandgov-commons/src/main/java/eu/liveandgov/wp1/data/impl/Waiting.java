@@ -4,6 +4,7 @@ import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.annotations.Unit;
+import eu.liveandgov.wp1.serialization.impl.WaitingSerialization;
 
 /**
  * Created by Lukas Härtel on 09.02.14.
@@ -64,5 +65,10 @@ public class Waiting extends AbstractItem {
                 ", duration=" + duration +
                 ", at='" + at + '\'' +
                 '}';
+    }
+
+    @Override
+    public String createSerializedForm() {
+        return WaitingSerialization.WAITING_SERIALIZATION.serialize(this);
     }
 }

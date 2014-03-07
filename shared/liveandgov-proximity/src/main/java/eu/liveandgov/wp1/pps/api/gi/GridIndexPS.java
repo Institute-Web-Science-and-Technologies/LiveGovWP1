@@ -1,20 +1,13 @@
 package eu.liveandgov.wp1.pps.api.gi;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InvalidClassException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import eu.liveandgov.wp1.pps.api.CalculationResult;
+import eu.liveandgov.wp1.pps.api.ProximityService;
+
+import java.io.*;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
-
-import eu.liveandgov.wp1.data.Tuple;
-import eu.liveandgov.wp1.pps.api.CalculationResult;
-import eu.liveandgov.wp1.pps.api.ProximityService;
 
 /**
  * Grid Index ProximityType Service, stores calculated values in a two-dimensional index. Acts as a

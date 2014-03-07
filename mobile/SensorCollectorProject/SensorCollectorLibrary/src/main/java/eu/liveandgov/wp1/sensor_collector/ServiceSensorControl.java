@@ -1,8 +1,10 @@
 package eu.liveandgov.wp1.sensor_collector;
 
+import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
@@ -13,8 +15,11 @@ import java.io.InputStream;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+import eu.liveandgov.wp1.data.Callback;
 import eu.liveandgov.wp1.data.Callbacks;
+import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.impl.Tag;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pps.api.AggregatingPS;
@@ -24,6 +29,7 @@ import eu.liveandgov.wp1.sensor_collector.activity_recognition.HARAdapter;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.PPSOptions;
+import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.configuration.WaitingOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.impl.ConnectorThread;
 import eu.liveandgov.wp1.sensor_collector.connectors.impl.GpsCache;
@@ -44,6 +50,7 @@ import eu.liveandgov.wp1.sensor_collector.waiting.WaitingAdapter;
 import eu.liveandgov.wp1.serialization.impl.TagSerialization;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.API_EXTENSIONS;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.MAIN_EXECUTOR_CORE_TIMEOUT;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
 
 public class ServiceSensorControl extends Service {
@@ -56,10 +63,8 @@ public class ServiceSensorControl extends Service {
     private static final String SHARED_PREFS_NAME = "SensorCollectorPrefs";
     private static final String PREF_ID = "userid";
 
-    private static final int EXECUTOR_THREADS = 3;
-
     // MAIN EXECUTION SERVICE
-    public final ScheduledExecutorService executorService;
+    public final ScheduledThreadPoolExecutor executorService;
 
     // STATUS FLAGS
     public boolean isRecording = false;
@@ -83,10 +88,10 @@ public class ServiceSensorControl extends Service {
     // SENSOR CONSUMERS
     public Persistor persistor;
     public PublicationPipeline publisher;
-    public Consumer<String> streamer;
-    public Consumer<String> harPipeline;
-    public Consumer<String> ppsPipeline;
-    public Consumer<String> waitingPipeline;
+    public Consumer<Item> streamer;
+    public Consumer<Item> harPipeline;
+    public Consumer<Item> ppsPipeline;
+    public Consumer<Item> waitingPipeline;
     public GpsCache gpsCache;
 
     // THREADS
@@ -100,7 +105,14 @@ public class ServiceSensorControl extends Service {
         // Register this object globally
         GlobalContext.set(this);
 
-        executorService = new ScheduledThreadPoolExecutor(3);
+        // Create the executor service, keep two threads in the pool
+        executorService = new ScheduledThreadPoolExecutor(SensorCollectionOptions.MAIN_EXECUTOR_CORE_POOL);
+
+        // If feature is available, enable core thread timeout with five seconds
+        if (Build.VERSION.SDK_INT >= 9) {
+            executorService.setKeepAliveTime(MAIN_EXECUTOR_CORE_TIMEOUT, TimeUnit.MILLISECONDS);
+            executorService.allowCoreThreadTimeOut(true);
+        }
     }
 
     /* ANDROID LIFECYCLE */
@@ -146,7 +158,9 @@ public class ServiceSensorControl extends Service {
         aggregatorPS.getProximityServices().add(osmIPPS);
 
         // Init sensor consumers
-        streamer = new ZMQStreamer();
+        final ZMQStreamer zmqStreamer = new ZMQStreamer();
+        streamer = zmqStreamer.itemNode;
+
         harPipeline = new HARAdapter();
         ppsPipeline = new PPSAdapter("platform", aggregatorPS);
         waitingPipeline = new WaitingAdapter("platform", WaitingOptions.WAITING_TRESHOLD);
@@ -169,18 +183,20 @@ public class ServiceSensorControl extends Service {
 
         // Start Recording once the first consumers connects to connector thread.
         // This should be done once the SensorThread is already running.
-        connectorThread.nonEmpty.register(Callbacks.convert(new Runnable() {
+        connectorThread.nonEmpty.register(new Callback<Consumer<? super Item>>() {
             @Override
-            public void run() {
+            public void call(Consumer<? super Item> consumer) {
+                Log.d(LOG_TAG, "Start recording sensors");
                 SensorThread.startAllRecording();
             }
-        }));
-        connectorThread.empty.register(Callbacks.convert(new Runnable() {
+        });
+        connectorThread.empty.register(new Callback<Consumer<? super Item>>() {
             @Override
-            public void run() {
+            public void call(Consumer<? super Item> consumer) {
+                Log.d(LOG_TAG, "Stop recording sensors");
                 SensorThread.stopAllRecording();
             }
-        }));
+        });
 
         // Setup monitoring thread
         monitorThread.registerMonitorable(connectorThread, "SampleCount");
@@ -324,12 +340,10 @@ public class ServiceSensorControl extends Service {
     private void doAnnotate(String tag) {
         Log.d("AN", "Adding annotation:" + tag);
 
-        final String message = TagSerialization.TAG_SERIALIZATION.serialize(new Tag(
+        sensorQueue.push(new Tag(
                 System.currentTimeMillis(),
                 GlobalContext.getUserId(),
                 tag));
-
-        sensorQueue.push(message);
     }
 
     private void doTransferSamples() {
@@ -340,18 +354,17 @@ public class ServiceSensorControl extends Service {
         connectorThread.removeConsumer(persistor);
         isRecording = false;
 
-
-        final String message = TagSerialization.TAG_SERIALIZATION.serialize(new Tag(
+        final Tag stopRecordingTag = new Tag(
                 System.currentTimeMillis(),
                 GlobalContext.getUserId(),
-                IntentAPI.VALUE_STOP_RECORDING));
+                IntentAPI.VALUE_STOP_RECORDING);
 
-        persistor.push(message);
+        persistor.push(stopRecordingTag);
 
         // API EXTENSIONS are triggered on together with recording
         if (API_EXTENSIONS) {
             // Add "STOP RECORDING TAG" to publisher
-            publisher.push(message);
+            publisher.push(stopRecordingTag);
             connectorThread.removeConsumer(publisher);
             connectorThread.removeConsumer(gpsCache);
         }
@@ -361,16 +374,16 @@ public class ServiceSensorControl extends Service {
         connectorThread.addConsumer(persistor);
         isRecording = true;
 
-        final String message = TagSerialization.TAG_SERIALIZATION.serialize(new Tag(
+        final Tag tagStartRecording = new Tag(
                 System.currentTimeMillis(),
                 GlobalContext.getUserId(),
-                IntentAPI.VALUE_START_RECORDING));
+                IntentAPI.VALUE_START_RECORDING);
 
-        persistor.push(message);
+        persistor.push(tagStartRecording);
 
         // API EXTENSIONS are triggered on together with recording
         if (API_EXTENSIONS) {
-            publisher.push(message);
+            publisher.push(tagStartRecording);
             connectorThread.addConsumer(publisher);
             connectorThread.addConsumer(gpsCache);
         }

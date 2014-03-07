@@ -7,7 +7,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 /**
  * Created by Lukas Härtel on 13.02.14.
  */
-public final class CallbackSet<Parameter> {
+public final class CallbackSet<Parameter> implements Callback<Parameter> {
     private final Set<Callback<? super Parameter>> callbacks = new CopyOnWriteArraySet<Callback<? super Parameter>>();
 
     public Set<Callback<? super Parameter>> getCallbacks() {
@@ -31,7 +31,8 @@ public final class CallbackSet<Parameter> {
     /**
      * Invokes all callbacks with the provided paramter
      */
-    public void invoke(Parameter parameter) {
+    @Override
+    public void call(Parameter parameter) {
         for (Callback<? super Parameter> callback : callbacks) {
             callback.call(parameter);
         }

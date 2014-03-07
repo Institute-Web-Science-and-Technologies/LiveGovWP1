@@ -1,13 +1,14 @@
 package eu.liveandgov.wp1.serialization.impl;
 
-import eu.liveandgov.wp1.data.*;
+import eu.liveandgov.wp1.data.DataCommons;
+import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.impl.*;
 import eu.liveandgov.wp1.serialization.Serialization;
 
-import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
-
 import java.util.Locale;
 import java.util.Scanner;
+
+import static eu.liveandgov.wp1.serialization.SerializationCommons.COMMA_SEPARATED;
 
 /**
  * Created by Lukas Härtel on 09.02.14.
@@ -41,12 +42,12 @@ public final class ItemSerialization implements Serialization<Item> {
             return GSMSerialization.GSM_SERIALIZATION.serialize((GSM) item);
         }
 
-        if (item instanceof GoogleActivity) {
-            return GoogleActivitySerialization.GOOGLE_ACTIVITY_SERIALIZATION.serialize((GoogleActivity) item);
-        }
-
         if (item instanceof Activity) {
             return ActivitySerialization.ACTIVITY_SERIALIZATION.serialize((Activity) item);
+        }
+
+        if (item instanceof GoogleActivity) {
+            return GoogleActivitySerialization.GOOGLE_ACTIVITY_SERIALIZATION.serialize((GoogleActivity) item);
         }
 
         if (item instanceof Tag) {
@@ -96,12 +97,12 @@ public final class ItemSerialization implements Serialization<Item> {
             return GSMSerialization.GSM_SERIALIZATION.deSerialize(string);
         }
 
-        if (DataCommons.TYPE_GOOGLE_ACTIVITY.equals(type)) {
-            return GoogleActivitySerialization.GOOGLE_ACTIVITY_SERIALIZATION.deSerialize(string);
-        }
-
         if (DataCommons.TYPE_ACTIVITY.equals(type)) {
             return ActivitySerialization.ACTIVITY_SERIALIZATION.deSerialize(string);
+        }
+
+        if (DataCommons.TYPE_GOOGLE_ACTIVITY.equals(type)) {
+            return GoogleActivitySerialization.GOOGLE_ACTIVITY_SERIALIZATION.deSerialize(string);
         }
 
         if (DataCommons.TYPE_TAG.equals(type)) {

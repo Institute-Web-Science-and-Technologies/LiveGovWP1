@@ -2,13 +2,13 @@ package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.data.impl.GPS;
-
-import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
-
 import eu.liveandgov.wp1.serialization.Wrapper;
 
 import java.util.Locale;
 import java.util.Scanner;
+
+import static eu.liveandgov.wp1.serialization.SerializationCommons.SPACE;
+import static eu.liveandgov.wp1.serialization.SerializationCommons.SPACE_SEPARATED;
 
 /**
  * Created by Lukas Härtel on 08.02.14.

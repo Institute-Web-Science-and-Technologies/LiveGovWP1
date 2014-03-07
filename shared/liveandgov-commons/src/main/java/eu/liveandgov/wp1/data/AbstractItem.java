@@ -8,14 +8,20 @@ public abstract class AbstractItem implements Item {
 
     private final String device;
 
+    private String cacheSerializedForm;
+
     protected AbstractItem(long timestamp, String device) {
         this.timestamp = timestamp;
         this.device = device;
+
+        cacheSerializedForm = null;
     }
 
     protected AbstractItem(Item header) {
         this.timestamp = header.getTimestamp();
         this.device = header.getDevice();
+
+        cacheSerializedForm = null;
     }
 
     @Override
@@ -27,4 +33,18 @@ public abstract class AbstractItem implements Item {
     public String getDevice() {
         return device;
     }
+
+    /**
+     * {@inheritDoc} <br/>
+     * Calculated only once by AbstractItem and reused due to final assignment of fields
+     */
+    @Override
+    public String toSerializedForm() {
+        if (cacheSerializedForm == null) {
+            cacheSerializedForm = createSerializedForm();
+        }
+        return cacheSerializedForm;
+    }
+
+    protected abstract String createSerializedForm();
 }

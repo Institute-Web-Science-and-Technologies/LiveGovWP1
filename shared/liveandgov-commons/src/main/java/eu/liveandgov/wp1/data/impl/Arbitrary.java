@@ -2,6 +2,7 @@ package eu.liveandgov.wp1.data.impl;
 
 import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.serialization.impl.BasicSerialization;
 
 /**
  * Created by Lukas Härtel on 11.02.14.
@@ -53,5 +54,10 @@ public class Arbitrary extends AbstractItem {
                 "type='" + type + '\'' +
                 ", value='" + value + '\'' +
                 '}';
+    }
+
+    @Override
+    public String createSerializedForm() {
+        return BasicSerialization.BASIC_SERIALIZATION.serialize(this);
     }
 }

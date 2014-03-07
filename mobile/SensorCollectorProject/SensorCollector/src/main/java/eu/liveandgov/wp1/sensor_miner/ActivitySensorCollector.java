@@ -5,9 +5,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -16,8 +19,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
+import eu.liveandgov.wp1.sensor_miner.configuration.SensorMinerOptions;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.FIELD_MESSAGE;
 import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.FIELD_STREAMING;
@@ -44,10 +52,10 @@ import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.RETURN_
 
 /**
  * Basic User Interface implementing the IntentAPI
- *
+ * <p/>
  * REMARK:
  * Register intent API handlers in registerListeners() method.
- *
+ * <p/>
  * Created by hartmann on 9/26/13.
  */
 public class ActivitySensorCollector extends Activity {
@@ -60,23 +68,36 @@ public class ActivitySensorCollector extends Activity {
     private boolean isStreaming = false;
     private boolean isHAR = false;
 
-    // UI Elements
-    private ToggleButton    recordingToggleButton;
-    private ProgressBar     recordingProgressBar;
-    private Button          transferButton;
-    private ProgressBar     transferProgressBar;
-    private EditText        annotationText;
-    private Button          sendButton;
-    private TextView        logTextView;
-    private TextView        activityView;
-    private EditText        idText;
-    private Button          idButton;
-    private ToggleButton    streamButton;
-    private ToggleButton    harButton;
+    // UI EXECUTION SERVICE
+    public final ScheduledThreadPoolExecutor executorService;
 
+    // UI Elements
+    private ToggleButton recordingToggleButton;
+    private ProgressBar recordingProgressBar;
+    private Button transferButton;
+    private ProgressBar transferProgressBar;
+    private EditText annotationText;
+    private Button sendButton;
+    private TextView logTextView;
+    private TextView activityView;
+    private EditText idText;
+    private Button idButton;
+    private ToggleButton streamButton;
+    private ToggleButton harButton;
+    private ScheduledFuture<?> statusTask;
+
+    public ActivitySensorCollector() {
+        // Create the executor service, keep two threads in the pool
+        executorService = new ScheduledThreadPoolExecutor(SensorMinerOptions.UI_EXECUTOR_CORE_POOL);
+
+        // If feature is available, enable core thread timeout with five seconds
+        if (Build.VERSION.SDK_INT >= 9) {
+            executorService.setKeepAliveTime(SensorMinerOptions.UI_EXECUTOR_CORE_TIMEOUT, TimeUnit.MILLISECONDS);
+            executorService.allowCoreThreadTimeOut(true);
+        }
+    }
 
     /* ANDROID LIFECYCLE MANAGEMENT */
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -135,20 +156,34 @@ public class ActivitySensorCollector extends Activity {
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         setupIntentListeners();
-
-        runStatusLoop();
     }
 
-    @Override
-    public void onPause(){
-        super.onPause();
-        unregisterListeners();
-    }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         registerListeners();
+
+        if (statusTask == null) {
+            statusTask = executorService.scheduleAtFixedRate(statusMethod, 0L, SensorMinerOptions.REQUEST_STATUS_INTERVAL, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        if (statusTask != null) {
+            statusTask.cancel(true);
+            statusTask = null;
+        }
+
+        unregisterListeners();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        executorService.shutdown();
+        super.onDestroy();
     }
 
     /* BUTTON HANDLER */
@@ -185,7 +220,7 @@ public class ActivitySensorCollector extends Activity {
         startService(intent);
     }
 
-    public void onStreamButtonClick(View view){
+    public void onStreamButtonClick(View view) {
         if (!isStreaming) {
             Intent intent = new Intent(this, ServiceSensorControl.class);
             intent.setAction(START_STREAMING);
@@ -197,7 +232,7 @@ public class ActivitySensorCollector extends Activity {
         }
     }
 
-    public void onHarButtonClick(View view){
+    public void onHarButtonClick(View view) {
         if (!isHAR) {
             Intent intent = new Intent(this, ServiceSensorControl.class);
             intent.setAction(ACTION_START_HAR);
@@ -209,13 +244,13 @@ public class ActivitySensorCollector extends Activity {
         }
     }
 
-    public void onGpsButtonClick(View view){
+    public void onGpsButtonClick(View view) {
         Intent intent = new Intent(this, ServiceSensorControl.class);
         intent.setAction(ExtendedIntentAPI.ACTION_GET_GPS);
         startService(intent);
     }
 
-    public void onDeleteButtonClick(View view){
+    public void onDeleteButtonClick(View view) {
         Intent intent = new Intent(this, ServiceSensorControl.class);
         intent.setAction(ExtendedIntentAPI.ACTION_DELETE_SAMPLES);
         startService(intent);
@@ -257,7 +292,7 @@ public class ActivitySensorCollector extends Activity {
     }
 
     // REMARK: called onPause
-    private void unregisterListeners(){
+    private void unregisterListeners() {
         unregisterReceiver(universalBroadcastReceiver);
     }
 
@@ -274,6 +309,14 @@ public class ActivitySensorCollector extends Activity {
         activityView.setText(activityName);
     }
 
+    private final Runnable statusMethod = new Runnable() {
+        @Override
+        public void run() {
+            requestStatus();
+        }
+    };
+
+
     private void requestStatus() {
         Intent requestIntent = new Intent(this, ServiceSensorControl.class);
         requestIntent.setAction(ACTION_GET_STATUS);
@@ -282,10 +325,10 @@ public class ActivitySensorCollector extends Activity {
 
     private void updateStatus(Intent intent) {
         // Update Flags
-        isRecording = intent.getBooleanExtra(FIELD_SAMPLING, false );
-        isTransferring = intent.getBooleanExtra(FIELD_TRANSFERRING, false );
-        isStreaming = intent.getBooleanExtra(FIELD_STREAMING, false );
-        isHAR = intent.getBooleanExtra(FIELD_HAR, false );
+        isRecording = intent.getBooleanExtra(FIELD_SAMPLING, false);
+        isTransferring = intent.getBooleanExtra(FIELD_TRANSFERRING, false);
+        isStreaming = intent.getBooleanExtra(FIELD_STREAMING, false);
+        isHAR = intent.getBooleanExtra(FIELD_HAR, false);
 
         // Update Buttons
         if (isRecording) {
@@ -320,32 +363,30 @@ public class ActivitySensorCollector extends Activity {
     private void logStatus(Intent intent) {
         Log.d("STATUS", "SAMPLING:       " + intent.getBooleanExtra(FIELD_SAMPLING, false));
         Log.d("STATUS", "TRANSFERRING:   " + intent.getBooleanExtra(FIELD_TRANSFERRING, false));
-        Log.d("STATUS", "SAMPLES_STORED: " + intent.getBooleanExtra(FIELD_SAMPLES_STORED,false));
-        Log.d("STATUS", "HAR:            " + intent.getBooleanExtra(FIELD_HAR,false));
+        Log.d("STATUS", "SAMPLES_STORED: " + intent.getBooleanExtra(FIELD_SAMPLES_STORED, false));
+        Log.d("STATUS", "HAR:            " + intent.getBooleanExtra(FIELD_HAR, false));
         Log.d("STATUS", "ID:             " + intent.getStringExtra(FIELD_ID));
     }
 
-    /**
-     * Spawn new thread that request status updates in regular intervals.
-     */
-    private void runStatusLoop() {
-        final int INTERVAL = 2000; // in ms;
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    requestStatus();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 
-                    // wait 1 sec.
-                    try {
-                        Thread.sleep(INTERVAL);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.activity_sensor_collector, menu);
+        return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(this, ActivitySettings.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

@@ -6,14 +6,15 @@ import android.telephony.ServiceState;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import eu.liveandgov.wp1.data.impl.GSM;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
+import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.serialization.impl.GSMSerialization;
 
 /**
  * Created by lukashaertel on 02.12.13.
@@ -71,6 +72,8 @@ public class TelephonyHolder implements SensorHolder {
 
     private final SensorQueue sensorQueue;
 
+    private ScheduledFuture<?> gsmTask;
+
     private ServiceState lastServiceState;
 
     private SignalStrength lastSignalStrength;
@@ -93,11 +96,15 @@ public class TelephonyHolder implements SensorHolder {
     @Override
     public void startRecording() {
         GlobalContext.getTelephonyManager().listen(phoneStateEndpoint, LISTEN_FLAGS);
+
+        gsmTask = GlobalContext.getExecutorService().scheduleAtFixedRate(gsmMethod, 0L, SensorCollectionOptions.GSM_SCAN_DELAY_MS, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void stopRecording() {
         GlobalContext.getTelephonyManager().listen(phoneStateEndpoint, PhoneStateListener.LISTEN_NONE);
+
+        gsmTask.cancel(true);
     }
 
 
@@ -178,7 +185,7 @@ public class TelephonyHolder implements SensorHolder {
             );
         }
 
-        final String message = GSMSerialization.GSM_SERIALIZATION.serialize(new GSM(
+        sensorQueue.push(new GSM(
                 System.currentTimeMillis(),
                 GlobalContext.getUserId(),
                 serviceState,
@@ -188,9 +195,16 @@ public class TelephonyHolder implements SensorHolder {
                 getSignalStrengthText(lastSignalStrength),
                 items
         ));
-
-        sensorQueue.push(message);
     }
+
+    private final Runnable gsmMethod = new Runnable() {
+        @Override
+        public void run() {
+            lastNeighboringCellInfos = GlobalContext.getTelephonyManager().getNeighboringCellInfo();
+
+            tryPushToSensorQueue();
+        }
+    };
 
     private final PhoneStateListener phoneStateEndpoint = new PhoneStateListener() {
         @Override
@@ -198,12 +212,6 @@ public class TelephonyHolder implements SensorHolder {
             super.onSignalStrengthsChanged(signalStrength);
 
             lastSignalStrength = signalStrength;
-
-            // TODO: Enumerate neighboring cells in a thread on a regular schedule instead of
-            // fetching it on other events
-            lastNeighboringCellInfos = GlobalContext.getTelephonyManager().getNeighboringCellInfo();
-
-            tryPushToSensorQueue();
         }
 
         @Override
@@ -211,9 +219,6 @@ public class TelephonyHolder implements SensorHolder {
             super.onServiceStateChanged(serviceState);
 
             lastServiceState = serviceState;
-            lastNeighboringCellInfos = GlobalContext.getTelephonyManager().getNeighboringCellInfo();
-
-            tryPushToSensorQueue();
         }
     };
 }

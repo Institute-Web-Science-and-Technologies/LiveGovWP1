@@ -1,7 +1,5 @@
 package eu.liveandgov.wp1.pps.api;
 
-import eu.liveandgov.wp1.data.Tuple;
-
 import java.util.LinkedList;
 import java.util.List;
 

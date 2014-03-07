@@ -2,6 +2,7 @@ package eu.liveandgov.wp1.data.impl;
 
 import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.serialization.impl.MotionSerialization;
 
 import java.util.Arrays;
 
@@ -44,5 +45,10 @@ public abstract class Motion extends AbstractItem {
         return "Motion{" +
                 "values=" + Arrays.toString(values) +
                 '}';
+    }
+
+    @Override
+    public String createSerializedForm() {
+        return MotionSerialization.MOTION_SERIALIZATION.serialize(this);
     }
 }

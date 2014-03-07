@@ -19,4 +19,5 @@ public class Gyroscope extends Motion {
     public String getType() {
         return DataCommons.TYPE_GYROSCOPE;
     }
+
 }

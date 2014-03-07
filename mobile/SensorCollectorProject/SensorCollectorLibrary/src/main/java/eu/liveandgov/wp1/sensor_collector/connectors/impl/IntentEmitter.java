@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.sensor_collector.connectors.impl;
 import android.content.Intent;
 import android.util.Log;
 
+import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 
@@ -24,10 +25,10 @@ public class IntentEmitter implements Consumer<String> {
     }
 
     @Override
-    public void push(String m) {
-        Log.d("EM", "Sending out intent action:" + action + " \n " + field + ":" + m );
+    public void push(String string) {
+       // Log.d("EM", "Sending out intent action:" + action + " \n " + field + ":" + m );
         Intent intent = new Intent(action);
-        intent.putExtra(field, m);
+        intent.putExtra(field, string);
         GlobalContext.context.sendBroadcast(intent);
     }
 }

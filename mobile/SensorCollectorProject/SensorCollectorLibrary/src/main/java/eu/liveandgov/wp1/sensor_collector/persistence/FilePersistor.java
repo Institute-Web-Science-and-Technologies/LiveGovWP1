@@ -7,9 +7,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import eu.liveandgov.wp1.data.Item;
+
 /**
  * Persistor class that writes samples into a log file.
- *
+ * <p/>
  * Created by hartmann on 9/20/13.
  */
 public class FilePersistor implements Persistor {
@@ -32,7 +34,7 @@ public class FilePersistor implements Persistor {
     }
 
     @Override
-    public synchronized void push(String s) {
+    public synchronized void push(Item item) {
         if (disabled) return;
         try {
             if (fileWriter == null) {
@@ -40,11 +42,11 @@ public class FilePersistor implements Persistor {
                 return;
             }
 
-            fileWriter.write(s + "\n");
-            sampleCount ++;
+            fileWriter.write(item.toSerializedForm() + "\n");
+            sampleCount++;
 
         } catch (IOException e) {
-            Log.e(LOG_TAG,"Cannot write file.");
+            Log.e(LOG_TAG, "Cannot write file.");
             e.printStackTrace();
         }
     }
@@ -56,12 +58,18 @@ public class FilePersistor implements Persistor {
         try {
             Log.i(LOG_TAG, "Exporting samples.");
 
-            if (stageFile.exists()) { Log.e(LOG_TAG, "Stage file exists."); return false; }
+            if (stageFile.exists()) {
+                Log.e(LOG_TAG, "Stage file exists.");
+                return false;
+            }
 
             closeLogFile();
 
             boolean suc = logFile.renameTo(stageFile);
-            if (!suc) { Log.e(LOG_TAG, "Staging Failed"); return false; }
+            if (!suc) {
+                Log.e(LOG_TAG, "Staging Failed");
+                return false;
+            }
 
             openLogFileOverwrite();
 
@@ -102,15 +110,15 @@ public class FilePersistor implements Persistor {
 
     @Override
     public String getStatus() {
-        return "File size: " + logFile.length()/1024 + "kb. Samples written: " + sampleCount;
+        return "File size: " + logFile.length() / 1024 + "kb. Samples written: " + sampleCount;
     }
 
     private void openLogFileAppend() throws IOException {
-        fileWriter = new BufferedWriter(new FileWriter(logFile,true));
+        fileWriter = new BufferedWriter(new FileWriter(logFile, true));
     }
 
     private void openLogFileOverwrite() throws IOException {
-        fileWriter = new BufferedWriter(new FileWriter(logFile,false));
+        fileWriter = new BufferedWriter(new FileWriter(logFile, false));
     }
 
     private void closeLogFile() throws IOException {
@@ -120,4 +128,8 @@ public class FilePersistor implements Persistor {
         fileWriter = null;
     }
 
+    @Override
+    public String toString() {
+        return "File persistor";
+    }
 }

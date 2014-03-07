@@ -3,10 +3,10 @@ package eu.liveandgov.wp1.serialization.impl;
 import eu.liveandgov.wp1.data.impl.Arbitrary;
 import eu.liveandgov.wp1.serialization.Serialization;
 
-import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
-
 import java.util.Locale;
 import java.util.Scanner;
+
+import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
 
 /**
  * Created by Lukas Härtel on 08.02.14.
@@ -21,7 +21,7 @@ public final class BasicSerialization implements Serialization<Arbitrary> {
     @Override
     public String serialize(Arbitrary item) {
         final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(item.type);
+        stringBuilder.append(item.getType());
         stringBuilder.append(COMMA);
         stringBuilder.append(item.getTimestamp());
         stringBuilder.append(COMMA);

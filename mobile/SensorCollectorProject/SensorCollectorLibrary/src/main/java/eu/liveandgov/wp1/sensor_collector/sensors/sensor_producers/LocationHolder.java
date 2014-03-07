@@ -20,15 +20,13 @@ public abstract class LocationHolder implements SensorHolder {
     }
 
     protected void receivedNewLocation(Location location) {
-        final String message = GPSSerialization.GPS_SERIALIZATION.serialize(new GPS(
+        sensorQueue.push(new GPS(
                 System.currentTimeMillis(),
                 GlobalContext.getUserId(),
                 location.getLatitude(),
                 location.getLongitude(),
                 location.hasAltitude() ? location.getAltitude() : null
         ));
-
-        sensorQueue.push(message);
     }
 
 }
