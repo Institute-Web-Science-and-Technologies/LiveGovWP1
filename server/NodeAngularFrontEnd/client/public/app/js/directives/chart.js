@@ -166,7 +166,7 @@ app.directive("chart", function(debounce) { // $timeout here
 					x.domain(d3.extent([].concat.apply([], scope.data.map(function(d) {return [d.starttime, d.endtime]; }))));
 					transition_data(scope.data);
 					reset_axis();
-					scope.selection = ''
+					scope.selection = ''; // FIXME clear button must clear all brushes
 				});
 			}
 
