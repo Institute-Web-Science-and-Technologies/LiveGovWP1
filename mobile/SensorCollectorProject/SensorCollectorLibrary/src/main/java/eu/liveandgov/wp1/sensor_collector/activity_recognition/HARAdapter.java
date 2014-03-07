@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.sensor_collector.activity_recognition;
 import com.google.common.base.Function;
 
 import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.data.Triple;
 import eu.liveandgov.wp1.data.Tuple;
 import eu.liveandgov.wp1.data.impl.Acceleration;
 import eu.liveandgov.wp1.data.impl.Activity;
@@ -74,9 +75,9 @@ public class HARAdapter implements Consumer<Item> {
         final SensorEmitter sensorEmitter = new SensorEmitter();
         final IntentEmitter intentEmitter = new IntentEmitter(IntentAPI.RETURN_ACTIVITY, IntentAPI.FIELD_ACTIVITY);
 
-        activityPipeline.setConsumer(new Consumer<Tuple<Long, String>>() {
+        activityPipeline.setConsumer(new Consumer<Triple<Long, Long, String>>() {
             @Override
-            public void push(Tuple<Long, String> longStringTuple) {
+            public void push(Triple<Long, Long, String> longStringTuple) {
                 final Activity activity = new Activity(System.currentTimeMillis(), GlobalContext.getUserId(), longStringTuple.right);
 
                 sensorEmitter.push(activity);
