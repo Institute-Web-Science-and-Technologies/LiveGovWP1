@@ -43,7 +43,7 @@ app.controller('recCtrl', function ($scope, $rootScope, $routeParams, $location,
 		// reset brush selection if trip changed
 		$scope.data.selection = '';
 
-		$routeParams.trip_id = trip.trip_id; // FIXME rewrite and react on $locationParams (if possible)
+		$routeParams.trip_id = trip.trip_id; // CHANGEME rewrite and react on $locationParams (if possible)
 	};
 
 	// highlight the selected trip (see rec.jade)
@@ -97,15 +97,12 @@ app.controller('rawCtrl', function ($scope, $rootScope, $location, Sensor, Data)
 			console.log("BRUSH DETECTED: " + sel);
 
 			var loadMoreData = function(trip_id, sensor, sel) {
-				console.log("Old data length: " + $scope.data[sensor].length);
 				Sensor.query({
 					trip_id: trip_id,
 					sensor: sensor,
 					sel: sel
 				}).then(function (data) {
 					console.log('Success: ' + sensor + ' data for trip ' + $rootScope.trip.trip_id + ' returned');
-					console.log(data);
-					console.log("New data length: " + data.length);
 					$scope.data[sensor] = data;
 				}, function (data) {
 					console.log("Failure: No " + sensor + " data for trip " + $rootScope.trip.trip_id + " returned");
