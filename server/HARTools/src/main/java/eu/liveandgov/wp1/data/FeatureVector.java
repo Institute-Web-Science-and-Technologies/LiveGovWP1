@@ -91,6 +91,10 @@ public class FeatureVector {
 
         Deque<Object> R = new ArrayDeque<Object>();
 
+        // for tag and ID
+        R.addLast((double) 0);
+        R.addLast((double) 0);
+
         R.addLast((double)xMean);
         R.addLast((double)yMean);
         R.addLast((double)zMean);

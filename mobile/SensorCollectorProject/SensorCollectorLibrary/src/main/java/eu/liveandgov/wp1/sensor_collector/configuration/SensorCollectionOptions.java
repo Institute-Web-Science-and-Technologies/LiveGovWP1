@@ -34,9 +34,9 @@ public class SensorCollectionOptions {
     public static final int REC_ACC = SensorOptions.ON_GAME;
     public static final int REC_LINEAR_ACC = SensorOptions.OFF;
     public static final int REC_GRAVITY_ACC = SensorOptions.OFF;
-    public static final int REC_GYROSCOPE = SensorOptions.ON_GAME;
-    public static final int REC_MAGNETOMETER = SensorOptions.ON_GAME;
-    public static final int REC_ROTATION = SensorOptions.ON_GAME;
+    public static final int REC_GYROSCOPE = SensorOptions.OFF;
+    public static final int REC_MAGNETOMETER = SensorOptions.OFF;
+    public static final int REC_ROTATION = SensorOptions.OFF;
 
     // Network samples
     public static final boolean REC_WIFI = true;   // wifi
@@ -58,9 +58,9 @@ public class SensorCollectionOptions {
 
     public static class SensorOptions {
         public static int OFF = -1;
-        public static int ON_FASTEST = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_FASTEST : 10; // 100Hz
-        public static int ON_GAME = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_GAME : 25; // 40Hz
-        public static int ON_UI = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_UI : 50; // 20Hz
-        public static int ON_NORMAL = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_NORMAL : 100; // 10Hz
+        public static int ON_FASTEST = SensorManager.SENSOR_DELAY_FASTEST; // 100Hz
+        public static int ON_GAME =SensorManager.SENSOR_DELAY_GAME; // 40Hz
+        public static int ON_UI = SensorManager.SENSOR_DELAY_UI; // 20Hz
+        public static int ON_NORMAL = SensorManager.SENSOR_DELAY_NORMAL; // 10Hz
     }
 }
