@@ -1,4 +1,8 @@
-server/node_modules
-client/public/css/style.css
-npm-debug.log
+.important
+.trash
 _trash
+bower_components
+client/public/css/style.css
+node_modules
+npm-debug.log
+server/node_modules
