@@ -144,7 +144,7 @@ app.directive("chart", function(debounce) { // $timeout here
 
 			var clear_button;
 
-			function brushend() {
+			function brushend(data) {
 				scope.$apply(function() { scope.selection = brush.extent(); }); // put selection in scope
 
 				var get_button = d3.select(".clear-button");
@@ -172,7 +172,8 @@ app.directive("chart", function(debounce) { // $timeout here
 				});
 			}
 
-			function transition_data() {
+			function transition_data(data) {
+				if (!data) { return; }
 				svg.selectAll(".line0").attr("d", line(data.map(function(d) { return [d.ts, d.avgx]; })));
 				svg.selectAll(".line1").attr("d", line(data.map(function(d) { return [d.ts, d.avgy]; })));
 				svg.selectAll(".line2").attr("d", line(data.map(function(d) { return [d.ts, d.avgz]; })));
@@ -187,7 +188,6 @@ app.directive("chart", function(debounce) { // $timeout here
 			// WATCH FOR NEW DATA
 			scope.$watchCollection("data", function(data, oldData) {
 				if (!data) { console.log("Error: drawGraph() has no data!"); return; }
-				console.log("XXX " + data.length);
 				drawGraph(data);
 			});
 
