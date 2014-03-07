@@ -7,7 +7,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.6.1'
+        classpath 'com.android.tools.build:gradle:0.9.+'
     }
 }
 
@@ -24,10 +24,22 @@ repositories {
 
 android {
     compileSdkVersion 17
-    buildToolsVersion '17.0.0'
+    buildToolsVersion '19.0.0'
     defaultConfig {
         minSdkVersion 8
         targetSdkVersion 17
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
     }
 }
 
@@ -37,9 +49,6 @@ configurations.all {
 }
 
 dependencies {
-//    compile 'eu.liveandgov:liveandgov-commons:1.0', changing: true
-//    compile 'eu.liveandgov:liveandgov-proximity:1.0', changing: true
-//    compile 'eu.liveandgov:liveandgov-har-tools:1.0', changing: true
     compile  group: 'eu.liveandgov', name: 'liveandgov-commons', version: '1.0', changing: true
     compile  group: 'eu.liveandgov', name: 'liveandgov-proximity', version: '1.0', changing: true
     compile  group: 'eu.liveandgov', name: 'liveandgov-har-tools', version: '1.0', changing: true
