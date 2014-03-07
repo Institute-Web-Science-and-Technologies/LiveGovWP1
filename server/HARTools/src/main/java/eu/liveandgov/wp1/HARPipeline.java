@@ -1,6 +1,5 @@
 package eu.liveandgov.wp1;
 
-import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.Triple;
 import eu.liveandgov.wp1.data.Tuple;
 import eu.liveandgov.wp1.data.impl.Acceleration;
@@ -43,8 +42,8 @@ public class HARPipeline extends Pipeline<Acceleration, Triple<Long, Long, Strin
     }
 
     @Override
-    public void setConsumer(Consumer<Long, Long, String> consumer) {
-        this.ap.setConsumer(consumer);
+    public void setConsumer(Consumer<? super Triple<Long, Long, String>> consumer) {
+        ap.setConsumer(consumer);
     }
 
     @Override
