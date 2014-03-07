@@ -122,7 +122,7 @@ module.exports = {
 			case "gra": sensor = "sensor_gravity"; break;
 		}
 
-		var text = "SELECT w, avg(x) AS avgX, min(x) AS minX, max(x) AS maxX, avg(y) AS avgY, min(y) AS minY, max(y) AS maxY, avg(z) AS avgZ, min(z) AS minZ, max(z) AS maxZ, min(ts) AS startTime, max(ts) AS endTime FROM (SELECT x, y, z, ts, NTILE($2) OVER (ORDER BY ts) AS w FROM " + sensor + " WHERE trip_id = $1{{LIMIT_TIME}}) A GROUP BY w ORDER BY w;"
+		var text = "SELECT avg(x) AS avgX, min(x) AS minX, max(x) AS maxX, avg(y) AS avgY, min(y) AS minY, max(y) AS maxY, avg(z) AS avgZ, min(z) AS minZ, max(z) AS maxZ, min(ts) AS startTime, max(ts) AS endTime FROM (SELECT x, y, z, ts, NTILE($2) OVER (ORDER BY ts) AS w FROM " + sensor + " WHERE trip_id = $1{{LIMIT_TIME}}) A GROUP BY w ORDER BY w;"
 
 		if (query.window === undefined) { query.window = 200 }; // 966 =~ 1024kb, 483 =~ 1024kb/3
 
