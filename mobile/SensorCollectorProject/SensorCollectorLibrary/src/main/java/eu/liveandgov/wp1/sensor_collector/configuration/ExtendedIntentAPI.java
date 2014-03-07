@@ -5,7 +5,7 @@ package eu.liveandgov.wp1.sensor_collector.configuration;
  *
  * Created by hartmann on 10/26/13.
  */
-public class ExtendedIntentAPI {
+public class    ExtendedIntentAPI {
     /**
      * Stream Sensor Samples to the remote server (using zmq).
      */
