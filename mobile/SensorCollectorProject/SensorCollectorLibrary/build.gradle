@@ -31,18 +31,10 @@ android {
     }
 }
 
-configurations.all {
-    // check for updates every build
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
 dependencies {
-//    compile 'eu.liveandgov:liveandgov-commons:1.0', changing: true
-//    compile 'eu.liveandgov:liveandgov-proximity:1.0', changing: true
-//    compile 'eu.liveandgov:liveandgov-har-tools:1.0', changing: true
-    compile  group: 'eu.liveandgov', name: 'liveandgov-commons', version: '1.0', changing: true
-    compile  group: 'eu.liveandgov', name: 'liveandgov-proximity', version: '1.0', changing: true
-    compile  group: 'eu.liveandgov', name: 'liveandgov-har-tools', version: '1.0', changing: true
+    compile 'eu.liveandgov:liveandgov-commons:1.0-SNAPSHOT'
+    compile 'eu.liveandgov:liveandgov-proximity:1.0-SNAPSHOT'
+    compile 'eu.liveandgov:liveandgov-har-tools:1.0-SNAPSHOT'
     compile 'com.android.support:appcompat-v7:18.0.0'
     compile 'com.google.android.gms:play-services:3.1.36'
     compile 'org.apache.httpcomponents:httpmime:4.3-beta2'
