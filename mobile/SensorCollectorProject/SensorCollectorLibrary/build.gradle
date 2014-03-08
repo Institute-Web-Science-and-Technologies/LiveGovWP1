@@ -3,11 +3,11 @@ buildscript {
         mavenCentral()
         mavenLocal()
         maven {
-            url 'https://raw.github.com/HeinrichHartmann/LiveGovWp1/mvn-repo/'
+            url 'https://raw.github.com/HeinrichHartmann/LiveGovWP1/mvn-repo'
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.6.1'
+        classpath 'com.android.tools.build:gradle:0.9.+'
     }
 }
 
@@ -18,17 +18,35 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven {
-        url 'https://raw.github.com/HeinrichHartmann/LiveGovWp1/mvn-repo/'
+        url 'https://raw.github.com/HeinrichHartmann/LiveGovWP1/mvn-repo'
     }
 }
 
 android {
     compileSdkVersion 17
-    buildToolsVersion "17.0.0"
+    buildToolsVersion '19.0.0'
     defaultConfig {
         minSdkVersion 8
         targetSdkVersion 17
     }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
+    }
+}
+
+configurations.all {
+    // check for updates every build
+    // resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 dependencies {
@@ -36,10 +54,11 @@ dependencies {
     compile 'com.google.android.gms:play-services:3.1.36'
     compile 'org.apache.httpcomponents:httpmime:4.3-beta2'
     compile 'org.apache.httpcomponents:httpcore:4.3-beta2'
+    compile 'org.apache.servicemix.bundles:org.apache.servicemix.bundles.commons-csv:1.0-r706899_5'
     compile 'junit:junit:3.8'
     compile 'org.apache.commons:commons-math3:3.2'
     compile 'org.apache.commons:commons-lang3:3.1'
     compile 'commons-lang:commons-lang:2.3'
-    compile 'eu.liveandgov.wp1:HumanActivityRecognitionLibrary:1.0'
+//    compile 'eu.liveandgov.wp1:HumanActivityRecognitionLibrary:1.0'
     compile 'org.jeromq:jeromq:0.2.0'
 }
