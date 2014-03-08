@@ -29,7 +29,7 @@ public class SmoothingProducer extends Producer<String> implements Consumer<Stri
         if ( isAllEqual() ) {
             consumer.push(message);
         } else {
-            consumer.push("unknown");
+            // consumer.push("unknown");
         }
     }
 

@@ -24,7 +24,6 @@ public class HarPipeline extends Pipeline<MotionSensorValue, String> {
     public static int INTERVAL = 500;
 
     public HarPipeline(){
-
         // Window
         windowProducer = new WindowProducer(WINDOW_LENGTH_IN_MS, WINDOW_LENGTH_IN_MS - INTERVAL);
 
@@ -36,7 +35,7 @@ public class HarPipeline extends Pipeline<MotionSensorValue, String> {
         classifyProducer = new ClassifyProducer();
         featureProducer.setConsumer(classifyProducer);
 
-        smoothingProducer = new SmoothingProducer(5);
+        smoothingProducer = new SmoothingProducer(4);
         classifyProducer.setConsumer(smoothingProducer);
     }
 
