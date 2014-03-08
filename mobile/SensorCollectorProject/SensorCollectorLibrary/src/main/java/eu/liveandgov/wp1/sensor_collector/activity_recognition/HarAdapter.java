@@ -32,7 +32,7 @@ public class HarAdapter implements Consumer<String> {
         filter.setConsumer(parseProd);
 
         // HAR
-        harPipeline = new HarPipeline(500);
+        harPipeline = new HarPipeline();
         parseProd.setConsumer(harPipeline);
 
         // Multiplex samples, in order for multiple consumers to connect

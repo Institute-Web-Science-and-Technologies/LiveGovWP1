@@ -14,7 +14,7 @@ public class FeatureProducer extends Producer<FeatureVector> implements Consumer
 
     public void push(TaggedWindow m) {
         FeatureVector vec = new FeatureVector(m);
-        Log.v("FEATURE", vec.toCSV());
+        Log.v("ACTIVITY", vec.toCSV());
         consumer.push(vec);
     }
 }

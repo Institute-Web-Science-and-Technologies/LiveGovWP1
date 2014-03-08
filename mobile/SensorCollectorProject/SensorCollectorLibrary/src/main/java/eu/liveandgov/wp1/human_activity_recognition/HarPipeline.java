@@ -5,6 +5,7 @@ import eu.liveandgov.wp1.human_activity_recognition.connectors.Pipeline;
 import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
 import eu.liveandgov.wp1.human_activity_recognition.producers.ClassifyProducer;
 import eu.liveandgov.wp1.human_activity_recognition.producers.FeatureProducer;
+import eu.liveandgov.wp1.human_activity_recognition.producers.SmoothingProducer;
 import eu.liveandgov.wp1.human_activity_recognition.producers.WindowProducer;
 
 /**
@@ -17,12 +18,15 @@ public class HarPipeline extends Pipeline<MotionSensorValue, String> {
     private final WindowProducer windowProducer;
     private final FeatureProducer featureProducer;
     private final ClassifyProducer classifyProducer;
+    private final SmoothingProducer smoothingProducer;
 
-    public static int WINDOW_LENGTH_IN_MS = 5 * 1000;
+    public static int WINDOW_LENGTH_IN_MS = 2 * 1000;
+    public static int INTERVAL = 500;
 
-    public HarPipeline(int interval){
+    public HarPipeline(){
+
         // Window
-        windowProducer = new WindowProducer(WINDOW_LENGTH_IN_MS, WINDOW_LENGTH_IN_MS - interval);
+        windowProducer = new WindowProducer(WINDOW_LENGTH_IN_MS, WINDOW_LENGTH_IN_MS - INTERVAL);
 
         // Feature
         featureProducer = new FeatureProducer();
@@ -31,6 +35,9 @@ public class HarPipeline extends Pipeline<MotionSensorValue, String> {
         // Classify
         classifyProducer = new ClassifyProducer();
         featureProducer.setConsumer(classifyProducer);
+
+        smoothingProducer = new SmoothingProducer(5);
+        classifyProducer.setConsumer(smoothingProducer);
     }
 
     public void push(MotionSensorValue message) {
@@ -39,6 +46,6 @@ public class HarPipeline extends Pipeline<MotionSensorValue, String> {
 
     @Override
     public void setConsumer(Consumer<String> c) {
-        classifyProducer.setConsumer(c);
+        smoothingProducer.setConsumer(c);
     }
 }

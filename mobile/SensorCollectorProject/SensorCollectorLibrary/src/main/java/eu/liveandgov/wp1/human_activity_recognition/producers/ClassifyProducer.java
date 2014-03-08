@@ -15,7 +15,7 @@ public class ClassifyProducer extends Producer<String> implements Consumer<Featu
     public void push(FeatureVector m) {
         try {
             String activity = ManualClassify.classify(m);
-            Log.v("ACT", activity);
+            Log.v("ACTIVITY", activity);
             consumer.push(activity);
         } catch (Exception e) {
             e.printStackTrace();

@@ -15,10 +15,10 @@ public class ManualClassify {
     private static final String RUNNING  = "running";
 
     public static String classify(FeatureVector v) {
-        if (v.s2Var < 1.5) {
+        if (v.s2Var < 0.9) {
             // sitting, standing, on_table
-            if (v.tilt < 0.7) {
-                if (v.s2Var < 0.05) {
+            if (v.ytilt < 0.7) {
+                if (v.s2Var < 0.05 && v.ztilt > 0.9) {
                     return ON_TABLE;
                 } else {
                     return SITTING;

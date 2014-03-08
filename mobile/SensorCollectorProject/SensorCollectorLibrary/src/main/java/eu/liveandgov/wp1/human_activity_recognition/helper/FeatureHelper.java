@@ -63,8 +63,8 @@ public class FeatureHelper {
     // 1 if Mobile is pointing to sky or ground
     // 0 if lying flat
     // arccos of return value gives tilting angle
-    public static float tilt(float x,float y,float z){
-        double abs = Math.sqrt(Math.pow(x,2) + Math.pow(y,2) + Math.pow(x,2));
+    public static float ytilt(float x, float y, float z){
+        double abs = Math.sqrt(Math.pow(x,2) + Math.pow(y,2) + Math.pow(z,2));
         return (float) (Math.abs(y) / abs);
     }
 
@@ -78,4 +78,8 @@ public class FeatureHelper {
         return fT.transform(dinput, TransformType.FORWARD);
     }
 
+    public static float ztilt(float x, float y, float z) {
+        double abs = Math.sqrt(Math.pow(x,2) + Math.pow(y,2) + Math.pow(z,2));
+        return (float) (Math.abs(z) / abs);
+    }
 }

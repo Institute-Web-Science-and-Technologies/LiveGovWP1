@@ -22,7 +22,9 @@ public class FeatureVector {
     public float s2Var;
 
     // Tilting Angle
-    public float tilt;
+    public float ytilt;
+    public float ztilt;
+
     public float energy;
     public float kurtosis;
 
@@ -44,7 +46,9 @@ public class FeatureVector {
         s2Mean = FeatureHelper.mean(S2);
         s2Var = FeatureHelper.var(S2);
 
-        tilt = FeatureHelper.tilt(xMean,yMean,zMean);
+        ytilt = FeatureHelper.ytilt(xMean, yMean, zMean);
+        ztilt = FeatureHelper.ztilt(xMean, yMean, zMean);
+
         energy = FeatureHelper.sum(S2);
         kurtosis = FeatureHelper.kurtosis(S2);
 
@@ -52,12 +56,12 @@ public class FeatureVector {
 
 
     public static String getCsvHead() {
-        return "xMean,yMean,zMean,xVar,yVar,zVar,s2Mean,s2Var,tilt,energy,kurtosis,tag";
+        return "xMean,yMean,zMean,xVar,yVar,zVar,s2Mean,s2Var,ytilt,ztilt,energy,kurtosis,tag";
     }
 
     public String toCSV() {
-        return String.format("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%s",
-            xMean, yMean, zMean, xVar, yVar, zVar, s2Mean, s2Var, tilt, energy, kurtosis, tag
+        return String.format("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%s",
+            xMean, yMean, zMean, xVar, yVar, zVar, s2Mean, s2Var, ytilt, ztilt, energy, kurtosis, tag
         );
     }
 
@@ -74,7 +78,7 @@ public class FeatureVector {
         r[5] = (double)zVar;
         r[6] = (double)s2Mean;
         r[7] = (double)s2Var;
-        r[8] = (double)tilt;
+        r[8] = (double) ytilt;
         r[9] = (double)energy;
         r[10] = (double)kurtosis;
 
