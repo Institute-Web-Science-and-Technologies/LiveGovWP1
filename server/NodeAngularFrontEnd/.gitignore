@@ -1,6 +1,6 @@
 .important
 .trash
-_trash
+trash
 bower_components
 client/public/css/style.css
 node_modules
