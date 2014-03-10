@@ -2,12 +2,11 @@
 <metadata>
   <groupId>eu.liveandgov</groupId>
   <artifactId>liveandgov-commons</artifactId>
-  <version>1.0</version>
+  <version>1.0-SNAPSHOT</version>
   <versioning>
     <versions>
-      <version>1.0</version>
       <version>1.0-SNAPSHOT</version>
     </versions>
-    <lastUpdated>20140310112618</lastUpdated>
+    <lastUpdated>20140310122906</lastUpdated>
   </versioning>
 </metadata>
