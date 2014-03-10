@@ -72,10 +72,46 @@ public class ZMQServer extends Pipeline<String, String> implements Stoppable {
         });
     }
 
+    /**
+     * Configures the socket
+     *
+     * @param socket The socket to configure
+     */
     protected void configure(ZMQ.Socket socket) {
         socket.setHWM(DEFAULT_HWM);
     }
 
+    /**
+     * Subscribes to a topic
+     *
+     * @param topic The string representing the topic
+     */
+    public void subscribe(final String topic) {
+        try {
+            connection.get();
+            socket.subscribe(topic.getBytes());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Un-subscribes from a topic
+     *
+     * @param topic The string representing the topic
+     */
+    public void unsubscribe(final String topic) {
+        try {
+            connection.get();
+            socket.unsubscribe(topic.getBytes());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void push(final String s) {

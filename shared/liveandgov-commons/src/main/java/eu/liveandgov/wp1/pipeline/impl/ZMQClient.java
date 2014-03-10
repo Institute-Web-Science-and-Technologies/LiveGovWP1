@@ -144,6 +144,39 @@ public abstract class ZMQClient extends Pipeline<String, String> implements Stop
      */
     protected abstract String getAddress();
 
+    /**
+     * Subscribes to a topic
+     *
+     * @param topic The string representing the topic
+     */
+    public void subscribe(final String topic) {
+        try {
+            connection.get();
+            socket.subscribe(topic.getBytes());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Un-subscribes from a topic
+     *
+     * @param topic The string representing the topic
+     */
+    public void unsubscribe(final String topic) {
+        try {
+            connection.get();
+            socket.unsubscribe(topic.getBytes());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     @Override
     public void push(final String s) {
         try {

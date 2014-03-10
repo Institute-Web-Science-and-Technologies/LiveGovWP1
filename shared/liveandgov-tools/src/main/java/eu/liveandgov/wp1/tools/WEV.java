@@ -29,34 +29,38 @@ import java.util.concurrent.Callable;
 /**
  * Created by Lukas Härtel on 11.02.14.
  */
-public class WaitingEvaluator {
+public class WEV {
     public static void main(String[] rawArgs) {
         // Analyze arguments
-        final Multimap<String, String> args = ToolsCommon.commands(ToolsCommon.sequentialShorthand(
-                "h", "hres",
-                "v", "vres",
-                "c", "centroid",
-                "s", "storedegree",
-                "d", "distance",
-                "l", "local",
-                "r", "remote",
-                "k", "key",
-                "t", "time",
-                "?", "help"
-        ), rawArgs);
+        final Multimap<String, String> args = ToolsCommon.commands(
+                ToolsCommon.oneOf(
+                        "help"
+                ),
+                ToolsCommon.sequentialShorthand(
+                        "h", "hres",
+                        "v", "vres",
+                        "c", "centroid",
+                        "s", "storedegree",
+                        "d", "distance",
+                        "l", "local",
+                        "r", "remote",
+                        "k", "key",
+                        "t", "time",
+                        "?", "help"
+                ), rawArgs);
 
         if (!Iterables.isEmpty(args.get("help"))) {
             System.out.println("usage: [options]");
             System.out.println("  options:");
-            System.out.println("    -h, --hres Horizontal resolution of the grid in degrees");
-            System.out.println("    -v, --vres Vertical resolution of the grid in degrees");
-            System.out.println("    -c, --centroid True if check is by centroid instead of first entry point");
-            System.out.println("    -s, --storedegree Amount of results to be cached");
-            System.out.println("    -d, --distance Maximum distance to identify an object as proxy");
-            System.out.println("    -l, --local Adds a .csv file to the local sources");
-            System.out.println("    -r, --remote Adds a overpass url to the remote sources");
-            System.out.println("    -k, --key The key of proximity objects to filter");
-            System.out.println("    -t, --time The time considered waiting time");
+            System.out.println("    -h, --hres DOUBLE Horizontal resolution of the grid in degrees");
+            System.out.println("    -v, --vres DOUBLE Vertical resolution of the grid in degrees");
+            System.out.println("    -c, --centroid BOOLEAN True if check is by centroid instead of first entry point");
+            System.out.println("    -s, --storedegree INTEGER Amount of results to be cached");
+            System.out.println("    -d, --distance DOUBLE Maximum distance to identify an object as proxy");
+            System.out.println("    -l, --local STRING Adds a .csv file to the local sources");
+            System.out.println("    -r, --remote STRING Adds a overpass url to the remote sources");
+            System.out.println("    -k, --key STRING The key of proximity objects to filter");
+            System.out.println("    -t, --time LONG The time considered waiting time");
             System.out.println("    -?, --help Displays the help");
         }
 
