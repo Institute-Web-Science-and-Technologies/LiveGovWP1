@@ -62,14 +62,14 @@ public class ActivitySensorCollector extends Activity {
     private static final String LOG_TAG = "ASC";
     private BroadcastReceiver universalBroadcastReceiver;
 
-    // FLAGS
+    // MIRRORED FLAGS
     private boolean isRecording = false;
     private boolean isTransferring = false;
     private boolean isStreaming = false;
     private boolean isHAR = false;
 
-    // UI EXECUTION SERVICE
-    public final ScheduledThreadPoolExecutor executorService;
+    // FLAGS
+    public boolean isForeground = false;
 
     // UI Elements
     private ToggleButton recordingToggleButton;
@@ -163,6 +163,7 @@ public class ActivitySensorCollector extends Activity {
     public void onResume() {
         super.onResume();
         registerListeners();
+        isForeground = true;
 
         if (statusTask == null) {
             statusTask = executorService.scheduleAtFixedRate(statusMethod, 0L, SensorMinerOptions.REQUEST_STATUS_INTERVAL, TimeUnit.MILLISECONDS);
@@ -176,14 +177,8 @@ public class ActivitySensorCollector extends Activity {
             statusTask = null;
         }
 
+        isForeground = false;
         unregisterListeners();
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        executorService.shutdown();
-        super.onDestroy();
     }
 
     /* BUTTON HANDLER */
@@ -207,10 +202,13 @@ public class ActivitySensorCollector extends Activity {
     }
 
     public void onSendButtonClick(View view) {
+        String annotation = annotationText.getText().toString();
+
         Intent intent = new Intent(this, ServiceSensorControl.class);
         intent.setAction(ACTION_ANNOTATE);
-        intent.putExtra(FIELD_ANNOTATION, annotationText.getText().toString());
+        intent.putExtra(FIELD_ANNOTATION, annotation);
         startService(intent);
+        Toast.makeText(this, "Adding annotation: " + annotation, 3).show();
     }
 
     public void onIdButtonClick(View view) {
@@ -368,14 +366,6 @@ public class ActivitySensorCollector extends Activity {
         Log.d("STATUS", "ID:             " + intent.getStringExtra(FIELD_ID));
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_sensor_collector, menu);
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

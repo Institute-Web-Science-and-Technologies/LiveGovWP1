@@ -101,20 +101,6 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
 
         Assert.assertTrue(service.isRecording);
 
-        // Start streaming
-        final Intent iaStartStreaming = new Intent(getContext(), ServiceSensorControl.class);
-        iaStartStreaming.setAction(START_STREAMING);
-        startService(iaStartStreaming);
-
-        Assert.assertTrue(service.isStreaming);
-
-        // Stop streaming
-        final Intent iaStopStreaming = new Intent(getContext(), ServiceSensorControl.class);
-        iaStopStreaming.setAction(STOP_STREAMING);
-        startService(iaStopStreaming);
-
-        Assert.assertFalse(service.isStreaming);
-
         // Send recording disable intent
         final Intent iaRecordingDisable = new Intent(getContext(), ServiceSensorControl.class);
         iaRecordingDisable.setAction(RECORDING_DISABLE);
@@ -193,13 +179,6 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
         final ServiceSensorControl service = initialize();
         service.connectorThread.addConsumer(helper.itemNode);
 
-        // Send recording enable intent
-        final Intent iaRecordingEnable = new Intent(getContext(), ServiceSensorControl.class);
-        iaRecordingEnable.setAction(ACTION_RECORDING_ENABLE);
-        startService(iaRecordingEnable);
-
-        Assert.assertTrue(service.isRecording);
-
         // Send annotaion intent
         final Intent iaAnnotate = new Intent(getContext(), ServiceSensorControl.class);
         iaAnnotate.setAction(ACTION_ANNOTATE);
@@ -216,11 +195,6 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
     public void testSetId() throws TimeoutException {
         final ServiceSensorControl service = initialize();
 
-        // Send recording enable intent
-        final Intent iaRecordingEnable = new Intent(getContext(), ServiceSensorControl.class);
-        iaRecordingEnable.setAction(ACTION_RECORDING_ENABLE);
-        startService(iaRecordingEnable);
-
         // Set Id change request
         final Intent iaSetId = new Intent(getContext(), ServiceSensorControl.class);
         iaSetId.setAction(ACTION_SET_ID);
@@ -236,11 +210,6 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
 
         // Assert correct user identity
         Assert.assertEquals(resultIntent.getStringExtra(FIELD_USER_ID), "ANONYMOUSE");
-
-        // Send recording disable intent
-        final Intent iaRecordingDisable = new Intent(getContext(), ServiceSensorControl.class);
-        iaRecordingDisable.setAction(RECORDING_DISABLE);
-        startService(iaRecordingDisable);
     }
 
     public void testHAR() {
@@ -250,11 +219,6 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
         // Initialize service, set the pipeline tester as the HAR
         final ServiceSensorControl service = initialize();
         service.harPipeline = helper.itemNode;
-
-        // Send recording enable intent
-        final Intent iaRecordingEnable = new Intent(getContext(), ServiceSensorControl.class);
-        iaRecordingEnable.setAction(ACTION_RECORDING_ENABLE);
-        startService(iaRecordingEnable);
 
         // Start HAR
         final Intent iaStartHAR = new Intent(getContext(), ServiceSensorControl.class);
@@ -278,10 +242,6 @@ public class ServiceTest extends ServiceTestCase<ServiceSensorControl> {
         service.sensorQueue.push(new Tag(0, "NO DEVICE", "NOT EMPTY"));
         helper.assertStatusIn(1L, TimeUnit.SECONDS);
 
-        // Send recording disable intent
-        final Intent iaRecordingDisable = new Intent(getContext(), ServiceSensorControl.class);
-        iaRecordingDisable.setAction(RECORDING_DISABLE);
-        startService(iaRecordingDisable);
     }
 
 

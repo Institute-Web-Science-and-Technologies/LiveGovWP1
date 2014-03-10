@@ -18,11 +18,7 @@ import eu.liveandgov.wp1.util.LocalBuilder;
 public class LinkedSensorQueue implements SensorQueue {
     public static final int CAPACITY = 1024;
 
-    private final BlockingQueue<Item> queue;
-
-    public LinkedSensorQueue() {
-        queue = new LinkedBlockingQueue<Item>();
-    }
+    private final BlockingQueue<Item>queue = new LinkedBlockingQueue<Item>();
 
     /**
      * Push message to the queue.

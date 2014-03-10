@@ -1,57 +1,52 @@
 package eu.liveandgov.wp1.sensor_collector.activity_recognition;
 
-import eu.liveandgov.wp1.HARPipeline;
-import eu.liveandgov.wp1.data.Item;
-import eu.liveandgov.wp1.data.Triple;
-import eu.liveandgov.wp1.data.impl.Acceleration;
-import eu.liveandgov.wp1.data.impl.Activity;
-import eu.liveandgov.wp1.pipeline.Consumer;
-import eu.liveandgov.wp1.pipeline.impl.ClassFilter;
-import eu.liveandgov.wp1.sensor_collector.GlobalContext;
+import eu.liveandgov.wp1.human_activity_recognition.HarPipeline;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
+import eu.liveandgov.wp1.human_activity_recognition.connectors.Pipeline;
+import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
-import eu.liveandgov.wp1.sensor_collector.connectors.impl.IntentEmitter;
-import eu.liveandgov.wp1.sensor_collector.connectors.impl.SensorEmitter;
+import eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat;
+import eu.liveandgov.wp1.sensor_collector.connectors.implementations.IntentEmitter;
+import eu.liveandgov.wp1.sensor_collector.connectors.implementations.Multiplexer;
+import eu.liveandgov.wp1.sensor_collector.connectors.implementations.PrefixFilter;
+import eu.liveandgov.wp1.sensor_collector.connectors.implementations.SampleEmitter;
 
 /**
  * Pipeline class that consumes accelerometer values and produces an activity stream.
+ *
  * Created by hartmann on 10/20/13.
  */
-public class HARAdapter implements Consumer<Item> {
-    private static final String LOG_TAG = "HARA";
-    private final ClassFilter<Acceleration> filter;
-    private final HARPipeline harPipeline;
+public class HARAdapter implements Consumer<String> {
 
+    private final PrefixFilter filter;
+    private final MotionSensorValueProducer parseProd;
+    private final Pipeline<MotionSensorValue, String> harPipeline;
 
-    public HARAdapter() {
+    public HARAdapter(){
+        // ACC filter
+        filter = new PrefixFilter();
+        filter.addFilter("ACC");
 
-        // Type Filter
-        filter = new ClassFilter<Acceleration>(Acceleration.class);
+        // Parser
+        parseProd = new MotionSensorValueProducer();
+        filter.setConsumer(parseProd);
 
-        harPipeline = new HARPipeline();
-        filter.setConsumer(harPipeline);
+        // HAR
+        harPipeline = new HarPipeline(1000);
+        parseProd.setConsumer(harPipeline);
 
-        // Emission
-        final SensorEmitter sensorEmitter = new SensorEmitter();
-        final IntentEmitter intentEmitter = new IntentEmitter(IntentAPI.RETURN_ACTIVITY, IntentAPI.FIELD_ACTIVITY);
+        // Multiplex samples, in order for multiple consumers to connect
+        Multiplexer<String> multiplexer = new Multiplexer<String>();
+        harPipeline.setConsumer(multiplexer);
 
-        harPipeline.setConsumer(new Consumer<Triple<Long, Long, String>>() {
-            @Override
-            public void push(Triple<Long, Long, String> longStringTuple) {
-                final Activity activity = new Activity(System.currentTimeMillis(), GlobalContext.getUserId(), longStringTuple.right);
-
-                sensorEmitter.push(activity);
-                intentEmitter.push(activity.activity);
-            }
-        });
+        // Publish samples as Intent and as Sensor Sample.
+        multiplexer.addConsumer(new IntentEmitter(IntentAPI.RETURN_ACTIVITY, IntentAPI.FIELD_ACTIVITY));
+        multiplexer.addConsumer(new SampleEmitter(SsfFileFormat.SSF_ACTIVITY) );
     }
 
     @Override
-    public void push(Item item) {
-        filter.push(item);
+    public void push(String m) {
+        filter.push(m);
     }
 
-    @Override
-    public String toString() {
-        return "HAR Adapter";
-    }
 }

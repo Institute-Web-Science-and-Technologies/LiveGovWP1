@@ -16,4 +16,14 @@ public class TaggedWindow {
     public float[] x;
     public float[] y;
     public float[] z;
+    public long time[];
+
+    public String toString() {
+        String result = "";
+        for (int i = 0; i < x.length; i++) {
+            result += x[i] + "," + y[i] + "," + z[i] + ",";
+        }
+        result += "\"" + tag + "\"";
+        return tag;
+    }
 }

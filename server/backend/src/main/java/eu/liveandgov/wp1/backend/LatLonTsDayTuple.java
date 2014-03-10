@@ -6,8 +6,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+
+import org.json.JSONObject;
 
 public class LatLonTsDayTuple {
 	
@@ -18,7 +21,8 @@ public class LatLonTsDayTuple {
 	// Lat,Lon,Timestamp,DayOfWeek
 	// 60.1652805,24.95296666,2013-09-23 20:06:36,Mon
 	private Pattern pattern = Pattern.compile("(.+),(.+),(.+),(.+)");
-	private SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss"); 
+	private SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss", Locale.US); 
+	
 	public LatLonTsDayTuple() {
 		m_lat = 0;
 		m_lng = 0;
@@ -28,10 +32,11 @@ public class LatLonTsDayTuple {
 
 	public LatLonTsDayTuple(String csvLine) throws ParseException {
 		Matcher matcher = pattern.matcher(csvLine);
+		ft.setTimeZone(TimeZone.getTimeZone( "Europe/Helsinki" ));
 
 		if (matcher.find()) {
 			m_lat = Float.parseFloat(matcher.group(1));
-			m_lng = Float.parseFloat(matcher.group(2));
+			m_lng = Float.parseFloat(matcher.group(2));			
 			m_dateTime = ft.parse(matcher.group(3));
 			m_day = matcher.group(4);
 		}
@@ -48,26 +53,16 @@ public class LatLonTsDayTuple {
 	public String getLonLatPoint() {
 		return String.format(Locale.US, "POINT(%.5f %.5f)", m_lng, m_lat);
 	}
-	public String getDateDigitsOnly() {
-		return String.format(Locale.US,"%tY%tm%td", m_dateTime, m_dateTime, m_dateTime );
-	}
 	public String getDaytimeDigitsOnly() {
 		return getDaytimeDigitsOnly(m_dateTime);
 	}
 	public String getWeekdayName() {
-		return String.format(Locale.US,"%tA", m_dateTime );
+		SimpleDateFormat ft = new SimpleDateFormat ("EEEE", Locale.US);
+		ft.setTimeZone(TimeZone.getTimeZone( "Europe/Helsinki" ));
+		return ft.format(m_dateTime);
 	}
-	public String getUTC() {
-		return String.format(Locale.US,"%tF %tT", m_dateTime, m_dateTime );
-	}
-	public String getBetweenTimeClause(int toleranceInMinutes) {
-		long ONE_MINUTE_IN_MILLIS=60000;
-		long t = m_dateTime.getTime();
-		Date d0 = new Date(t - (toleranceInMinutes * ONE_MINUTE_IN_MILLIS));
-		Date d1 = new Date(t + (toleranceInMinutes * ONE_MINUTE_IN_MILLIS));
-		return getDaytimeDigitsOnly(d0) + " AND " + getDaytimeDigitsOnly(d1);
-	}
-	public String getBetweenTimeClause2(String colName, int toleranceInMinutes) {
+
+	public String getBetweenTimeClause(String colName, int toleranceInMinutes) {
 		long ONE_MINUTE_IN_MILLIS=60000;
 		long t = m_dateTime.getTime();
 		Date d0 = new Date(t - (toleranceInMinutes * ONE_MINUTE_IN_MILLIS));
@@ -75,15 +70,18 @@ public class LatLonTsDayTuple {
 		return colName + ">=" + getDaytimeSecSinceMidnight(d0) + " AND " + colName + "<" + getDaytimeSecSinceMidnight(d1);
 	}
 	public String getISO8601Date() {
-		return String.format(Locale.US,"%tF", m_dateTime );
+		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd", Locale.US);
+		ft.setTimeZone(TimeZone.getTimeZone( "Europe/Helsinki" ));
+		return ft.format(m_dateTime);
 	}
 	private String getDaytimeDigitsOnly(Date d) {
 		return String.format(Locale.US,"%tH%tM%tS", d, d, d );
 	}
 	private int getDaytimeSecSinceMidnight(Date d) {
 
-		Calendar calendar = GregorianCalendar.getInstance(); // creates a new calendar instance
+		Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("Europe/Helsinki")); // creates a new calendar instance
 		calendar.setTime(d);   // assigns calendar to given date 
+//		System.out.println( calendar.get(Calendar.HOUR_OF_DAY) + " " + calendar.get(Calendar.MINUTE)+ " " + calendar.get(Calendar.SECOND));
 		return calendar.get(Calendar.HOUR_OF_DAY) * 3600 + calendar.get(Calendar.MINUTE) * 60 + calendar.get(Calendar.SECOND);
 	}
 	
@@ -101,5 +99,15 @@ public class LatLonTsDayTuple {
 	}
 	public double getLon() {
 		return m_lng;
+	}
+	
+	public JSONObject getJson() {
+		JSONObject responseJSON = new JSONObject();
+		responseJSON.put("lat", m_lat);
+		responseJSON.put("lng", m_lng);
+		ft.setTimeZone(TimeZone.getTimeZone( "Europe/Helsinki" ));
+		responseJSON.put("ts", ft.format(m_dateTime));
+		responseJSON.put("day", m_day);
+		return responseJSON;
 	}
 }

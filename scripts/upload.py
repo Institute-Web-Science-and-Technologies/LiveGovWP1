@@ -8,25 +8,38 @@
 #
 
 import requests # if not avaialbel do `sudo easy_install requests`
-from StringIO import StringIO
-
-SERVLET_URL = "http://141.26.71.84:8080/UploadServlet/"
-
-EXAMPLE_CONTENTS = "TEST UPLOAD\n" * 100
-fh = StringIO(EXAMPLE_CONTENTS)
-
 import sys
 
+DEFAULT_HOST = "LG"
+
+def get_servlet_url(host):
+    return "http://" + host +":8080/UploadServlet/"
+
+
 def main():
-    if (len(sys.argv) != 2):
-        print "Usage: Upload.py filename.ssf"
-        return
+    filename = ""
+    endpoint = get_servlet_url(DEFAULT_HOST)
     
-    filename = sys.argv[1]
+    if (len(sys.argv) == 2):
+        filename = sys.argv[1]
+    elif (len(sys.argv) == 3):
+        endpoint = get_servlet_url(sys.argv[1])
+        filename = sys.argv[2]
+    else:
+        print "Usage: upload.py [host] filename"
+        return
+
+    print "Uploading %s to %s" % (filename, endpoint)
+
+    is_compressed = filename.endswith(".gz")
 
     fh = open(filename)
 
-    v_req = requests.post(SERVLET_URL, files = {"upfile" : fh}, headers = {'ID' : 'Upload.py'})
+    v_req = requests.post(endpoint, files = {"upfile" : fh},
+                          headers = {
+                              'ID' : 'Upload.py',
+                              'COMPRESSED' : is_compressed
+                          })
 
     if (v_req.status_code == 202):
         print "OK: Status Code 202: Accepted"
@@ -36,3 +49,11 @@ def main():
     print v_req.text
 
 if __name__ == "__main__": main()
+
+
+
+
+
+
+
+
