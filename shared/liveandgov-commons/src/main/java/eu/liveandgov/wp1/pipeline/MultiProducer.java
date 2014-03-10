@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
+ * <p>Multi producer represents a producer that can have multiple consumers as targets</p>
  * Created by Lukas Härtel on 11.02.14.
  */
 public abstract class MultiProducer<Item> {

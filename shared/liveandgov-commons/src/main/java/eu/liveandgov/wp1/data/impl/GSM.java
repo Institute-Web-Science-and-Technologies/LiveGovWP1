@@ -8,36 +8,130 @@ import eu.liveandgov.wp1.serialization.impl.GSMSerialization;
 import java.util.Arrays;
 
 /**
+ * <p>State of the GSM environment</p>
  * Created by Lukas Härtel on 09.02.14.
  */
 public class GSM extends AbstractItem {
+    /**
+     * Service state of the GSM unit
+     */
     public static enum ServiceState {
-        EMERGENCY_ONLY, IN_SERVICE, OUT_OF_SERVICE, POWER_OFF, UNKNOWN
+        /**
+         * Only emergency calls
+         */
+        EMERGENCY_ONLY,
+        /**
+         * In service
+         */
+        IN_SERVICE,
+        /**
+         * Out of service
+         */
+        OUT_OF_SERVICE,
+        /**
+         * Power off
+         */
+        POWER_OFF,
+        /**
+         * Unknown state
+         */
+        UNKNOWN
     }
 
+    /**
+     * Roaming state
+     */
     public static enum RoamingState {
-        ROAMING, NOT_ROAMING
+        /**
+         * Roaming in other network
+         */
+        ROAMING,
+        /**
+         * In home network
+         */
+        NOT_ROAMING
     }
 
+    /**
+     * Carrier selection state
+     */
     public static enum CarrierSelection {
-        MANUAL_CARRIER, AUTOMATIC_CARRIER
+        /**
+         * Data manually entered
+         */
+        MANUAL_CARRIER,
+        /**
+         * Automatic selection enabled
+         */
+        AUTOMATIC_CARRIER
     }
 
+    /**
+     * Type of a mobile cell
+     */
     public static enum CellType {
-
-        GPRS, EDGE, UMTS, HSDPA, HSUPA, HSPA, UNKNOWN
+        /**
+         * GPRS cell
+         */
+        GPRS,
+        /**
+         * EDGE cell
+         */
+        EDGE,
+        /**
+         * UMTS cell
+         */
+        UMTS,
+        /**
+         * HSDPA cell
+         */
+        HSDPA,
+        /**
+         * HSUPA cell
+         */
+        HSUPA,
+        /**
+         * HSPA cell
+         */
+        HSPA,
+        /**
+         * Unknown cell type
+         */
+        UNKNOWN
     }
 
+    /**
+     * Item of the GSM environment
+     */
     public static final class Item {
+        /**
+         * Empty array of items
+         */
         public static final Item[] EMPTY_ARRAY = new Item[0];
 
+        /**
+         * Identity string of the cell
+         */
         public final String cellIdentity;
 
+        /**
+         * Type of the cell
+         */
         public final CellType cellType;
 
+        /**
+         * Receive signal strength indicator
+         */
         @Unit("dBm")
         public final int rssi;
 
+        /**
+         * Creates a new instance with the given values
+         *
+         * @param cellIdentity Identity string of the cell
+         * @param cellType     Type of the cell
+         * @param rssi         Receive signal strength indicator
+         */
         public Item(String cellIdentity, CellType cellType, @Unit("dBm") int rssi) {
             this.cellIdentity = cellIdentity;
             this.cellType = cellType;
@@ -77,30 +171,50 @@ public class GSM extends AbstractItem {
         }
     }
 
+    /**
+     * Current service state
+     */
     public final ServiceState serviceState;
 
+    /**
+     * Roaming state
+     */
     public final RoamingState roamingState;
 
+    /**
+     * Carrier selection mode
+     */
     public final CarrierSelection carrierSelection;
 
+    /**
+     * Carrier name
+     */
     public final String carrierName;
 
+    /**
+     * Signal strength text
+     */
     public final String signalStrength;
 
+    /**
+     * Items forming the environment
+     */
     public final Item[] items;
 
+    /**
+     * Creates a new instance with the given values
+     *
+     * @param timestamp        Time of the item
+     * @param device           Device of the item
+     * @param serviceState     Current service state
+     * @param roamingState     Roaming state
+     * @param carrierSelection Carrier selection mode
+     * @param carrierName      Carrier name
+     * @param signalStrength   Signal strength text
+     * @param items            Items forming the environment
+     */
     public GSM(long timestamp, String device, ServiceState serviceState, RoamingState roamingState, CarrierSelection carrierSelection, String carrierName, String signalStrength, Item[] items) {
         super(timestamp, device);
-        this.serviceState = serviceState;
-        this.roamingState = roamingState;
-        this.carrierSelection = carrierSelection;
-        this.carrierName = carrierName;
-        this.signalStrength = signalStrength;
-        this.items = items;
-    }
-
-    public GSM(eu.liveandgov.wp1.data.Item header, ServiceState serviceState, RoamingState roamingState, CarrierSelection carrierSelection, String carrierName, String signalStrength, Item[] items) {
-        super(header);
         this.serviceState = serviceState;
         this.roamingState = roamingState;
         this.carrierSelection = carrierSelection;

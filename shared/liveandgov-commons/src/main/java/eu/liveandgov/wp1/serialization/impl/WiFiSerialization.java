@@ -2,21 +2,25 @@ package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.impl.WiFi;
 import eu.liveandgov.wp1.serialization.SerializationCommons;
-import eu.liveandgov.wp1.serialization.Wrapper;
-import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 
 /**
+ * <p>Serialization of the WiFi item</p>
  * Created by Lukas Härtel on 08.02.14.
  */
 public class WiFiSerialization extends AbstractSerialization<WiFi> {
+    /**
+     * The one instance of the serialization
+     */
     public static final WiFiSerialization WI_FI_SERIALIZATION = new WiFiSerialization();
 
-    private WiFiSerialization() {
+    /**
+     * Hidden constructor
+     */
+    protected WiFiSerialization() {
     }
 
     @Override
@@ -32,6 +36,13 @@ public class WiFiSerialization extends AbstractSerialization<WiFi> {
         }
     }
 
+    /**
+     * Writes one WiFi sub-item to the string builder
+     *
+     * @param wiFi           The WiFi item
+     * @param stringBuilder The target string builder
+     * @param i             The index of the item to write
+     */
     private static void appendWifiItem(WiFi wiFi, StringBuilder stringBuilder, int i) {
         final WiFi.Item item = wiFi.items[i];
 

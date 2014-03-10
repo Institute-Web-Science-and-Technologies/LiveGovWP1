@@ -10,9 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 /**
- * Grid Index ProximityType Service, stores calculated values in a two-dimensional index. Acts as a
- * database for calculation results approximated to the nearest field of the specified resolution.
- * Stores no more than `storeDegree` values, old values are truncated.
+ * <p>Grid Index ProximityType Service, stores calculated values in a two-dimensional index. Acts as a
+ * database for calculation results approximated to the nearest field of the specified resolution.</p>
+ * <p>Stores no more than `storeDegree` values, old values are truncated.</p>
  *
  * @author lukashaertel
  */
@@ -27,34 +27,35 @@ public abstract class GridIndexPS implements ProximityService {
     /**
      * Horizontal resolution of the grid in degrees (division of longitude)
      */
-    private final double horizontalResultion;
+    private final double horizontalResolution;
 
     /**
      * Vertical resolution of the grid in degrees (division of latitude)
      */
-    private final double verticalResulution;
+    private final double verticalResolution;
 
     /**
-     * Specify this as true to calculate the value of an index by its centroid rather than its
-     * first calling parameters
+     * Specify this as true to calculate the value of an index by its centroid rather than its first calling parameters
      */
     private final boolean byCentroid;
 
     /**
-     * Storage level of the index, maximum of stored indice
+     * Storage level of the index, maximum of stored indices
      */
     private int storeDegree;
 
-    public GridIndexPS(double horizontalResultion, double verticalResulution, boolean byCentroid, int storeDegree) {
+    public GridIndexPS(double horizontalResolution, double verticalResolution, boolean byCentroid, int storeDegree) {
         this.calculated = new LinkedHashMap<Field, CalculationResult>();
-        this.horizontalResultion = horizontalResultion;
-        this.verticalResulution = verticalResulution;
+        this.horizontalResolution = horizontalResolution;
+        this.verticalResolution = verticalResolution;
         this.byCentroid = byCentroid;
         this.storeDegree = storeDegree;
     }
 
     /**
      * Saves the database to the given file
+     *
+     * @param file The destination file
      */
     public void save(File file) throws IOException {
         final FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -70,6 +71,11 @@ public abstract class GridIndexPS implements ProximityService {
         fileOutputStream.close();
     }
 
+    /**
+     * Tries to save the database to the given file, ignores upcoming exceptions
+     *
+     * @param file The destination file
+     */
     public void trySave(File file) {
         try {
             save(file);
@@ -79,6 +85,8 @@ public abstract class GridIndexPS implements ProximityService {
 
     /**
      * Loads the database from the given file
+     *
+     * @param file The source file
      */
     public void load(File file) throws IOException, ClassNotFoundException {
         final FileInputStream fileInputStream = new FileInputStream(file);
@@ -96,6 +104,11 @@ public abstract class GridIndexPS implements ProximityService {
         fileInputStream.close();
     }
 
+    /**
+     * Tries to load the database from the given file
+     *
+     * @param file The source file
+     */
     public void tryLoad(File file) {
         try {
             load(file);
@@ -106,22 +119,39 @@ public abstract class GridIndexPS implements ProximityService {
         }
     }
 
-    public double getHorizontalResultion() {
-        return horizontalResultion;
+    /**
+     * Horizontal resolution of the grid in degrees (division of longitude)
+     */
+    public double getHorizontalResolution() {
+        return horizontalResolution;
     }
 
-    public double getVerticalResulution() {
-        return verticalResulution;
+    /**
+     * Vertical resolution of the grid in degrees (division of latitude)
+     */
+    public double getVerticalResolution() {
+        return verticalResolution;
     }
 
+    /**
+     * True if the index is supposed to calculate the value of an index by its centroid rather than its first calling parameters
+     */
     public boolean isByCentroid() {
         return byCentroid;
     }
 
+    /**
+     * Storage level of the index, maximum of stored indices
+     */
     public int getStoreDegree() {
         return storeDegree;
     }
 
+    /**
+     * Changes the store level of the index, the maximum of stored indices
+     *
+     * @param storeDegree The new degree of storage
+     */
     public void setStoreDegree(int storeDegree) {
         assert storeDegree > 0;
 
@@ -130,6 +160,9 @@ public abstract class GridIndexPS implements ProximityService {
         assertStoreDegree();
     }
 
+    /**
+     * Assert that the store degree is met
+     */
     private final void assertStoreDegree() {
         final Iterator<Entry<Field, CalculationResult>> it = calculated.entrySet().iterator();
 
@@ -142,11 +175,11 @@ public abstract class GridIndexPS implements ProximityService {
     @Override
     public CalculationResult calculate(double lat, double lon) {
         if (byCentroid) {
-            lon = Math.round(lon / verticalResulution) * verticalResulution + verticalResulution / 2.0;
-            lat = Math.round(lat / horizontalResultion) * horizontalResultion + horizontalResultion / 2.0;
+            lon = Math.round(lon / verticalResolution) * verticalResolution + verticalResolution / 2.0;
+            lat = Math.round(lat / horizontalResolution) * horizontalResolution + horizontalResolution / 2.0;
         }
 
-        final Field at = new Field( Math.round(lat / horizontalResultion), Math.round(lon / verticalResulution));
+        final Field at = new Field(Math.round(lat / horizontalResolution), Math.round(lon / verticalResolution));
 
         CalculationResult result = calculated.get(at);
         if (result == null) {

@@ -1,25 +1,29 @@
 package eu.liveandgov.wp1.data.impl;
 
 import eu.liveandgov.wp1.data.AbstractItem;
-import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.serialization.impl.MotionSerialization;
 
 import java.util.Arrays;
 
 /**
+ * <p>Base class for motion sensor items</p>
  * Created by Lukas Härtel on 08.02.14.
  */
 public abstract class Motion extends AbstractItem {
-
+    /**
+     * Sensor values
+     */
     public final float[] values;
 
+    /**
+     * Creates a new instance with the given values
+     *
+     * @param timestamp Time of the item
+     * @param device    Device of the item
+     * @param values    Sensor values
+     */
     public Motion(long timestamp, String device, float[] values) {
         super(timestamp, device);
-        this.values = values;
-    }
-
-    public Motion(Item header, float[] values) {
-        super(header);
         this.values = values;
     }
 

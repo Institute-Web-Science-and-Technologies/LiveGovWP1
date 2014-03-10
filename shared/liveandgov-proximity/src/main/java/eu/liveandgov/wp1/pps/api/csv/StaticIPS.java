@@ -9,25 +9,58 @@ import java.io.InputStreamReader;
 import java.util.concurrent.Callable;
 
 /**
- * Static Indexed ProximityType Service, indexes by a given CSV file proxmities
+ * <p>Static Indexed ProximityType Service, indexes by a given CSV file proxmities</p>
  *
  * @author lukashaertel
  */
+
 public class StaticIPS extends GridIndexPS {
+    /**
+     * Producer of the input stream used to define the CSV file
+     */
     private final Callable<InputStream> inputStreams;
 
+    /**
+     * True if this static IPS can make assumptions on every coordinate of the world, usually false
+     */
     private final boolean universal;
 
+    /**
+     * The index of the ID column
+     */
     private final int idField;
 
-    private final int lonField;
-
+    /**
+     * The index of the latitude column
+     */
     private final int latField;
 
+    /**
+     * The index of the longitude column
+     */
+    private final int lonField;
+
+    /**
+     * The distance that limits proximity
+     */
     private final double distance;
 
-    public StaticIPS(double horizontalResultion, double verticalResulution, boolean byCentroid, int storeDegree, Callable<InputStream> inputStreams, boolean universal, int idField, int latField, int lonField, double distance) {
-        super(horizontalResultion, verticalResulution, byCentroid, storeDegree);
+    /**
+     * Constructs a new instance with the given values
+     *
+     * @param horizontalResolution Horizontal resolution of the grid in degrees (division of longitude)
+     * @param verticalResolution  Vertical resolution of the grid in degrees (division of latitude)
+     * @param byCentroid          Specify this as true to calculate the value of an index by its centroid rather than its first calling parameters
+     * @param storeDegree         Storage level of the index, maximum of stored indices
+     * @param inputStreams        Producer of the input stream used to define the CSV file
+     * @param universal           True if this static IPS can make assumptions on every coordinate of the world, usually false
+     * @param idField             The index of the ID column
+     * @param latField            The index of the latitude column
+     * @param lonField            The index of the longitude column
+     * @param distance            The distance that limits proximity
+     */
+    public StaticIPS(double horizontalResolution, double verticalResolution, boolean byCentroid, int storeDegree, Callable<InputStream> inputStreams, boolean universal, int idField, int latField, int lonField, double distance) {
+        super(horizontalResolution, verticalResolution, byCentroid, storeDegree);
 
         this.inputStreams = inputStreams;
         this.universal = universal;

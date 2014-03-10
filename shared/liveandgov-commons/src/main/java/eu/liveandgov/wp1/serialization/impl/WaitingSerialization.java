@@ -2,19 +2,23 @@ package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.impl.Waiting;
 import eu.liveandgov.wp1.serialization.SerializationCommons;
-import eu.liveandgov.wp1.serialization.Wrapper;
-import eu.liveandgov.wp1.util.LocalBuilder;
 
-import java.util.Locale;
 import java.util.Scanner;
 
 /**
+ * <p>Serialization of the waiting item</p>
  * Created by Lukas Härtel on 08.02.14.
  */
 public class WaitingSerialization extends AbstractSerialization<Waiting> {
+    /**
+     * The one instance of the serialization
+     */
     public static final WaitingSerialization WAITING_SERIALIZATION = new WaitingSerialization();
 
-    private WaitingSerialization() {
+    /**
+     * Hidden constructor
+     */
+    protected WaitingSerialization() {
     }
 
     @Override

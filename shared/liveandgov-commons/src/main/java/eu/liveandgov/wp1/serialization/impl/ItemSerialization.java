@@ -11,12 +11,19 @@ import java.util.Scanner;
 import static eu.liveandgov.wp1.serialization.SerializationCommons.COMMA_SEPARATED;
 
 /**
+ * <p>Serialization of a general item</p>
  * Created by Lukas Härtel on 09.02.14.
  */
 public final class ItemSerialization implements Serialization<Item> {
+    /**
+     * The one instance of the serialization
+     */
     public static final ItemSerialization ITEM_SERIALIZATION = new ItemSerialization();
 
-    private ItemSerialization() {
+    /**
+     * Hidden constructor
+     */
+    protected ItemSerialization() {
 
     }
 

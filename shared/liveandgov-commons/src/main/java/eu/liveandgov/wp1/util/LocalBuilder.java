@@ -1,8 +1,6 @@
 package eu.liveandgov.wp1.util;
 
 
-import eu.liveandgov.wp1.data.Tuple;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**

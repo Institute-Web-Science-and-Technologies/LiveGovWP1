@@ -2,30 +2,41 @@ package eu.liveandgov.wp1.data.impl;
 
 import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.DataCommons;
-import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.annotations.Unit;
 import eu.liveandgov.wp1.serialization.impl.WaitingSerialization;
 
 /**
+ * <p>Result of a waiting analysis</p>
  * Created by Lukas Härtel on 09.02.14.
  */
 public class Waiting extends AbstractItem {
+    /**
+     * Key of the proximity group
+     */
     public final String key;
 
+    /**
+     * Waiting time
+     */
     @Unit("ms")
     public final long duration;
 
+    /**
+     * Identification of the object
+     */
     public final String at;
 
+    /**
+     * Creates a new instance with the given values
+     *
+     * @param timestamp Time of the item
+     * @param device    Device of the item
+     * @param key       Key of the proximity group
+     * @param duration  Waiting time
+     * @param at        Identification of the object
+     */
     public Waiting(long timestamp, String device, String key, long duration, String at) {
         super(timestamp, device);
-        this.key = key;
-        this.duration = duration;
-        this.at = at;
-    }
-
-    public Waiting(Item header, String key, long duration, String at) {
-        super(header);
         this.key = key;
         this.duration = duration;
         this.at = at;

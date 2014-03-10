@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 /**
+ * <p>Utility functions on consumers</p>
  * Created by Lukas Härtel on 13.02.14.
  */
 public class Consumers {

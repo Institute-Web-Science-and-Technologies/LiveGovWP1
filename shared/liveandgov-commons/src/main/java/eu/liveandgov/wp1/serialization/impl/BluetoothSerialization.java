@@ -1,23 +1,27 @@
 package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.impl.Bluetooth;
-import eu.liveandgov.wp1.serialization.Wrapper;
-import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 
 import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
 
 /**
+ * <p>Serialization of the bluetooth item</p>
  * Created by Lukas Härtel on 08.02.14.
  */
 public class BluetoothSerialization extends AbstractSerialization<Bluetooth> {
+    /**
+     * The one instance of the serialization
+     */
     public static final BluetoothSerialization BLUETOOTH_SERIALIZATION = new BluetoothSerialization();
 
-    private BluetoothSerialization() {
+    /**
+     * Hidden constructor
+     */
+    protected BluetoothSerialization() {
     }
 
 
@@ -34,6 +38,13 @@ public class BluetoothSerialization extends AbstractSerialization<Bluetooth> {
         }
     }
 
+    /**
+     * Writes one bluetooth sub-item to the string builder
+     *
+     * @param bluetooth     The bluetooth item
+     * @param stringBuilder The target string builder
+     * @param i             The index of the item to write
+     */
     private static void appendBluetoothItem(Bluetooth bluetooth, StringBuilder stringBuilder, int i) {
         final Bluetooth.Item item = bluetooth.items[i];
 

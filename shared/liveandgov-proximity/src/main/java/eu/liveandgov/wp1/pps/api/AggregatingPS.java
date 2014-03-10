@@ -4,17 +4,26 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Aggregating ProximityType Service
+ * <p>Aggregating proximity service, uses multiple proximity services in order</p>
  *
  * @author lukashaertel
  */
 public class AggregatingPS implements ProximityService {
+    /**
+     * The list of proximity services to use in order of application
+     */
     private final List<ProximityService> proximityServices;
 
+    /**
+     * Creates a new instance
+     */
     public AggregatingPS() {
         this.proximityServices = new LinkedList<ProximityService>();
     }
 
+    /**
+     * Returns a modifiable list of proximity services
+     */
     public List<ProximityService> getProximityServices() {
         return proximityServices;
     }
@@ -34,6 +43,12 @@ public class AggregatingPS implements ProximityService {
         return new CalculationResult(CalculationResult.CalculationType.NO_DECISION, "");
     }
 
+    /**
+     * Creates an inline aggregating proximity service
+     *
+     * @param from The proximity serives to use
+     * @return Returns a new aggregating proximity service
+     */
     public static AggregatingPS create(ProximityService... from) {
         final AggregatingPS result = new AggregatingPS();
         for (ProximityService f : from) {
@@ -43,6 +58,10 @@ public class AggregatingPS implements ProximityService {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Returns true if one of the proximity services is universal</p>
+     */
     @Override
     public boolean isUniversal() {
         for (ProximityService ps : proximityServices) {

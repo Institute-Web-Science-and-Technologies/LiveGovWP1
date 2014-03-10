@@ -12,40 +12,78 @@ import java.util.concurrent.*;
  * Created by Lukas Härtel on 10.02.14.
  */
 public abstract class ZMQClient extends Pipeline<String, String> implements Stoppable {
+    /**
+     * Maximum number of elements to receive in one pull
+     */
     private static final int BULK_SIZE = 512;
 
-    public static long TAXI_INTERVAL = 5000L;
+    /**
+     * Time between checking if a new address is desired
+     */
+    public static long TAXI_INTERVAL = 2000L;
 
+    /**
+     * Default high water mark of the ZMQ socket
+     */
     public static final int DEFAULT_HWM = 1000;
 
+    /**
+     * Executor service to schedule the tasks on
+     */
     public final ScheduledExecutorService scheduledExecutorService;
 
+    /**
+     * Receive interval
+     */
     public final long interval;
 
+    /**
+     * ZMQ mode
+     */
     public final int mode;
 
+    /**
+     * Callback called when the address has updated
+     */
     public final CallbackSet<String> addressUpdated = new CallbackSet<String>();
 
+    /**
+     * ZMQ context
+     */
     private ZMQ.Context context;
 
+    /**
+     * ZMQ socket
+     */
     private ZMQ.Socket socket;
 
+    /**
+     * Last connected address
+     */
     private String lastAddress;
 
+    /**
+     * Future representing the completion of the connection method
+     */
     private Future<?> connection;
 
+    /**
+     * Scheduled future representing the continuous address update
+     */
     private ScheduledFuture<?> taxi;
 
+    /**
+     * Scheduled future representing the continuous response task
+     */
     private ScheduledFuture<?> responder;
 
     /**
-     * Creates the ZMQ eu.liveandgov.wp1.pipeline element with the given scheduled executor service, a delegator that polls the socket
-     * on a regular basis. For this eu.liveandgov.wp1.pipeline element, a socket is created with the given ZMQ mode, which in turn is
-     * bound to a given address. Sends are executed on the calling pipeline elements thread.
+     * <p> Creates the ZMQ pipeline element with the given scheduled executor service, a delegator that polls the socket on a regular basis. </p>
+     * <p>For this pipeline element, a socket is created with the given ZMQ mode, which in turn is bound to a given address. Sends are executed on the calling pipeline elements thread.</p>
      *
-     * @param scheduledExecutorService
-     * @param interval
-     * @param mode
+     * @param scheduledExecutorService Executor service to schedule the tasks on
+     * @param interval                 Receive interval
+     * @param mode                     ZMQ mode
      */
     public ZMQClient(final ScheduledExecutorService scheduledExecutorService, final long interval, final int mode) {
         this.scheduledExecutorService = scheduledExecutorService;
@@ -90,10 +128,20 @@ public abstract class ZMQClient extends Pipeline<String, String> implements Stop
         });
     }
 
+    /**
+     * Configures the socket
+     *
+     * @param socket The socket to configure
+     */
     protected void configure(ZMQ.Socket socket) {
         socket.setHWM(DEFAULT_HWM);
     }
 
+    /**
+     * Gets the address the client should connect to, may change to represent a new target
+     *
+     * @return The current target address
+     */
     protected abstract String getAddress();
 
     @Override

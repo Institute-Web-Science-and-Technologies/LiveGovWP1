@@ -3,7 +3,7 @@ package eu.liveandgov.wp1.pps.api.gi;
 import java.io.Serializable;
 
 /**
- * Two-dimensional, serializable and comparable index
+ * <p>Two-dimensional, serializable and comparable index</p>
  */
 public class Field implements Comparable<Field>, Serializable
 {
@@ -25,11 +25,17 @@ public class Field implements Comparable<Field>, Serializable
 		this.y = y;
 	}
 
+    /**
+     * Index in the horizontal dimension
+     */
 	public long getX()
 	{
 		return x;
 	}
 
+    /**
+     * Index in the vertical dimension
+     */
 	public long getY()
 	{
 		return y;

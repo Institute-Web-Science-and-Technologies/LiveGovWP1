@@ -2,33 +2,39 @@ package eu.liveandgov.wp1.data.impl;
 
 import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.DataCommons;
-import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.serialization.impl.ProximitySerialization;
 
 /**
+ * <p>Result of a proximity query</p>
  * Created by Lukas Härtel on 09.02.14.
  */
 public class Proximity extends AbstractItem {
-
-    public static enum ProximityType {
-        IN_PROXIMITY, NOT_IN_PROXIMITY, NO_DECISION
-    }
-
+    /**
+     * Key of the proximity group
+     */
     public final String key;
 
+    /**
+     * True if inside of the proximity
+     */
     public final boolean in;
 
+    /**
+     * Identification of the object
+     */
     public final String of;
 
+    /**
+     * Creates a new instance with the given values
+     *
+     * @param timestamp Time of the item
+     * @param device    Device of the item
+     * @param key       Key of the proximity group
+     * @param in        True if inside of the proximity
+     * @param of        Identification of the object
+     */
     public Proximity(long timestamp, String device, String key, boolean in, String of) {
         super(timestamp, device);
-        this.key = key;
-        this.in = in;
-        this.of = of;
-    }
-
-    public Proximity(Item header, String key, boolean in, String of) {
-        super(header);
         this.key = key;
         this.in = in;
         this.of = of;

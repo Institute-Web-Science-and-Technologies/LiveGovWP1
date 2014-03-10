@@ -1,23 +1,27 @@
 package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.impl.GSM;
-import eu.liveandgov.wp1.serialization.Wrapper;
-import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 
 import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
 
 /**
+ * <p>Serialization of the GSM item</p>
  * Created by Lukas Härtel on 09.02.14.
  */
 public class GSMSerialization extends AbstractSerialization<GSM> {
+    /**
+     * The one instance of the serialization
+     */
     public static final GSMSerialization GSM_SERIALIZATION = new GSMSerialization();
 
-    private GSMSerialization() {
+    /**
+     * Hidden constructor
+     */
+    protected GSMSerialization() {
     }
 
     @Override
@@ -44,6 +48,13 @@ public class GSMSerialization extends AbstractSerialization<GSM> {
         }
     }
 
+    /**
+     * Writes one GSM sub-item to the string builder
+     *
+     * @param gsm           The GSM item
+     * @param stringBuilder The target string builder
+     * @param i             The index of the item to write
+     */
     private static void appendGSMItem(GSM gsm, StringBuilder stringBuilder, int i) {
         final GSM.Item item = gsm.items[i];
 

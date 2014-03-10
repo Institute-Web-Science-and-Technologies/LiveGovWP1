@@ -1,22 +1,26 @@
 package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.impl.GPS;
-import eu.liveandgov.wp1.serialization.Wrapper;
-import eu.liveandgov.wp1.util.LocalBuilder;
 
-import java.util.Locale;
 import java.util.Scanner;
 
 import static eu.liveandgov.wp1.serialization.SerializationCommons.SPACE;
 import static eu.liveandgov.wp1.serialization.SerializationCommons.SPACE_SEPARATED;
 
 /**
+ * <p>Serialization of the GPS item</p>
  * Created by Lukas Härtel on 08.02.14.
  */
 public class GPSSerialization extends AbstractSerialization<GPS> {
+    /**
+     * The one instance of the serialization
+     */
     public static final GPSSerialization GPS_SERIALIZATION = new GPSSerialization();
 
-    private GPSSerialization() {
+    /**
+     * Hidden constructor
+     */
+    protected GPSSerialization() {
     }
 
     @Override

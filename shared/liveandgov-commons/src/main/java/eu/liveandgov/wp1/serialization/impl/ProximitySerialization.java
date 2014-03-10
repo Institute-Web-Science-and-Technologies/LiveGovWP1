@@ -2,19 +2,23 @@ package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.impl.Proximity;
 import eu.liveandgov.wp1.serialization.SerializationCommons;
-import eu.liveandgov.wp1.serialization.Wrapper;
-import eu.liveandgov.wp1.util.LocalBuilder;
 
-import java.util.Locale;
 import java.util.Scanner;
 
 /**
+ * <p>Serialization of the proximity item</p>
  * Created by Lukas Härtel on 08.02.14.
  */
 public class ProximitySerialization extends AbstractSerialization<Proximity> {
+    /**
+     * The one instance of the serialization
+     */
     public static final ProximitySerialization PROXIMITY_SERIALIZATION = new ProximitySerialization();
 
-    private ProximitySerialization() {
+    /**
+     * Hidden constructor
+     */
+    protected ProximitySerialization() {
     }
 
     @Override

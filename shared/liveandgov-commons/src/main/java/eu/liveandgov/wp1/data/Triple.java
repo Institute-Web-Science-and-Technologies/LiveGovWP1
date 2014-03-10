@@ -1,21 +1,53 @@
 package eu.liveandgov.wp1.data;
 
 /**
+ * <p>Value triple</p>
  * Created by Lukas Härtel on 09.02.14.
+ *
+ * @param <T> Type of the left object
+ * @param <U> Type of the center object
+ * @param <V> Type of the right object
  */
 public final class Triple<T, U, V> implements Comparable<Triple<T, U, V>> {
+    /**
+     * Value of the left object
+     */
     public final T left;
 
+    /**
+     * Value of the center object
+     */
     public final U center;
 
+    /**
+     * Value of the right object
+     */
     public final V right;
 
+    /**
+     * Creates a new instance with the given values
+     *
+     * @param left   Value of the left object
+     * @param center Value of the center object
+     * @param right  Value of the right object
+     */
     public Triple(T left, U center, V right) {
         this.left = left;
         this.center = center;
         this.right = right;
     }
 
+    /**
+     * Creates a new instance with the given values
+     *
+     * @param left   Value of the left object
+     * @param center Value of the center object
+     * @param right  Value of the right object
+     * @param <T>    Type of the left object
+     * @param <U>    Type of the center object
+     * @param <V>    Type of the right object
+     * @return Returns the new instance
+     */
     public static <T, U, V> Triple<T, U, V> create(T left, U center, V right) {
         return new Triple<T, U, V>(left, center, right);
     }
@@ -68,6 +100,11 @@ public final class Triple<T, U, V> implements Comparable<Triple<T, U, V>> {
         return 0;
     }
 
+    /**
+     * Flips the triple
+     *
+     * @return Returns the flipped triple
+     */
     public Triple<V, U, T> flip() {
         return new Triple<V, U, T>(right, center, left);
     }

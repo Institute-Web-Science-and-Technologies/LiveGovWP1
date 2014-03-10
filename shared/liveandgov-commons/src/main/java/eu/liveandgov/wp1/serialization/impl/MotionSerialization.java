@@ -3,21 +3,25 @@ package eu.liveandgov.wp1.serialization.impl;
 import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.impl.*;
 import eu.liveandgov.wp1.serialization.SerializationCommons;
-import eu.liveandgov.wp1.serialization.Wrapper;
-import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 
 /**
+ * <p>Serialization of a motion item</p>
  * Created by Lukas Härtel on 08.02.14.
  */
 public class MotionSerialization extends AbstractSerialization<Motion> {
+    /**
+     * The one instance of the serialization
+     */
     public static final MotionSerialization MOTION_SERIALIZATION = new MotionSerialization();
 
-    private MotionSerialization() {
+    /**
+     * Hidden constructor
+     */
+    protected MotionSerialization() {
     }
 
     @Override

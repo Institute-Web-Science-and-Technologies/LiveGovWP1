@@ -1,26 +1,45 @@
 package eu.liveandgov.wp1.waiting;
 
+import eu.liveandgov.wp1.data.annotations.Unit;
 import eu.liveandgov.wp1.data.impl.Proximity;
 import eu.liveandgov.wp1.data.impl.Waiting;
 import eu.liveandgov.wp1.pipeline.Pipeline;
 
 /**
- * Created by lukashaertel on 04.02.14.
+ * <p>Pipeline that takes proximities and tries find longer sequences of continuous proximity to determine if the source stream is waiting at a given object</p>
+ * Created by Lukas Härtel on 04.02.14.
  */
 public class WaitingPipeline extends Pipeline<Proximity, Waiting> {
-    private static final String LOG_TAG = "WPL";
+    /**
+     * Key of the items to receive
+     */
+    public final String key;
 
-    private final String key;
+    /**
+     * Threshold in millisecond that is seen as minimum waiting time
+     */
+    @Unit("ms")
+    public final long waitThreshold;
 
-    private final long waitTreshold;
-
+    /**
+     * The base time to compare to
+     */
     private long lastTime;
 
+    /**
+     * The last object identity
+     */
     private String lastIdentity;
 
-    public WaitingPipeline(String key, long waitTreshold) {
+    /**
+     * Creates a new instance with the given values
+     *
+     * @param key           Key of the items to receive
+     * @param waitThreshold Threshold in millisecond that is seen as minimum waiting time
+     */
+    public WaitingPipeline(String key, @Unit("ms") long waitThreshold) {
         this.key = key;
-        this.waitTreshold = waitTreshold;
+        this.waitThreshold = waitThreshold;
     }
 
     @Override
@@ -34,7 +53,7 @@ public class WaitingPipeline extends Pipeline<Proximity, Waiting> {
         if (proximity.in) {
             if (lastIdentity != null) {
                 if (!lastIdentity.equals(proximity.of)) {
-                    if (proximity.getTimestamp() - lastTime > waitTreshold) {
+                    if (proximity.getTimestamp() - lastTime > waitThreshold) {
                         produce(new Waiting(lastTime, proximity.getDevice(), key, proximity.getTimestamp() - lastTime, lastIdentity));
                     }
 
@@ -48,7 +67,7 @@ public class WaitingPipeline extends Pipeline<Proximity, Waiting> {
             }
         } else {
             if (lastIdentity != null) {
-                if (proximity.getTimestamp() - lastTime > waitTreshold) {
+                if (proximity.getTimestamp() - lastTime > waitThreshold) {
                     produce(new Waiting(lastTime, proximity.getDevice(), key, proximity.getTimestamp() - lastTime, lastIdentity));
                 }
 

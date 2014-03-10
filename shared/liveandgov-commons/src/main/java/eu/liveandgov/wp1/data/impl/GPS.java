@@ -2,28 +2,45 @@ package eu.liveandgov.wp1.data.impl;
 
 import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.DataCommons;
-import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.data.annotations.Optional;
+import eu.liveandgov.wp1.data.annotations.Unit;
 import eu.liveandgov.wp1.serialization.impl.GPSSerialization;
 
 /**
+ * <p>GPS coordinate with optional height</p>
  * Created by Lukas Härtel on 09.02.14.
  */
 public class GPS extends AbstractItem {
+    /**
+     * Latitude of the coordinate
+     */
+    @Unit("°")
     public final double lat;
 
+    /**
+     * Longitude of the coordinate
+     */
+    @Unit("°")
     public final double lon;
 
+    /**
+     * Height above the sealevel, may be null
+     */
+    @Optional
+    @Unit("m")
     public final Double alt;
 
-    public GPS(long timestamp, String device, double lat, double lon, Double alt) {
+    /**
+     * Creates a new instance with the given values
+     *
+     * @param timestamp Time of the item
+     * @param device    Device of the item
+     * @param lat       Latitude of the coordinate
+     * @param lon       Longitude of the coordinate
+     * @param alt       Height above the sealevel, may be null
+     */
+    public GPS(long timestamp, String device, @Unit("°") double lat, @Unit("°") double lon, @Optional @Unit("m") Double alt) {
         super(timestamp, device);
-        this.lat = lat;
-        this.lon = lon;
-        this.alt = alt;
-    }
-
-    public GPS(Item header, double lat, double lon, Double alt) {
-        super(header);
         this.lat = lat;
         this.lon = lon;
         this.alt = alt;

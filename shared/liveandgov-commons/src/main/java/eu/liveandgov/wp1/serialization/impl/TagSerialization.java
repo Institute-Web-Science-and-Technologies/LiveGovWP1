@@ -1,21 +1,26 @@
 package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.impl.Tag;
-import eu.liveandgov.wp1.serialization.Wrapper;
 
 import java.util.Scanner;
 
 import static eu.liveandgov.wp1.serialization.SerializationCommons.escape;
 import static eu.liveandgov.wp1.serialization.SerializationCommons.nextString;
-import static eu.liveandgov.wp1.serialization.SerializationCommons.unescape;
 
 /**
+ * <p>Serialization of the tag item</p>
  * Created by Lukas Härtel on 08.02.14.
  */
 public class TagSerialization extends AbstractSerialization<Tag> {
+    /**
+     * The one instance of the serialization
+     */
     public static final TagSerialization TAG_SERIALIZATION = new TagSerialization();
 
-    private TagSerialization() {
+    /**
+     * Hidden constructor
+     */
+    protected TagSerialization() {
     }
 
     @Override

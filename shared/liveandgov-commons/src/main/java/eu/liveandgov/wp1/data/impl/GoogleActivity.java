@@ -2,30 +2,39 @@ package eu.liveandgov.wp1.data.impl;
 
 import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.DataCommons;
-import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.annotations.Unit;
 import eu.liveandgov.wp1.serialization.impl.GoogleActivitySerialization;
 
 /**
+ * <p>Activity recognized by Google Play Services</p>
  * Created by Lukas Härtel on 09.02.14.
  */
 public class GoogleActivity extends AbstractItem {
+    /**
+     * The name of the activity recognized by Google Play Services
+     */
     public final String activity;
 
+    /**
+     * The confidence of the recognized activity in percent
+     */
     @Unit("%")
     public final int confidence;
 
+    /**
+     * Creates
+     *
+     * @param timestamp
+     * @param device
+     * @param activity
+     * @param confidence
+     */
     public GoogleActivity(long timestamp, String device, String activity, int confidence) {
         super(timestamp, device);
         this.activity = activity;
         this.confidence = confidence;
     }
 
-    public GoogleActivity(Item header, String activity, int confidence) {
-        super(header);
-        this.activity = activity;
-        this.confidence = confidence;
-    }
 
     @Override
     public String getType() {

@@ -8,8 +8,16 @@ import eu.liveandgov.wp1.pipeline.Pipeline;
  * Created by Lukas Härtel on 10.02.14.
  */
 public class Transformation<SourceItem, TargetItem> extends Pipeline<SourceItem, TargetItem> {
+    /**
+     * Function used to transform
+     */
     public final Function<? super SourceItem, ? extends TargetItem> function;
 
+    /**
+     * Constructs a new instance with the given values
+     *
+     * @param function Function used to transform
+     */
     public Transformation(Function<? super SourceItem, ? extends TargetItem> function) {
         this.function = function;
     }

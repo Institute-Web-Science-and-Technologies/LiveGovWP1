@@ -8,9 +8,9 @@ import java.util.Locale;
 import java.util.Scanner;
 
 import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
-import static eu.liveandgov.wp1.serialization.SerializationCommons.COMMA_SEPARATED;
 
 /**
+ * <p>Abstract serialization formulates the basic serialization and de-serialization that have to be completed</p>
  * Created by Lukas Härtel on 07.03.14.
  */
 public abstract class AbstractSerialization<Data extends Item> implements Serialization<Data> {
@@ -30,6 +30,12 @@ public abstract class AbstractSerialization<Data extends Item> implements Serial
         return stringBuilder.toString();
     }
 
+    /**
+     * Writes the relevant data of the item to the string builder
+     *
+     * @param stringBuilder The string builder to write to
+     * @param item          The item of which to write the relevant data, i.e. not type, timestamp or device
+     */
     protected abstract void serializeRest(StringBuilder stringBuilder, Data item);
 
     @Override
@@ -47,5 +53,14 @@ public abstract class AbstractSerialization<Data extends Item> implements Serial
         return deSerializeRest(type, timestamp, device, scanner);
     }
 
+    /**
+     * Reads the relevant data of the string into the resulting item
+     *
+     * @param type      The type that has been prepared
+     * @param timestamp The time that has been prepared
+     * @param device    The device that has been prepared
+     * @param scanner   The scanner to read the relevant data from, i.e. not type, timestamp or device
+     * @return Returns the resulting item
+     */
     protected abstract Data deSerializeRest(String type, long timestamp, String device, Scanner scanner);
 }

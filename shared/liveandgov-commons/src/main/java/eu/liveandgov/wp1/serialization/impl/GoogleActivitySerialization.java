@@ -1,21 +1,25 @@
 package eu.liveandgov.wp1.serialization.impl;
 
 import eu.liveandgov.wp1.data.impl.GoogleActivity;
-import eu.liveandgov.wp1.serialization.Wrapper;
-import eu.liveandgov.wp1.util.LocalBuilder;
 
-import java.util.Locale;
 import java.util.Scanner;
 
 import static eu.liveandgov.wp1.serialization.SerializationCommons.*;
 
 /**
+ * <p>Serialization of the google play activity item</p>
  * Created by Lukas Härtel on 09.02.14.
  */
 public class GoogleActivitySerialization extends AbstractSerialization<GoogleActivity> {
+    /**
+     * The one instance of the serialization
+     */
     public static final GoogleActivitySerialization GOOGLE_ACTIVITY_SERIALIZATION = new GoogleActivitySerialization();
 
-    private GoogleActivitySerialization() {
+    /**
+     * Hidden constructor
+     */
+    protected GoogleActivitySerialization() {
     }
 
     @Override

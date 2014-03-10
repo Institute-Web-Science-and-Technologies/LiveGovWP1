@@ -9,6 +9,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
+ * <p>Plays a stream of incoming items back to the consumer using a queue and a scheduled task in an executor service</p>
  * Created by Lukas Härtel on 01.03.14.
  */
 public class Player<Item> extends Pipeline<Item, Item> implements Stoppable {

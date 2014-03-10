@@ -2,22 +2,27 @@ package eu.liveandgov.wp1.data.impl;
 
 import eu.liveandgov.wp1.data.AbstractItem;
 import eu.liveandgov.wp1.data.DataCommons;
-import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.serialization.impl.ActivitySerialization;
 
 /**
+ * <p>Represents an activity recognized by the HAR pipeline</p>
  * Created by Lukas Härtel on 09.02.14.
  */
 public class Activity extends AbstractItem {
+    /**
+     * The name of the activity recognized by the HAR pipeline
+     */
     public final String activity;
 
+    /**
+     * Creates a new instance with the given values
+     *
+     * @param timestamp Time of the item
+     * @param device    Device of the item
+     * @param activity  Recognized activity
+     */
     public Activity(long timestamp, String device, String activity) {
         super(timestamp, device);
-        this.activity = activity;
-    }
-
-    public Activity(Item header, String activity) {
-        super(header);
         this.activity = activity;
     }
 

@@ -5,9 +5,17 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 /**
+ * <p>Utilities for command-line tools</p>
  * Created by Lukas Härtel on 10.02.14.
  */
 public class ToolsCommon {
+    /**
+     * Parses a set of commands
+     *
+     * @param shorthandExpansion The expansion function expanding shorthands to full commands
+     * @param args               The arguments to parse
+     * @return Returns a multimap from key to values
+     */
     public static Multimap<String, String> commands(Function<String, String> shorthandExpansion, String[] args) {
         final Multimap<String, String> result = HashMultimap.create();
 
@@ -28,10 +36,22 @@ public class ToolsCommon {
         return result;
     }
 
+    /**
+     * Returns the last string of the params
+     *
+     * @param args The The arguments to parse
+     * @return Returns the last item
+     */
     public static String end(String[] args) {
         return args.length == 0 ? null : args[args.length - 1];
     }
 
+    /**
+     * Maps a sequence of strings to a mapping function that maps the key at the even index to the value of the subsequent odd index
+     *
+     * @param shAndExpansion The keys and the values interspersed
+     * @return Returns a mapping function
+     */
     public static Function<String, String> sequentialShorthand(final String... shAndExpansion) {
         return new Function<String, String>() {
             @Override

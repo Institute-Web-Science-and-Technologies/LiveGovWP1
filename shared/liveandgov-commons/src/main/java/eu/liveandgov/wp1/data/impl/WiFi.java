@@ -8,22 +8,49 @@ import eu.liveandgov.wp1.serialization.impl.WiFiSerialization;
 import java.util.Arrays;
 
 /**
+ * <p>State of the WiFi environment</p>
  * Created by Lukas Härtel on 08.02.14.
  */
 public class WiFi extends AbstractItem {
+    /**
+     * Item forming the WiFi environment
+     */
     public static final class Item {
+        /**
+         * Empty array of items
+         */
         public static final Item[] EMPTY_ARRAY = new Item[0];
 
+        /**
+         * SSID of the access point
+         */
         public final String ssid;
 
+        /**
+         * BSSID of the access point
+         */
         public final String bssid;
 
+        /**
+         * Frequency used
+         */
         @Unit("MHz")
         public final int frequency;
 
+        /**
+         * Signal strength
+         */
         @Unit("dBm")
         public final int level;
 
+        /**
+         * Creates a new instance with the given values
+         *
+         * @param ssid      SSID of the access point
+         * @param bssid     BSSID of the access point
+         * @param frequency Frequency used
+         * @param level     Signal strength
+         */
         public Item(String ssid, String bssid, @Unit("MHz") int frequency, @Unit("dBm") int level) {
             this.ssid = ssid;
             this.bssid = bssid;
@@ -66,17 +93,23 @@ public class WiFi extends AbstractItem {
         }
     }
 
+    /**
+     * Items forming the environment
+     */
     public final Item[] items;
 
+    /**
+     * Creates a new instance with the given values
+     *
+     * @param timestamp Time of the item
+     * @param device    Device of the item
+     * @param items     Items forming the environment
+     */
     public WiFi(long timestamp, String device, Item[] items) {
         super(timestamp, device);
         this.items = items;
     }
 
-    public WiFi(eu.liveandgov.wp1.data.Item header, Item[] items) {
-        super(header);
-        this.items = items;
-    }
 
     @Override
     public String getType() {

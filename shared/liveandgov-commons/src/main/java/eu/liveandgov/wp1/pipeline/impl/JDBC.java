@@ -12,19 +12,41 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * <p>Database producer</p>
  * Created by Lukas Härtel on 24.02.14.
  */
 public class JDBC extends Producer<Map<String, Object>> {
+    /**
+     * URL of the source
+     */
     private final String url;
 
+    /**
+     * Username in the source domain
+     */
     private final String username;
 
+    /**
+     * Password in the source domain
+     */
     private final String password;
 
+    /**
+     * Creates a new instance with the given values
+     *
+     * @param url      URL of the source
+     * @param username Username in the source domain
+     * @param password Password in the source domain
+     */
     public JDBC(String url, String username, String password) {
         this.url = url;
         this.username = username;
         this.password = password;
+    }
+
+
+    public void readAll(String cmd) throws SQLException {
+        readAll(cmd, null);
     }
 
     public void readAll(String cmd, Callback<RowSet> configureParameters) throws SQLException {

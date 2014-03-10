@@ -1,7 +1,6 @@
 package eu.liveandgov.wp1.pipeline.impl;
 
 
-import eu.liveandgov.wp1.data.CallbackSet;
 import eu.liveandgov.wp1.data.Stoppable;
 import eu.liveandgov.wp1.pipeline.Pipeline;
 import org.zeromq.ZMQ;

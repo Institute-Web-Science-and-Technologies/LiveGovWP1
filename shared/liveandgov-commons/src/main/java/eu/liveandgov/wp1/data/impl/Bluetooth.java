@@ -8,30 +8,83 @@ import eu.liveandgov.wp1.serialization.impl.BluetoothSerialization;
 import java.util.Arrays;
 
 /**
+ * <p>State of the bluetooth environment</p>
  * Created by Lukas Härtel on 09.02.14.
  */
 public class Bluetooth extends AbstractItem {
+    /**
+     * Bond state of another device with this device
+     */
     public static enum BondState {
-        NONE, BONDING, BONDED, UNKNOWN
+        /**
+         * Not bonded
+         */
+        NONE,
+        /**
+         * About to be bonded
+         */
+        BONDING,
+        /**
+         * Bonded
+         */
+        BONDED,
+        /**
+         * Unknown state
+         */
+        UNKNOWN
     }
 
+    /**
+     * Represents one item of the bluetooth environment
+     */
     public static final class Item {
+        /**
+         * Empty array of items
+         */
         public static final Item[] EMPTY_ARRAY = new Item[0];
 
+        /**
+         * Address of the device
+         */
         public final String address;
 
+        /**
+         * Major class of the device
+         */
         public final String deviceMajorClass;
 
+        /**
+         * Minor class of the device
+         */
         public final String deviceMinorClass;
 
+        /**
+         * State of bonding
+         */
         public final BondState bondState;
 
+        /**
+         * Name of the device
+         */
         @Optional
         public final String name;
 
+        /**
+         * Receive strength indicator of the device
+         */
         @Optional
         public final Short rssi;
 
+        /**
+         * Creates a new instance with the given values
+         *
+         * @param address          The address of the device
+         * @param deviceMajorClass Major class of the device
+         * @param deviceMinorClass Minor class of the device
+         * @param bondState        State of bonding
+         * @param name             Name of the device
+         * @param rssi             Receive strength indicator of the device
+         */
         public Item(String address, String deviceMajorClass, String deviceMinorClass, BondState bondState, @Optional String name, @Optional Short rssi) {
             this.address = address;
             this.deviceMajorClass = deviceMajorClass;
@@ -84,16 +137,20 @@ public class Bluetooth extends AbstractItem {
         }
     }
 
+    /**
+     * Items forming the bluetooth environment
+     */
     public final Item[] items;
 
+    /**
+     * Creates a new instance with the given values
+     *
+     * @param timestamp Time of the item
+     * @param device    Device of the item
+     * @param items     Items forming the bluetooth environment
+     */
     public Bluetooth(long timestamp, String device, Item[] items) {
         super(timestamp, device);
-
-        this.items = items;
-    }
-
-    public Bluetooth(eu.liveandgov.wp1.data.Item header, Item[] items) {
-        super(header);
 
         this.items = items;
     }

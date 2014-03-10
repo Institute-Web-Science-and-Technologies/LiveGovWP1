@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.pipeline;
 
 /**
+ * <p>SAM representing the consumption of an item</p>
  * Created by Lukas Härtel on 08.02.14.
  */
 public interface Consumer<Item> {
