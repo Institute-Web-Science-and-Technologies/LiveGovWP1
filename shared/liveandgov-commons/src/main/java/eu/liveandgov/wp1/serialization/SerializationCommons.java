@@ -70,7 +70,7 @@ public class SerializationCommons {
      */
     private static final void unicodeEscape(StringBuilder target, char c) {
         target.append("\\u");
-        target.append(String.format(Locale.ENGLISH, "%04x", c));
+        target.append(String.format(Locale.ENGLISH, "%04x", (int) c));
     }
 
     /**
