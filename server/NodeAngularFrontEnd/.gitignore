@@ -6,3 +6,5 @@ client/public/css/style.css
 node_modules
 npm-debug.log
 server/node_modules
+doc
+.idea
