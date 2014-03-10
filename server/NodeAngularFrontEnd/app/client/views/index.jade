@@ -1,6 +1,6 @@
 doctype html
 
-html(lang="en", ng-app="nodeInspectionFrontEnd")
+html(lang="en", ng-app="inspectionFrontEnd")
 	head
 		meta(charset="utf-8")
 		title= title
@@ -14,40 +14,45 @@ html(lang="en", ng-app="nodeInspectionFrontEnd")
 		script(src="/lib/geojson-utils.js")
 
 		//- jQuery
-		script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js")
+		//- script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js")
+		script(src="/lib/jquery/dist/jquery.min.js")
 
 		//- Moment
-		script(src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js")
+		//- script(src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js")
+		script(src="/lib/moment/min/moment.min.js")
 
 		//- D3
-		script(src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.1/d3.min.js")
+		//- script(src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.1/d3.min.js")
+		script(src="/lib/d3/d3.js")
 
 		//- Leaflet
-		script(src="//cdn.leafletjs.com/leaflet-0.7.2/leaflet.js")
-		link(rel="stylesheet", href="//cdn.leafletjs.com/leaflet-0.7.2/leaflet.css")
+		//- script(src="//cdn.leafletjs.com/leaflet-0.7.2/leaflet.js")
+		script(src="/lib/leaflet/dist/leaflet.js")
+		link(rel="stylesheet", href="/lib/leaflet/dist/leaflet.css")
 
 		//- Angular
-		script(src="/lib/angular-1.2.12/angular.js")
-		script(src="/lib/angular-1.2.12/angular-resource.js")
-		script(src="/lib/angular-1.2.12/angular-route.js")
-		script(src="/lib/angular-1.2.12/angular-animate.js")
-		script(src="/lib/angular-1.2.12/angular-sanitize.js")
+		script(src="/lib/angular/angular.js")
+		script(src="/lib/angular-resource/angular-resource.js")
+		script(src="/lib/angular-route/angular-route.js")
+		script(src="/lib/angular-animate/angular-animate.js")
+		script(src="/lib/angular-sanitize/angular-sanitize.js")
+		script(src="/lib/angular-mocks/angular-mocks.js")
 
 		//- Bootstrap
 		//- script(src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js")
-		link(href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css", rel="stylesheet")
-		link(href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css", rel="stylesheet")
+		link(href="/lib/bootstrap/dist/css/bootstrap.min.css", rel="stylesheet")
+		//- link(href="/lib/bootstrap/dist/css/bootstrap-theme.min.css", rel="stylesheet")
 
 		//- Angular-xeditable
 		link(href="/lib/angular-xeditable/dist/css/xeditable.css", rel="stylesheet")
 		script(src="/lib/angular-xeditable/dist/js/xeditable.js")
 
 		//- Angular Strap
-		script(src="/lib/angular-strap/dist/angular-strap.min.js")
-		script(src="/lib/angular-strap/dist/angular-strap.tpl.min.js")
+		//- script(src="/lib/angular-strap/dist/angular-strap.min.js")
+		//- script(src="/lib/angular-strap/dist/angular-strap.tpl.min.js")
 
 		//- Angular Motion (required by Angular Strap)
-		link(href="/lib/angular-motion/dist/angular-motion.min.css", rel="stylesheet")
+		//- link(href="/lib/angular-motion/dist/angular-motion.min.css", rel="stylesheet")
 
 		//- Angular Application
 		script(src="/app/js/modules.js")
@@ -55,7 +60,7 @@ html(lang="en", ng-app="nodeInspectionFrontEnd")
 		script(src="/app/js/routes.js")
 		script(src="/app/js/services.js")
 		script(src="/app/js/filters.js")
-		//- script(src="/app/js/directives/brush.js")
+		//- script(src="/js/directives/brush.js")
 		script(src="/app/js/directives/chart.js")
 		script(src="/app/js/directives/map.js")
 
@@ -68,9 +73,9 @@ html(lang="en", ng-app="nodeInspectionFrontEnd")
 					ul.nav.navbar-nav
 						li(ng-class='{active:nav.is("rec")}')
 							a(href="/#/rec") Recordings
-						li(ng-class='{active:nav.is("raw"), disabled:!$root.trip}')
+						li(ng-class='{active:nav.is("raw"), disabled:!$root.tripSelected}')
 							a(href="/#/raw") Raw Data
-						li(ng-class='{active:nav.is("har"), disabled:!$root.trip}')
+						li(ng-class='{active:nav.is("har"), disabled:!$root.tripSelected}')
 							a(href="/#/har") Activity Recognition
 
 					ul.nav.navbar-nav.pull-right
@@ -79,7 +84,7 @@ html(lang="en", ng-app="nodeInspectionFrontEnd")
 						li(ng-class="{'hidden':!data.selection}")
 							a {{ data.selection[0] | date:'HH:mm' }} — {{ data.selection[1] | date:'HH:mm' }} ({{ data.selection[0] | duration:data.selection[1] | date:'mm' }} minutes)
 						li
-							a.trip-indicator(ng-class="{'selected':$root.trip}") {{ $root.trip.trip_id || "PLEASE SELECT A TRIP" }}
+							a.trip-indicator(ng-class="{'selected':$root.tripSelected}") {{ $root.tripSelected || "PLEASE SELECT A TRIP" }}
 		#body
 			div(ng-view)
 
