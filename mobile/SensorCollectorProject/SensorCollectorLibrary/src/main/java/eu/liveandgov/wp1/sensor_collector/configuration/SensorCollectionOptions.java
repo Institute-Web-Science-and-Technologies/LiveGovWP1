@@ -51,9 +51,6 @@ public class SensorCollectionOptions {
     public static final boolean ASK_BLT = false;
     public static final boolean ASK_WIFI = false;
 
-    // Timeout for Client connection
-    public static final long CLIENT_TIMEOUT = 5000; // If 5 seconds no action required, close
-
     /**
      * Record Activity using the new Google Activity API
      */

@@ -1,15 +1,16 @@
 package eu.liveandgov.wp1.pipeline.impl;
 
 import eu.liveandgov.wp1.pipeline.Producer;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.io.InputStream;
 import java.util.Scanner;
 
 /**
- * <p>The line-in producer reads from a scanner</p>
+ * <p>The scan-in producer reads from a scanner</p>
  * Created by Lukas Härtel on 10.02.14.
  */
-public class LinesIn extends Producer<String> {
+public class ScanIn extends Producer<String> {
     /**
      * Reads all lines from a scanner into the output
      *

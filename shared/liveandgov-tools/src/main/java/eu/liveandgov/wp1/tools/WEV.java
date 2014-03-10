@@ -4,7 +4,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import eu.liveandgov.wp1.data.impl.GPS;
 import eu.liveandgov.wp1.data.impl.Waiting;
-import eu.liveandgov.wp1.pipeline.impl.LinesIn;
+import eu.liveandgov.wp1.pipeline.impl.ScanIn;
 import eu.liveandgov.wp1.pipeline.impl.LinesOut;
 import eu.liveandgov.wp1.pipeline.impl.Transformation;
 import eu.liveandgov.wp1.pps.PPSPipeline;
@@ -118,7 +118,7 @@ public class WEV {
         }
 
         // Setup input
-        final LinesIn input = new LinesIn();
+        final ScanIn input = new ScanIn();
 
         // Setup parser
         final Transformation<String, GPS> deSerializer = new Transformation<String, GPS>(Serializations.deSerialization(GPSSerialization.GPS_SERIALIZATION));

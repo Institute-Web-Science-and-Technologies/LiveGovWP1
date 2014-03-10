@@ -2,10 +2,7 @@ package eu.liveandgov.wp1.tools;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import eu.liveandgov.wp1.pipeline.impl.Catcher;
-import eu.liveandgov.wp1.pipeline.impl.LinesIn;
-import eu.liveandgov.wp1.pipeline.impl.LinesOut;
-import eu.liveandgov.wp1.pipeline.impl.ZMQClient;
+import eu.liveandgov.wp1.pipeline.impl.*;
 import org.zeromq.ZMQ;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -73,7 +70,7 @@ public class ZMQC {
             final ScheduledThreadPoolExecutor ex = new ScheduledThreadPoolExecutor(1);
 
             // Producer of input data
-            LinesIn lip = new LinesIn();
+            LineIn lip = new LineIn();
 
             // Catcher of unsupported operation exception thrown when sending is not allowed
             Catcher<String> ccr = new Catcher<String>();
@@ -89,8 +86,7 @@ public class ZMQC {
             };
 
             // Result writer
-            LinesOut loc = new LinesOut(System.out);
-
+            PrintOut poc = new PrintOut(System.out);
 
             for (String topic : args.get("topic"))
                 zcp.subscribe(topic);
@@ -100,7 +96,7 @@ public class ZMQC {
 
             lip.setConsumer(ccr);
             ccr.setConsumer(zcp);
-            zcp.setConsumer(loc);
+            zcp.setConsumer(poc);
 
             lip.readFrom(System.in);
         }

@@ -11,11 +11,12 @@ import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.R;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 import org.zeromq.ZMQ;
 
 /**
- * String-Consumer that sends samples to a remote server using ZMQ message queue system.
+ * String-Consumer that sends samples to a remote server as lines using ZMQ message queue system.
  * <p/>
  * Created by hartmann on 10/2/13.
  */
@@ -45,14 +46,17 @@ public class ZMQStreamer extends ZMQClient implements Monitorable {
 
         // Reconnect starts with half a second
         socket.setReconnectIVL(500L);
-        // Maximum rate is one minute
-        socket.setReconnectIVLMax(60L * 1000L);
+        // Maximum rate is fifteen seconds
+        socket.setReconnectIVLMax(15L * 1000L);
     }
 
     @Override
     public void push(String s) {
-        super.push(s);
-        super.push("\r\n");
+        StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+        stringBuilder.append(s);
+        stringBuilder.append("\r\n");
+
+        super.push(stringBuilder.toString());
     }
 
     @Override

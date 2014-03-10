@@ -16,7 +16,7 @@ apply plugin: 'android-library'
 repositories {
     // Need to add new repositories also here!
     mavenCentral()
-    // mavenLocal()
+    mavenLocal()
     maven {
         url 'https://raw.github.com/HeinrichHartmann/LiveGovWP1/mvn-repo'
     }
@@ -25,6 +25,7 @@ repositories {
 android {
     compileSdkVersion 17
     buildToolsVersion '17.0.0'
+
     defaultConfig {
         minSdkVersion 8
         targetSdkVersion 17

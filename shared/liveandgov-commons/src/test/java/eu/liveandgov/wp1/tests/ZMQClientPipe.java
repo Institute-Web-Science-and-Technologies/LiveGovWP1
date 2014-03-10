@@ -1,6 +1,6 @@
 package eu.liveandgov.wp1.tests;
 
-import eu.liveandgov.wp1.pipeline.impl.LinesIn;
+import eu.liveandgov.wp1.pipeline.impl.ScanIn;
 import eu.liveandgov.wp1.pipeline.impl.LinesOut;
 import eu.liveandgov.wp1.pipeline.impl.ZMQClient;
 import org.zeromq.ZMQ;
@@ -14,7 +14,7 @@ public class ZMQClientPipe {
     public static void main(String[] args) throws InterruptedException {
         final ScheduledThreadPoolExecutor ex = new ScheduledThreadPoolExecutor(1);
 
-        LinesIn lip = new LinesIn();
+        ScanIn lip = new ScanIn();
         ZMQClient zcp = new ZMQClient(ex, 50, ZMQ.PUSH) {
 
             @Override

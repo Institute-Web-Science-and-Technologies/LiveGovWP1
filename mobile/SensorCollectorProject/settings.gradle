@@ -1,1 +1,1 @@
-include ':SensorCollector', ':SensorCollectorLibrary'
+include ':SensorCollectorGUI', ':SensorCollectorLibrary'

@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.util.concurrent.ScheduledFuture;
@@ -70,6 +71,9 @@ public class ActivitySensorCollector extends Activity {
 
     // FLAGS
     public boolean isForeground = false;
+
+    // UI EXECUTION SERVICE
+    public final ScheduledThreadPoolExecutor executorService;
 
     // UI Elements
     private ToggleButton recordingToggleButton;
@@ -179,10 +183,10 @@ public class ActivitySensorCollector extends Activity {
 
         isForeground = false;
         unregisterListeners();
+        super.onPause();
     }
 
     /* BUTTON HANDLER */
-
     public void onRecordingToggleButtonClick(View view) {
         if (!isRecording) {
             Intent intent = new Intent(this, ServiceSensorControl.class);
@@ -366,6 +370,13 @@ public class ActivitySensorCollector extends Activity {
         Log.d("STATUS", "ID:             " + intent.getStringExtra(FIELD_ID));
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.activity_sensor_collector, menu);
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

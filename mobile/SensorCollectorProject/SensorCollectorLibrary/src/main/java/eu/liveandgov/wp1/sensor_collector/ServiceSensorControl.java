@@ -223,29 +223,6 @@ public class ServiceSensorControl extends Service {
         return null;
     }
 
-    /**
-     * This runnable is used by the handler to be scheduled and cancelled for keep-alive handling
-     */
-    public final Runnable keepAliveCallback = new Runnable() {
-        /**
-         * TODO: Replace with scheduled executor
-         */
-       
-        @Override
-        public void run() {
-            // If service is recording, no external action is required for keep-alive
-            if(isRecording)
-            {
-                Log.v(LOG_TAG, "Rescheduling keep alive because of service status");
-                mainHandler.postDelayed(keepAliveCallback, SensorCollectionOptions.CLIENT_TIMEOUT);
-            }
-            else
-            {
-                Log.v(LOG_TAG, "Stopping service because of no action and not recording");
-                stopSelf();
-            }
-        }
-    };
 
     /* INTENT API */
 
@@ -376,6 +353,8 @@ public class ServiceSensorControl extends Service {
                 System.currentTimeMillis(),
                 GlobalContext.getUserId(),
                 IntentAPI.VALUE_STOP_RECORDING);
+
+        persistor.push(stopRecordingTag);
 
         // API EXTENSIONS are triggered on together with recording
         if (API_EXTENSIONS) {

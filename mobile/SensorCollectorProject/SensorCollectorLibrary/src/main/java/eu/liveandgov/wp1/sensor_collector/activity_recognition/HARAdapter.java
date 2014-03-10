@@ -1,52 +1,99 @@
 package eu.liveandgov.wp1.sensor_collector.activity_recognition;
 
-import eu.liveandgov.wp1.human_activity_recognition.HarPipeline;
-import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
-import eu.liveandgov.wp1.human_activity_recognition.connectors.Pipeline;
-import eu.liveandgov.wp1.human_activity_recognition.containers.MotionSensorValue;
+import com.google.common.base.Function;
+
+import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.data.Triple;
+import eu.liveandgov.wp1.data.Tuple;
+import eu.liveandgov.wp1.data.impl.Acceleration;
+import eu.liveandgov.wp1.data.impl.Activity;
+import eu.liveandgov.wp1.pipeline.ActivityPipeline;
+import eu.liveandgov.wp1.pipeline.Consumer;
+import eu.liveandgov.wp1.pipeline.FeaturePipeline;
+import eu.liveandgov.wp1.pipeline.InterpolationPipeline;
+import eu.liveandgov.wp1.pipeline.QualityPipeline;
+import eu.liveandgov.wp1.pipeline.WindowPipeline;
+import eu.liveandgov.wp1.pipeline.impl.ClassFilter;
+import eu.liveandgov.wp1.pipeline.impl.Transformation;
+import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
-import eu.liveandgov.wp1.sensor_collector.configuration.SsfFileFormat;
-import eu.liveandgov.wp1.sensor_collector.connectors.implementations.IntentEmitter;
-import eu.liveandgov.wp1.sensor_collector.connectors.implementations.Multiplexer;
-import eu.liveandgov.wp1.sensor_collector.connectors.implementations.PrefixFilter;
-import eu.liveandgov.wp1.sensor_collector.connectors.implementations.SampleEmitter;
+import eu.liveandgov.wp1.sensor_collector.connectors.impl.IntentEmitter;
+import eu.liveandgov.wp1.sensor_collector.connectors.impl.SensorEmitter;
 
 /**
  * Pipeline class that consumes accelerometer values and produces an activity stream.
- *
  * Created by hartmann on 10/20/13.
  */
-public class HARAdapter implements Consumer<String> {
+public class HARAdapter implements Consumer<Item> {
+    private static final String LOG_TAG = "HARA";
+    private final ClassFilter<Acceleration> filter;
+    private final Transformation<Acceleration, Tuple<Long, Acceleration>> tupleTransformation;
+    private final WindowPipeline windowPipeline;
+    private final QualityPipeline qualityPipeline;
+    private final InterpolationPipeline interpolationPipeline;
+    private final FeaturePipeline featurePipeline;
+    private final ActivityPipeline activityPipeline;
 
-    private final PrefixFilter filter;
-    private final MotionSensorValueProducer parseProd;
-    private final Pipeline<MotionSensorValue, String> harPipeline;
 
-    public HARAdapter(){
-        // ACC filter
-        filter = new PrefixFilter();
-        filter.addFilter("ACC");
+    public HARAdapter() {
 
-        // Parser
-        parseProd = new MotionSensorValueProducer();
-        filter.setConsumer(parseProd);
+        // Type Filter
+        filter = new ClassFilter<Acceleration>(Acceleration.class);
 
-        // HAR
-        harPipeline = new HarPipeline(1000);
-        parseProd.setConsumer(harPipeline);
+        // Trip-ID annotation
+        tupleTransformation = new Transformation<Acceleration, Tuple<Long, Acceleration>>(new Function<Acceleration, Tuple<Long, Acceleration>>() {
+            @Override
+            public Tuple<Long, Acceleration> apply(Acceleration acceleration) {
+                return Tuple.create(-1L, acceleration);
+            }
+        });
+        filter.setConsumer(tupleTransformation);
 
-        // Multiplex samples, in order for multiple consumers to connect
-        Multiplexer<String> multiplexer = new Multiplexer<String>();
-        harPipeline.setConsumer(multiplexer);
+        // Windowing
+        windowPipeline = new WindowPipeline(20000, 19000);
+        tupleTransformation.setConsumer(windowPipeline);
 
-        // Publish samples as Intent and as Sensor Sample.
-        multiplexer.addConsumer(new IntentEmitter(IntentAPI.RETURN_ACTIVITY, IntentAPI.FIELD_ACTIVITY));
-        multiplexer.addConsumer(new SampleEmitter(SsfFileFormat.SSF_ACTIVITY) );
+        // Quality check
+        qualityPipeline = new QualityPipeline(40);
+        windowPipeline.setConsumer(qualityPipeline);
+
+
+        // Interpolation
+        interpolationPipeline = new InterpolationPipeline(50);
+        qualityPipeline.setConsumer(interpolationPipeline);
+
+        // Feature extraction
+        featurePipeline = new FeaturePipeline();
+        interpolationPipeline.setConsumer(featurePipeline);
+
+
+        // Activity recognition
+        activityPipeline = new ActivityPipeline(1);
+        featurePipeline.setConsumer(activityPipeline);
+
+        // Emission
+        final SensorEmitter sensorEmitter = new SensorEmitter();
+        final IntentEmitter intentEmitter = new IntentEmitter(IntentAPI.RETURN_ACTIVITY, IntentAPI.FIELD_ACTIVITY);
+
+        activityPipeline.setConsumer(new Consumer<Triple<Long, Long, String>>() {
+
+            @Override
+            public void push(Triple<Long, Long, String> item) {
+                final Activity activity = new Activity(System.currentTimeMillis(), GlobalContext.getUserId(), item.right);
+
+                sensorEmitter.push(activity);
+                intentEmitter.push(activity.activity);
+            }
+        });
     }
 
     @Override
-    public void push(String m) {
-        filter.push(m);
+    public void push(Item item) {
+        filter.push(item);
     }
 
+    @Override
+    public String toString() {
+        return "HAR Adapter";
+    }
 }

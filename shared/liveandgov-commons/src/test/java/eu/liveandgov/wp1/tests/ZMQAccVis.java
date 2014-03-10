@@ -21,7 +21,7 @@ public class ZMQAccVis {
     public static void main(String[] args) throws InterruptedException {
         final ScheduledThreadPoolExecutor ex = new ScheduledThreadPoolExecutor(1);
 
-        LinesIn lip = new LinesIn();
+        ScanIn lip = new ScanIn();
 
         ZMQServer zcp = new ZMQServer(ex, 50, ZMQ.PULL, "tcp://*:5555");
 
