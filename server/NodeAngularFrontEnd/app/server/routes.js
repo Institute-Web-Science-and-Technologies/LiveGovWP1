@@ -5,29 +5,29 @@ module.exports = function(app) {
 
 	/* TRIP ROUTES */
 
-	app.get('/trips.:format(csv)?', function(req, res, next) {
+	app.get('/trips.:format(csv)?', function (req, res) {
 		db.index(function(err, data) {
 			if (err) { res.send(err); console.error(err); return; }
-			(req.params.format == "csv") ? res.csv(data) : res.json(data);
+				(req.params.format == "csv") ? res.csv(data) : res.json(data);
+			});
 		});
-	});
 
-	app.get('/trips/:trip_id([0-9]+).:format(csv)?', function(req, res, next) {
+	app.get('/trips/:trip_id([0-9]+).:format(csv)?', function (req, res) {
 		db.show(req.params, req.query, function(err, data) {
 			if (err) { res.send(err); console.error(err); return; }
-			(req.params.format == "csv") ? res.csv(data) : res.json(data);
+				(req.params.format == "csv") ? res.csv(data) : res.json(data);
+			});
 		});
-	});
 
-	app.post('/trips/:trip_id([0-9]+).:format(csv)?', function(req, res, next) {
-		db.update(req.params, req.body, function(err, data) {
+	app.post('/trips/:trip_id([0-9]+).:format(csv)?', function(req, res) {
+		db.update(req.params, req.body, function(err) {
 			if (err) { res.send(err); console.error(err); return; }
 			res.end(); // 205 Reset Content
 		});
 	});
 
-	app.del('/trips/:trip_id([0-9]+).:format(csv)?', function(req, res, next) {
-		db.destroy(req.params, function(err, data) {
+	app.del('/trips/:trip_id([0-9]+).:format(csv)?', function(req, res) {
+		db.destroy(req.params, function(err) {
 			if (err) { res.send(err); console.error(err); return; }
 			res.end(); // 204 No Content
 		});
@@ -35,21 +35,21 @@ module.exports = function(app) {
 
 	/* SENSOR ROUTES */
 
-	app.get('/trips/:trip_id/:sensor(acc|har|goo|lac|gra|tag).:format(csv)?', function(req, res, next) {
+	app.get('/trips/:trip_id/:sensor(acc|har|goo|lac|gra|tag).:format(csv)?', function(req, res) {
 		db.show(req.params, req.query, function(err, data) {
 			if (err) { res.send(err); console.error(err); return; }
 			(req.params.format == "csv") ? res.csv(data) : res.json(data);
 		});
 	});
 
-	app.get('/trips/:trip_id/gps.:format(csv)?', function(req, res, next) {
+	app.get('/trips/:trip_id/gps.:format(csv)?', function(req, res) {
 		db.gps(req.params, req.query, function(err, data) {
 			if (err) { res.send(err); console.error(err); return; }
 			(req.params.format == "csv") ? res.csv(data) : res.json(data);
 		});
 	});
 
-	app.get('/trips/:trip_id/:sensor(acc|lac|gra)/window.:format(csv)?', function(req, res, next) {
+	app.get('/trips/:trip_id/:sensor(acc|lac|gra)/window.:format(csv)?', function(req, res) {
 		db.window(req.params, req.query, function(err, data) {
 			if (err) { res.send(err); console.error(err); return; }
 			(req.params.format == "csv") ? res.csv(data) : res.json(data);
@@ -57,7 +57,7 @@ module.exports = function(app) {
 	});
 
 	// count sensor data of a specific trip
-	app.get('/trips/:trip_id/:sensor(acc|lac|gra)/count.:format(csv)?', function(req, res, next) {
+	app.get('/trips/:trip_id/:sensor(acc|lac|gra)/count.:format(csv)?', function(req, res) {
 		db.count(req.params, function(err, data) {
 			if (err) { res.send(err); console.error(err); return; }
 			(req.params.format == "csv") ? res.csv(data) : res.json(data);
@@ -67,7 +67,7 @@ module.exports = function(app) {
 	/* DEVICE ROUTES (SEE WIKI) */
 
 	// list all devices
-	app.get('/devices.:format(csv)?', function(req, res, next) {
+	app.get('/devices.:format(csv)?', function(req, res) {
 		db.devices(function(err, data) {
 			if (err) { res.send(err); console.error(err); return; }
 			(req.params.format == "csv") ? res.csv(data) : res.json(data);
@@ -75,7 +75,7 @@ module.exports = function(app) {
 	});
 
 	// show all records of a specific device
-	app.get('/devices/:uuid.:format(csv)?', function(req, res, next) {
+	app.get('/devices/:uuid.:format(csv)?', function(req, res) {
 		db.show(req.params, req.query, function(err, data) {
 			if (err) { res.send(err); console.error(err); return; }
 			(req.params.format == "csv") ? res.csv(data) : res.json(data);
@@ -83,7 +83,7 @@ module.exports = function(app) {
 	});
 
 	// count records of a specific device
-	app.get('/devices/:uuid/count.:format(csv)?', function(req, res, next) {
+	app.get('/devices/:uuid/count.:format(csv)?', function(req, res) {
 		db.count(req.params, function(err, data) {
 			if (err) { res.send(err); console.error(err); return; }
 			res.json(data);
@@ -91,21 +91,22 @@ module.exports = function(app) {
 	});
 
 	// show specific sensor data for a device
-	app.get('/devices/:uuid/:sensor.:format(csv)?', function(req, res, next) {
+	app.get('/devices/:uuid/:sensor.:format(csv)?', function(req, res) {
 		db.show(req.params, req.query, function(err, data) {
+
 			if (err) { res.send(err); console.error(err); return; }
 			(req.params.format == "csv") ? res.csv(data) : res.json(data);
 		});
 	});
 
-	app.get('/partials/:name', function(req, res, next) {
-		console.log('partials/' + req.params.name);
+	app.get('/partials/:name', function(req, res) {
+		console.log('\x1b[31m%s\x1b[0m', ('partials/' + req.params.name), '\x1b[0m');  //cyan
 		res.render('partials/' + req.params.name);
 	});
 
-	app.get('/', function(req, res, next) {
+	app.get('/', function(req, res) {
 		res.render('index');
 	});
 
 //BOT
-}
+};
