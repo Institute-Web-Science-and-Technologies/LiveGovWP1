@@ -10,17 +10,17 @@
 	h1
 		small(style="padding-left: 2em;") {{ data.selection }}
 
-	chart(data="data.gra", selection="data.selection", domain="data.domain", sensor="'gra'")
+	chart(data="data.gra", brush="$root.trip.brush", domain="data.domain", sensor="'gra'")
 		h2 Gravity
 			small(style="padding-left: 2em;") {{ data.gra.length }}
 		#chart.gra
 
-	chart(data="data.acc", selection="data.selection", domain="data.domain", sensor="'acc'")
+	chart(data="data.acc", brush="$root.trip.brush", domain="data.domain", sensor="'acc'")
 		h2 Accelerometer
 			small(style="padding-left: 2em;") {{ data.acc.length }}
 		#chart.acc
 
-	chart(data="data.lac", selection="data.selection", domain="data.domain", sensor="'lac'")
+	chart(data="data.lac", brush="$root.trip.brush", domain="data.domain", sensor="'lac'")
 		h2 Linear Acceleration
 			small(style="padding-left: 2em;") {{ data.lac.length }}
 		#chart.lac
