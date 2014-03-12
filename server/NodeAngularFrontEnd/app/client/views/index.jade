@@ -67,25 +67,29 @@ html(lang="en", ng-app="inspectionFrontEnd")
 		//- Stylesheets
 		link(rel="stylesheet", href="/app/css/001.css")
 
-		body
-			header
-				nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation" ng-controller="navCtrl as nav")
-					ul.nav.navbar-nav
-						li(ng-class='{active:nav.is("rec")}')
-							a(href="/#/rec") Recordings
-						li(ng-class='{active:nav.is("raw"), disabled:!$root.tripSelected}')
-							a(href="/#/raw") Raw Data
-						li(ng-class='{active:nav.is("har"), disabled:!$root.tripSelected}')
-							a(href="/#/har") Activity Recognition
+	body
+		header
+			nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation" ng-controller="navCtrl as nav")
+				ul.nav.navbar-nav
+					li(ng-class='{active:nav.is("rec")}')
+						a(href="/#/rec") Recordings
+					li(ng-class='{active:nav.is("raw"), disabled:!$root.trip.id}')
+						a(href="/#/raw") Raw Data
+					li(ng-class='{active:nav.is("har"), disabled:!$root.trip.id}')
+						a(href="/#/har") Activity Recognition
 
-					ul.nav.navbar-nav.pull-right
-						li(ng-class="{'hidden':!data.selection}")
-							a.clear-button Clear Brush
-						li(ng-class="{'hidden':!data.selection}")
-							a {{ data.selection[0] | date:'HH:mm' }} — {{ data.selection[1] | date:'HH:mm' }} ({{ data.selection[0] | duration:data.selection[1] | date:'mm' }} minutes)
-						li
-							a.trip-indicator(ng-class="{'selected':$root.tripSelected}") {{ $root.tripSelected || "PLEASE SELECT A TRIP" }}
-		#body
-			div(ng-view)
+				ul.nav.navbar-nav.pull-right
+					li(ng-class="{'hidden':!$root.trip.id}", ng-click="nav.deselectTrip()")
+						a.clear-button Deselect Trip
+					li(ng-class="{'hidden':!$root.trip.brush}", ng-click="nav.clearBrush()")
+						a.clear-button Clear Brush
+					li(ng-class="{'hidden':!$root.trip.brush}", ng-click="nav.loadMoreData()")
+						a.clear-button Load More Data
+					li(ng-class="{'hidden':!$root.trip.brush}")
+						a {{ $root.trip.brush[0] | date:'HH:mm' }} — {{ $root.trip.brush[1] | date:'HH:mm' }} ({{ $root.trip.brush[0] | duration:$root.trip.brush[1] | date:'mm' }} minutes)
+					li
+						a.trip-indicator(ng-class="{'selected':$root.trip.id}") {{ $root.trip.id || "PLEASE SELECT A TRIP" }}
+	#body
+		div(ng-view)
 
 // ex:ft=jade
