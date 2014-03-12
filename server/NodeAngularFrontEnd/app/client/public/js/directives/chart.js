@@ -9,7 +9,7 @@ app.directive("chart", function(debounce) { // $timeout here
 		restrict: "EA",
 		scope: {
 			data: "=",
-			selection: "=",
+			brush: "=",
 			domain: "=",
 			sensor: "="
 		},
@@ -90,8 +90,8 @@ app.directive("chart", function(debounce) { // $timeout here
 
 				// setup axis domain
 
-				if (scope.selection) {
-					x.domain(scope.selection);
+				if (scope.brush) {
+					x.domain(scope.brush);
 				} else {
 					x.domain(d3.extent([].concat.apply([], data.map(function(d) {return [d.starttime, d.endtime]; }))));
 				}
@@ -147,22 +147,12 @@ app.directive("chart", function(debounce) { // $timeout here
 			};
 
 			function brushend() {
-
 				if (brush.extent()[0].getTime() == brush.extent()[1].getTime()) {
-					console.log("CLICK!");
-					return
+					console.log("click!");
+					return;
 				} else {
-					scope.$apply(function() { scope.selection = brush.extent(); }); // put selection in scope
+					scope.$apply(function() { scope.brush = brush.extent(); }); // put selection in scope
 				}
-
-				// var get_button = d3.select(".clear-button");
-				// if(get_button.empty() === true) {
-				// 	clear_button = chart.append('text')
-				// 		.attr("y", 460)
-				// 		.attr("x", 825)
-				// 		.attr("class", "clear-button")
-				// 		.text("Clear Brush");
-				// }
 
 				x.domain(brush.extent());
 				transition_data();
@@ -171,17 +161,11 @@ app.directive("chart", function(debounce) { // $timeout here
 
 				chart.select("brush").call(brush.clear());
 				chart.select("brush").call(brush);
-
-				d3.select('.clear-button').on('click', function() {
-					x.domain(d3.extent([].concat.apply([], scope.data.map(function(d) {return [d.starttime, d.endtime]; }))));
-					transition_data(scope.data);
-					reset_axis();
-					scope.selection = ''; // FIXME clear button must clear all brushes
-				});
 			}
 
 			function transition_data(data) {
 				if (!data) { return; }
+				scope.$root.trip.brushSize = data.length; // put selection in scope
 				svg.selectAll(".line0").attr("d", line(data.map(function(d) { return [d.ts, d.avgx]; })));
 				svg.selectAll(".line1").attr("d", line(data.map(function(d) { return [d.ts, d.avgy]; })));
 				svg.selectAll(".line2").attr("d", line(data.map(function(d) { return [d.ts, d.avgz]; })));
@@ -193,10 +177,20 @@ app.directive("chart", function(debounce) { // $timeout here
 					.call(xAxis);
 			}
 
+			function clear_brush() {
+				if (scope.data) {
+					x.domain(d3.extent([].concat.apply([], scope.data.map(function(d) {return [d.starttime, d.endtime]; }))));
+					transition_data(scope.data);
+					reset_axis();
+				}
+			}
+
+			// WATCH FOR BRUSH CLEARING
+			scope.$watch('!brush', function() {clear_brush(); } );
+
 			// WATCH FOR NEW DATA
 			scope.$watchCollection("data", function(data, oldData) {
-				if (!data) { console.warn("Warning: drawGraph() has no data!"); return; }
-				drawGraph(data);
+				data && drawGraph(data);
 			});
 
 		} // end link

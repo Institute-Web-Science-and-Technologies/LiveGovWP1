@@ -22,11 +22,29 @@ app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams,
 		Trip.query().then(function (data) {
 			$rootScope.trips = data;
 		}, function (data) {
-			console.error("Error getting trips");
+			throw("Error getting trips!");
 		});
 	}
 
-	// TODO retain table sorting
+	// select a trip and calculate it's array index in $scope.trips
+	this.select = function (trip) {
+		if (!$scope.trips) return;
+		if ($rootScope.trip && $rootScope.trip.id === trip.trip_id) return;
+
+		$rootScope.trip = {
+			'id': trip.trip_id || undefined,
+			'idx': findById($rootScope.trips, trip.trip_id) || undefined,
+			'brush': undefined,
+			'domain': undefined
+		}
+	};
+
+	// reset previously drawn brushes if we return to the recordings view
+	if ($rootScope.trip && $rootScope.trip.id && $rootScope.trip.brush) {
+		$rootScope.trip.brush = undefined;
+	}
+
+	// TODO retain and display table sorting
 
 	// delete a trip
 	this.destroy = function (trip) {
@@ -46,42 +64,34 @@ app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams,
 		console.log("DB QUERY: UPDATED TRIP " + trip.trip_id);
 	};
 
-	// globally select a trip
-	this.select = function (trip) {
-		$rootScope.tripSelected = trip.trip_id;
-
-		// reset brush selection if trip changed
-		// $scope.data.selection = '';
-		// $routeParams.trip_id = trip.trip_id; // CHANGEME rewrite and react on $locationParams (if possible)
-	};
-
 	// change route to loc
 	this.to = function(loc) {
-		if ($rootScope.tripSelected) {
+		if ($rootScope.trip) {
 			$location.path(loc);
 		}
 	};
 
 	// test if a trip is selected (highlight helper, see rec.jade)
 	this.is = function(trip) {
-		return ($rootScope.tripSelected === trip.trip_id) ? true : false;
+		if ($rootScope.trip) {
+			return ($rootScope.trip.id === trip.trip_id) ? true : false;
+		}
 	};
 
-	$rootScope.$watch('tripSelected',
+	$rootScope.$watch(
+		function() {
+			return $rootScope.trip === undefined;
+		},
 		// FIXME the next function fires twice after switching back vom raw to rec
 		// and selecting a different trip. though the db requests are only made
 		// once, i $rootScope will be updated twice.
 		function (newTrip, oldTrip) {
 			if (newTrip !== oldTrip) {
-				console.log(newTrip, oldTrip);
-				var trip_idx = findById($rootScope.trips, $rootScope.tripSelected);
-				console.info("TRIP SELECTED\n", $rootScope.trips[trip_idx]);
-
-				console.log('data req from recCtrl');
-				Data.geo($rootScope.tripSelected, trip_idx);
-				Data.sensor($rootScope.tripSelected, trip_idx, 'gra');
-				Data.sensor($rootScope.tripSelected, trip_idx, 'acc');
-				Data.sensor($rootScope.tripSelected, trip_idx, 'lac');
+				console.info("TRIP SELECTED\n", $rootScope.trips[$rootScope.trip.idx]);
+				Data.geo();
+				Data.sensor('gra');
+				Data.sensor('acc');
+				Data.sensor('lac');
 			}
 		}
 	);
@@ -89,57 +99,57 @@ app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams,
 
 app.controller('rawCtrl', function ($scope, $rootScope, $location, Data) {
 
-	$rootScope.tripSelected || $location.path('/rec');
-	var trip_idx = findById($rootScope.trips, $rootScope.tripSelected);
-	$scope.data = $rootScope.trips[trip_idx];
+	if (!$rootScope.trip) {
+		$location.path('/rec')
+		return;
+	}
 
-	$scope.$watchCollection('data.selection', function (sel, oldSel) {
-		if (sel !== oldSel) {
+	$scope.data = $rootScope.trips[$rootScope.trip.idx];
 
-
-
-			// FIX BRUSH
-
-			if (sel[0].getTime() == sel[1].getTime()) {
-				console.warn('THATS NO BRUSH');
-				console.log(sel[0].getTime());
-				console.log(sel[1].getTime());
-				$scope.data.selection = [];
-				return;
-			}
-
-			console.log(sel);
-			console.log("BRUSH DETECTED: " + sel);
-
-
-
-
-			// SHOULD ONLY BE TRIGGERED TO RELOAD DATA, SO SKIP GEO
-			if ($rootScope.tripSelected) {
-				console.log('data req from rawCtrl');
-				// Data.geo($rootScope.tripSelected, trip_idx);
-				Data.sensor($rootScope.tripSelected, trip_idx, 'gra', sel);
-				Data.sensor($rootScope.tripSelected, trip_idx, 'acc', sel);
-				Data.sensor($rootScope.tripSelected, trip_idx, 'lac', sel);
-			}
+	$rootScope.$watch('trip.brush', function (sel, oldSel) {
+		if (sel && sel !== oldSel) {
+			Data.sensor('gra', sel);
+			Data.sensor('acc', sel);
+			Data.sensor('lac', sel);
 		}
 	});
 });
 
 app.controller('harCtrl', function ($scope, $rootScope, $location) {
-	$rootScope.tripSelected || $location.path('/rec');
-	var trip_idx = findById($rootScope.trips, $rootScope.tripSelected);
-	$scope.data = $scope.data[trip_idx];
+	$rootScope.trip || $location.path('/rec');
+	$scope.data = $scope.data[$rootScope.trip.idx];
 });
 
 // navbar
-app.controller('navCtrl', function ($scope, $rootScope, $route) {
-	if ($rootScope.tripSelected) {
-		var trip_idx = findById($rootScope.trips, $rootScope.tripSelected);
-		$scope.data = $scope.data[trip_idx];
+app.controller('navCtrl', function ($scope, $rootScope, $route, Data) {
+	if ($rootScope.trip) {
+		$scope.data = $scope.data[$rootScope.trip.idx];
+		console.log($scope.data);
 	}
 
 	this.is = function(loc) {
 		return ($route.current && $route.current.name == loc) ? true : false;
 	};
+
+	this.deselectTrip = function () {
+		delete $rootScope.trip;
+		// $rootScope.trip.id = undefined;
+		// $rootScope.trip.idx = undefined;
+		// $rootScope.trip.brush = undefined;
+		// $rootScope.trip.domain = undefined;
+	}
+
+	this.clearBrush = function () {
+		$rootScope.trip.brush = undefined;
+	}
+
+	this.loadMoreData = function(sensor) {
+		Data.sensor('gra', $rootScope.trip.brush, 'more');
+		Data.sensor('acc', $rootScope.trip.brush, 'more');
+		Data.sensor('lac', $rootScope.trip.brush, 'more');
+		$scope.digest();
+		// $scope.apply();
+	}
+
+
 });

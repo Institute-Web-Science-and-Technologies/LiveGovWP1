@@ -58,31 +58,34 @@ app.factory('Trip', ['$http', '$q', function ($http, $q) {
 
 app.factory('Data', ['Geo', 'Sensor', '$rootScope', 'debounce', function (Geo, Sensor, $rootScope) {
 	return {
-		geo: function (trip_id, trip_idx) {
-			Geo.query(trip_id)
+		geo: function () {
+			var queryStartTime = new Date();
+			Geo.query($rootScope.trip.id)
 			.then(function (data) {
-				console.log('Success: geo data for trip ' + trip_id + ' ready');
-				$rootScope.trips[trip_idx].geo = data;
+				console.log('Success: geo data for trip ' + $rootScope.trip.id + ' ready (' + ((new Date() - queryStartTime) / 1000) + " ms)");
+				$rootScope.trips[$rootScope.trip.idx].geo = data;
 			}, function (data) {
-				console.log("Failure: No geo data for trip " + trip_id);
+				console.log("Failure: No geo data for trip " + $rootScope.trip.id);
 			});
 		},
 
-		sensor: function (trip_id, trip_idx, sensor, sel) {
+		sensor: function (sensor, sel, more) {
+			var queryStartTime = new Date();
 			Sensor.query({
-				trip_id: trip_id,
+				trip_id: $rootScope.trip.id,
 				sensor: sensor,
-				trips: $rootScope.trips[trip_idx][sensor], // = this sensor data of current trip!
-				sel: sel
+				oldData: $rootScope.trips[$rootScope.trip.idx][sensor],
+				sel: sel,
+				more: true
 			}).then(function (data) {
-				console.log('Success: ' + sensor + ' data for trip ' + trip_id + ' ready');
-				$rootScope.trips[trip_idx][sensor] = data;
+				console.log('Success: ' + sensor + ' data for trip ' + $rootScope.trip.id + ' ready (' + ((new Date() - queryStartTime) / 1000) + " ms)");
+				$rootScope.trips[$rootScope.trip.idx][sensor] = data;
 			}, function (data) {
-				console.log("Failure: No " + sensor + " data for trip " + trip_id);
+				console.log("Failure: No " + sensor + " data for trip " + $rootScope.trip.id);
 			});
 		}
 	};
-}])
+}]);
 
 app.factory('Geo', ['$http', '$q', function ($http, $q) {
 
@@ -194,12 +197,10 @@ app.factory('Geo', ['$http', '$q', function ($http, $q) {
 		}};
 }]);
 
-app.factory('Sensor', ['$http', '$q', function ($http, $q) {
+app.factory('Sensor', ['$http', '$q', '$rootScope', function ($http, $q, $rootScope) {
 
 	function merge(oldData, data) {
-		// console.log(oldData);
-		// console.log(data);
-
+		console.log(oldData.length, data.length);
 		var len = oldData.length;
 		function index() {
 			for (var i = 0; i < len; i++) {
@@ -215,8 +216,9 @@ app.factory('Sensor', ['$http', '$q', function ($http, $q) {
 				}
 			}
 		}
-		
+		console.log(range());
 		Array.prototype.splice.apply(oldData, range().concat(data));
+		console.log(oldData.length);
 		return oldData;
 	}
 
@@ -235,12 +237,11 @@ app.factory('Sensor', ['$http', '$q', function ($http, $q) {
 					sensor = value.sensor,
 					startTime = '',
 					endTime = '',
-					windowSize = '';
+					windowSize;
 
-			if (value.trip) {
-				var oldData = value.trip[sensor];
+			if (value.oldData) {
+				var oldData = value.oldData;
 			}
-
 
 			if (value.sel) {
 				startTime = value.sel[0].getTime();
@@ -250,25 +251,22 @@ app.factory('Sensor', ['$http', '$q', function ($http, $q) {
 			if (value.windowSize) {
 				windowSize = value.windowSize;
 			}
+			else if (value.more && $rootScope.trip.brushSize) {
+				console.log($rootScope.trip.brushSize);
+				windowSize = $rootScope.trip.brushSize + 200;
+				console.log(windowSize);
+			}
 
 			var deferred = $q.defer();
-
-			// console.log('DB request for ' + sensor + ' data of trip ' + trip_id);
-			var queryStartTime = new Date();
-
-			// if (startTime) {
-			// 	console.info('/trips/' + trip_id + '/' + sensor + '/window' + '?starttime=' + startTime + '?endtime=' + endTime);
-			// }
 
 			$http({
 				method: "GET",
 				url: '/trips/' + trip_id + '/' + sensor + '/window',
 				params: {
-					// windowSize: windowSize,
+					window: windowSize,
 					startTime: startTime,
 					endTime: endTime
 				}}).success(function (data, status, headers, config) {
-					// console.log("Success: received " + sensor + " data for trip " + trip_id + " after " + ((new Date() - queryStartTime) / 1000) + " ms");
 
 					data.forEach(function(d) {
 						d.ts         = new Date((+d.starttime + (+d.endtime)) / 2);
@@ -276,18 +274,11 @@ app.factory('Sensor', ['$http', '$q', function ($http, $q) {
 						d.endtime    = +d.endtime;
 					});
 
-					// console.info(data);
+					if (oldData) { data = merge(oldData, data); console.log('merging');}
 
-					if (oldData && oldData.length > 0 && data) { // ?
-						data = merge(oldData, data);
-						// console.log("Success: merged " + sensor + " data for trip " + trip_id + " after " + ((new Date() - queryStartTime) / 1000) + " ms");
-					}
-
-					// console.log("Success: prepared " + sensor + " data for trip " + trip_id + " after " + ((new Date() - queryStartTime) / 1000) + " ms");
 					deferred.resolve(data);
-					// console.log("Success: serving " + sensor + " data for trip " + trip_id + " after " + ((new Date() - queryStartTime) / 1000) + " ms");
 				}).error(function (data, status, headers, config) {
-					// console.log("Failure: couldn't get any " + sensor + " data for trip " + trip_id);
+					console.log("Failure: couldn't get any " + sensor + " data for trip " + trip_id);
 					deferred.reject(data);
 				});
 
