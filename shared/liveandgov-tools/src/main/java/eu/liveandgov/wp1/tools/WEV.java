@@ -4,8 +4,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import eu.liveandgov.wp1.data.impl.GPS;
 import eu.liveandgov.wp1.data.impl.Waiting;
-import eu.liveandgov.wp1.pipeline.impl.ScanIn;
 import eu.liveandgov.wp1.pipeline.impl.LinesOut;
+import eu.liveandgov.wp1.pipeline.impl.ScanIn;
 import eu.liveandgov.wp1.pipeline.impl.Transformation;
 import eu.liveandgov.wp1.pps.PPSPipeline;
 import eu.liveandgov.wp1.pps.api.AggregatingPS;
@@ -52,16 +52,16 @@ public class WEV {
         if (!Iterables.isEmpty(args.get("help"))) {
             System.out.println("usage: [options]");
             System.out.println("  options:");
-            System.out.println("    -h, --hres DOUBLE Horizontal resolution of the grid in degrees");
-            System.out.println("    -v, --vres DOUBLE Vertical resolution of the grid in degrees");
-            System.out.println("    -c, --centroid BOOLEAN True if check is by centroid instead of first entry point");
+            System.out.println("    -h, --hres DOUBLE         Horizontal resolution of the grid in degrees");
+            System.out.println("    -v, --vres DOUBLE         Vertical resolution of the grid in degrees");
+            System.out.println("    -c, --centroid BOOLEAN    True if check is by centroid instead of first entry point");
             System.out.println("    -s, --storedegree INTEGER Amount of results to be cached");
-            System.out.println("    -d, --distance DOUBLE Maximum distance to identify an object as proxy");
-            System.out.println("    -l, --local STRING Adds a .csv file to the local sources");
-            System.out.println("    -r, --remote STRING Adds a overpass url to the remote sources");
-            System.out.println("    -k, --key STRING The key of proximity objects to filter");
-            System.out.println("    -t, --time LONG The time considered waiting time");
-            System.out.println("    -?, --help Displays the help");
+            System.out.println("    -d, --distance DOUBLE     Maximum distance to identify an object as proxy");
+            System.out.println("    -l, --local STRING        Adds a .csv file to the local sources");
+            System.out.println("    -r, --remote STRING       Adds a overpass url to the remote sources");
+            System.out.println("    -k, --key STRING          The key of proximity objects to filter");
+            System.out.println("    -t, --time LONG           The time considered waiting time");
+            System.out.println("    -?, --help                Displays the help");
         }
 
         final double hres = Double.valueOf(Iterables.getFirst(args.get("hres"), "4.0484081228265274681719312721498e-10"));

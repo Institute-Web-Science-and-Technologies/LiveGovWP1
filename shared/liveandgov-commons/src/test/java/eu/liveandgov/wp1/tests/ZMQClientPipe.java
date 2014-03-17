@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.tests;
 
-import eu.liveandgov.wp1.pipeline.impl.ScanIn;
 import eu.liveandgov.wp1.pipeline.impl.LinesOut;
+import eu.liveandgov.wp1.pipeline.impl.ScanIn;
 import eu.liveandgov.wp1.pipeline.impl.ZMQClient;
 import org.zeromq.ZMQ;
 

@@ -3,7 +3,6 @@ package eu.liveandgov.wp1.tools;
 import com.google.common.base.Function;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 /**
  * <p>Utilities for command-line tools</p>
@@ -69,7 +68,7 @@ public class ToolsCommon {
             @Override
             public Boolean apply(String s) {
                 for (String key : keys) {
-                    if (s.equals(key)) return true;
+                    if (key.equals(s)) return true;
                 }
                 return false;
             }

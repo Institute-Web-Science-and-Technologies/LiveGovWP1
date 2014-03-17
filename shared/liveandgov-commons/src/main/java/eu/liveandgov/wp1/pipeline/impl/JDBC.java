@@ -44,6 +44,14 @@ public class JDBC extends Producer<Map<String, Object>> {
         this.password = password;
     }
 
+    public boolean addDriver(String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
 
     public void readAll(String cmd) throws SQLException {
         readAll(cmd, null);
@@ -67,12 +75,12 @@ public class JDBC extends Producer<Map<String, Object>> {
         final String[] columnNames = new String[columnCount];
 
         for (int i = 0; i < columnCount; i++)
-            columnNames[i] = metadata.getColumnName(i);
+            columnNames[i] = metadata.getColumnName(i + 1);
 
         final Map<String, Object> row = new HashMap<String, Object>();
         while (source.next()) {
             for (int i = 0; i < columnCount; i++)
-                row.put(columnNames[i], source.getObject(i));
+                row.put(columnNames[i], source.getObject(i + 1));
 
             produce(row);
         }

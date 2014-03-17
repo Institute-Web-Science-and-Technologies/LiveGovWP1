@@ -100,6 +100,42 @@
                 <version>1.3.3</version>
                 <executions>
                     <execution>
+                        <id>JDJ packaging</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>eu.liveandgov.wp1.tools.JDJ</mainClass>
+                                </transformer>
+                            </transformers>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>jdj</shadedClassifierName>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>WEV packaging</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>eu.liveandgov.wp1.tools.WEV</mainClass>
+                                </transformer>
+                            </transformers>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>wev</shadedClassifierName>
+                        </configuration>
+                    </execution>
+
+                    <execution>
                         <id>ZMQC packaging</id>
                         <phase>package</phase>
                         <goals>
@@ -132,24 +168,6 @@
                             </transformers>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>zmqs</shadedClassifierName>
-                        </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>WEV packaging</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>eu.liveandgov.wp1.tools.WEV</mainClass>
-                                </transformer>
-                            </transformers>
-                            <shadedArtifactAttached>true</shadedArtifactAttached>
-                            <shadedClassifierName>wev</shadedClassifierName>
                         </configuration>
                     </execution>
                 </executions>

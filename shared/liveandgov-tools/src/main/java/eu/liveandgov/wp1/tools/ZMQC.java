@@ -2,7 +2,10 @@ package eu.liveandgov.wp1.tools;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import eu.liveandgov.wp1.pipeline.impl.*;
+import eu.liveandgov.wp1.pipeline.impl.Catcher;
+import eu.liveandgov.wp1.pipeline.impl.LineIn;
+import eu.liveandgov.wp1.pipeline.impl.PrintOut;
+import eu.liveandgov.wp1.pipeline.impl.ZMQClient;
 import org.zeromq.ZMQ;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;

@@ -1,7 +1,6 @@
 package eu.liveandgov.wp1.pipeline.impl;
 
 import eu.liveandgov.wp1.pipeline.Producer;
-import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.io.InputStream;
 import java.util.Scanner;

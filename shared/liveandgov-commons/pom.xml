@@ -70,6 +70,18 @@
             <artifactId>jeromq</artifactId>
             <version>0.3.3</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.3-1101-jdbc41</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20131018</version>
+        </dependency>
     </dependencies>
 
     <distributionManagement>

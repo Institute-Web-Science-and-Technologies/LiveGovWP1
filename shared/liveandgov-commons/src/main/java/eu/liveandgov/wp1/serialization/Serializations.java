@@ -3,14 +3,14 @@ package eu.liveandgov.wp1.serialization;
 import com.google.common.base.Function;
 
 /**
- * <p>Contains methods working on eu.liveandgov.wp1.serialization instances</p>
+ * <p>Contains methods working on serialization instances</p>
  * Created by Lukas Härtel on 10.02.14.
  */
 public class Serializations {
     /**
-     * This method converts a eu.liveandgov.wp1.serialization object into a eu.liveandgov.wp1.serialization functor
+     * This method converts a serialization object into a serialization functor
      *
-     * @param serialization The eu.liveandgov.wp1.serialization object to convert
+     * @param serialization The serialization object to convert
      * @param <T>           The type of the input items
      * @return Returns a functor that maps T to String
      */
@@ -24,9 +24,9 @@ public class Serializations {
     }
 
     /**
-     * This method converts a eu.liveandgov.wp1.serialization object into a de-eu.liveandgov.wp1.serialization functor
+     * This method converts a serialization object into a de-serialization functor
      *
-     * @param serialization The eu.liveandgov.wp1.serialization object to convert
+     * @param serialization The serialization object to convert
      * @param <T>           The type of the output items
      * @return Returns a functor that maps String to T
      */
