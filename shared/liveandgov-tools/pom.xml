@@ -100,6 +100,42 @@
                 <version>1.3.3</version>
                 <executions>
                     <execution>
+                        <id>JDI packaging</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>eu.liveandgov.wp1.tools.JDI</mainClass>
+                                </transformer>
+                            </transformers>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>jdi</shadedClassifierName>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>JDIA packaging</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>eu.liveandgov.wp1.tools.JDIA</mainClass>
+                                </transformer>
+                            </transformers>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>jdia</shadedClassifierName>
+                        </configuration>
+                    </execution>
+
+                    <execution>
                         <id>JDJ packaging</id>
                         <phase>package</phase>
                         <goals>
