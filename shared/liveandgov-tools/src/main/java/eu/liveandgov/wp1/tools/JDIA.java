@@ -54,7 +54,7 @@ public class JDIA {
         }
 
         if (!Iterables.isEmpty(args.get("help")) || Iterables.isEmpty(args.get("map"))) {
-            System.out.println("usage: [options] command");
+            System.out.println("usage: [options]");
             System.out.println("  JDIA writes all entries of a database for SSF specified by mappings from types to tables and columns");
             System.out.println("  options:");
             System.out.println("    -h, --host STRING     Database url including host, port and table, according to specification of the driver");

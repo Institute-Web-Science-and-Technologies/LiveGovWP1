@@ -2,6 +2,7 @@ package eu.liveandgov.wp1.pps.api.csv;
 
 import eu.liveandgov.wp1.pps.api.CalculationResult;
 import eu.liveandgov.wp1.pps.api.gi.GridIndexPS;
+import eu.liveandgov.wp1.util.Geo;
 import org.apache.commons.csv.CSVParser;
 
 import java.io.InputStream;
@@ -70,22 +71,6 @@ public class StaticIPS extends GridIndexPS {
         this.distance = distance;
     }
 
-    /**
-     * We might have this functions everywhere around this project
-     */
-    private static double haversine(double lat1, final double lon1, double lat2, final double lon2) {
-        final double R = 6371000.785;
-        final double dLat = Math.toRadians(lat2 - lat1);
-        final double dLon = Math.toRadians(lon2 - lon1);
-        lat1 = Math.toRadians(lat1);
-        lat2 = Math.toRadians(lat2);
-
-        final double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
-        final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
-    }
-
     @Override
     protected CalculationResult calculateContains(double lat, double lon) {
         try {
@@ -102,7 +87,7 @@ public class StaticIPS extends GridIndexPS {
                 final double cLon = Double.valueOf(line[lonField]);
 
                 // Test distance
-                if (haversine(lat, lon, cLat, cLon) < distance) {
+                if (Geo.haversine(lat, lon, cLat, cLon) < distance) {
                     // If in range, close file and return in-proximityType
                     inputStreamReader.close();
                     inputStream.close();
