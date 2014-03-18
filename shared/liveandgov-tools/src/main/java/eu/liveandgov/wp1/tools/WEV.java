@@ -49,6 +49,12 @@ public class WEV {
                         "?", "help"
                 ), rawArgs);
 
+        try {
+            ToolsCommon.config(args, new File("default.config"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         if (!Iterables.isEmpty(args.get("help"))) {
             System.out.println("usage: [options]");
             System.out.println("  options:");

@@ -3,12 +3,27 @@ package eu.liveandgov.wp1.tools;
 import com.google.common.base.Function;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Iterator;
 
 /**
  * <p>Utilities for command-line tools</p>
  * Created by Lukas Härtel on 10.02.14.
  */
 public class ToolsCommon {
+
+    public static Multimap<String, String> commands(Function<String, Boolean> flag, Function<String, String> shorthandExpansion, String[] args) {
+        final Multimap<String, String> result = HashMultimap.create();
+        return commands(result, flag, shorthandExpansion, args);
+    }
+
     /**
      * Parses a set of commands
      *
@@ -17,8 +32,7 @@ public class ToolsCommon {
      * @param args               The arguments to parse
      * @return Returns a multimap from key to values
      */
-    public static Multimap<String, String> commands(Function<String, Boolean> flag, Function<String, String> shorthandExpansion, String[] args) {
-        final Multimap<String, String> result = HashMultimap.create();
+    public static Multimap<String, String> commands(final Multimap<String, String> enrich, Function<String, Boolean> flag, Function<String, String> shorthandExpansion, String[] args) {
 
         for (int i = 0; i < args.length; i++) {
             final String key;
@@ -41,10 +55,43 @@ public class ToolsCommon {
                 }
             } else continue;
 
-            result.put(key, value);
+            enrich.put(key, value);
         }
 
-        return result;
+        return enrich;
+    }
+
+    public static Multimap<String, String> config(File file) throws IOException {
+        final Multimap<String, String> result = HashMultimap.create();
+        return config(result, file);
+    }
+
+    public static Multimap<String, String> config(Multimap<String, String> enrich, File file) throws IOException {
+        if (!file.exists()) return enrich;
+
+        final FileInputStream fileInputStream = new FileInputStream(file);
+        final JSONObject jo = new JSONObject(new JSONTokener(fileInputStream));
+
+        final Iterator keys = jo.keys();
+        while (keys.hasNext()) {
+            final String key = (String) keys.next();
+
+            final JSONArray a = jo.optJSONArray(key);
+
+            if (a != null) {
+                for (int i = 0; i < a.length(); i++) {
+                    enrich.put(key, a.getString(i));
+                }
+            }
+            else
+            {
+                enrich.put(key,jo.getString(key));
+            }
+        }
+
+        fileInputStream.close();
+
+        return enrich;
     }
 
     /**

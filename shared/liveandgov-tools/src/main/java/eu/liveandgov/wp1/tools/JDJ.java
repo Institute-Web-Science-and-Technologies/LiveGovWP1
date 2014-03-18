@@ -4,6 +4,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import eu.liveandgov.wp1.pipeline.impl.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 
 /**
@@ -26,6 +28,11 @@ public class JDJ {
                         "?", "help"
                 ), rawArgs);
 
+        try {
+            ToolsCommon.config(args, new File("default.config"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         final String command = ToolsCommon.end(rawArgs);
 

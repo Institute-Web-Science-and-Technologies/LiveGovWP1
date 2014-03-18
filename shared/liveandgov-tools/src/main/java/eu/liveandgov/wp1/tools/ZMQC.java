@@ -8,6 +8,8 @@ import eu.liveandgov.wp1.pipeline.impl.PrintOut;
 import eu.liveandgov.wp1.pipeline.impl.ZMQClient;
 import org.zeromq.ZMQ;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
@@ -29,6 +31,11 @@ public class ZMQC {
                         "?", "help"
                 ), rawArgs);
 
+        try {
+            ToolsCommon.config(args, new File("default.config"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         // Get main parameter
         final String address = ToolsCommon.end(rawArgs);
