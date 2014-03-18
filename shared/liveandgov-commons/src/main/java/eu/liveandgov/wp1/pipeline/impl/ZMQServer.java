@@ -131,5 +131,11 @@ public class ZMQServer extends Pipeline<String, String> implements Stoppable {
             responder.cancel(true);
         if (connection != null)
             connection.cancel(true);
+
+        if (socket != null)
+            socket.close();
+
+        if (context != null)
+            context.term();
     }
 }
