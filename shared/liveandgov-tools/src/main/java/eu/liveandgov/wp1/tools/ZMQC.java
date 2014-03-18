@@ -118,6 +118,8 @@ public class ZMQC {
             zcp.setConsumer(poc);
 
             lip.readFrom(System.in);
+
+            zcp.stop();
         }
     }
 }

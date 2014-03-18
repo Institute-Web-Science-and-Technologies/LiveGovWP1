@@ -197,5 +197,14 @@ public abstract class ZMQClient extends Pipeline<String, String> implements Stop
             responder.cancel(true);
         if (connection != null)
             connection.cancel(true);
+
+        if (socket != null) socket.close();
+
+        if (context != null) {
+            context.close();
+            context.term();
+        }
+
     }
+
 }
