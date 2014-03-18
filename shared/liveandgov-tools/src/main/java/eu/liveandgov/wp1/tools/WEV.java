@@ -1,5 +1,6 @@
 package eu.liveandgov.wp1.tools;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import eu.liveandgov.wp1.data.impl.GPS;
@@ -31,8 +32,16 @@ import java.util.concurrent.Callable;
  */
 public class WEV {
     public static void main(String[] rawArgs) {
+        final Multimap<String, String> args = HashMultimap.create();
+
+        try {
+            ToolsCommon.config(args, new File("default.config"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         // Analyze arguments
-        final Multimap<String, String> args = ToolsCommon.commands(
+        ToolsCommon.commands(args,
                 ToolsCommon.oneOf(
                         "help"
                 ),
@@ -50,7 +59,7 @@ public class WEV {
                 ), rawArgs);
 
         try {
-            ToolsCommon.config(args, new File("default.config"));
+            ToolsCommon.config(args, new File("override.config"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

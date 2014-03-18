@@ -3,7 +3,7 @@ package eu.liveandgov.wp1.pipeline.impl;
 import eu.liveandgov.wp1.pipeline.Producer;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
-import java.io.InputStream;
+import java.io.*;
 import java.util.Scanner;
 
 /**
@@ -12,26 +12,22 @@ import java.util.Scanner;
  */
 public class LineIn extends Producer<String> {
     /**
-     * Reads all lines from a scanner into the output
+     * Reads all lines from an input stream by wrapping it in a buffered reader
      *
-     * @param scanner The scanner to read from
+     * @param inputStream The stream to read from
      */
-    public void readFrom(Scanner scanner) {
-        while (scanner.hasNextLine()) {
+    public void readFrom(InputStream inputStream) throws IOException {
+        final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+
+        String line;
+        while ((line = br.readLine()) != null) {
             final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
-            stringBuilder.append(scanner.nextLine());
+            stringBuilder.append(line);
             stringBuilder.append("\r\n");
 
             produce(stringBuilder.toString());
         }
-    }
 
-    /**
-     * Reads all lines from an input stream by wrapping it in a scanner
-     *
-     * @param inputStream The stream to read from
-     */
-    public void readFrom(InputStream inputStream) {
-        readFrom(new Scanner(inputStream));
+        br.close();
     }
 }

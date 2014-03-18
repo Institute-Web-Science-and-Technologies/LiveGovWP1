@@ -82,10 +82,8 @@ public class ToolsCommon {
                 for (int i = 0; i < a.length(); i++) {
                     enrich.put(key, a.getString(i));
                 }
-            }
-            else
-            {
-                enrich.put(key,jo.getString(key));
+            } else {
+                enrich.put(key, jo.getString(key));
             }
         }
 

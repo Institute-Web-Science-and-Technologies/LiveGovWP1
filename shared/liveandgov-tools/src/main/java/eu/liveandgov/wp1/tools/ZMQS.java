@@ -1,5 +1,6 @@
 package eu.liveandgov.wp1.tools;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import eu.liveandgov.wp1.pipeline.impl.Catcher;
@@ -16,9 +17,17 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  * Created by Lukas Härtel on 10.02.14.
  */
 public class ZMQS {
-    public static void main(String[] rawArgs) {
+    public static void main(String[] rawArgs) throws IOException {
+        final Multimap<String, String> args = HashMultimap.create();
+
+        try {
+            ToolsCommon.config(args, new File("default.config"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         // Analyze arguments
-        final Multimap<String, String> args = ToolsCommon.commands(
+        ToolsCommon.commands(args,
                 ToolsCommon.oneOf(
                         "help",
                         "zerotopic"
@@ -32,7 +41,7 @@ public class ZMQS {
                 ), rawArgs);
 
         try {
-            ToolsCommon.config(args, new File("default.config"));
+            ToolsCommon.config(args, new File("override.config"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

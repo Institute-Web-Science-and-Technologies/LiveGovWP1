@@ -28,8 +28,16 @@ import java.util.*;
  */
 public class JDIA {
     public static void main(String[] rawArgs) throws SQLException {
+        final Multimap<String, String> args = HashMultimap.create();
+
+        try {
+            ToolsCommon.config(args, new File("default.config"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         // Analyze arguments
-        final Multimap<String, String> args = ToolsCommon.commands(
+        ToolsCommon.commands(args,
                 ToolsCommon.oneOf(
                         "help",
                         "nodriver",
@@ -48,7 +56,7 @@ public class JDIA {
                 ), rawArgs);
 
         try {
-            ToolsCommon.config(args, new File("default.config"));
+            ToolsCommon.config(args, new File("override.config"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
