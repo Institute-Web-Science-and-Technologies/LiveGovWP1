@@ -1,95 +1,71 @@
 doctype html
 
 html(lang="en", ng-app="inspectionFrontEnd")
-	head
-		meta(charset="utf-8")
-		title= title
+  head
+    meta(charset="utf-8")
+    title= title
 
-		//- base(href="/")
+    //- base(href="/")
 
-		meta(name="google" content="notranslate")
-		meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+    meta(name="google" content="notranslate")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
 
-		//- http://www.movable-type.co.uk/scripts/latlong.html
-		script(src="/lib/geojson-utils.js")
+    //- To ensure CSS files are downloaded in parallel, always include
+    //- external CSS before external JavaScript.
 
-		//- jQuery
-		//- script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js")
-		script(src="/lib/jquery/dist/jquery.min.js")
+    link(href="/lib/leaflet-dist/leaflet.css", rel="stylesheet")
+    link(href="/lib/bootstrap/dist/css/bootstrap.min.css", rel="stylesheet")
+    link(href="/lib/angular-xeditable/dist/css/xeditable.css", rel="stylesheet")
+    link(href='http://fonts.googleapis.com/css?family=Roboto:300', rel='stylesheet', type='text/css')
+    link(href="/app/css/001.css", rel="stylesheet")
 
-		//- Moment
-		//- script(src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js")
-		script(src="/lib/moment/min/moment.min.js")
+    script(src="/lib/angular/angular.min.js")
 
-		//- D3
-		//- script(src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.1/d3.min.js")
-		script(src="/lib/d3/d3.js")
+  body
+    header
+      nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation" ng-controller="navCtrl as nav")
+        ul.nav.navbar-nav
+          li(ng-class='{active:nav.is("rec")}')
+            a(href="/#/rec") Recordings
+          li(ng-class='{active:nav.is("raw"), disabled:!$root.trip.id}')
+            a(href="/#/raw") Raw Data
+          li(ng-class='{active:nav.is("har"), disabled:!$root.trip.id}')
+            a(href="/#/har") Activity Recognition
 
-		//- Leaflet
-		//- script(src="//cdn.leafletjs.com/leaflet-0.7.2/leaflet.js")
-		script(src="/lib/leaflet/dist/leaflet.js")
-		link(rel="stylesheet", href="/lib/leaflet/dist/leaflet.css")
+        ul.nav.navbar-nav.pull-right
+          li(ng-class="{'hidden':!$root.trip.id}", ng-click="nav.deselectTrip()")
+            a.clear-button Deselect Trip
+          li(ng-class="{'hidden':!$root.trip.brush}", ng-click="nav.clearBrush()")
+            a.clear-button Clear Brush
+          li(ng-class="{'hidden':!$root.trip.brush}", ng-click="nav.loadMoreData()")
+            a.clear-button Load More Data
+          li(ng-class="{'hidden':!$root.trip.brush}")
+            a {{ $root.trip.brush[0] | date:'HH:mm' }} — {{ $root.trip.brush[1] | date:'HH:mm' }} ({{ $root.trip.brush[0] | duration:$root.trip.brush[1] | date:'mm' }} minutes)
+          li
+            a.trip-indicator(ng-class="{'selected':$root.trip.id}") {{ $root.trip.id || "PLEASE SELECT A TRIP" }}
+  
+    #body
+      div(ng-view)
 
-		//- Angular
-		script(src="/lib/angular/angular.js")
-		script(src="/lib/angular-resource/angular-resource.js")
-		script(src="/lib/angular-route/angular-route.js")
-		script(src="/lib/angular-animate/angular-animate.js")
-		script(src="/lib/angular-sanitize/angular-sanitize.js")
-		script(src="/lib/angular-mocks/angular-mocks.js")
+  //- Angular
+  script(src="/lib/angular-resource/angular-resource.min.js")
+  script(src="/lib/angular-route/angular-route.min.js")
+  script(src="/lib/angular-xeditable/dist/js/xeditable.js")
+  script(src="/lib/d3/d3.min.js")
+  script(src="/lib/geojson-utils.js") // FIXME
+  script(src="/lib/jquery/dist/jquery.min.js")
+  script(src="/lib/leaflet-dist/leaflet.js")
+  script(src="/lib/moment/min/moment.min.js")
 
-		//- Bootstrap
-		//- script(src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js")
-		link(href="/lib/bootstrap/dist/css/bootstrap.min.css", rel="stylesheet")
-		//- link(href="/lib/bootstrap/dist/css/bootstrap-theme.min.css", rel="stylesheet")
-
-		//- Angular-xeditable
-		link(href="/lib/angular-xeditable/dist/css/xeditable.css", rel="stylesheet")
-		script(src="/lib/angular-xeditable/dist/js/xeditable.js")
-
-		//- Angular Strap
-		//- script(src="/lib/angular-strap/dist/angular-strap.min.js")
-		//- script(src="/lib/angular-strap/dist/angular-strap.tpl.min.js")
-
-		//- Angular Motion (required by Angular Strap)
-		//- link(href="/lib/angular-motion/dist/angular-motion.min.css", rel="stylesheet")
-
-		//- Angular Application
-		script(src="/app/js/modules.js")
-		script(src="/app/js/controllers.js")
-		script(src="/app/js/routes.js")
-		script(src="/app/js/services.js")
-		script(src="/app/js/filters.js")
-		//- script(src="/js/directives/brush.js")
-		script(src="/app/js/directives/chart.js")
-		script(src="/app/js/directives/map.js")
-
-		//- Stylesheets
-		link(rel="stylesheet", href="/app/css/001.css")
-
-	body
-		header
-			nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation" ng-controller="navCtrl as nav")
-				ul.nav.navbar-nav
-					li(ng-class='{active:nav.is("rec")}')
-						a(href="/#/rec") Recordings
-					li(ng-class='{active:nav.is("raw"), disabled:!$root.trip.id}')
-						a(href="/#/raw") Raw Data
-					li(ng-class='{active:nav.is("har"), disabled:!$root.trip.id}')
-						a(href="/#/har") Activity Recognition
-
-				ul.nav.navbar-nav.pull-right
-					li(ng-class="{'hidden':!$root.trip.id}", ng-click="nav.deselectTrip()")
-						a.clear-button Deselect Trip
-					li(ng-class="{'hidden':!$root.trip.brush}", ng-click="nav.clearBrush()")
-						a.clear-button Clear Brush
-					li(ng-class="{'hidden':!$root.trip.brush}", ng-click="nav.loadMoreData()")
-						a.clear-button Load More Data
-					li(ng-class="{'hidden':!$root.trip.brush}")
-						a {{ $root.trip.brush[0] | date:'HH:mm' }} — {{ $root.trip.brush[1] | date:'HH:mm' }} ({{ $root.trip.brush[0] | duration:$root.trip.brush[1] | date:'mm' }} minutes)
-					li
-						a.trip-indicator(ng-class="{'selected':$root.trip.id}") {{ $root.trip.id || "PLEASE SELECT A TRIP" }}
-	#body
-		div(ng-view)
-
+  //- Angular Application
+  script(src="/app/js/reusable/chart.js")
+  script(src="/app/js/reusable/brush.js")
+  //- script(src="/app/js/reusable/map.js")
+  script(src="/app/js/modules.js")
+  script(src="/app/js/controllers.js")
+  script(src="/app/js/directives.js")
+  script(src="/app/js/filters.js")
+  script(src="/app/js/services.js")
+  script(src="/app/js/routes.js")
+    
 // ex:ft=jade
