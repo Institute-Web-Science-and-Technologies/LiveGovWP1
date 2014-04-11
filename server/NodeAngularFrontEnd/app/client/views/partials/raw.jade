@@ -1,28 +1,20 @@
 #raw
-	map(data="data.geo")
-		#map
+  //- map(data="data.geo")
+  //-   #map
 
-	//- brush(selection="data.selection")
-	//- 	h2 Brush
-	//- 		small(ng-bind="selection", style="padding-left: 2em;")
-	//- 	#brush
+  pre
 
-	h1
-		small(style="padding-left: 2em;") {{ data.selection }}
 
-	chart(data="data.gra", brush="$root.trip.brush", domain="data.domain", sensor="'gra'")
-		h2 Gravity
-			small(style="padding-left: 2em;") {{ data.gra.length }}
-		#chart.gra
+    | domain x: {{ $root.trips[$root.trip.idx].domain.x }} {{ $root.trips[$root.trip.idx].domain.x[0] | date:'HH:mm:ss' }} {{ $root.trips[$root.trip.idx].domain.x[1] | date:'HH:mm:ss' }} {{$root.trips[$root.trip.idx].domain.x[0] | duration:$root.trips[$root.trip.idx].domain.x[1] | date:'HH:mm:ss'}}
+    | domain y: {{ $root.trips[$root.trip.idx].domain.y }}
+    | extent: {{ $root.trip.extent }} {{ $root.trip.extent[0] | date:'HH:mm:ss' }} {{ $root.trip.extent[1] | date:'HH:mm:ss' }} {{ $root.trip.extent[0] | duration:$root.trip.extent[1] | date:'HH:mm:ss' }} {{ ((($root.trip.extent[1] - $root.trip.extent[0]) / ($root.trips[$root.trip.idx].domain[1] - $root.trips[$root.trip.idx].domain[0])) * 100).toFixed(2) }}%
+    | acc: {{ $root.trips[$root.trip.idx].acc.length }} {{ $root.trips[$root.trip.idx].acc.updates }}
+    | gra: {{ $root.trips[$root.trip.idx].gra.length }} {{ $root.trips[$root.trip.idx].gra.updates }}
+    | lac: {{ $root.trips[$root.trip.idx].lac.length }} {{ $root.trips[$root.trip.idx].lac.updates }}
 
-	chart(data="data.acc", brush="$root.trip.brush", domain="data.domain", sensor="'acc'")
-		h2 Accelerometer
-			small(style="padding-left: 2em;") {{ data.acc.length }}
-		#chart.acc
-
-	chart(data="data.lac", brush="$root.trip.brush", domain="data.domain", sensor="'lac'")
-		h2 Linear Acceleration
-			small(style="padding-left: 2em;") {{ data.lac.length }}
-		#chart.lac
+  brush(extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)")
+  chart(data="data.gra" extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)")
+  chart(data="data.acc" extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)")
+  chart(data="data.lac" extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)")
 
 // ex:ft=jade
