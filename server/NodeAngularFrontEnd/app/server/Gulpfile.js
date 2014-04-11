@@ -32,8 +32,7 @@ gulp.task('develop', function () {
     verbose: true,
     ext: 'html js jade',
     env: { 'NODE_ENV': 'development', 'PORT': 3000 },
-    ignore: ['Gulpfile.js', '.sass-cache/*'],
-    watch: ['../../app']
+    ignore: ['Gulpfile.js', '.sass-cache/*']
   })
     .on('change', [])
     .on('restart', []);
