@@ -18,7 +18,8 @@ gulp.task('sass', function () {
       sourcemap: true,
       style: process.env.NODE_ENV === 'develop' ? 'expanded' : 'compressed'
     }))
-    .pipe(autoprefixer("last 1 version", "> 1%", "ie 8", "ie 7"));
+    .pipe(autoprefixer("last 1 version", "> 1%", "ie 8", "ie 7"))
+    .pipe(gulp.dest('../client/public/css'));
 });
 
 gulp.task('watch', function () {
@@ -31,7 +32,7 @@ gulp.task('develop', function () {
     verbose: true,
     ext: 'html js jade',
     env: { 'NODE_ENV': 'development', 'PORT': 3000 },
-    ignore: ['Gulpfile.js'],
+    ignore: ['Gulpfile.js', '.sass-cache/*'],
     watch: ['../../app']
   })
     .on('change', [])
