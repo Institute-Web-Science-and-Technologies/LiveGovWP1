@@ -1,11 +1,11 @@
 .DS_Store
 
+npm-debug.log
 node_modules
 bower_components
 
-client/public/css/style.css
+client/public/css/*.css
 
-npm-debug.log
 
 doc
 
@@ -16,3 +16,5 @@ trash
 
 .idea
 NodeAngularFrontEnd.sublime-*
+*.css.map
+.sass-cache
