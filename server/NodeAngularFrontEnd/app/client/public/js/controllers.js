@@ -31,23 +31,25 @@ app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams,
       throw("Error getting trips!");
     });
   }
-  
-  // select a trip (FIXME: empty arg to unselect)
-  this.select = function (trip) {
-    if (this.is(trip)) return; // trip already selected
-    $rootScope.trip = {
-      'id': trip.trip_id,
-      'idx': $rootScope.trips.indexOf(trip),
-      'extent': []
-    };
-  };
 
   // test if a trip is selected
-  this.is = function(trip) {
+  this.is = function (trip) {
     if ($rootScope.trip) {
       return ($rootScope.trip.id === trip.trip_id) ? true : false;
     }
   };
+
+  // select a trip
+  this.select = function (trip) {
+    if (this.is(trip)) return; // trip already selected
+    $rootScope.trip = {
+      'id': trip ? trip.trip_id : undefined,
+      'idx': trip ? $rootScope.trips.indexOf(trip) : undefined,
+      'extent': []
+    };
+  };
+
+  if (!$rootScope.trip) this.select(); // create empty trip selection object
 
   // delete a trip
   this.destroy = function (trip) {
@@ -75,7 +77,7 @@ app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams,
 
   $rootScope.$watch('trip.id',
     function (newTrip, oldTrip) {
-      if ($rootScope.trip) {
+      if ($rootScope.trip.id) {
         if (!$rootScope.trips[$rootScope.trip.idx].updates) {
           $rootScope.trips[$rootScope.trip.idx].updates++;
           console.info("trip selected", $rootScope.trip, $rootScope.trips[$rootScope.trip.idx]);
