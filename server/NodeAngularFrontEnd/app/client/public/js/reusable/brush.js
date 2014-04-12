@@ -7,29 +7,37 @@
 
   d3.custom.chartBrush = function module() {
 
+    // default values. may be overwritten by exported functions.
+
     var margin = {top: 8, right: 8, bottom: 8, left: 8},
         width = d3.select(this)[0].parentNode.offsetWidth - ((margin.left + margin.right)*3) - 1,
         height = 64,
-        xScale = d3.time.scale(),
-        yScale = d3.scale.linear(),
+        xScale = d3.time.scale().range([0, width]),
+        yScale = d3.scale.linear().range([height, 0]),
         xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(Math.max(width/75, 2)),
         yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(Math.max(height/25, 2)),
         brush = d3.svg.brush(),
         extent = [];
 
-    var svg,
-        gBrush;
+    var svg;
 
     var dispatch = d3.dispatch('brushed', 'brushended', 'ready');
 
     function exports(_selection) {
       _selection.each(function (d, i) {
-        if (!d.domain || d.domain.length === 0) return;
-        dispatch.ready(); // stop watching for domain
+
+        // REQUIREMENTS
+        // domain = { 'x': Array[2], 'y': Array[2] }
+
+        // THIS FUNCTION SHOULD NOT BE CALLED WITHOUT PROPER DOMAIN DATA!
+
         var domain = d.domain;
 
-        xScale.range([0, width]).domain(domain.x);
-        yScale.range([height, 0]).domain(domain.y);
+        // FIXME: domain must be updated after final domain is calculated!
+        dispatch.ready(); // stop watching for domain
+
+        xScale.domain(domain.x);
+        yScale.domain(domain.y);
 
         if (!d3.select(this).select('svg')[0][0]) {
           svg = d3.select(this)
@@ -42,26 +50,36 @@
         // so important...
         svg.selectAll("*").remove();
 
-        // var brush = d3.svg.brush().x(xScale)
-        //   .on("brush", brushed)
-        //   .on("brushend", brushended);
-
         brush.x(xScale)
           .on("brush", brushed)
           .on("brushend", brushended);
 
-        gBrush = svg.append("g")
+        var gBrush = svg.append("g")
           .attr("class", "brush")
           .call(brush)
         .selectAll("rect")
-          .attr("height", height - 1 ); // ?
+          .attr("height", height - 1); // ?
 
-        if (extent && extent.length !== 0) brush.extent(extent);
+        // if the extent is not at it's default value ([], empty array), it
+        // was changed by the exported function, then programatically set the
+        // brushes extent.
+        if (extent.length) brush.extent(extent);
 
         function brushed() {
-          // console.log(d3.event.mode);
-          if (!d3.event.sourceEvent) return; // only transition after input
-          dispatch.brushed(brush.extent().map(function(d) { return +d; }));
+
+          // FIXME: MAJOR BUG
+          //
+          // on mousedown on the brush brush.extent() is correct, on
+          // mouserelease is expanded to the right.
+          //
+          // [1387563184444, 1387563184444] on mousedown
+          // [1387563184444, 1387563214772] on mouserelease
+          //
+          // why, how and where is the extent changed?
+
+          // EXTENT 1:
+          console.log('EXTENT 1:', brush.extent().map(function (d) { return +d }), extent);
+          dispatch.brushed(brush.extent().map(function (d) { return +d }));
         }
 
         function brushended() {
@@ -71,22 +89,28 @@
       });
     }
 
-    exports.width = function(_x) {
+    exports.width = function(_) {
       if (!arguments.length) return width;
-      width = parseInt(_x);
+      width = parseInt(_);
       return this;
     };
 
-    exports.height = function(_x) {
+    exports.height = function(_) {
       if (!arguments.length) return height;
-      height = parseInt(_x);
+      height = parseInt(_);
       duration = 0;
       return this;
     };
 
-    exports.extent = function(_x) {
+    exports.extent = function(_) {
       if (!arguments.length) return extent;
-      extent = _x;
+
+      // _ is the incoming extent value
+      // extent is the old extent value
+
+      console.log('EXTENT 5:', _, extent);
+      console.log('\n--- END OF BRUSH CYCLE -----------------------------------------------\n');
+      extent = _;
       return this;
     };
 
