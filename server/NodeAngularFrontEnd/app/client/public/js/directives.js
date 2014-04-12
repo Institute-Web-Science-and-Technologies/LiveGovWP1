@@ -12,6 +12,8 @@
         var brushElement = d3.select($element[0]);
 
         brush.on('brushed', function (d, i) {
+          // EXTENT 2:
+          console.log('EXTENT 2:', d, $scope.extent);
           $scope.onBrushExtent({args:d});
         });
 
@@ -23,13 +25,24 @@
           unwatchDomain();
         });
 
+        // STEP 1: create the brush
+        // domain = { 'x': Array[2], 'y': Array[2] }
         var unwatchDomain =
-        $scope.$watchCollection('domain', function (val, oldVal) {
-          brushElement.datum({domain:val}).call(brush);
+        $scope.$watchCollection('domain', function (domain, oldDomain) {
+          if (domain && domain.x.length && domain.y.length) {
+            console.info('BRUSH 1: drawing brush with domain', domain);
+            brushElement.datum({domain:domain}).call(brush);
+          }
         });
 
-        $scope.$watchCollection('extent', function (val, oldVal) {
-          brushElement.call(brush.extent(val));
+        // how to check if brush is already drawn?
+
+        // extent = Array[2]
+        $scope.$watchCollection('extent', function (extent, oldExtent) {
+          if (extent && extent.length) {
+            console.log('EXTENT 4:', extent, oldExtent);
+            brushElement.call(brush.extent(extent));
+          }
         });
       }
     };
