@@ -17,7 +17,7 @@ table#rec.table
 
 			tbody
 				tr(ng-repeat="trip in trips | orderBy:predicate:reverse", ng-class='{selected:rec.is(trip)}')
-					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.trip_id }}
+					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')", ng-class='{hasData:rec.hasData(trip)}') {{ trip.trip_id }}
 					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.user_id }}
 					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.start_ts | date:'yyyy-MM-dd HH:mm:ss Z' }}
 					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.duration | date:'HH:mm:ss.sss' }}

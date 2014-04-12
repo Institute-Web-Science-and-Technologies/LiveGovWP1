@@ -39,6 +39,10 @@ app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams,
     }
   };
 
+  this.hasData = function (trip) {
+    return $rootScope.trips[$rootScope.trips.indexOf(trip)].acc.length ? true : false;
+  }
+
   // select a trip
   this.select = function (trip) {
     if (this.is(trip)) return; // trip already selected

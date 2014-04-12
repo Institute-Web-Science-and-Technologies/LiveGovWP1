@@ -53,6 +53,9 @@ tbody {
     &.name {
       width: 200px;
     }
+    &.hasData {
+      background-color: #c4ffc2;
+    }
     // the 'del' button on the far right
     &.destroy {
       text-align: center;
