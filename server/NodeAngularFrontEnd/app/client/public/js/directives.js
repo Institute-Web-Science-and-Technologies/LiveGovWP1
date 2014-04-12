@@ -64,32 +64,37 @@
         });
 
         // chart.on('ready', function (d, i) {
-        //   console.info('unwatching domain!');
-        //   unwatchDomain();
+        //   // console.info('unwatching y domain!');
+        //   // unwatchDomain();
         // });
 
         // var unwatchDomain =
         // $scope.$watchCollection('domain', function (val, oldVal) {
-        //   if (val && val.x.length && val.y.length) {
-        //     chartElement.call(chart.xScale(val.x));
+        //   if (val) {
         //     chartElement.call(chart.yScale(val.y));
-        //     console.info('domain action!');
+        //     chartElement.call(chart.xScale(val.x));
+        //     // console.info('updating y domain!');
         //   }
         // });
 
-        $scope.$watchCollection('data', function (val, oldVal) {
-          if ($scope.data.length && $scope.domain.x.length && $scope.domain.y.length) {
-            chartElement.datum({data:$scope.data, domain:$scope.domain}).call(chart);
+        // STEP 1: as soon as chart data arrives, draw the chart
+        $scope.$watchCollection('data', function (data, oldData) {
+          // console.log($scope.data.length);
+          // if (data && data.length && $scope.domain.x.length && $scope.domain.y.length) {
+          if (data && data.length) {
+            chartElement.datum({data:data}).call(chart);
+            // chartElement.datum({data:$scope.data, domain:$scope.domain}).call(chart);
           }
         });
 
-        $scope.$watchCollection('extent', function (val, oldVal) {
-          chartElement.call(chart.x($scope.extent));
-        });
-
-
+        // if the brush extent changes, change the charts x-domain accordingly
+        // $scope.$watchCollection('extent', function (val, oldVal) {
+        //   if (val !== oldVal) {
+        //     // console.log('extent updated!', val);
+        //     chartElement.call(chart.x($scope.extent));
+        //   }
+        // });
       }
     };
   }]);
-
 }());
