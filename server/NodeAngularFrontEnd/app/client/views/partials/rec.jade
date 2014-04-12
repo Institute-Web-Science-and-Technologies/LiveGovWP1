@@ -15,6 +15,11 @@ table#rec.table
 				a(ng-click="predicate='name'; reverse=!reverse") name
 			th
 
+			//- FIXME table drawing takes forever. too much calculations in here?
+			//- rec.is
+			//- rec.hasData
+			//- ng-show="([item] | filter:searchFilter).length > 0"
+
 			tbody
 				tr(ng-repeat="trip in trips | orderBy:predicate:reverse", ng-class='{selected:rec.is(trip)}')
 					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')", ng-class='{hasData:rec.hasData(trip)}') {{ trip.trip_id }}
