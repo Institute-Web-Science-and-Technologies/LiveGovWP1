@@ -16,5 +16,6 @@ trash
 
 .idea
 NodeAngularFrontEnd.sublime-*
+*.css
 *.css.map
 .sass-cache
