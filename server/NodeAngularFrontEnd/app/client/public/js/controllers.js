@@ -41,7 +41,7 @@ app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams,
 
   this.hasData = function (trip) {
     return $rootScope.trips[$rootScope.trips.indexOf(trip)].acc.length ? true : false;
-  }
+  };
 
   // select a trip
   this.select = function (trip) {
@@ -99,12 +99,14 @@ app.controller('rawCtrl', function ($scope, $rootScope, $location, $timeout, Dat
   if (!$rootScope.trip) { $location.path('/rec'); return; }
   $scope.data = $rootScope.trips[$rootScope.trip.idx];
 
-  // called by directive
+  // update scope (called by directive)
   $scope.onBrushExtent = function(extent) {
+    // EXTENT 3:
+    console.log('EXTENT 3:', extent, $rootScope.trip.extent);
     $scope.$apply(function() { $rootScope.trip.extent = extent; });
   };
   
-  // called by directive
+  // load more data (called by directive)
   $scope.loadMoreData = function(extent) {
     $rootScope.trips[$rootScope.trip.idx].updates++;
     Data.sensor('gra', extent, 'more');
