@@ -97,7 +97,7 @@ app.factory('Data', ['Geo', 'Sensor', '$rootScope', function (Geo, Sensor, $root
         extent: extent
       }).then(function (data) {
         data.forEach(function(d) {
-          d.ts         = new Date((+d.starttime + (+d.endtime)) / 2);
+          d.ts         = (+d.starttime + (+d.endtime)) / 2;
           d.starttime  = +d.starttime;
           d.endtime    = +d.endtime;
         });
