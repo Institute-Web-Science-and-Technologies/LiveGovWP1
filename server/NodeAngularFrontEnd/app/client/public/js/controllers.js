@@ -4,7 +4,7 @@
 
 /* CONTROLLERS */
 
-app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams, Trip, Data, debounce) {
+app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams, Trip, Data) {
 /*
   $rootScope.trips
     Array containing all trips including sensor and geo data.
@@ -95,14 +95,14 @@ app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams,
   );
 });
 
-app.controller('rawCtrl', function ($scope, $rootScope, $location, $timeout, Data) {
+app.controller('rawCtrl', function ($scope, $rootScope, $location, Data) {
   if (!$rootScope.trip) { $location.path('/rec'); return; }
   $scope.data = $rootScope.trips[$rootScope.trip.idx];
 
   // update scope (called by directive)
   $scope.onBrushExtent = function(extent) {
     // EXTENT 3:
-    console.log('EXTENT 3:', extent, $rootScope.trip.extent);
+    console.log('CTRL  EXTENT 3:', extent, $rootScope.trip.extent);
     $scope.$apply(function() { $rootScope.trip.extent = extent; });
   };
   
@@ -113,11 +113,6 @@ app.controller('rawCtrl', function ($scope, $rootScope, $location, $timeout, Dat
     Data.sensor('acc', extent, 'more');
     Data.sensor('lac', extent, 'more');
   };
-});
-
-app.controller('harCtrl', function ($scope, $rootScope, $location) {
-  if (!$rootScope.trip) { $location.path('/rec'); return; }
-  $scope.data = $rootScope.trips[$rootScope.trip.idx];
 });
 
 app.controller('navCtrl', function ($scope, $rootScope, $route, Data) {
