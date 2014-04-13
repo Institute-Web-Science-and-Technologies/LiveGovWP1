@@ -9,7 +9,7 @@
 
     // default values. may be overwritten by exported functions.
 
-    var margin = {top: 8, right: 8, bottom: 8, left: 8},
+    var margin = {top: 30, right: 30, bottom: 30, left: 30},
         width = d3.select(this)[0].parentNode.offsetWidth - ((margin.left + margin.right)*3) - 1,
         height = 120,
         xScale = d3.time.scale().range([0, width]),
@@ -19,24 +19,21 @@
         brush = d3.svg.brush(),
         extent = [];
 
-    // console.log(width);
-
     var svg;
 
     var dispatch = d3.dispatch('brushended', 'ready');
 
-    function exports(_selection) {
-      _selection.each(function (d, i) {
+    function exports(selection) {
+      selection.each(function (d, i) {
+        if (!d) return;
 
         // REQUIREMENTS
-        // data = Array[n]
-
-        // if (!d) return;
+        // d.data = Array[n]
 
         var data = d.data;
 
-        // var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(Math.max(width/75, 2)),
-        //     yAxis = d3.svg.axis().scale(y).orient("left").ticks(Math.max(height/25, 2));
+        // var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(Math.max(width/75, 2)),
+        //     yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(Math.max(height/25, 2));
 
         var line = d3.svg.line().interpolate("linear")
           .x(function(d) { return xScale(d[0]); })
@@ -53,11 +50,11 @@
                   .attr("id", "clip")
                 .append("rect")
                   .attr("width", width)
-                  .attr("height", height)
-                  .attr('width', '100%');
+                  .attr("height", height);
+                  // .attr('width', '100%');
+        } else {
+          d3.select(this).selectAll('svg').selectAll("*").remove();
         }
-
-        d3.select(this).selectAll('svg').selectAll("*").remove();
 
         svg = d3.select(this).selectAll('svg').data(data);
 
@@ -95,8 +92,11 @@
           .attr("transform", "translate(-3,0)")
           .call(yAxis);
 
+        if (extent.length) xScale.domain(extent);
+        
         brush.x(xScale)
           .on("brushend", brushended);
+
 
         var gBrush = chart.append("g")
           .attr("class", "brush")
@@ -104,30 +104,33 @@
         .selectAll("rect")
           .attr("height", height);
 
-        if (extent && extent.length) x.domain(extent);
 
         function brushended() {
-          if (brush.extent()[0] == brush.extent()[1]) return;
-          // if (brush.empty()) return;
+          if (brush.empty()) return;
 
-          dispatch.brushended(brush.extent().map(function (d) { return +d }));
-          // dispatch.brushended(brush.extent().map(function(d) { return +d; })); // update brush extent in scope
-
+          // scale x domain to brush extent (zoom in)
           xScale.domain(brush.extent());
 
+          console.log('CHART EXTENT 1:', brush.extent().map(function (d) { return +d; }), extent);
+          // dispatch.brushed(brush.empty() ? [] : brush.extent().map(function (d) { return +d; }));
+
+          // redraw the graph lines
           svg.selectAll(".line0").attr("d", line(data.map(function (d) { return [d.ts, d.avgx]; })));
           svg.selectAll(".line1").attr("d", line(data.map(function (d) { return [d.ts, d.avgy]; })));
           svg.selectAll(".line2").attr("d", line(data.map(function (d) { return [d.ts, d.avgz]; })));
 
-          svg.select(".x.axis").call(xAxis);
+          // rescale x axis
+          // svg.select(".x.axis").call(xAxis);
 
-          // after brushing clear the brush and call a new one
+          brush.clear();
+          reset_axis();
+          // clear the brush and call a new one
           chart.select("brush").call(brush.clear());
-          chart.select("brush").call(brush);
+          // chart.select("brush").call(brush);
         }
 
         function reset_axis() {
-          svg //.transition().duration(500)
+          svg.transition().duration(500)
             .select(".x.axis")
             .call(xAxis);
         }
@@ -168,6 +171,18 @@
       if (!arguments.length) return yScale;
       yScale = yScale.range([height, 0]).domain(_);
       // dispatch.ready(); // stop watching for y domain
+      return this;
+    };
+
+    exports.extent = function(_) {
+      if (!arguments.length) return extent;
+
+      // _ is the incoming extent value
+      // extent is the old extent value
+
+      console.log('CHART EXTENT 5:', _, extent);
+      // console.log('\n--- END OF BRUSH CYCLE -----------------------------------------------\n');
+      extent = _;
       return this;
     };
 
