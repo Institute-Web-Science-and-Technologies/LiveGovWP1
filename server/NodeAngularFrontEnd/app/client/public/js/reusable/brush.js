@@ -23,13 +23,12 @@
 
     var dispatch = d3.dispatch('brushed', 'brushended', 'ready');
 
-    function exports(_selection) {
-      _selection.each(function (d, i) {
+    function exports(selection) {
+      selection.each(function (d, i) {
+        if (!d) return;
 
         // REQUIREMENTS
-        // domain = { 'x': Array[2], 'y': Array[2] }
-
-        // THIS FUNCTION SHOULD NOT BE CALLED WITHOUT PROPER DOMAIN DATA!
+        // d.domain = { 'x': Array[2], 'y': Array[2] }
 
         var domain = d.domain;
 
@@ -54,32 +53,20 @@
           .on("brush", brushed)
           .on("brushend", brushended);
 
+        // programatically set brush extent, if extent differs from default value []
+        if (extent.length) brush.extent(extent);
+
+        // draw the actual brush rectangle
         var gBrush = svg.append("g")
           .attr("class", "brush")
           .call(brush)
         .selectAll("rect")
           .attr("height", height - 1); // ?
 
-        // if the extent is not at it's default value ([], empty array), it
-        // was changed by the exported function, then programatically set the
-        // brushes extent.
-        if (extent.length) brush.extent(extent);
-
         function brushed() {
-
-          // FIXME: MAJOR BUG
-          //
-          // on mousedown on the brush brush.extent() is correct, on
-          // mouserelease is expanded to the right.
-          //
-          // [1387563184444, 1387563184444] on mousedown
-          // [1387563184444, 1387563214772] on mouserelease
-          //
-          // why, how and where is the extent changed?
-
           // EXTENT 1:
-          console.log('EXTENT 1:', brush.extent().map(function (d) { return +d }), extent);
-          dispatch.brushed(brush.extent().map(function (d) { return +d }));
+          console.log('BRUSH EXTENT 1:', brush.extent().map(function (d) { return +d; }), extent);
+          dispatch.brushed(brush.empty() ? [] : brush.extent().map(function (d) { return +d; }));
         }
 
         function brushended() {
@@ -108,8 +95,8 @@
       // _ is the incoming extent value
       // extent is the old extent value
 
-      console.log('EXTENT 5:', _, extent);
-      console.log('\n--- END OF BRUSH CYCLE -----------------------------------------------\n');
+      console.log('BRUSH EXTENT 5:', _, extent);
+      // console.log('\n--- END OF BRUSH CYCLE -----------------------------------------------\n');
       extent = _;
       return this;
     };
