@@ -10,9 +10,9 @@
     | gra: {{ $root.trips[$root.trip.idx].gra.length }} {{ $root.trips[$root.trip.idx].gra.updates }}
     | lac: {{ $root.trips[$root.trip.idx].lac.length }} {{ $root.trips[$root.trip.idx].lac.updates }}
 
-  brush(extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)")
-    chart(data="data.gra" extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)")
-    chart(data="data.acc" extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)")
-    chart(data="data.lac" extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)")
+  brush.bru(extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)", data="data")
+  chart.gra(extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)", data="data.gra")
+  chart.acc(extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)", data="data.acc")
+  chart.lac(extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)", data="data.lac")
 
 // ex:ft=jade
