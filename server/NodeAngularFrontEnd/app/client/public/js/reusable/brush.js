@@ -10,7 +10,7 @@
     // default values. may be overwritten by exported functions.
 
     var margin = {top: 8, right: 8, bottom: 8, left: 8},
-        width = d3.select(this)[0].parentNode.offsetWidth - ((margin.left + margin.right)*3) - 1,
+        width = d3.select(this)[0].parentNode.offsetWidth - ((margin.left + margin.right) * 3) - 1,
         height = 64,
         xScale = d3.time.scale().range([0, width]),
         yScale = d3.scale.linear().range([height, 0]),
@@ -65,7 +65,7 @@
 
         function brushed() {
           // EXTENT 1:
-          console.log('BRUSH EXTENT 1:', brush.extent().map(function (d) { return +d; }), extent);
+          // console.log('BRUSH EXTENT 1:', brush.extent().map(function (d) { return +d; }), extent);
           dispatch.brushed(brush.empty() ? [] : brush.extent().map(function (d) { return +d; }));
         }
 
@@ -95,7 +95,7 @@
       // _ is the incoming extent value
       // extent is the old extent value
 
-      console.log('BRUSH EXTENT 5:', _, extent);
+      // console.log('BRUSH EXTENT 5:', _, extent);
       // console.log('\n--- END OF BRUSH CYCLE -----------------------------------------------\n');
       extent = _;
       return this;
