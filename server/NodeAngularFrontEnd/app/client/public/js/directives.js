@@ -69,23 +69,17 @@
           // brushCtrl.setExtent(d);
         });
 
-        chart.on('ready', function (d, i) {
-            // unwatchDomain();
-          });
-
-        // draw the chart as soon as the data has arrived
+        // draw the chart as soon as the data and x-domain are ready
         $scope.$watchCollection('data', function (data, oldData) {
           if (data && data.length) {
+            console.log('drawing chart', $scope.domain.x);
             chartElement.datum({data:data}).call(chart);
           }
         });
 
-        // watch for domain changes
-        var unwatchDomain =
-        $scope.$watchCollection('domain', function (domain, oldDomain) {
-          if (domain && domain.x.length && domain.y.length) {
-            chartElement.call(chart.yScale(domain.y));
-            chartElement.call(chart.xScale(domain.x));
+        $scope.$watchCollection('domain.y', function (yDomain, oldYDomain) {
+          if (yDomain && yDomain.length) {
+            chartElement.call(chart.yScale(yDomain));
           }
         });
 
@@ -99,4 +93,5 @@
       }
     };
   }]);
+
 }());
