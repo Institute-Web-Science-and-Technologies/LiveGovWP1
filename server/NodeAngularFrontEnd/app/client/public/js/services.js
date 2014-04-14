@@ -5,6 +5,7 @@ app.factory('Trip', ['$http', '$q', function ($http, $q) {
   return {
     query: function() {
       var deferred = $q.defer();
+
       $http.get('/trips')
       .success(function(data, status, headers, config) {
         data.map(function(d) {
@@ -15,67 +16,29 @@ app.factory('Trip', ['$http', '$q', function ($http, $q) {
           d.lac = []; // linear acceleration sensor data
           d.acc = []; // acceleration sensor data
           d.domain = {x: [], y: []}; // min/max values of all sensor data
-          d.updates = 0; // count data updates
         });
         deferred.resolve(data);
-      }).error(function(data, status, headers, config) {
-        deferred.reject(data);
-      });
+      })
+      .error(function(data, status, headers, config) { deferred.reject(); });
+
       return deferred.promise;
     },
 
     save: function (tripId, data) {
-      $http({method: 'POST', url: '/trips/' + tripId, data: data
-      }).success(function(data, status, headers, config) {
-      }).error(function(data, status, headers, config) {
-      });
+      $http({ method: 'POST', url: '/trips/' + tripId, data: data })
+      .success(function(data, status, headers, config) {})
+      .error(function(data, status, headers, config) {});
     },
 
     delete: function(tripId) {
-      $http({method: 'DELETE', url: '/trips/' + tripId
-      }).success(function(data, status, headers, config) {
-      }).error(function(data, status, headers, config) {
-      });
+      $http({ method: 'DELETE', url: '/trips/' + tripId })
+      .success(function(data, status, headers, config) {})
+      .error(function(data, status, headers, config) {});
     }
   };
 }]);
 
 app.factory('Data', ['$q', 'Geo', 'Sensor', '$rootScope', function ($q, Geo, Sensor, $rootScope) {
-  function merge(oldData, data) {
-    // FIXME: check for correctness
-
-    if (!oldData.length) return data; // on first run
-
-    var len = oldData.length;
-    function index() {
-      for (var i = 0; i < len; i++) {
-        if (oldData[i].starttime >= data[0].starttime) return i;
-      }
-    }
-
-    function range() {
-      for (var i = len - 1; i >= 0; --i) {
-        if (oldData[i].starttime <= data[data.length - 1].starttime) {
-          var idx = index();
-          return [idx, i - idx + 1]; // [ from-here, n-fields ]
-        }
-      }
-    }
-
-    // dont merge if there's no new data
-    if (((data.length - range()[1]) > 0)) {
-      Array.prototype.splice.apply(oldData, range().concat(data));
-    }
-
-    return oldData;
-  }
-
-  // FIXME test merged and sorted data for equality
-  function sortData(data) {
-    // data.sort(function(a, b) { return d3.ascending(a.starttime, b.starttime); });
-    data.sort(function(a, b) { return +a.ts < +b.ts ? -1 : +a.ts > +b.ts ? 1 : 0; });
-  }
-
   return {
     sensor: function (sensors, extent) {
       var trip = $rootScope.trips[$rootScope.trip.idx];
@@ -99,12 +62,12 @@ app.factory('Data', ['$q', 'Geo', 'Sensor', '$rootScope', function ($q, Geo, Sen
             d.endtime    = +d.endtime;
           });
 
-          // merge old and new data
-          trip[sensor] = merge(trip[sensor], data);
+          // merge old and new data (sorted, w/o duplicates)
+          trip[sensor] = trip[sensor].merge(data);
 
           console.info(sensor + ' data for trip ' + trip.trip_id + ' ready (' + ((new Date() - t) / 1000) + " ms)");
 
-          // defer merged data
+          // defer unmerged(!?) data (beware) FIXME
           deferred.resolve(data);
 
         }, function (data) {
@@ -270,7 +233,7 @@ app.factory('Sensor', ['$http', '$q', function ($http, $q) {
         params: { 'window': windowSize, 'startTime': startTime, 'endTime': endTime }
       })
       .success(function (data, status, headers, config) { deferred.resolve(data); })
-      .error(function (data, status, headers, config) { deferred.reject(data); });
+      .error(function (data, status, headers, config) { deferred.reject(); });
 
       return deferred.promise;
     }
