@@ -79,45 +79,23 @@ app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams,
     }
   };
 
-  // calculate a trip's domain
-  function updateDomains(data) {
-    // FIXME wrgon wongr wrong! causes all kind of trouble
-
-    // AND REMEMBER: we need to update the y-domain on every extent change.
-    // the x-domain must be updated on first data arrival only.
-
-    var trip = $rootScope.trips[$rootScope.trip.idx];
-    trip.domain.x = d3.extent(trip.domain.x.concat.apply([], data.map(function(d) {
-      return [d.starttime, d.endtime];
-    })));
-    trip.domain.y = d3.extent(trip.domain.y.concat.apply([], data.map(function(d) {
-      return [d.avgx, d.avgy, d.avgz]; // these are the values used drawing the chart lines
-    })));
-  };
-
   $rootScope.$watch('trip.id',
     function (newTrip, oldTrip) {
       var t = new Date(); // query start time
       if ($rootScope.trip.id) {
-        if (!$rootScope.trips[$rootScope.trip.idx].updates) {
-          $rootScope.trips[$rootScope.trip.idx].updates++;
-          console.info("trip selected", $rootScope.trip, $rootScope.trips[$rootScope.trip.idx]);
+        var trip = $rootScope.trips[$rootScope.trip.idx];
+        console.info("trip selected", $rootScope.trip, trip);
 
-          Data.geo();
+        Data.geo();
 
-          Data.sensor(['gra', 'acc', 'lac']).then(function(data) {
-            console.log('all sensor data has arrived (' + ((new Date() - t) / 1000) + " ms)");
-            var trip = $rootScope.trips[$rootScope.trip.idx];
-            if (trip.updates == 1) { // if this is the first data query for this trip id
-              data.map(function(d) {
-                updateDomains(d); // update trip domains
-              })
-            }
-          });
-        }
+        Data.sensor(['gra', 'acc', 'lac']).then(function(data) {
+          console.log('all sensor data has arrived (' + ((new Date() - t) / 1000) + " ms)");
+          trip.domain.x = d3.extent(data.select(['starttime', 'endtime']));
+          trip.domain.y = d3.extent(data.select(['avgx', 'avgy', 'avgz']));
+        });
       }
     }
-  ); // end of watch
+  );
 });
 
 app.controller('rawCtrl', function ($scope, $rootScope, $location, Data) {
@@ -133,8 +111,12 @@ app.controller('rawCtrl', function ($scope, $rootScope, $location, Data) {
   
   // load more data (called by directive)
   $scope.loadMoreData = function(extent) {
-    $rootScope.trips[$rootScope.trip.idx].updates++;
-    Data.sensor(['gra', 'acc', 'lac'], extent, 'more');
+    var trip = $rootScope.trips[$rootScope.trip.idx];
+    Data.sensor(['gra', 'acc', 'lac'], extent, 'more').then(function(data) {
+
+      // recalculate y-domain
+      trip.domain.y = d3.extent(data.select(['avgx', 'avgy', 'avgz']));
+    });
   };
 });
 
