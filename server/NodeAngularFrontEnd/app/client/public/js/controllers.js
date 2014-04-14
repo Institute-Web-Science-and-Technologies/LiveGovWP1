@@ -4,7 +4,7 @@
 
 /* CONTROLLERS */
 
-app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams, Trip, Data) {
+app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams, $q, Trip, Data) {
 /*
   $rootScope.trips
     Array containing all trips including sensor and geo data.
@@ -79,20 +79,45 @@ app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams,
     }
   };
 
+  // calculate a trip's domain
+  function updateDomains(data) {
+    // FIXME wrgon wongr wrong! causes all kind of trouble
+
+    // AND REMEMBER: we need to update the y-domain on every extent change.
+    // the x-domain must be updated on first data arrival only.
+
+    var trip = $rootScope.trips[$rootScope.trip.idx];
+    trip.domain.x = d3.extent(trip.domain.x.concat.apply([], data.map(function(d) {
+      return [d.starttime, d.endtime];
+    })));
+    trip.domain.y = d3.extent(trip.domain.y.concat.apply([], data.map(function(d) {
+      return [d.avgx, d.avgy, d.avgz]; // these are the values used drawing the chart lines
+    })));
+  };
+
   $rootScope.$watch('trip.id',
     function (newTrip, oldTrip) {
+      var t = new Date(); // query start time
       if ($rootScope.trip.id) {
         if (!$rootScope.trips[$rootScope.trip.idx].updates) {
           $rootScope.trips[$rootScope.trip.idx].updates++;
           console.info("trip selected", $rootScope.trip, $rootScope.trips[$rootScope.trip.idx]);
+
           Data.geo();
-          Data.sensor('gra');
-          Data.sensor('acc');
-          Data.sensor('lac');
+
+          Data.sensor(['gra', 'acc', 'lac']).then(function(data) {
+            console.log('all sensor data has arrived (' + ((new Date() - t) / 1000) + " ms)");
+            var trip = $rootScope.trips[$rootScope.trip.idx];
+            if (trip.updates == 1) { // if this is the first data query for this trip id
+              data.map(function(d) {
+                updateDomains(d); // update trip domains
+              })
+            }
+          });
         }
       }
     }
-  );
+  ); // end of watch
 });
 
 app.controller('rawCtrl', function ($scope, $rootScope, $location, Data) {
@@ -102,16 +127,14 @@ app.controller('rawCtrl', function ($scope, $rootScope, $location, Data) {
   // update scope (called by directive)
   $scope.onBrushExtent = function(extent) {
     // EXTENT 3:
-    console.log('CTRL  EXTENT 3:', extent, $rootScope.trip.extent);
+    // console.log('CTRL  EXTENT 3:', extent, $rootScope.trip.extent);
     $scope.$apply(function() { $rootScope.trip.extent = extent; });
   };
   
   // load more data (called by directive)
   $scope.loadMoreData = function(extent) {
     $rootScope.trips[$rootScope.trip.idx].updates++;
-    Data.sensor('gra', extent, 'more');
-    Data.sensor('acc', extent, 'more');
-    Data.sensor('lac', extent, 'more');
+    Data.sensor(['gra', 'acc', 'lac'], extent, 'more');
   };
 });
 

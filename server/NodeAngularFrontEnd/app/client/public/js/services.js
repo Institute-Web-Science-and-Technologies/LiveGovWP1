@@ -40,19 +40,9 @@ app.factory('Trip', ['$http', '$q', function ($http, $q) {
   };
 }]);
 
-app.factory('Data', ['Geo', 'Sensor', '$rootScope', function (Geo, Sensor, $rootScope) {
-  var updateDomains = function(data) {
-    var trip = $rootScope.trips[$rootScope.trip.idx];
-    trip.domain.x = d3.extent(trip.domain.x.concat.apply([], data.map(function(d) {
-      return [d.starttime, d.endtime];
-    })));
-    trip.domain.y = d3.extent(trip.domain.y.concat.apply([], data.map(function(d) {
-      return [d.minx, d.miny, d.minz, d.maxx, d.maxy, d.maxz];
-    })));
-  };
-
+app.factory('Data', ['$q', 'Geo', 'Sensor', '$rootScope', function ($q, Geo, Sensor, $rootScope) {
   function merge(oldData, data) {
-    // FIXME: CHECK FOR CORRECTNESS
+    // FIXME: check for correctness
 
     if (!oldData.length) return data; // on first run
 
@@ -80,47 +70,65 @@ app.factory('Data', ['Geo', 'Sensor', '$rootScope', function (Geo, Sensor, $root
     return oldData;
   }
 
+  // FIXME test merged and sorted data for equality
   function sortData(data) {
     // data.sort(function(a, b) { return d3.ascending(a.starttime, b.starttime); });
     data.sort(function(a, b) { return +a.ts < +b.ts ? -1 : +a.ts > +b.ts ? 1 : 0; });
   }
 
-
   return {
-    sensor: function (sensor, extent) {
+    sensor: function (sensors, extent) {
       var trip = $rootScope.trips[$rootScope.trip.idx];
       var t = new Date();
-      Sensor.query({
-        tripId: trip.trip_id,
-        oldData: trip[sensor], // data array
-        sensor: sensor,
-        extent: extent
-      }).then(function (data) {
-        data.forEach(function(d) {
-          d.ts         = (+d.starttime + (+d.endtime)) / 2;
-          d.starttime  = +d.starttime;
-          d.endtime    = +d.endtime;
+
+      var promises = sensors.map(function(sensor) {
+        var deferred = $q.defer();
+
+        // call sensor service
+        Sensor.query({
+          tripId: trip.trip_id,
+          oldData: trip[sensor], // data array
+          sensor: sensor, // 'gra', 'acc' or 'lac'
+          extent: extent // [] or [timestamp, timestamp]
+        }).then(function (data) {
+
+          // prepare new data
+          data.forEach(function(d) {
+            d.ts         = (+d.starttime + (+d.endtime)) / 2;
+            d.starttime  = +d.starttime;
+            d.endtime    = +d.endtime;
+          });
+
+          // merge old and new data
+          trip[sensor] = merge(trip[sensor], data);
+
+          console.info(sensor + ' data for trip ' + trip.trip_id + ' ready (' + ((new Date() - t) / 1000) + " ms)");
+
+          // defer merged data
+          deferred.resolve(data);
+
+        }, function (data) {
+          console.warn("Failure: No " + sensor + " data for trip " + trip.trip_id);
+          deferred.reject();
         });
 
-        trip[sensor] = data; // data is already merged
-        if (trip.updates == 1) { // if this is the first data query for this trip id
-          updateDomains(data); // update trip domain
-        }
-        console.log('Success: ' + sensor + ' data for trip ' + trip.trip_id + ' ready (' + ((new Date() - t) / 1000) + " ms)");
-      }, function (data) {
-        console.log("Failure: No " + sensor + " data for trip " + trip.trip_id);
+        // return merged data as promise
+        return deferred.promise;
       });
+
+      // return all promised sensor data
+      return $q.all(promises);
     },
 
+    // FIXME return promise to controller
     geo: function () {
       var trip = $rootScope.trips[$rootScope.trip.idx];
       var t = new Date();
-      Geo.query(trip.trip_id)
-      .then(function (data) {
+      Geo.query(trip.trip_id).then(function (data) {
         trip.geo = data;
-        console.log('Success: geo data for trip ' + trip.trip_id + ' ready (' + ((new Date() - t) / 1000) + " ms)");
+        console.info('geo data for trip ' + trip.trip_id + ' ready (' + ((new Date() - t) / 1000) + " ms)");
       }, function (data) {
-        console.log("Failure: No geo data for trip " + trip.trip_id);
+        console.warn("Failure: No geo data for trip " + trip.trip_id);
       });
     }
   };
