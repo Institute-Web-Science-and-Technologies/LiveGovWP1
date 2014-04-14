@@ -15,37 +15,50 @@
     }).flatten();
   }
 
-  // insert-merge two arrays of objects by property, sorted w/o duplicates
-  Array.prototype.insert = function(array, property) {
-
+  // merge two sensor data arrays, sorted w/o duplicates
+  Array.prototype.merge = function(array) {
     if (!this.length) return array;
     if (!array.length) return this;
 
-    // returns index where to insert the array, e.g. ([1,2,3], [2,3]) -> 1
-    var len = this.length;
-    function index() {
-      for (var i = 0; i < len; i++) {
-        if (this[i][property] >= array[0][property]) return i;
-      }
-    };
+    return this.concat(array)
+      .sort(function(a,b) {
+        return d3.ascending(a.starttime, b.starttime);
+      })
+      .filter(function(d,i,a) { // true returns d
+        return (a[i+1] ? (a[i].endtime <= a[i+1].endtime) : true);
+      })
+      .filter(function(d,i,a) { // FIXME
+        return (a[i+1] ? (a[i].endtime <= a[i+1].endtime) : true);
+      })
+  }
 
-    // returns fields to replace with array
-    function range() {
-      for (var i = len - 1; i >= 0; --i) {
-        if (this[i][property] <= array[array.length - 1][property]) {
-          var idx = index.apply(this);
-          return [idx, i - idx + 1]; // [ from-here, n-fields ]
-        }
+  // get array element which occures the most
+  function getMaxOccurrence(array) {
+    if (!array.length) return null;
+    var len = array.length;
+    var modeMap = {};
+    var maxEl = array[0];
+    var maxCount = 1;
+    for (var i = 0; i < len; i++) {
+      var el = array[i];
+      if (modeMap[el] === null) modeMap[el] = 1;
+      else modeMap[el]++;
+      if (modeMap[el] > maxCount) {
+        maxEl = el;
+        maxCount = modeMap[el];
       }
     }
+    return maxEl;
+  }
 
-    Array.prototype.splice.apply(this, range.apply(this).concat(array));
-
-    if (this.length < array.length) console.warn('this.length < array.length', this.length, array.length)
-    if (this.length < len) console.warn('this.length < len', this.length, len)
-    if (this.length == len) console.warn('this.length == len', this.length, len)
-
-    return this;
+  // FIXME abstract
+  // calculate the most popular tag between t0 and t1
+  function topActivity(har, t0, t1) {
+    return getMaxOccurrence(har.map(function (d) {
+      if (d.ts >= t0 && d.ts <= t1) { // get tags between t0 and t1
+        return d.tag.replace(/\"/g, ""); // remove quotes
+      }}).filter(function (d) { return d; }) // remove undefined
+    );
   }
 
 }())
