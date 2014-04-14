@@ -205,12 +205,10 @@
       return this;
     };
 
-    // to update the y-domain when it changes FIXME: release watch after final
-    // y-domain has been calculated (or better calculate all domains first and
-    // then draw stuff)
+    // to update the y-domain when it changes
     exports.yScale = function(_) {
       if (!arguments.length) return yScale;
-      yScale = yScale.range([height, 0]).domain(_);
+      yScale = yScale.domain(_);
       return this;
     };
 
