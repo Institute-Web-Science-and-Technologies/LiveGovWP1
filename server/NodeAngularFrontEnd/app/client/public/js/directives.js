@@ -59,7 +59,7 @@
       // priority: 1,
       // require: '^brush',
       link: function ($scope, $element, $attributes) { // brushCtrl
-        var chartElement = d3.select($element[0]);
+        var chartElement = d3.select($element[0]); // chart's this
 
         chart.on('brushended', function(d, i) {
           // console.log('CHART EXTENT 2:', d, $scope.extent);
@@ -72,7 +72,6 @@
         // draw the chart as soon as the data and x-domain are ready
         $scope.$watchCollection('data', function (data, oldData) {
           if (data && data.length) {
-            console.log('drawing chart', $scope.domain.x);
             chartElement.datum({data:data}).call(chart);
           }
         });
@@ -85,9 +84,14 @@
 
         // watch for extent changes and change the charts x-domain accordingly
         $scope.$watchCollection('extent', function (extent, oldExtent) {
-          if (extent && extent.length) {
-            // console.log('CHART EXTENT 4:', extent, oldExtent);
-            chartElement.call(chart.extent(extent));
+          if (extent && $scope.data.length) {
+            if (extent.length) { // extent set
+              chartElement.call(chart.extent(extent))
+              } else {
+                chartElement
+                  .call(chart.extent($scope.domain.x))
+                  .call(chart.yScale($scope.domain.y));
+              }
           }
         });
       }
