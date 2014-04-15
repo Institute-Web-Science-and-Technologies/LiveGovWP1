@@ -29,6 +29,9 @@
 
         var data = d.data;
 
+        var chartName = this.getAttribute('data').split('.')[1];
+
+        // FIXME
         if (extent.length) {
           xScale.domain(extent);
         } else {
@@ -39,25 +42,28 @@
           .x(function(d) { return xScale(d[0]); })
           .y(function(d) { return yScale(d[1]); });
 
-        // FIXME this is probably wrong and causes all the trouble
-        if (!d3.select(this).select('svg')[0][0]) { // why not (!svg)?
+        console.log('this', chartName, this);
+        console.log('svg', chartName, svg);
+
+        // FIXME svg is probably selected wrong and causes all the trouble
+        if (d3.select(this).select('svg').empty()) { // why not (!svg)?
           svg = d3.select(this)
-                .append('svg')
-                  .classed('chart', true)
-                  .attr("width", width + margin.left + margin.right)
-                  .attr("height", height + margin.top + margin.bottom)
-                .append("defs")
-                .append("clipPath")
-                  .attr("id", "clip")
-                .append("rect")
-                  .attr("width", width)
-                  .attr("height", height);
+            .append('svg')
+              .classed('chart', true)
+              .classed(chartName, true)
+              .attr("width", width + margin.left + margin.right)
+              .attr("height", height + margin.top + margin.bottom)
+            .append("defs")
+            .append("clipPath")
+              .attr("id", "clip")
+            .append("rect")
+              .attr("width", width)
+              .attr("height", height);
         }
 
-        d3.select(this).selectAll('svg').selectAll("*").remove();
-        // svg.selectAll("*").remove(); // why not?
-
-        svg = d3.select(this).selectAll('svg').data(data);
+        d3.select(this).select('svg').selectAll("*").remove();
+        
+        svg = d3.select(this).select('svg').data(data);
 
         brush.x(xScale)
           .on("brushend", brushended);
@@ -103,15 +109,11 @@
           .attr("height", height);
 
 
-
-        var chartName = this.getAttribute('data').split('.')[1].toUpperCase();
-
         // console.log(chartName, 'CHART DOMAIN XSCALE', xScale.domain().map(function (d) { return +d; }));
         // console.log(chartName, 'CHART DOMAIN YSCALE', yScale.domain());
         // console.log(chartName, 'CHART RANGE  XSCALE', xScale.range());
         // console.log(chartName, 'CHART RANGE  YSCALE', yScale.range());
         // console.log('--------------------------------------------------');
-
 
 
         function brushended() {
