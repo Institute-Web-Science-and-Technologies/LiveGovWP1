@@ -14,7 +14,7 @@ app.use(require('body-parser')()); // previously bodyParser, json and urlencoded
 app.use(require('method-override')());
 app.use(require('compression')());
 
-if ('development' == app.get('env')) {
+if (process.env.NODE_ENV == 'development') {
   app.use(require('morgan')()); // logger
   app.use(require('errorhandler')());
 }

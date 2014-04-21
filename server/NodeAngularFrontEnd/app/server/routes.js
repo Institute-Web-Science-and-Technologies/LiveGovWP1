@@ -1,6 +1,9 @@
 var db = require('./database');
 var csv = require('express-csv');
 
+// TODO refactor for express 4.x
+// http://scotch.io/bar-talk/expressjs-4-0-new-features-and-upgrading-from-3-0
+
 module.exports = function(app) {
 
 	/* TRIP ROUTES */
