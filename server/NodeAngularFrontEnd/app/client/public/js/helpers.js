@@ -3,17 +3,17 @@
 
   // flatten an array
   Array.prototype.flatten = function() {
-    return [].concat.apply([], this)
-  }
+    return [].concat.apply([], this);
+  };
 
   // return array of property values, e.g. [[objs],...] -> [props]
   Array.prototype.select = function(properties) {
     return this.flatten().map(function(d) {
       return properties.map(function(p) {
         return d[p];
-      })
+      });
     }).flatten();
-  }
+  };
 
   // merge two sensor data arrays, sorted w/o duplicates
   Array.prototype.merge = function(array) {
@@ -22,15 +22,16 @@
 
     return this.concat(array)
       .sort(function(a,b) {
-        return d3.ascending(a.starttime, b.starttime);
+        return d3.ascending(a.ts, b.ts);
       })
       .filter(function(d,i,a) { // true returns d
-        return (a[i+1] ? (a[i].endtime <= a[i+1].endtime) : true);
-      })
-      .filter(function(d,i,a) { // FIXME
-        return (a[i+1] ? (a[i].endtime <= a[i+1].endtime) : true);
-      })
-  }
+        return (a[i+1] ? (a[i].ts <= a[i+1].ts) : true);
+      });
+  };
+
+  Array.prototype.extent = function(a) {
+    return d3.extent(this.select(a)); // e.g. ['avgx, avgy, avgz']
+  };
 
   // get array element which occures the most
   function getMaxOccurrence(array) {
