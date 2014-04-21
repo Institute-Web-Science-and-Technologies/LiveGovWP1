@@ -1,143 +1,98 @@
-/* global app:true, console:true, confirm:true */
-
+/* jshint strict:true, devel:true, debug:true */
+/* globals app, d3 */
 'use strict'; // jshint -W097
 
-/* CONTROLLERS */
+app.controller('recCtrl',
+  function($scope, $location, $route, $q, Config, Trip) {
 
-app.controller('recCtrl', function ($scope, $rootScope, $location, $routeParams, $q, Trip, Data) {
-/*
-  $rootScope.trips
-    Array containing all trips including sensor and geo data.
+    /*
+      1. gather input
+      2. perform work
+      3. deliver results
+      4. handle failure
+    */
 
-  $rootScope.trip
-    Array containing the temporary state of currently selected trip.
-      id: currently selected trip id
-      idx: index of currently selected trip
-      extent: brush extent
+    /*
+      - only controllers modify scope
+      - only controllers communicate with services (though directives could)
+      - rootScope is not used
+      - passed trip variable is always trip object
+      - tell, don't ask (avoid watching)
+      - code does not repeat (dry)
+      - all business logic happens in services
+      - directives <-> controller <-> trip service <-> data factory
+      - all parameters are optional
+      - all functions return some useful value
+     */
 
-  $rootScope.trips[$rootScope.trip.idx]
-    Array containing the currently selected trip.
-      domain: min/max values of all sensor data
-      ...
-*/
-
-  // get all trips
-  if (!$rootScope.trips) {
-    var t = new Date(); // query start time
-    Trip.query().then(function (data) {
-      $rootScope.trips = data;
-      console.info("trip data ready (" + ((new Date() - t) / 1000) + " ms)");
-    }, function (data) {
-      throw("Error getting trips!");
-    });
-  }
-
-  // test if a trip is selected
-  this.is = function (trip) {
-    if ($rootScope.trip) {
-      return ($rootScope.trip.id === trip.trip_id) ? true : false;
-    }
+  // get all trips (init)
+  this.query = function() {
+    $scope.trips = Trip.query();
   };
 
-  this.hasData = function (trip) {
-    return $rootScope.trips[$rootScope.trips.indexOf(trip)].acc.length ? true : false;
+  // update a trip's name FIXME abstract for all fields
+  this.update = function(trip, data) {
+    Trip.save(trip, data);
+  };
+
+  // delete a trip
+  this.delete = function(trip) {
+    if (confirm("Permanently delete trip " + trip.trip_id + "?")) {
+      Trip.delete(trip);
+    }
   };
 
   // select a trip
-  this.select = function (trip) {
-    if (this.is(trip)) return; // trip already selected
-    $rootScope.trip = {
-      'id': trip ? trip.trip_id : undefined,
-      'idx': trip ? $rootScope.trips.indexOf(trip) : undefined,
-      'extent': []
-    };
+  this.select = function(trip) {
+    Trip.select(trip);
   };
 
-  if (!$rootScope.trip) this.select(); // create empty trip selection object
-
-  // delete a trip
-  this.destroy = function (trip) {
-    var r = confirm("Are you sure? Permanently delete trip " + trip.trip_id + "?");
-    if (r) {
-      Trip.delete(trip.trip_id);
-      $rootScope.trips.splice($rootScope.trips.indexOf(trip), 1);
-      console.log("trip deleted:", trip.trip_id);
-    }
+  // test if a trip is selected
+  this.selected = function(trip) {
+    return Trip.selected(trip);
   };
 
-  // update a trip's name
-  this.updateName = function (trip, data) {
-    trip.name = data;
-    Trip.save(trip.trip_id, {'name': data});
-    console.info("trip updated:", trip.trip_id);
+  // test if trip data is loaded
+  this.hasData = function(trip) {
+    return Trip.hasData();
+  };
+
+  // load (more) data for a trip
+  // obj is optional: { extent: Array[2], windowSize: number }
+  this.loadData = function(trip, obj) {
+    Trip.loadData(trip, obj);
+  };
+
+  // test if a trip has extent set (zoomed in)
+  this.extent = function(trip, extent) {
+    return Trip.extent(trip);
   };
 
   // change location path
   this.to = function(loc) {
-    if ($rootScope.trip) {
-      $location.path(loc);
-    }
+    $location.path(loc);
   };
 
-  $rootScope.$watch('trip.id',
-    function (newTrip, oldTrip) {
-      var t = new Date(); // query start time
-      if ($rootScope.trip.id) {
-        var trip = $rootScope.trips[$rootScope.trip.idx];
-        console.info("trip selected", $rootScope.trip, trip);
+  // test for current route (used by navbar)
+  this.loc = function(loc) {
+    return ($route.current && $route.current.name == loc);
+  };
 
-        Data.geo();
-
-        Data.sensor(['gra', 'acc', 'lac']).then(function(data) {
-          console.log('all sensor data has arrived (' + ((new Date() - t) / 1000) + " ms)");
-          trip.domain.x = d3.extent(data.select(['starttime', 'endtime']));
-          trip.domain.y = d3.extent(data.select(['avgx', 'avgy', 'avgz']));
-        });
-      }
-    }
-  );
 });
 
-app.controller('rawCtrl', function ($scope, $rootScope, $location, Data) {
-  if (!$rootScope.trip) { $location.path('/rec'); return; }
-  $scope.data = $rootScope.trips[$rootScope.trip.idx];
+app.controller('rawCtrl',
+  function($scope, $location, Trip) {
+
+  if (!Trip.selected()) {
+    $location.path('/rec');
+    return;
+  }
+
+  $scope.trip = Trip.selected();
 
   // update scope (called by directive)
-  $scope.onBrushExtent = function(extent) {
-    // EXTENT 3:
-    // console.log('CTRL  EXTENT 3:', extent, $rootScope.trip.extent);
-    $scope.$apply(function() { $rootScope.trip.extent = extent; });
+  $scope.onBrushExtent = function(trip, extent) {
+    Trip.updateExtent(trip, extent);
+    Trip.loadMoreData(trip, extent);
   };
-  
-  // load more data (called by directive)
-  $scope.loadMoreData = function(extent) {
-    var trip = $rootScope.trips[$rootScope.trip.idx];
-    Data.sensor(['gra', 'acc', 'lac'], extent, 'more').then(function(data) {
-
-      // recalculate y-domain
-      trip.domain.y = d3.extent(data.select(['avgx', 'avgy', 'avgz']));
-    });
-  };
-});
-
-app.controller('navCtrl', function ($scope, $rootScope, $route, Data) {
-  this.is = function(loc) {
-    return ($route.current && $route.current.name == loc) ? true : false;
-  };
-
-  // this.deselectTrip = function () {
-  //   delete $rootScope.trip;
-  // };
-
-  // this.clearBrush = function () {
-  //   $rootScope.trip.extent = undefined;
-  // };
-
-  // this.loadMoreData = function(sensor) {
-  //   Data.sensor('gra', $rootScope.trip.extent, 'more');
-  //   Data.sensor('acc', $rootScope.trip.extent, 'more');
-  //   Data.sensor('lac', $rootScope.trip.extent, 'more');
-  //   $scope.digest();
-  //   // $scope.apply();
-  // };
 });
