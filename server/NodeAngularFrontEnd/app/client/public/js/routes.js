@@ -38,34 +38,6 @@ app.config(function ($routeProvider, $locationProvider) {
 			name: 'raw'
 		})
 
-		.when('/har', {
-			templateUrl: '/partials/har',
-			controller: 'harCtrl',
-			controllerAs: 'har',
-			name: 'har'
-		})
-
-		.when('/har/:trip_id', {
-			templateUrl: '/partials/har',
-			controller: 'harCtrl',
-			controllerAs: 'har',
-			name: 'har'
-		})
-
-		.when('/sld', {
-			templateUrl: '/partials/sld',
-			controller: 'sldCtrl',
-			controllerAs: 'sld',
-			name: 'sld'
-		})
-
-		.when('/sld/:trip_id', {
-			templateUrl: '/partials/sld',
-			controller: 'sldCtrl',
-			controllerAs: 'sld',
-			name: 'sld'
-		})
-
 		.otherwise({
 			redirectTo: '/rec'
 	});
