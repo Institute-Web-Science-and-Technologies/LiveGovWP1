@@ -3,16 +3,17 @@
   //-   #map
 
   pre
-    | domain x: {{ $root.trips[$root.trip.idx].domain.x }} {{ $root.trips[$root.trip.idx].domain.x[0] | date:'HH:mm:ss' }} {{ $root.trips[$root.trip.idx].domain.x[1] | date:'HH:mm:ss' }} {{$root.trips[$root.trip.idx].domain.x[0] | duration:$root.trips[$root.trip.idx].domain.x[1] | date:'HH:mm:ss'}}
-    | domain y: {{ $root.trips[$root.trip.idx].domain.y }}
-    | extent: {{ $root.trip.extent }} {{ $root.trip.extent[0] | date:'HH:mm:ss' }} {{ $root.trip.extent[1] | date:'HH:mm:ss' }} {{ $root.trip.extent[0] | duration:$root.trip.extent[1] | date:'HH:mm:ss' }} {{ ((($root.trip.extent[1] - $root.trip.extent[0]) / ($root.trips[$root.trip.idx].domain.x[1] - $root.trips[$root.trip.idx].domain.x[0])) * 100).toFixed(2) }}% {{ $root.trip.extent[1] - $root.trip.extent[0] }}
-    | acc: {{ $root.trips[$root.trip.idx].acc.length }} {{ $root.trips[$root.trip.idx].acc.updates }}
-    | gra: {{ $root.trips[$root.trip.idx].gra.length }} {{ $root.trips[$root.trip.idx].gra.updates }}
-    | lac: {{ $root.trips[$root.trip.idx].lac.length }} {{ $root.trips[$root.trip.idx].lac.updates }}
+    | domain x: {{ trip.domain.x }} {{ trip.domain.x[0] | date:'HH:mm:ss' }} {{ trip.domain.x[1] | date:'HH:mm:ss' }} {{trip.domain.x[0] | duration:trip.domain.x[1] | date:'HH:mm:ss'}}
+    | domain y: {{ trip.domain.y }}
+    | extent: {{ trip.extent }} {{ trip.extent[0] | date:'HH:mm:ss' }} {{ trip.extent[1] | date:'HH:mm:ss' }} {{ trip.extent[0] | duration:trip.extent[1] | date:'HH:mm:ss' }} {{ (((trip.extent[1] - trip.extent[0]) / (trip.domain.x[1] - trip.domain.x[0])) * 100).toFixed(2) }}% {{ trip.extent[1] - trip.extent[0] }}
+    | acc: {{ trip.data.sensors.acc.length }}
+    | gra: {{ trip.data.sensors.gra.length }}
+    | lac: {{ trip.data.sensors.lac.length }}
 
-  brush.bru(extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)", data="data")
-  chart.gra(extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)", data="data.gra")
-  chart.acc(extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)", data="data.acc")
-  chart.lac(extent="$root.trip.extent", domain="$root.trips[$root.trip.idx].domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)", data="data.lac")
+  raw
+    brush.bru(extent="trip.extent", domain="trip.domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)")
+    chart.gra(extent="trip.extent", domain="trip.domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)", data="trip.data.sensors.gra")
+    chart.acc(extent="trip.extent", domain="trip.domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)", data="trip.data.sensors.acc")
+    chart.lac(extent="trip.extent", domain="trip.domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)", data="trip.data.sensors.lac")
 
 // ex:ft=jade

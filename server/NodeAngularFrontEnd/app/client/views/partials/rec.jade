@@ -2,11 +2,11 @@ table#rec.table
 	thead
 		tr
 			th
-				a(ng-click="predicate='trip_id'; reverse=!reverse") id
+				a(ng-click="predicate='id'; reverse=!reverse") id
 			th
-				a(ng-click="predicate='user_id'; reverse=!reverse") user
+				a(ng-click="predicate='user'; reverse=!reverse") user
 			th
-				a(ng-click="predicate='start_ts'; reverse=!reverse") start
+				a(ng-click="predicate='start'; reverse=!reverse") start
 			th
 				a(ng-click="predicate='duration'; reverse=!reverse") duration
 			th
@@ -15,19 +15,19 @@ table#rec.table
 				a(ng-click="predicate='name'; reverse=!reverse") name
 			th
 
-			//- FIXME table drawing takes forever. too much calculations in here?
+			//- FIXME ng-repeat takes forever. too much action in here?
 			//- rec.is
 			//- rec.hasData
 			//- ng-show="([item] | filter:searchFilter).length > 0"
 
 			tbody
-				tr(ng-repeat="trip in trips | orderBy:predicate:reverse", ng-class='{selected:rec.is(trip)}')
-					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')", ng-class='{hasData:rec.hasData(trip)}') {{ trip.trip_id }}
-					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.user_id }}
-					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.start_ts | date:'yyyy-MM-dd HH:mm:ss Z' }}
+				tr(ng-repeat="trip in trips | orderBy:predicate:reverse", ng-class='{selected:rec.selected(trip)}')
+					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')", ng-class='{hasData:rec.hasData(trip)}') {{ trip.id }}
+					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.user }}
+					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.start | date:'yyyy-MM-dd HH:mm:ss Z' }}
 					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.duration | date:'HH:mm:ss.sss' }}
 					td
-					td.name(editable-text="trip.name", onaftersave="rec.updateName(trip, $data)", buttons="no", e-style="width: 200px; height: 37px") {{ trip.name }}
-					td.destroy(ng-click="rec.destroy(trip)") DEL
+					td.name(editable-text="trip.name", onaftersave="rec.update(trip, {name: $data})", buttons="no", e-style="width: 200px; height: 37px") {{ trip.name }}
+					td.delete(ng-click="rec.delete(trip)") DEL
 
 // ex:ft=jade
