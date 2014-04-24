@@ -46,7 +46,7 @@ public class FeatureHelper {
     public static float[] S2(float[] x, float[] y, float[] z){
         float[] out = new float[x.length];
         for (int i =0; i< x.length; i++){
-            out[i] = (float)Math.sqrt(x[i]*x[i] + y[i]*y[i] + z[i]*z[i]);
+            out[i] = x[i]*x[i] + y[i]*y[i] + z[i]*z[i];
         }
         return out;
     }
@@ -68,26 +68,6 @@ public class FeatureHelper {
         return (float) (Math.abs(y) / abs);
     }
 
-    public static float [] padZero(float[] input) {
-        if (input == null) { return null; }
-        if (input.length == 0) { return new float [0]; }
-        int nextPowerOf2 = (int) Math.pow(2, 32 - Integer.numberOfLeadingZeros(input.length - 1));
-
-        float [] output = new float[nextPowerOf2];
-        for (int i = 0; i < nextPowerOf2; i++){
-            if (i < input.length) {
-                output[i] = input[i];
-            } else {
-                output[i] = 0;
-            }
-        }
-        return output;
-    }
-
-    public static Complex[] FT(float[] input){
-        return FFT(padZero(input));
-    }
-
     public static Complex[] FFT(float[] input){
         double[] dinput = new double[input.length];
         for (int i = 0; i < input.length; i++){
@@ -97,18 +77,5 @@ public class FeatureHelper {
         FastFourierTransformer fT = new FastFourierTransformer(DftNormalization.STANDARD);
         return fT.transform(dinput, TransformType.FORWARD);
     }
-
-    public static float[] Abs(Complex [] input){
-        float [] output = new float [input.length];
-        for (int i = 0; i < input.length; i++) {
-            output[i] = (float) input[i].abs();
-        }
-        return output;
-    }
-
-    public static float[] FTAbsolute(float[] input){
-        return Abs(FT(input));
-    }
-
 
 }

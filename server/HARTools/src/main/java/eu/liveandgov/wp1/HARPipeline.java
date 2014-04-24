@@ -16,15 +16,20 @@ public class HARPipeline extends Pipeline<Acceleration, Triple<Long, Long, Strin
     private FeaturePipeline fp;
     private ActivityPipeline ap;
 
-    public HARPipeline () {
+    public HARPipeline() {
+        this(100);
+    }
+
+    public HARPipeline (int delay) {
+
         int WINDOW_LENGTH_MS = 5 * 1000;
-        int WINDOW_OVERLAP   = WINDOW_LENGTH_MS - 100;
+        int WINDOW_OVERLAP   = WINDOW_LENGTH_MS - delay;
 
         int SAMPLING_FREQUENCY_HZ = 50;
         int MIN_RECORDING_FREQUENCY = 40;
 
-        double SAMPLE_LENGHT_MS = 1000D / SAMPLING_FREQUENCY_HZ;
-        int NO_SAMPLES_PER_WINDOW = (int) (WINDOW_LENGTH_MS / SAMPLE_LENGHT_MS);
+        double SAMPLE_LENGTH_MS = 1000D / SAMPLING_FREQUENCY_HZ;
+        int NO_SAMPLES_PER_WINDOW = (int) (WINDOW_LENGTH_MS / SAMPLE_LENGTH_MS);
 
         wp = new WindowPipeline(WINDOW_LENGTH_MS, WINDOW_OVERLAP);
 

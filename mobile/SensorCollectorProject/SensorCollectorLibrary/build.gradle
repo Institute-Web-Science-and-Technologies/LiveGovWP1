@@ -32,6 +32,11 @@ android {
     }
 }
 
+configurations.all {
+    // check for updates every build
+    // resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 dependencies {
     compile 'eu.liveandgov:liveandgov-commons:1.0-SNAPSHOT'
     compile 'eu.liveandgov:liveandgov-proximity:1.0-SNAPSHOT'
