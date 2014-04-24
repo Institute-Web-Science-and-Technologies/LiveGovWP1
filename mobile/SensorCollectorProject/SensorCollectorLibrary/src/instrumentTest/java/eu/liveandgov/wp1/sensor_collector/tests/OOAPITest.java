@@ -11,7 +11,7 @@ public class OOAPITest extends TestCase {
             {50.351232, 7.577668}};
 
     public void testOSMIPPS() {
-        double dia = 25.0;
+        double dia = 33.0;
 
         OSMIPPS ips = new OSMIPPS(dia / 111132.954, dia / 111132.954, true, 2048, "http://overpass.osm.rambler.ru/cgi/", dia);
 
@@ -20,7 +20,10 @@ public class OOAPITest extends TestCase {
         int tp = 0;
 
         for (double[] p : POSITIVE) {
-            tp += ips.calculate(p[1], p[0]).type == CalculationResult.CalculationType.IN_PROXIMITY ? 1 : 0;
+            if (ips.calculate(p[0], p[1]).type == CalculationResult.CalculationType.IN_PROXIMITY)
+                tp++;
+            else
+                System.err.println(p + " should be in proximity");
         }
 
         // Negative count/true negative
@@ -28,7 +31,10 @@ public class OOAPITest extends TestCase {
         int tn = 0;
 
         for (double[] n : NEGATIVE) {
-            tn += ips.calculate(n[1], n[0]).type == CalculationResult.CalculationType.NOT_IN_PROXIMITY ? 1 : 0;
+            if (ips.calculate(n[0], n[1]).type == CalculationResult.CalculationType.NOT_IN_PROXIMITY)
+                tn++;
+            else
+                System.err.println(n + " should not be in proximity");
         }
 
         int fp = nc - tn;
@@ -45,9 +51,11 @@ public class OOAPITest extends TestCase {
         System.out.println("Sensitivity: " + (tp / (double) pc));
         System.out.println("Specificity: " + (tn / (double) nc));
         System.out.println();
-        System.out.println("Precision: " + (tp / (tp + fp)));
+        if (tp + fp != 0)
+            System.out.println("Precision: " + (tp / (tp + fp)));
         System.out.println();
-        System.out.println("Accuracy: " + ((tp + tn) / (pc + nc)));
+        if (pc + nc != 0)
+            System.out.println("Accuracy: " + ((tp + tn) / (pc + nc)));
 
         assertEquals(pc, tp);
         assertEquals(nc, tn);

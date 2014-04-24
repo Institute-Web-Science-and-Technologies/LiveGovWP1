@@ -104,7 +104,10 @@ public class TelephonyHolder implements SensorHolder {
     public void stopRecording() {
         GlobalContext.getTelephonyManager().listen(phoneStateEndpoint, PhoneStateListener.LISTEN_NONE);
 
-        gsmTask.cancel(true);
+        if (gsmTask != null) {
+            gsmTask.cancel(true);
+            gsmTask = null;
+        }
     }
 
 
