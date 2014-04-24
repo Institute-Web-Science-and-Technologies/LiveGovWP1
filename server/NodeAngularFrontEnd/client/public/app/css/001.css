@@ -1,0 +1,129 @@
+/*   GLOBAL   */
+body {
+  padding-top: 50px;
+}
+.triangle {
+  font-size: 0.8em;
+  color: #428bca;
+}
+.modal-backdrop.am-fade {
+  opacity: 0.5;
+  transition: opacity 0.15s linear;
+}
+.modal-backdrop.am-fade.ng-enter {
+  opacity: 0;
+}
+.modal-backdrop.am-fade.ng-enter.ng-enter-active {
+  opacity: 0.5;
+}
+.modal-backdrop.am-fade.ng-leave {
+  opacity: 0.5;
+}
+.modal-backdrop.am-fade.ng-leave.ng-leave-active {
+  opacity: 0;
+}
+/*   REC TABLE   */
+tr.selected {
+  background-color: #fff3b3;
+}
+tr.selected:hover {
+  background-color: #ffeb80;
+}
+a.trip-indicator {
+  color: #cd5c5c !important;
+}
+a.trip-indicator.selected {
+  color: #ffd700 !important;
+}
+tbody tr:hover {
+  background-color: #ecf3fa;
+}
+td.name {
+  width: 200px;
+}
+td.destroy {
+  text-align: center;
+  font-weight: bold;
+  color: #cd5c5c;
+  width: 2.2em;
+}
+td.destroy:hover {
+  background-color: #cd5c5c;
+  color: #fff;
+}
+li.disabled a.red {
+  color: #cd5c5c !important;
+}
+/*   RAW DATA VIEW   */
+#raw {
+  margin: 24px;
+}
+#left {
+  display: table-cell;
+  width: 100%;
+  white-space: nowrap;
+  padding: 0 24px 0 0;
+}
+#right {
+  display: table-cell;
+  min-width: 500px;
+  vertical-align: top;
+}
+#map {
+  height: 384px;
+  width: 100%;
+}
+.legend {
+  line-height: 18px;
+  color: #555;
+  background: #fff;
+  padding: 8px;
+}
+.legend i {
+  width: 18px;
+  height: 18px;
+  float: left;
+  margin-right: 8px;
+  opacity: 0.7;
+}
+rawh2 {
+  width: 100%;
+  background-color: #ccc;
+  padding-top: 24px;
+}
+/*   HAR VIEW   */
+#har {
+  margin: 24px;
+}
+#har #map {
+  height: 768px;
+}
+/*   D3 CHARTS   */
+svg {
+  font: 10px sans-serif;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.x.axis path {
+  display: none;
+}
+.line {
+  stroke: #000;
+  stroke-width: 0.75px;
+  fill: none;
+}
+.line.line1 {
+  stroke: #dc143c;
+}
+.line.line2 {
+  stroke: #1e90ff;
+}
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: 0.125;
+  shape-rendering: crispEdges;
+}

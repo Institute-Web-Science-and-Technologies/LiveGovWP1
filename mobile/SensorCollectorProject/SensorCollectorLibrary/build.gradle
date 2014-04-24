@@ -1,0 +1,47 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven {
+            url 'https://raw.github.com/HeinrichHartmann/LiveGovWP1/mvn-repo'
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.6.1'
+    }
+}
+
+apply plugin: 'android-library'
+
+repositories {
+    // Need to add new repositories also here!
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url 'https://raw.github.com/HeinrichHartmann/LiveGovWP1/mvn-repo'
+    }
+}
+
+android {
+    compileSdkVersion 17
+    buildToolsVersion '17.0.0'
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 17
+    }
+}
+
+dependencies {
+    compile 'eu.liveandgov:liveandgov-commons:1.0-SNAPSHOT'
+    compile 'eu.liveandgov:liveandgov-proximity:1.0-SNAPSHOT'
+    compile 'eu.liveandgov:liveandgov-har-tools:1.0-SNAPSHOT'
+    compile 'com.android.support:appcompat-v7:18.0.0'
+    compile 'com.google.android.gms:play-services:3.1.36'
+    compile 'org.apache.httpcomponents:httpmime:4.3-beta2'
+    compile 'org.apache.httpcomponents:httpcore:4.3-beta2'
+    compile 'org.apache.servicemix.bundles:org.apache.servicemix.bundles.commons-csv:1.0-r706899_5'
+    compile 'junit:junit:3.8'
+    compile 'org.apache.commons:commons-math3:3.2'
+    compile 'org.apache.commons:commons-lang3:3.1'
+}
