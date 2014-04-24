@@ -8,6 +8,8 @@ import java.io.*;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * <p>Grid Index ProximityType Service, stores calculated values in a two-dimensional index. Acts as a
@@ -22,7 +24,7 @@ public abstract class GridIndexPS implements ProximityService {
     /**
      * Main index
      */
-    private final LinkedHashMap<Field, CalculationResult> calculated;
+    private final ConcurrentMap<Field, CalculationResult> calculated;
 
     /**
      * Horizontal resolution of the grid in degrees (division of longitude)
@@ -45,7 +47,7 @@ public abstract class GridIndexPS implements ProximityService {
     private int storeDegree;
 
     public GridIndexPS(double horizontalResolution, double verticalResolution, boolean byCentroid, int storeDegree) {
-        this.calculated = new LinkedHashMap<Field, CalculationResult>();
+        this.calculated = new ConcurrentHashMap<Field, CalculationResult>();
         this.horizontalResolution = horizontalResolution;
         this.verticalResolution = verticalResolution;
         this.byCentroid = byCentroid;
