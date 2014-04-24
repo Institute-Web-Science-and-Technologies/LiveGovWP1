@@ -32,7 +32,6 @@ public class FeatureVector {
     // public float energy = 0F;
     public float kurtosis = 0F;
 
-    public Integer [] S2Bins = new Integer[0];
     public Integer [] S2FTBins = new Integer[0];
 
     public long startTime = 0;
@@ -103,12 +102,7 @@ public class FeatureVector {
         R.addLast((double)s2Mean);
         R.addLast((double)s2Var);
         R.addLast((double)tilt);
-//        R.addLast((double)energy);
         R.addLast((double)kurtosis);
-
-//        for (float f : S2Bins){
-//            R.addLast((double) f);
-//        }
         for (float f : S2FTBins){
             R.addLast((double) f);
         }

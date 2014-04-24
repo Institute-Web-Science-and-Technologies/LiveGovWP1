@@ -132,7 +132,7 @@ public class UCIClassifier {
     public static double classify(Object[] i)
             throws Exception {
 
-        double p = Double.NaN;
+        double p;
         p = UCIClassifier.N29d602b30(i);
         return p;
     }
@@ -140,9 +140,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 0;
-        } else if (((Double) i[9]).doubleValue() <= 269.954926) {
+        } else if ((Double) i[9] <= 269.954926) {
             p = UCIClassifier.N214b4b3a1(i);
-        } else if (((Double) i[9]).doubleValue() > 269.954926) {
+        } else if ((Double) i[9] > 269.954926) {
             p = UCIClassifier.N4cba8fce36(i);
         }
         return p;
@@ -151,9 +151,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 0;
-        } else if (((Double) i[2]).doubleValue() <= 2.943442) {
+        } else if ((Double) i[2] <= 2.943442) {
             p = 0;
-        } else if (((Double) i[2]).doubleValue() > 2.943442) {
+        } else if ((Double) i[2] > 2.943442) {
             p = UCIClassifier.N5637dde92(i);
         }
         return p;
@@ -162,9 +162,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 2;
-        } else if (((Double) i[3]).doubleValue() <= -0.390226) {
+        } else if ((Double) i[3] <= -0.390226) {
             p = UCIClassifier.N6dca18373(i);
-        } else if (((Double) i[3]).doubleValue() > -0.390226) {
+        } else if ((Double) i[3] > -0.390226) {
             p = UCIClassifier.N6173560219(i);
         }
         return p;
@@ -173,9 +173,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 2;
-        } else if (((Double) i[6]).doubleValue() <= 0.700096) {
+        } else if ((Double) i[6] <= 0.700096) {
             p = UCIClassifier.N6efbfb304(i);
-        } else if (((Double) i[6]).doubleValue() > 0.700096) {
+        } else if ((Double) i[6] > 0.700096) {
             p = 1;
         }
         return p;
@@ -184,9 +184,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 2;
-        } else if (((Double) i[4]).doubleValue() <= 1.329958) {
+        } else if ((Double) i[4] <= 1.329958) {
             p = UCIClassifier.N6128453c5(i);
-        } else if (((Double) i[4]).doubleValue() > 1.329958) {
+        } else if ((Double) i[4] > 1.329958) {
             p = UCIClassifier.N7371b24615(i);
         }
         return p;
@@ -195,9 +195,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 2;
-        } else if (((Double) i[6]).doubleValue() <= 0.343011) {
+        } else if ((Double) i[6] <= 0.343011) {
             p = UCIClassifier.N1ad997f96(i);
-        } else if (((Double) i[6]).doubleValue() > 0.343011) {
+        } else if ((Double) i[6] > 0.343011) {
             p = UCIClassifier.N771931f811(i);
         }
         return p;
@@ -206,9 +206,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 2;
-        } else if (((Double) i[4]).doubleValue() <= -0.598831) {
+        } else if ((Double) i[4] <= -0.598831) {
             p = UCIClassifier.N43886a347(i);
-        } else if (((Double) i[4]).doubleValue() > -0.598831) {
+        } else if ((Double) i[4] > -0.598831) {
             p = 2;
         }
         return p;
@@ -217,9 +217,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 2;
-        } else if (((Double) i[5]).doubleValue() <= 0.003981) {
+        } else if ((Double) i[5] <= 0.003981) {
             p = UCIClassifier.N30f49e8f8(i);
-        } else if (((Double) i[5]).doubleValue() > 0.003981) {
+        } else if ((Double) i[5] > 0.003981) {
             p = 2;
         }
         return p;
@@ -228,9 +228,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 1;
-        } else if (((Double) i[8]).doubleValue() <= 102.136177) {
+        } else if ((Double) i[8] <= 102.136177) {
             p = 1;
-        } else if (((Double) i[8]).doubleValue() > 102.136177) {
+        } else if ((Double) i[8] > 102.136177) {
             p = UCIClassifier.Nbd5d7659(i);
         }
         return p;
@@ -239,9 +239,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 2;
-        } else if (((Double) i[2]).doubleValue() <= 9.908153) {
+        } else if ((Double) i[2] <= 9.908153) {
             p = 2;
-        } else if (((Double) i[2]).doubleValue() > 9.908153) {
+        } else if ((Double) i[2] > 9.908153) {
             p = UCIClassifier.N4302df510(i);
         }
         return p;
@@ -250,9 +250,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 1;
-        } else if (((Double) i[2]).doubleValue() <= 9.95014) {
+        } else if ((Double) i[2] <= 9.95014) {
             p = 1;
-        } else if (((Double) i[2]).doubleValue() > 9.95014) {
+        } else if ((Double) i[2] > 9.95014) {
             p = 2;
         }
         return p;
@@ -261,9 +261,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 1;
-        } else if (((Double) i[5]).doubleValue() <= 0.008142) {
+        } else if ((Double) i[5] <= 0.008142) {
             p = 1;
-        } else if (((Double) i[5]).doubleValue() > 0.008142) {
+        } else if ((Double) i[5] > 0.008142) {
             p = UCIClassifier.N171fcdde12(i);
         }
         return p;
@@ -272,9 +272,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 2;
-        } else if (((Double) i[5]).doubleValue() <= 0.07211) {
+        } else if ((Double) i[5] <= 0.07211) {
             p = UCIClassifier.N2904b5ae13(i);
-        } else if (((Double) i[5]).doubleValue() > 0.07211) {
+        } else if ((Double) i[5] > 0.07211) {
             p = 1;
         }
         return p;
@@ -283,9 +283,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 1;
-        } else if (((Double) i[8]).doubleValue() <= 101.748245) {
+        } else if ((Double) i[8] <= 101.748245) {
             p = 1;
-        } else if (((Double) i[8]).doubleValue() > 101.748245) {
+        } else if ((Double) i[8] > 101.748245) {
             p = UCIClassifier.N7433c78b14(i);
         }
         return p;
@@ -294,9 +294,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 1;
-        } else if (((Double) i[6]).doubleValue() <= 0.358472) {
+        } else if ((Double) i[6] <= 0.358472) {
             p = 1;
-        } else if (((Double) i[6]).doubleValue() > 0.358472) {
+        } else if ((Double) i[6] > 0.358472) {
             p = 2;
         }
         return p;
@@ -305,9 +305,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 1;
-        } else if (((Double) i[9]).doubleValue() <= 0.526522) {
+        } else if ((Double) i[9] <= 0.526522) {
             p = UCIClassifier.N2d6f4ce016(i);
-        } else if (((Double) i[9]).doubleValue() > 0.526522) {
+        } else if ((Double) i[9] > 0.526522) {
             p = UCIClassifier.N466c137c18(i);
         }
         return p;
@@ -316,9 +316,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 1;
-        } else if (((Double) i[8]).doubleValue() <= 102.322304) {
+        } else if ((Double) i[8] <= 102.322304) {
             p = UCIClassifier.N66201d6d17(i);
-        } else if (((Double) i[8]).doubleValue() > 102.322304) {
+        } else if ((Double) i[8] > 102.322304) {
             p = 2;
         }
         return p;
@@ -327,9 +327,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 2;
-        } else if (((Double) i[2]).doubleValue() <= 9.533285) {
+        } else if ((Double) i[2] <= 9.533285) {
             p = 2;
-        } else if (((Double) i[2]).doubleValue() > 9.533285) {
+        } else if ((Double) i[2] > 9.533285) {
             p = 1;
         }
         return p;
@@ -338,9 +338,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 1;
-        } else if (((Double) i[10]).doubleValue() <= 0.040138) {
+        } else if ((Double) i[10] <= 0.040138) {
             p = 1;
-        } else if (((Double) i[10]).doubleValue() > 0.040138) {
+        } else if ((Double) i[10] > 0.040138) {
             p = 2;
         }
         return p;
@@ -349,9 +349,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 1;
-        } else if (((Double) i[2]).doubleValue() <= 9.771587) {
+        } else if ((Double) i[2] <= 9.771587) {
             p = 1;
-        } else if (((Double) i[2]).doubleValue() > 9.771587) {
+        } else if ((Double) i[2] > 9.771587) {
             p = UCIClassifier.N5b13cf4920(i);
         }
         return p;
@@ -360,9 +360,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 1;
-        } else if (((Double) i[3]).doubleValue() <= 0.884546) {
+        } else if ((Double) i[3] <= 0.884546) {
             p = UCIClassifier.N718df05521(i);
-        } else if (((Double) i[3]).doubleValue() > 0.884546) {
+        } else if ((Double) i[3] > 0.884546) {
             p = 1;
         }
         return p;
@@ -371,9 +371,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 1;
-        } else if (((Double) i[2]).doubleValue() <= 10.063571) {
+        } else if ((Double) i[2] <= 10.063571) {
             p = UCIClassifier.N1d9d96b122(i);
-        } else if (((Double) i[2]).doubleValue() > 10.063571) {
+        } else if ((Double) i[2] > 10.063571) {
             p = 2;
         }
         return p;
@@ -382,9 +382,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 1;
-        } else if (((Double) i[9]).doubleValue() <= 7.936812) {
+        } else if ((Double) i[9] <= 7.936812) {
             p = UCIClassifier.N55104da723(i);
-        } else if (((Double) i[9]).doubleValue() > 7.936812) {
+        } else if ((Double) i[9] > 7.936812) {
             p = UCIClassifier.N69c1f2c33(i);
         }
         return p;
@@ -393,9 +393,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 2;
-        } else if (((Double) i[8]).doubleValue() <= 101.028893) {
+        } else if ((Double) i[8] <= 101.028893) {
             p = UCIClassifier.N215a3a9224(i);
-        } else if (((Double) i[8]).doubleValue() > 101.028893) {
+        } else if ((Double) i[8] > 101.028893) {
             p = UCIClassifier.N2abb585925(i);
         }
         return p;
@@ -404,9 +404,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 2;
-        } else if (((Double) i[6]).doubleValue() <= 0.033121) {
+        } else if ((Double) i[6] <= 0.033121) {
             p = 2;
-        } else if (((Double) i[6]).doubleValue() > 0.033121) {
+        } else if ((Double) i[6] > 0.033121) {
             p = 1;
         }
         return p;
@@ -415,9 +415,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 1;
-        } else if (((Double) i[8]).doubleValue() <= 101.328201) {
+        } else if ((Double) i[8] <= 101.328201) {
             p = 1;
-        } else if (((Double) i[8]).doubleValue() > 101.328201) {
+        } else if ((Double) i[8] > 101.328201) {
             p = UCIClassifier.N71a550f926(i);
         }
         return p;
@@ -426,9 +426,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 1;
-        } else if (((Double) i[12]).doubleValue() <= 5.427856) {
+        } else if ((Double) i[12] <= 5.427856) {
             p = 1;
-        } else if (((Double) i[12]).doubleValue() > 5.427856) {
+        } else if ((Double) i[12] > 5.427856) {
             p = UCIClassifier.N1c6745b927(i);
         }
         return p;
@@ -437,9 +437,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 2;
-        } else if (((Double) i[9]).doubleValue() <= 0.501479) {
+        } else if ((Double) i[9] <= 0.501479) {
             p = 2;
-        } else if (((Double) i[9]).doubleValue() > 0.501479) {
+        } else if ((Double) i[9] > 0.501479) {
             p = UCIClassifier.N4012834028(i);
         }
         return p;
@@ -448,9 +448,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 1;
-        } else if (((Double) i[4]).doubleValue() <= 0.959302) {
+        } else if ((Double) i[4] <= 0.959302) {
             p = UCIClassifier.N7f66ff9c29(i);
-        } else if (((Double) i[4]).doubleValue() > 0.959302) {
+        } else if ((Double) i[4] > 0.959302) {
             p = 2;
         }
         return p;
@@ -459,9 +459,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 1;
-        } else if (((Double) i[2]).doubleValue() <= 10.035295) {
+        } else if ((Double) i[2] <= 10.035295) {
             p = UCIClassifier.N43179c1c30(i);
-        } else if (((Double) i[2]).doubleValue() > 10.035295) {
+        } else if ((Double) i[2] > 10.035295) {
             p = UCIClassifier.N4ad38c3d32(i);
         }
         return p;
@@ -470,9 +470,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 1;
-        } else if (((Double) i[12]).doubleValue() <= 31.792858) {
+        } else if ((Double) i[12] <= 31.792858) {
             p = 1;
-        } else if (((Double) i[12]).doubleValue() > 31.792858) {
+        } else if ((Double) i[12] > 31.792858) {
             p = UCIClassifier.N430a14ad31(i);
         }
         return p;
@@ -481,9 +481,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 1;
-        } else if (((Double) i[9]).doubleValue() <= 2.810832) {
+        } else if ((Double) i[9] <= 2.810832) {
             p = 1;
-        } else if (((Double) i[9]).doubleValue() > 2.810832) {
+        } else if ((Double) i[9] > 2.810832) {
             p = 2;
         }
         return p;
@@ -492,9 +492,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 2;
-        } else if (((Double) i[7]).doubleValue() <= 0.081761) {
+        } else if ((Double) i[7] <= 0.081761) {
             p = 2;
-        } else if (((Double) i[7]).doubleValue() > 0.081761) {
+        } else if ((Double) i[7] > 0.081761) {
             p = 1;
         }
         return p;
@@ -503,9 +503,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 1;
-        } else if (((Double) i[8]).doubleValue() <= 101.308372) {
+        } else if ((Double) i[8] <= 101.308372) {
             p = 1;
-        } else if (((Double) i[8]).doubleValue() > 101.308372) {
+        } else if ((Double) i[8] > 101.308372) {
             p = UCIClassifier.N73c2851734(i);
         }
         return p;
@@ -514,9 +514,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 2;
-        } else if (((Double) i[2]).doubleValue() <= 10.015995) {
+        } else if ((Double) i[2] <= 10.015995) {
             p = 2;
-        } else if (((Double) i[2]).doubleValue() > 10.015995) {
+        } else if ((Double) i[2] > 10.015995) {
             p = UCIClassifier.N67afe46035(i);
         }
         return p;
@@ -525,9 +525,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 2;
-        } else if (((Double) i[7]).doubleValue() <= 0.179089) {
+        } else if ((Double) i[7] <= 0.179089) {
             p = 2;
-        } else if (((Double) i[7]).doubleValue() > 0.179089) {
+        } else if ((Double) i[7] > 0.179089) {
             p = 1;
         }
         return p;
@@ -536,9 +536,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 6528.52002) {
+        } else if ((Double) i[9] <= 6528.52002) {
             p = UCIClassifier.N6c3744bc37(i);
-        } else if (((Double) i[9]).doubleValue() > 6528.52002) {
+        } else if ((Double) i[9] > 6528.52002) {
             p = UCIClassifier.N71d9d55b148(i);
         }
         return p;
@@ -547,9 +547,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 3;
-        } else if (((Double) i[10]).doubleValue() <= 0.118923) {
+        } else if ((Double) i[10] <= 0.118923) {
             p = UCIClassifier.N2081ca2538(i);
-        } else if (((Double) i[10]).doubleValue() > 0.118923) {
+        } else if ((Double) i[10] > 0.118923) {
             p = UCIClassifier.N506dd10860(i);
         }
         return p;
@@ -558,9 +558,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 3;
-        } else if (((Double) i[10]).doubleValue() <= 0.055807) {
+        } else if ((Double) i[10] <= 0.055807) {
             p = UCIClassifier.N28fe53cf39(i);
-        } else if (((Double) i[10]).doubleValue() > 0.055807) {
+        } else if ((Double) i[10] > 0.055807) {
             p = UCIClassifier.N3b48a8e647(i);
         }
         return p;
@@ -569,9 +569,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 2090.507568) {
+        } else if ((Double) i[9] <= 2090.507568) {
             p = UCIClassifier.N5130500f40(i);
-        } else if (((Double) i[9]).doubleValue() > 2090.507568) {
+        } else if ((Double) i[9] > 2090.507568) {
             p = UCIClassifier.N3ad8326d41(i);
         }
         return p;
@@ -580,9 +580,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 5;
-        } else if (((Double) i[10]).doubleValue() <= 0.029647) {
+        } else if ((Double) i[10] <= 0.029647) {
             p = 5;
-        } else if (((Double) i[10]).doubleValue() > 0.029647) {
+        } else if ((Double) i[10] > 0.029647) {
             p = 3;
         }
         return p;
@@ -591,9 +591,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= -2.075402) {
+        } else if ((Double) i[4] <= -2.075402) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() > -2.075402) {
+        } else if ((Double) i[4] > -2.075402) {
             p = UCIClassifier.N47d6b04942(i);
         }
         return p;
@@ -602,9 +602,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() <= 2.959999) {
+        } else if ((Double) i[6] <= 2.959999) {
             p = UCIClassifier.N5fcfad7743(i);
-        } else if (((Double) i[6]).doubleValue() > 2.959999) {
+        } else if ((Double) i[6] > 2.959999) {
             p = 3;
         }
         return p;
@@ -613,9 +613,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 5;
-        } else if (((Double) i[7]).doubleValue() <= 1.826596) {
+        } else if ((Double) i[7] <= 1.826596) {
             p = UCIClassifier.N3b8590c544(i);
-        } else if (((Double) i[7]).doubleValue() > 1.826596) {
+        } else if ((Double) i[7] > 1.826596) {
             p = 5;
         }
         return p;
@@ -624,9 +624,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 5;
-        } else if (((Double) i[12]).doubleValue() <= 0.870867) {
+        } else if ((Double) i[12] <= 0.870867) {
             p = 5;
-        } else if (((Double) i[12]).doubleValue() > 0.870867) {
+        } else if ((Double) i[12] > 0.870867) {
             p = UCIClassifier.N3de3940a45(i);
         }
         return p;
@@ -635,9 +635,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 3;
-        } else if (((Double) i[8]).doubleValue() <= 112.968475) {
+        } else if ((Double) i[8] <= 112.968475) {
             p = UCIClassifier.N280c3c4446(i);
-        } else if (((Double) i[8]).doubleValue() > 112.968475) {
+        } else if ((Double) i[8] > 112.968475) {
             p = 3;
         }
         return p;
@@ -646,9 +646,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() <= 6.993151) {
+        } else if ((Double) i[5] <= 6.993151) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() > 6.993151) {
+        } else if ((Double) i[5] > 6.993151) {
             p = 5;
         }
         return p;
@@ -657,9 +657,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() <= 1.06505) {
+        } else if ((Double) i[6] <= 1.06505) {
             p = UCIClassifier.N1f48b27248(i);
-        } else if (((Double) i[6]).doubleValue() > 1.06505) {
+        } else if ((Double) i[6] > 1.06505) {
             p = UCIClassifier.N5dbb6a6949(i);
         }
         return p;
@@ -668,9 +668,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() <= 2.907737) {
+        } else if ((Double) i[5] <= 2.907737) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() > 2.907737) {
+        } else if ((Double) i[5] > 2.907737) {
             p = 5;
         }
         return p;
@@ -679,9 +679,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 3601.210205) {
+        } else if ((Double) i[9] <= 3601.210205) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() > 3601.210205) {
+        } else if ((Double) i[9] > 3601.210205) {
             p = UCIClassifier.N3b47439250(i);
         }
         return p;
@@ -690,9 +690,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 3;
-        } else if (((Double) i[7]).doubleValue() <= 1.533426) {
+        } else if ((Double) i[7] <= 1.533426) {
             p = UCIClassifier.N43a544a551(i);
-        } else if (((Double) i[7]).doubleValue() > 1.533426) {
+        } else if ((Double) i[7] > 1.533426) {
             p = UCIClassifier.N199de18156(i);
         }
         return p;
@@ -701,9 +701,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 5;
-        } else if (((Double) i[3]).doubleValue() <= -1.002184) {
+        } else if ((Double) i[3] <= -1.002184) {
             p = UCIClassifier.N173dcf5552(i);
-        } else if (((Double) i[3]).doubleValue() > -1.002184) {
+        } else if ((Double) i[3] > -1.002184) {
             p = 3;
         }
         return p;
@@ -712,9 +712,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() <= 3.369114) {
+        } else if ((Double) i[6] <= 3.369114) {
             p = UCIClassifier.N5af6e15e53(i);
-        } else if (((Double) i[6]).doubleValue() > 3.369114) {
+        } else if ((Double) i[6] > 3.369114) {
             p = 3;
         }
         return p;
@@ -723,9 +723,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 3;
-        } else if (((Double) i[6]).doubleValue() <= 2.106327) {
+        } else if ((Double) i[6] <= 2.106327) {
             p = UCIClassifier.N64610fa54(i);
-        } else if (((Double) i[6]).doubleValue() > 2.106327) {
+        } else if ((Double) i[6] > 2.106327) {
             p = UCIClassifier.N6204904d55(i);
         }
         return p;
@@ -734,9 +734,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= -0.123062) {
+        } else if ((Double) i[4] <= -0.123062) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() > -0.123062) {
+        } else if ((Double) i[4] > -0.123062) {
             p = 5;
         }
         return p;
@@ -745,9 +745,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 3;
-        } else if (((Double) i[7]).doubleValue() <= 1.161764) {
+        } else if ((Double) i[7] <= 1.161764) {
             p = 3;
-        } else if (((Double) i[7]).doubleValue() > 1.161764) {
+        } else if ((Double) i[7] > 1.161764) {
             p = 5;
         }
         return p;
@@ -756,9 +756,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 3;
-        } else if (((Double) i[2]).doubleValue() <= 9.277604) {
+        } else if ((Double) i[2] <= 9.277604) {
             p = UCIClassifier.N4c3fe94a57(i);
-        } else if (((Double) i[2]).doubleValue() > 9.277604) {
+        } else if ((Double) i[2] > 9.277604) {
             p = UCIClassifier.N77ed206158(i);
         }
         return p;
@@ -767,9 +767,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= -3.742124) {
+        } else if ((Double) i[4] <= -3.742124) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() > -3.742124) {
+        } else if ((Double) i[4] > -3.742124) {
             p = 4;
         }
         return p;
@@ -778,9 +778,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 6036.083496) {
+        } else if ((Double) i[9] <= 6036.083496) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() > 6036.083496) {
+        } else if ((Double) i[9] > 6036.083496) {
             p = UCIClassifier.N70e8fdc959(i);
         }
         return p;
@@ -789,9 +789,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 5;
-        } else if (((Double) i[8]).doubleValue() <= 113.944) {
+        } else if ((Double) i[8] <= 113.944) {
             p = 5;
-        } else if (((Double) i[8]).doubleValue() > 113.944) {
+        } else if ((Double) i[8] > 113.944) {
             p = 3;
         }
         return p;
@@ -800,9 +800,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 3;
-        } else if (((Double) i[10]).doubleValue() <= 0.210035) {
+        } else if ((Double) i[10] <= 0.210035) {
             p = UCIClassifier.N59b68d7861(i);
-        } else if (((Double) i[10]).doubleValue() > 0.210035) {
+        } else if ((Double) i[10] > 0.210035) {
             p = UCIClassifier.N37d7f3f4139(i);
         }
         return p;
@@ -811,9 +811,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 3574.864746) {
+        } else if ((Double) i[9] <= 3574.864746) {
             p = UCIClassifier.N6001ef4b62(i);
-        } else if (((Double) i[9]).doubleValue() > 3574.864746) {
+        } else if ((Double) i[9] > 3574.864746) {
             p = UCIClassifier.N79a8648891(i);
         }
         return p;
@@ -822,9 +822,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 3;
-        } else if (((Double) i[7]).doubleValue() <= 1.572092) {
+        } else if ((Double) i[7] <= 1.572092) {
             p = UCIClassifier.N1f05562b63(i);
-        } else if (((Double) i[7]).doubleValue() > 1.572092) {
+        } else if ((Double) i[7] > 1.572092) {
             p = UCIClassifier.N377e4cec73(i);
         }
         return p;
@@ -833,9 +833,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= 1.804352) {
+        } else if ((Double) i[4] <= 1.804352) {
             p = UCIClassifier.N175c30f664(i);
-        } else if (((Double) i[4]).doubleValue() > 1.804352) {
+        } else if ((Double) i[4] > 1.804352) {
             p = 4;
         }
         return p;
@@ -844,9 +844,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 2927.934326) {
+        } else if ((Double) i[9] <= 2927.934326) {
             p = UCIClassifier.N2592727565(i);
-        } else if (((Double) i[9]).doubleValue() > 2927.934326) {
+        } else if ((Double) i[9] > 2927.934326) {
             p = UCIClassifier.Nf8b729867(i);
         }
         return p;
@@ -855,9 +855,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 3;
-        } else if (((Double) i[2]).doubleValue() <= 9.548457) {
+        } else if ((Double) i[2] <= 9.548457) {
             p = UCIClassifier.N3198729866(i);
-        } else if (((Double) i[2]).doubleValue() > 9.548457) {
+        } else if ((Double) i[2] > 9.548457) {
             p = 3;
         }
         return p;
@@ -866,9 +866,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 4;
-        } else if (((Double) i[2]).doubleValue() <= 9.373204) {
+        } else if ((Double) i[2] <= 9.373204) {
             p = 4;
-        } else if (((Double) i[2]).doubleValue() > 9.373204) {
+        } else if ((Double) i[2] > 9.373204) {
             p = 3;
         }
         return p;
@@ -877,9 +877,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 3;
-        } else if (((Double) i[6]).doubleValue() <= 2.800068) {
+        } else if ((Double) i[6] <= 2.800068) {
             p = UCIClassifier.Nc10612168(i);
-        } else if (((Double) i[6]).doubleValue() > 2.800068) {
+        } else if ((Double) i[6] > 2.800068) {
             p = 3;
         }
         return p;
@@ -888,9 +888,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() <= 5.361926) {
+        } else if ((Double) i[5] <= 5.361926) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() > 5.361926) {
+        } else if ((Double) i[5] > 5.361926) {
             p = UCIClassifier.N758c3b769(i);
         }
         return p;
@@ -899,9 +899,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 4;
-        } else if (((Double) i[12]).doubleValue() <= 2.042665) {
+        } else if ((Double) i[12] <= 2.042665) {
             p = UCIClassifier.N5499272570(i);
-        } else if (((Double) i[12]).doubleValue() > 2.042665) {
+        } else if ((Double) i[12] > 2.042665) {
             p = 3;
         }
         return p;
@@ -910,9 +910,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 4;
-        } else if (((Double) i[2]).doubleValue() <= 9.85298) {
+        } else if ((Double) i[2] <= 9.85298) {
             p = UCIClassifier.N12d9198771(i);
-        } else if (((Double) i[2]).doubleValue() > 9.85298) {
+        } else if ((Double) i[2] > 9.85298) {
             p = 4;
         }
         return p;
@@ -921,9 +921,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 4;
-        } else if (((Double) i[12]).doubleValue() <= 1.170892) {
+        } else if ((Double) i[12] <= 1.170892) {
             p = 4;
-        } else if (((Double) i[12]).doubleValue() > 1.170892) {
+        } else if ((Double) i[12] > 1.170892) {
             p = UCIClassifier.N6b1af7bb72(i);
         }
         return p;
@@ -932,9 +932,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 4;
-        } else if (((Double) i[2]).doubleValue() <= 9.814983) {
+        } else if ((Double) i[2] <= 9.814983) {
             p = 4;
-        } else if (((Double) i[2]).doubleValue() > 9.814983) {
+        } else if ((Double) i[2] > 9.814983) {
             p = 3;
         }
         return p;
@@ -943,9 +943,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 4;
-        } else if (((Double) i[8]).doubleValue() <= 107.791428) {
+        } else if ((Double) i[8] <= 107.791428) {
             p = UCIClassifier.N44ec366a74(i);
-        } else if (((Double) i[8]).doubleValue() > 107.791428) {
+        } else if ((Double) i[8] > 107.791428) {
             p = UCIClassifier.N6fe88c7f75(i);
         }
         return p;
@@ -954,9 +954,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 4;
-        } else if (((Double) i[10]).doubleValue() <= 0.177631) {
+        } else if ((Double) i[10] <= 0.177631) {
             p = 4;
-        } else if (((Double) i[10]).doubleValue() > 0.177631) {
+        } else if ((Double) i[10] > 0.177631) {
             p = 3;
         }
         return p;
@@ -965,9 +965,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 3;
-        } else if (((Double) i[6]).doubleValue() <= 4.86866) {
+        } else if ((Double) i[6] <= 4.86866) {
             p = UCIClassifier.Nc601f3f76(i);
-        } else if (((Double) i[6]).doubleValue() > 4.86866) {
+        } else if ((Double) i[6] > 4.86866) {
             p = 4;
         }
         return p;
@@ -976,9 +976,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 1671.464111) {
+        } else if ((Double) i[9] <= 1671.464111) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() > 1671.464111) {
+        } else if ((Double) i[9] > 1671.464111) {
             p = UCIClassifier.N7aa3677177(i);
         }
         return p;
@@ -987,9 +987,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 3;
-        } else if (((Double) i[12]).doubleValue() <= 2.310261) {
+        } else if ((Double) i[12] <= 2.310261) {
             p = UCIClassifier.N7ddc6a9d78(i);
-        } else if (((Double) i[12]).doubleValue() > 2.310261) {
+        } else if ((Double) i[12] > 2.310261) {
             p = 3;
         }
         return p;
@@ -998,9 +998,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 3;
-        } else if (((Double) i[12]).doubleValue() <= -0.844935) {
+        } else if ((Double) i[12] <= -0.844935) {
             p = 3;
-        } else if (((Double) i[12]).doubleValue() > -0.844935) {
+        } else if ((Double) i[12] > -0.844935) {
             p = UCIClassifier.N11dba9f979(i);
         }
         return p;
@@ -1009,9 +1009,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 3;
-        } else if (((Double) i[10]).doubleValue() <= 0.204345) {
+        } else if ((Double) i[10] <= 0.204345) {
             p = UCIClassifier.N6c74239780(i);
-        } else if (((Double) i[10]).doubleValue() > 0.204345) {
+        } else if ((Double) i[10] > 0.204345) {
             p = UCIClassifier.Nef1df689(i);
         }
         return p;
@@ -1020,9 +1020,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 4;
-        } else if (((Double) i[3]).doubleValue() <= -2.456705) {
+        } else if ((Double) i[3] <= -2.456705) {
             p = UCIClassifier.N3cccc62181(i);
-        } else if (((Double) i[3]).doubleValue() > -2.456705) {
+        } else if ((Double) i[3] > -2.456705) {
             p = UCIClassifier.N27e3bfb682(i);
         }
         return p;
@@ -1031,9 +1031,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 4;
-        } else if (((Double) i[12]).doubleValue() <= 0.74279) {
+        } else if ((Double) i[12] <= 0.74279) {
             p = 4;
-        } else if (((Double) i[12]).doubleValue() > 0.74279) {
+        } else if ((Double) i[12] > 0.74279) {
             p = 3;
         }
         return p;
@@ -1042,9 +1042,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 3;
-        } else if (((Double) i[7]).doubleValue() <= 3.341181) {
+        } else if ((Double) i[7] <= 3.341181) {
             p = UCIClassifier.N593f5a2f83(i);
-        } else if (((Double) i[7]).doubleValue() > 3.341181) {
+        } else if ((Double) i[7] > 3.341181) {
             p = 4;
         }
         return p;
@@ -1053,9 +1053,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 3;
-        } else if (((Double) i[12]).doubleValue() <= 0.802247) {
+        } else if ((Double) i[12] <= 0.802247) {
             p = UCIClassifier.N4e39f16f84(i);
-        } else if (((Double) i[12]).doubleValue() > 0.802247) {
+        } else if ((Double) i[12] > 0.802247) {
             p = UCIClassifier.N2ec8f0a487(i);
         }
         return p;
@@ -1064,9 +1064,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 4;
-        } else if (((Double) i[6]).doubleValue() <= 2.461774) {
+        } else if ((Double) i[6] <= 2.461774) {
             p = UCIClassifier.N3e19d68885(i);
-        } else if (((Double) i[6]).doubleValue() > 2.461774) {
+        } else if ((Double) i[6] > 2.461774) {
             p = 3;
         }
         return p;
@@ -1075,9 +1075,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 4;
-        } else if (((Double) i[5]).doubleValue() <= 6.278641) {
+        } else if ((Double) i[5] <= 6.278641) {
             p = UCIClassifier.N12539a9286(i);
-        } else if (((Double) i[5]).doubleValue() > 6.278641) {
+        } else if ((Double) i[5] > 6.278641) {
             p = 3;
         }
         return p;
@@ -1086,9 +1086,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 4;
-        } else if (((Double) i[10]).doubleValue() <= 0.183699) {
+        } else if ((Double) i[10] <= 0.183699) {
             p = 4;
-        } else if (((Double) i[10]).doubleValue() > 0.183699) {
+        } else if ((Double) i[10] > 0.183699) {
             p = 3;
         }
         return p;
@@ -1097,9 +1097,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 3;
-        } else if (((Double) i[2]).doubleValue() <= 9.858363) {
+        } else if ((Double) i[2] <= 9.858363) {
             p = 3;
-        } else if (((Double) i[2]).doubleValue() > 9.858363) {
+        } else if ((Double) i[2] > 9.858363) {
             p = UCIClassifier.Na2eb6fb88(i);
         }
         return p;
@@ -1108,9 +1108,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 3;
-        } else if (((Double) i[12]).doubleValue() <= 1.19905) {
+        } else if ((Double) i[12] <= 1.19905) {
             p = 3;
-        } else if (((Double) i[12]).doubleValue() > 1.19905) {
+        } else if ((Double) i[12] > 1.19905) {
             p = 4;
         }
         return p;
@@ -1119,9 +1119,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 4;
-        } else if (((Double) i[6]).doubleValue() <= 1.998531) {
+        } else if ((Double) i[6] <= 1.998531) {
             p = UCIClassifier.N529801f490(i);
-        } else if (((Double) i[6]).doubleValue() > 1.998531) {
+        } else if ((Double) i[6] > 1.998531) {
             p = 3;
         }
         return p;
@@ -1130,9 +1130,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 4;
-        } else if (((Double) i[5]).doubleValue() <= 5.508829) {
+        } else if ((Double) i[5] <= 5.508829) {
             p = 4;
-        } else if (((Double) i[5]).doubleValue() > 5.508829) {
+        } else if ((Double) i[5] > 5.508829) {
             p = 3;
         }
         return p;
@@ -1141,9 +1141,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() <= 2.200146) {
+        } else if ((Double) i[6] <= 2.200146) {
             p = UCIClassifier.N1e605b1e92(i);
-        } else if (((Double) i[6]).doubleValue() > 2.200146) {
+        } else if ((Double) i[6] > 2.200146) {
             p = UCIClassifier.N3a396fce98(i);
         }
         return p;
@@ -1152,9 +1152,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 5;
-        } else if (((Double) i[7]).doubleValue() <= 1.363378) {
+        } else if ((Double) i[7] <= 1.363378) {
             p = UCIClassifier.N47fe1e2693(i);
-        } else if (((Double) i[7]).doubleValue() > 1.363378) {
+        } else if ((Double) i[7] > 1.363378) {
             p = UCIClassifier.N4638fb5996(i);
         }
         return p;
@@ -1163,9 +1163,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 5;
-        } else if (((Double) i[4]).doubleValue() <= -0.990013) {
+        } else if ((Double) i[4] <= -0.990013) {
             p = UCIClassifier.N7c6d75b694(i);
-        } else if (((Double) i[4]).doubleValue() > -0.990013) {
+        } else if ((Double) i[4] > -0.990013) {
             p = 5;
         }
         return p;
@@ -1174,9 +1174,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 5;
-        } else if (((Double) i[7]).doubleValue() <= 1.161013) {
+        } else if ((Double) i[7] <= 1.161013) {
             p = 5;
-        } else if (((Double) i[7]).doubleValue() > 1.161013) {
+        } else if ((Double) i[7] > 1.161013) {
             p = UCIClassifier.N764b3f8b95(i);
         }
         return p;
@@ -1185,9 +1185,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() <= 6.527034) {
+        } else if ((Double) i[5] <= 6.527034) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() > 6.527034) {
+        } else if ((Double) i[5] > 6.527034) {
             p = 5;
         }
         return p;
@@ -1196,9 +1196,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= 0.616417) {
+        } else if ((Double) i[4] <= 0.616417) {
             p = UCIClassifier.N46fdb41397(i);
-        } else if (((Double) i[4]).doubleValue() > 0.616417) {
+        } else if ((Double) i[4] > 0.616417) {
             p = 4;
         }
         return p;
@@ -1207,9 +1207,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 4;
-        } else if (((Double) i[12]).doubleValue() <= 0.610828) {
+        } else if ((Double) i[12] <= 0.610828) {
             p = 4;
-        } else if (((Double) i[12]).doubleValue() > 0.610828) {
+        } else if ((Double) i[12] > 0.610828) {
             p = 3;
         }
         return p;
@@ -1218,9 +1218,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 3;
-        } else if (((Double) i[12]).doubleValue() <= 1.580731) {
+        } else if ((Double) i[12] <= 1.580731) {
             p = UCIClassifier.N10db5b3f99(i);
-        } else if (((Double) i[12]).doubleValue() > 1.580731) {
+        } else if ((Double) i[12] > 1.580731) {
             p = UCIClassifier.N30394ffa125(i);
         }
         return p;
@@ -1229,9 +1229,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 3;
-        } else if (((Double) i[12]).doubleValue() <= -0.491765) {
+        } else if ((Double) i[12] <= -0.491765) {
             p = 3;
-        } else if (((Double) i[12]).doubleValue() > -0.491765) {
+        } else if ((Double) i[12] > -0.491765) {
             p = UCIClassifier.N31438dbe100(i);
         }
         return p;
@@ -1240,9 +1240,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 5669.368652) {
+        } else if ((Double) i[9] <= 5669.368652) {
             p = UCIClassifier.N4a0ece36101(i);
-        } else if (((Double) i[9]).doubleValue() > 5669.368652) {
+        } else if ((Double) i[9] > 5669.368652) {
             p = UCIClassifier.N465098f9122(i);
         }
         return p;
@@ -1251,9 +1251,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 4;
-        } else if (((Double) i[7]).doubleValue() <= 1.108897) {
+        } else if ((Double) i[7] <= 1.108897) {
             p = UCIClassifier.N12046136102(i);
-        } else if (((Double) i[7]).doubleValue() > 1.108897) {
+        } else if ((Double) i[7] > 1.108897) {
             p = UCIClassifier.N23dd246105(i);
         }
         return p;
@@ -1262,9 +1262,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 5;
-        } else if (((Double) i[4]).doubleValue() <= -0.515233) {
+        } else if ((Double) i[4] <= -0.515233) {
             p = 5;
-        } else if (((Double) i[4]).doubleValue() > -0.515233) {
+        } else if ((Double) i[4] > -0.515233) {
             p = UCIClassifier.N5d8a2977103(i);
         }
         return p;
@@ -1273,9 +1273,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 4;
-        } else if (((Double) i[6]).doubleValue() <= 3.896789) {
+        } else if ((Double) i[6] <= 3.896789) {
             p = UCIClassifier.N19a8739b104(i);
-        } else if (((Double) i[6]).doubleValue() > 3.896789) {
+        } else if ((Double) i[6] > 3.896789) {
             p = 3;
         }
         return p;
@@ -1284,9 +1284,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 4;
-        } else if (((Double) i[3]).doubleValue() <= -2.246712) {
+        } else if ((Double) i[3] <= -2.246712) {
             p = 4;
-        } else if (((Double) i[3]).doubleValue() > -2.246712) {
+        } else if ((Double) i[3] > -2.246712) {
             p = 3;
         }
         return p;
@@ -1295,9 +1295,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 3;
-        } else if (((Double) i[8]).doubleValue() <= 117.811577) {
+        } else if ((Double) i[8] <= 117.811577) {
             p = UCIClassifier.N28b7f2d0106(i);
-        } else if (((Double) i[8]).doubleValue() > 117.811577) {
+        } else if ((Double) i[8] > 117.811577) {
             p = UCIClassifier.N2b115a61119(i);
         }
         return p;
@@ -1306,9 +1306,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= -0.344617) {
+        } else if ((Double) i[4] <= -0.344617) {
             p = UCIClassifier.N44a64a92107(i);
-        } else if (((Double) i[4]).doubleValue() > -0.344617) {
+        } else if ((Double) i[4] > -0.344617) {
             p = UCIClassifier.Ndc0adca114(i);
         }
         return p;
@@ -1317,9 +1317,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 4;
-        } else if (((Double) i[12]).doubleValue() <= 0.196267) {
+        } else if ((Double) i[12] <= 0.196267) {
             p = UCIClassifier.N169da74108(i);
-        } else if (((Double) i[12]).doubleValue() > 0.196267) {
+        } else if ((Double) i[12] > 0.196267) {
             p = UCIClassifier.N2d4c8822110(i);
         }
         return p;
@@ -1328,9 +1328,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 4;
-        } else if (((Double) i[7]).doubleValue() <= 4.411524) {
+        } else if ((Double) i[7] <= 4.411524) {
             p = 4;
-        } else if (((Double) i[7]).doubleValue() > 4.411524) {
+        } else if ((Double) i[7] > 4.411524) {
             p = UCIClassifier.N4c84f665109(i);
         }
         return p;
@@ -1339,9 +1339,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 4;
-        } else if (((Double) i[3]).doubleValue() <= -2.431347) {
+        } else if ((Double) i[3] <= -2.431347) {
             p = 4;
-        } else if (((Double) i[3]).doubleValue() > -2.431347) {
+        } else if ((Double) i[3] > -2.431347) {
             p = 3;
         }
         return p;
@@ -1350,9 +1350,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 5;
-        } else if (((Double) i[7]).doubleValue() <= 1.372293) {
+        } else if ((Double) i[7] <= 1.372293) {
             p = UCIClassifier.N7b7d8769111(i);
-        } else if (((Double) i[7]).doubleValue() > 1.372293) {
+        } else if ((Double) i[7] > 1.372293) {
             p = UCIClassifier.N6e453dd5112(i);
         }
         return p;
@@ -1361,9 +1361,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 5;
-        } else if (((Double) i[3]).doubleValue() <= -2.449134) {
+        } else if ((Double) i[3] <= -2.449134) {
             p = 5;
-        } else if (((Double) i[3]).doubleValue() > -2.449134) {
+        } else if ((Double) i[3] > -2.449134) {
             p = 3;
         }
         return p;
@@ -1372,9 +1372,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 3;
-        } else if (((Double) i[7]).doubleValue() <= 3.131395) {
+        } else if ((Double) i[7] <= 3.131395) {
             p = 3;
-        } else if (((Double) i[7]).doubleValue() > 3.131395) {
+        } else if ((Double) i[7] > 3.131395) {
             p = UCIClassifier.N3dea382113(i);
         }
         return p;
@@ -1383,9 +1383,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 3;
-        } else if (((Double) i[2]).doubleValue() <= 9.084851) {
+        } else if ((Double) i[2] <= 9.084851) {
             p = 3;
-        } else if (((Double) i[2]).doubleValue() > 9.084851) {
+        } else if ((Double) i[2] > 9.084851) {
             p = 5;
         }
         return p;
@@ -1394,9 +1394,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 4;
-        } else if (((Double) i[6]).doubleValue() <= 4.189232) {
+        } else if ((Double) i[6] <= 4.189232) {
             p = UCIClassifier.N64d1afd3115(i);
-        } else if (((Double) i[6]).doubleValue() > 4.189232) {
+        } else if ((Double) i[6] > 4.189232) {
             p = UCIClassifier.N73e2bda7118(i);
         }
         return p;
@@ -1405,9 +1405,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 3;
-        } else if (((Double) i[12]).doubleValue() <= 0.265352) {
+        } else if ((Double) i[12] <= 0.265352) {
             p = 3;
-        } else if (((Double) i[12]).doubleValue() > 0.265352) {
+        } else if ((Double) i[12] > 0.265352) {
             p = UCIClassifier.N26e795b116(i);
         }
         return p;
@@ -1416,9 +1416,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 4;
-        } else if (((Double) i[4]).doubleValue() <= 0.999001) {
+        } else if ((Double) i[4] <= 0.999001) {
             p = UCIClassifier.N22e1469c117(i);
-        } else if (((Double) i[4]).doubleValue() > 0.999001) {
+        } else if ((Double) i[4] > 0.999001) {
             p = 3;
         }
         return p;
@@ -1427,9 +1427,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 3;
-        } else if (((Double) i[10]).doubleValue() <= 0.144513) {
+        } else if ((Double) i[10] <= 0.144513) {
             p = 3;
-        } else if (((Double) i[10]).doubleValue() > 0.144513) {
+        } else if ((Double) i[10] > 0.144513) {
             p = 4;
         }
         return p;
@@ -1438,9 +1438,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 3;
-        } else if (((Double) i[3]).doubleValue() <= -2.242316) {
+        } else if ((Double) i[3] <= -2.242316) {
             p = 3;
-        } else if (((Double) i[3]).doubleValue() > -2.242316) {
+        } else if ((Double) i[3] > -2.242316) {
             p = 5;
         }
         return p;
@@ -1449,9 +1449,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 5;
-        } else if (((Double) i[4]).doubleValue() <= 0.720585) {
+        } else if ((Double) i[4] <= 0.720585) {
             p = UCIClassifier.N44ac5e120(i);
-        } else if (((Double) i[4]).doubleValue() > 0.720585) {
+        } else if ((Double) i[4] > 0.720585) {
             p = 3;
         }
         return p;
@@ -1460,9 +1460,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 4;
-        } else if (((Double) i[4]).doubleValue() <= -0.08633) {
+        } else if ((Double) i[4] <= -0.08633) {
             p = UCIClassifier.N1c904f75121(i);
-        } else if (((Double) i[4]).doubleValue() > -0.08633) {
+        } else if ((Double) i[4] > -0.08633) {
             p = 5;
         }
         return p;
@@ -1471,9 +1471,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() <= 2.633541) {
+        } else if ((Double) i[6] <= 2.633541) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() > 2.633541) {
+        } else if ((Double) i[6] > 2.633541) {
             p = 4;
         }
         return p;
@@ -1482,9 +1482,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 3;
-        } else if (((Double) i[6]).doubleValue() <= 4.757226) {
+        } else if ((Double) i[6] <= 4.757226) {
             p = UCIClassifier.N556b277f123(i);
-        } else if (((Double) i[6]).doubleValue() > 4.757226) {
+        } else if ((Double) i[6] > 4.757226) {
             p = UCIClassifier.N6dee2ea8124(i);
         }
         return p;
@@ -1493,9 +1493,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 3;
-        } else if (((Double) i[7]).doubleValue() <= 3.880378) {
+        } else if ((Double) i[7] <= 3.880378) {
             p = 3;
-        } else if (((Double) i[7]).doubleValue() > 3.880378) {
+        } else if ((Double) i[7] > 3.880378) {
             p = 4;
         }
         return p;
@@ -1504,9 +1504,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 5;
-        } else if (((Double) i[7]).doubleValue() <= 3.492887) {
+        } else if ((Double) i[7] <= 3.492887) {
             p = 5;
-        } else if (((Double) i[7]).doubleValue() > 3.492887) {
+        } else if ((Double) i[7] > 3.492887) {
             p = 3;
         }
         return p;
@@ -1515,9 +1515,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 3;
-        } else if (((Double) i[7]).doubleValue() <= 1.357591) {
+        } else if ((Double) i[7] <= 1.357591) {
             p = UCIClassifier.N2b1bed2126(i);
-        } else if (((Double) i[7]).doubleValue() > 1.357591) {
+        } else if ((Double) i[7] > 1.357591) {
             p = UCIClassifier.N40bf015133(i);
         }
         return p;
@@ -1526,9 +1526,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 3;
-        } else if (((Double) i[10]).doubleValue() <= 0.16523) {
+        } else if ((Double) i[10] <= 0.16523) {
             p = UCIClassifier.N6366ce5f127(i);
-        } else if (((Double) i[10]).doubleValue() > 0.16523) {
+        } else if ((Double) i[10] > 0.16523) {
             p = UCIClassifier.N5f0704e1129(i);
         }
         return p;
@@ -1537,9 +1537,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= -0.478101) {
+        } else if ((Double) i[4] <= -0.478101) {
             p = UCIClassifier.N7276f1f4128(i);
-        } else if (((Double) i[4]).doubleValue() > -0.478101) {
+        } else if ((Double) i[4] > -0.478101) {
             p = 3;
         }
         return p;
@@ -1548,9 +1548,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() <= 7.909524) {
+        } else if ((Double) i[5] <= 7.909524) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() > 7.909524) {
+        } else if ((Double) i[5] > 7.909524) {
             p = 5;
         }
         return p;
@@ -1559,9 +1559,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 3;
-        } else if (((Double) i[2]).doubleValue() <= 9.711042) {
+        } else if ((Double) i[2] <= 9.711042) {
             p = 3;
-        } else if (((Double) i[2]).doubleValue() > 9.711042) {
+        } else if ((Double) i[2] > 9.711042) {
             p = UCIClassifier.N45d18084130(i);
         }
         return p;
@@ -1570,9 +1570,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 3;
-        } else if (((Double) i[12]).doubleValue() <= 1.848191) {
+        } else if ((Double) i[12] <= 1.848191) {
             p = UCIClassifier.N3d4c7deb131(i);
-        } else if (((Double) i[12]).doubleValue() > 1.848191) {
+        } else if ((Double) i[12] > 1.848191) {
             p = 4;
         }
         return p;
@@ -1581,9 +1581,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 3;
-        } else if (((Double) i[2]).doubleValue() <= 9.796209) {
+        } else if ((Double) i[2] <= 9.796209) {
             p = UCIClassifier.N68deeebd132(i);
-        } else if (((Double) i[2]).doubleValue() > 9.796209) {
+        } else if ((Double) i[2] > 9.796209) {
             p = 4;
         }
         return p;
@@ -1592,9 +1592,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 4;
-        } else if (((Double) i[2]).doubleValue() <= 9.777028) {
+        } else if ((Double) i[2] <= 9.777028) {
             p = 4;
-        } else if (((Double) i[2]).doubleValue() > 9.777028) {
+        } else if ((Double) i[2] > 9.777028) {
             p = 3;
         }
         return p;
@@ -1603,9 +1603,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= -0.098079) {
+        } else if ((Double) i[4] <= -0.098079) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() > -0.098079) {
+        } else if ((Double) i[4] > -0.098079) {
             p = UCIClassifier.N2bbef4c6134(i);
         }
         return p;
@@ -1614,9 +1614,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 5574.191895) {
+        } else if ((Double) i[9] <= 5574.191895) {
             p = UCIClassifier.N5b8099a135(i);
-        } else if (((Double) i[9]).doubleValue() > 5574.191895) {
+        } else if ((Double) i[9] > 5574.191895) {
             p = UCIClassifier.N3bea817f137(i);
         }
         return p;
@@ -1625,9 +1625,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 3;
-        } else if (((Double) i[6]).doubleValue() <= 2.351232) {
+        } else if ((Double) i[6] <= 2.351232) {
             p = UCIClassifier.N757e6064136(i);
-        } else if (((Double) i[6]).doubleValue() > 2.351232) {
+        } else if ((Double) i[6] > 2.351232) {
             p = 3;
         }
         return p;
@@ -1636,9 +1636,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 3;
-        } else if (((Double) i[2]).doubleValue() <= 9.73296) {
+        } else if ((Double) i[2] <= 9.73296) {
             p = 3;
-        } else if (((Double) i[2]).doubleValue() > 9.73296) {
+        } else if ((Double) i[2] > 9.73296) {
             p = 4;
         }
         return p;
@@ -1647,9 +1647,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 5;
-        } else if (((Double) i[2]).doubleValue() <= 9.783417) {
+        } else if ((Double) i[2] <= 9.783417) {
             p = 5;
-        } else if (((Double) i[2]).doubleValue() > 9.783417) {
+        } else if ((Double) i[2] > 9.783417) {
             p = UCIClassifier.N20dbd794138(i);
         }
         return p;
@@ -1658,9 +1658,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() <= 10.252527) {
+        } else if ((Double) i[5] <= 10.252527) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() > 10.252527) {
+        } else if ((Double) i[5] > 10.252527) {
             p = 5;
         }
         return p;
@@ -1669,9 +1669,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 4;
-        } else if (((Double) i[12]).doubleValue() <= -0.255376) {
+        } else if ((Double) i[12] <= -0.255376) {
             p = UCIClassifier.N42d134d0140(i);
-        } else if (((Double) i[12]).doubleValue() > -0.255376) {
+        } else if ((Double) i[12] > -0.255376) {
             p = UCIClassifier.N34e265f5141(i);
         }
         return p;
@@ -1680,9 +1680,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= -3.211778) {
+        } else if ((Double) i[4] <= -3.211778) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() > -3.211778) {
+        } else if ((Double) i[4] > -3.211778) {
             p = 4;
         }
         return p;
@@ -1691,9 +1691,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 4;
-        } else if (((Double) i[10]).doubleValue() <= 0.315365) {
+        } else if ((Double) i[10] <= 0.315365) {
             p = UCIClassifier.N7b93d2f2142(i);
-        } else if (((Double) i[10]).doubleValue() > 0.315365) {
+        } else if ((Double) i[10] > 0.315365) {
             p = 4;
         }
         return p;
@@ -1702,9 +1702,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 4;
-        } else if (((Double) i[6]).doubleValue() <= 2.394157) {
+        } else if ((Double) i[6] <= 2.394157) {
             p = 4;
-        } else if (((Double) i[6]).doubleValue() > 2.394157) {
+        } else if ((Double) i[6] > 2.394157) {
             p = UCIClassifier.N25fe4d40143(i);
         }
         return p;
@@ -1713,9 +1713,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 4;
-        } else if (((Double) i[12]).doubleValue() <= 1.273226) {
+        } else if ((Double) i[12] <= 1.273226) {
             p = UCIClassifier.N5a81b83c144(i);
-        } else if (((Double) i[12]).doubleValue() > 1.273226) {
+        } else if ((Double) i[12] > 1.273226) {
             p = 3;
         }
         return p;
@@ -1724,9 +1724,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 4076.038818) {
+        } else if ((Double) i[9] <= 4076.038818) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() > 4076.038818) {
+        } else if ((Double) i[9] > 4076.038818) {
             p = UCIClassifier.N7a66998f145(i);
         }
         return p;
@@ -1735,9 +1735,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 4;
-        } else if (((Double) i[12]).doubleValue() <= -0.025488) {
+        } else if ((Double) i[12] <= -0.025488) {
             p = 4;
-        } else if (((Double) i[12]).doubleValue() > -0.025488) {
+        } else if ((Double) i[12] > -0.025488) {
             p = UCIClassifier.N65ebba10146(i);
         }
         return p;
@@ -1746,9 +1746,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 3;
-        } else if (((Double) i[7]).doubleValue() <= 2.479808) {
+        } else if ((Double) i[7] <= 2.479808) {
             p = UCIClassifier.N5704a4b6147(i);
-        } else if (((Double) i[7]).doubleValue() > 2.479808) {
+        } else if ((Double) i[7] > 2.479808) {
             p = 4;
         }
         return p;
@@ -1757,9 +1757,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 3;
-        } else if (((Double) i[2]).doubleValue() <= 9.576704) {
+        } else if ((Double) i[2] <= 9.576704) {
             p = 3;
-        } else if (((Double) i[2]).doubleValue() > 9.576704) {
+        } else if ((Double) i[2] > 9.576704) {
             p = 4;
         }
         return p;
@@ -1768,9 +1768,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 5;
-        } else if (((Double) i[12]).doubleValue() <= -0.159183) {
+        } else if ((Double) i[12] <= -0.159183) {
             p = UCIClassifier.N144683c2149(i);
-        } else if (((Double) i[12]).doubleValue() > -0.159183) {
+        } else if ((Double) i[12] > -0.159183) {
             p = UCIClassifier.N21743ff4150(i);
         }
         return p;
@@ -1779,9 +1779,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 4;
-        } else if (((Double) i[2]).doubleValue() <= 9.340976) {
+        } else if ((Double) i[2] <= 9.340976) {
             p = 4;
-        } else if (((Double) i[2]).doubleValue() > 9.340976) {
+        } else if ((Double) i[2] > 9.340976) {
             p = 5;
         }
         return p;
@@ -1790,9 +1790,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 5;
-        } else if (((Double) i[10]).doubleValue() <= 0.155706) {
+        } else if ((Double) i[10] <= 0.155706) {
             p = UCIClassifier.N5712bd54151(i);
-        } else if (((Double) i[10]).doubleValue() > 0.155706) {
+        } else if ((Double) i[10] > 0.155706) {
             p = UCIClassifier.Ndc737be187(i);
         }
         return p;
@@ -1801,9 +1801,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= -3.073379) {
+        } else if ((Double) i[4] <= -3.073379) {
             p = UCIClassifier.Nf4c0275152(i);
-        } else if (((Double) i[4]).doubleValue() > -3.073379) {
+        } else if ((Double) i[4] > -3.073379) {
             p = UCIClassifier.N4735572b153(i);
         }
         return p;
@@ -1812,9 +1812,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 5;
-        } else if (((Double) i[12]).doubleValue() <= 0.043695) {
+        } else if ((Double) i[12] <= 0.043695) {
             p = 5;
-        } else if (((Double) i[12]).doubleValue() > 0.043695) {
+        } else if ((Double) i[12] > 0.043695) {
             p = 3;
         }
         return p;
@@ -1823,9 +1823,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 5;
-        } else if (((Double) i[8]).doubleValue() <= 114.506012) {
+        } else if ((Double) i[8] <= 114.506012) {
             p = 5;
-        } else if (((Double) i[8]).doubleValue() > 114.506012) {
+        } else if ((Double) i[8] > 114.506012) {
             p = UCIClassifier.N7eedec92154(i);
         }
         return p;
@@ -1834,9 +1834,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 5;
-        } else if (((Double) i[7]).doubleValue() <= 1.383678) {
+        } else if ((Double) i[7] <= 1.383678) {
             p = UCIClassifier.N3646a658155(i);
-        } else if (((Double) i[7]).doubleValue() > 1.383678) {
+        } else if ((Double) i[7] > 1.383678) {
             p = UCIClassifier.N22cb4138161(i);
         }
         return p;
@@ -1845,9 +1845,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 5;
-        } else if (((Double) i[12]).doubleValue() <= 1.273488) {
+        } else if ((Double) i[12] <= 1.273488) {
             p = UCIClassifier.N5852f73e156(i);
-        } else if (((Double) i[12]).doubleValue() > 1.273488) {
+        } else if ((Double) i[12] > 1.273488) {
             p = 3;
         }
         return p;
@@ -1856,9 +1856,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 5;
-        } else if (((Double) i[10]).doubleValue() <= 0.117741) {
+        } else if ((Double) i[10] <= 0.117741) {
             p = 5;
-        } else if (((Double) i[10]).doubleValue() > 0.117741) {
+        } else if ((Double) i[10] > 0.117741) {
             p = UCIClassifier.N2ee634bf157(i);
         }
         return p;
@@ -1867,9 +1867,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() <= 3.241215) {
+        } else if ((Double) i[6] <= 3.241215) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() > 3.241215) {
+        } else if ((Double) i[6] > 3.241215) {
             p = UCIClassifier.Nb90ffa7158(i);
         }
         return p;
@@ -1878,9 +1878,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 5;
-        } else if (((Double) i[4]).doubleValue() <= -0.553637) {
+        } else if ((Double) i[4] <= -0.553637) {
             p = 5;
-        } else if (((Double) i[4]).doubleValue() > -0.553637) {
+        } else if ((Double) i[4] > -0.553637) {
             p = UCIClassifier.N5c8032df159(i);
         }
         return p;
@@ -1889,9 +1889,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 5;
-        } else if (((Double) i[12]).doubleValue() <= 0.478957) {
+        } else if ((Double) i[12] <= 0.478957) {
             p = UCIClassifier.N648bfdea160(i);
-        } else if (((Double) i[12]).doubleValue() > 0.478957) {
+        } else if ((Double) i[12] > 0.478957) {
             p = 3;
         }
         return p;
@@ -1900,9 +1900,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 5;
-        } else if (((Double) i[7]).doubleValue() <= 0.744339) {
+        } else if ((Double) i[7] <= 0.744339) {
             p = 5;
-        } else if (((Double) i[7]).doubleValue() > 0.744339) {
+        } else if ((Double) i[7] > 0.744339) {
             p = 3;
         }
         return p;
@@ -1911,9 +1911,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() <= 25.994524) {
+        } else if ((Double) i[5] <= 25.994524) {
             p = UCIClassifier.N4e26d560162(i);
-        } else if (((Double) i[5]).doubleValue() > 25.994524) {
+        } else if ((Double) i[5] > 25.994524) {
             p = 5;
         }
         return p;
@@ -1922,9 +1922,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 5;
-        } else if (((Double) i[2]).doubleValue() <= 9.740656) {
+        } else if ((Double) i[2] <= 9.740656) {
             p = UCIClassifier.N5782b9b5163(i);
-        } else if (((Double) i[2]).doubleValue() > 9.740656) {
+        } else if ((Double) i[2] > 9.740656) {
             p = UCIClassifier.N3bf60430170(i);
         }
         return p;
@@ -1933,9 +1933,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 5;
-        } else if (((Double) i[8]).doubleValue() <= 127.295631) {
+        } else if ((Double) i[8] <= 127.295631) {
             p = UCIClassifier.N476e46f5164(i);
-        } else if (((Double) i[8]).doubleValue() > 127.295631) {
+        } else if ((Double) i[8] > 127.295631) {
             p = 3;
         }
         return p;
@@ -1944,9 +1944,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 5;
-        } else if (((Double) i[3]).doubleValue() <= 1.044218) {
+        } else if ((Double) i[3] <= 1.044218) {
             p = UCIClassifier.N18f4a376165(i);
-        } else if (((Double) i[3]).doubleValue() > 1.044218) {
+        } else if ((Double) i[3] > 1.044218) {
             p = 3;
         }
         return p;
@@ -1955,9 +1955,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 5;
-        } else if (((Double) i[7]).doubleValue() <= 1.569137) {
+        } else if ((Double) i[7] <= 1.569137) {
             p = UCIClassifier.N6517a4c6166(i);
-        } else if (((Double) i[7]).doubleValue() > 1.569137) {
+        } else if ((Double) i[7] > 1.569137) {
             p = UCIClassifier.N7342f703167(i);
         }
         return p;
@@ -1966,9 +1966,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() <= 4.627631) {
+        } else if ((Double) i[6] <= 4.627631) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() > 4.627631) {
+        } else if ((Double) i[6] > 4.627631) {
             p = 3;
         }
         return p;
@@ -1977,9 +1977,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 5;
-        } else if (((Double) i[12]).doubleValue() <= 0.094645) {
+        } else if ((Double) i[12] <= 0.094645) {
             p = 5;
-        } else if (((Double) i[12]).doubleValue() > 0.094645) {
+        } else if ((Double) i[12] > 0.094645) {
             p = UCIClassifier.N31672113168(i);
         }
         return p;
@@ -1988,9 +1988,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 6863.288574) {
+        } else if ((Double) i[9] <= 6863.288574) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() > 6863.288574) {
+        } else if ((Double) i[9] > 6863.288574) {
             p = UCIClassifier.N69ac7fbb169(i);
         }
         return p;
@@ -1999,9 +1999,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 5;
-        } else if (((Double) i[4]).doubleValue() <= 0.262445) {
+        } else if ((Double) i[4] <= 0.262445) {
             p = 5;
-        } else if (((Double) i[4]).doubleValue() > 0.262445) {
+        } else if ((Double) i[4] > 0.262445) {
             p = 3;
         }
         return p;
@@ -2010,9 +2010,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 7786.189941) {
+        } else if ((Double) i[9] <= 7786.189941) {
             p = UCIClassifier.N148d0a11171(i);
-        } else if (((Double) i[9]).doubleValue() > 7786.189941) {
+        } else if ((Double) i[9] > 7786.189941) {
             p = UCIClassifier.N17db8f8e180(i);
         }
         return p;
@@ -2021,9 +2021,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() <= 11.024488) {
+        } else if ((Double) i[5] <= 11.024488) {
             p = UCIClassifier.N378feca1172(i);
-        } else if (((Double) i[5]).doubleValue() > 11.024488) {
+        } else if ((Double) i[5] > 11.024488) {
             p = UCIClassifier.N4fff395a174(i);
         }
         return p;
@@ -2032,9 +2032,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() <= 2.619078) {
+        } else if ((Double) i[6] <= 2.619078) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() > 2.619078) {
+        } else if ((Double) i[6] > 2.619078) {
             p = UCIClassifier.N49f85a86173(i);
         }
         return p;
@@ -2043,9 +2043,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() <= 10.939869) {
+        } else if ((Double) i[5] <= 10.939869) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() > 10.939869) {
+        } else if ((Double) i[5] > 10.939869) {
             p = 5;
         }
         return p;
@@ -2054,9 +2054,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 3;
-        } else if (((Double) i[10]).doubleValue() <= 0.061946) {
+        } else if ((Double) i[10] <= 0.061946) {
             p = UCIClassifier.N7d0e6cbd175(i);
-        } else if (((Double) i[10]).doubleValue() > 0.061946) {
+        } else if ((Double) i[10] > 0.061946) {
             p = 3;
         }
         return p;
@@ -2065,9 +2065,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 3;
-        } else if (((Double) i[3]).doubleValue() <= 0.05526) {
+        } else if ((Double) i[3] <= 0.05526) {
             p = UCIClassifier.N3e052c6f176(i);
-        } else if (((Double) i[3]).doubleValue() > 0.05526) {
+        } else if ((Double) i[3] > 0.05526) {
             p = 5;
         }
         return p;
@@ -2076,9 +2076,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() <= 1.902067) {
+        } else if ((Double) i[6] <= 1.902067) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() > 1.902067) {
+        } else if ((Double) i[6] > 1.902067) {
             p = UCIClassifier.N45a84b38177(i);
         }
         return p;
@@ -2087,9 +2087,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 3;
-        } else if (((Double) i[7]).doubleValue() <= 2.333403) {
+        } else if ((Double) i[7] <= 2.333403) {
             p = UCIClassifier.N2be26d42178(i);
-        } else if (((Double) i[7]).doubleValue() > 2.333403) {
+        } else if ((Double) i[7] > 2.333403) {
             p = UCIClassifier.N1e731e90179(i);
         }
         return p;
@@ -2098,9 +2098,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= 1.416008) {
+        } else if ((Double) i[4] <= 1.416008) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() > 1.416008) {
+        } else if ((Double) i[4] > 1.416008) {
             p = 5;
         }
         return p;
@@ -2109,9 +2109,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 5;
-        } else if (((Double) i[3]).doubleValue() <= -0.79639) {
+        } else if ((Double) i[3] <= -0.79639) {
             p = 5;
-        } else if (((Double) i[3]).doubleValue() > -0.79639) {
+        } else if ((Double) i[3] > -0.79639) {
             p = 3;
         }
         return p;
@@ -2120,9 +2120,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() <= 3.703726) {
+        } else if ((Double) i[6] <= 3.703726) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() > 3.703726) {
+        } else if ((Double) i[6] > 3.703726) {
             p = UCIClassifier.N4fadbfde181(i);
         }
         return p;
@@ -2131,9 +2131,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 12349.428711) {
+        } else if ((Double) i[9] <= 12349.428711) {
             p = UCIClassifier.N180fb0b0182(i);
-        } else if (((Double) i[9]).doubleValue() > 12349.428711) {
+        } else if ((Double) i[9] > 12349.428711) {
             p = 5;
         }
         return p;
@@ -2142,9 +2142,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 3;
-        } else if (((Double) i[10]).doubleValue() <= 0.068729) {
+        } else if ((Double) i[10] <= 0.068729) {
             p = UCIClassifier.N2e18ff27183(i);
-        } else if (((Double) i[10]).doubleValue() > 0.068729) {
+        } else if ((Double) i[10] > 0.068729) {
             p = UCIClassifier.N6546169186(i);
         }
         return p;
@@ -2153,9 +2153,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 5;
-        } else if (((Double) i[2]).doubleValue() <= 9.939621) {
+        } else if ((Double) i[2] <= 9.939621) {
             p = UCIClassifier.N6b177115184(i);
-        } else if (((Double) i[2]).doubleValue() > 9.939621) {
+        } else if ((Double) i[2] > 9.939621) {
             p = 3;
         }
         return p;
@@ -2164,9 +2164,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 5;
-        } else if (((Double) i[12]).doubleValue() <= 0.253681) {
+        } else if ((Double) i[12] <= 0.253681) {
             p = 5;
-        } else if (((Double) i[12]).doubleValue() > 0.253681) {
+        } else if ((Double) i[12] > 0.253681) {
             p = UCIClassifier.N500150a0185(i);
         }
         return p;
@@ -2175,9 +2175,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 5;
-        } else if (((Double) i[2]).doubleValue() <= 9.907705) {
+        } else if ((Double) i[2] <= 9.907705) {
             p = 5;
-        } else if (((Double) i[2]).doubleValue() > 9.907705) {
+        } else if ((Double) i[2] > 9.907705) {
             p = 3;
         }
         return p;
@@ -2186,9 +2186,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= 1.235643) {
+        } else if ((Double) i[4] <= 1.235643) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() > 1.235643) {
+        } else if ((Double) i[4] > 1.235643) {
             p = 5;
         }
         return p;
@@ -2197,9 +2197,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= -0.285276) {
+        } else if ((Double) i[4] <= -0.285276) {
             p = UCIClassifier.N121ca203188(i);
-        } else if (((Double) i[4]).doubleValue() > -0.285276) {
+        } else if ((Double) i[4] > -0.285276) {
             p = 3;
         }
         return p;
@@ -2208,9 +2208,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 3;
-        } else if (((Double) i[8]).doubleValue() <= 122.934059) {
+        } else if ((Double) i[8] <= 122.934059) {
             p = UCIClassifier.N15d07c3f189(i);
-        } else if (((Double) i[8]).doubleValue() > 122.934059) {
+        } else if ((Double) i[8] > 122.934059) {
             p = UCIClassifier.N3e0339209(i);
         }
         return p;
@@ -2219,9 +2219,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[10] == null) {
             p = 3;
-        } else if (((Double) i[10]).doubleValue() <= 0.200816) {
+        } else if ((Double) i[10] <= 0.200816) {
             p = UCIClassifier.N2a8d1749190(i);
-        } else if (((Double) i[10]).doubleValue() > 0.200816) {
+        } else if ((Double) i[10] > 0.200816) {
             p = UCIClassifier.N3bbe9a50204(i);
         }
         return p;
@@ -2230,9 +2230,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() <= 3.017013) {
+        } else if ((Double) i[6] <= 3.017013) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() > 3.017013) {
+        } else if ((Double) i[6] > 3.017013) {
             p = UCIClassifier.N14f3cf72191(i);
         }
         return p;
@@ -2241,9 +2241,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 5;
-        } else if (((Double) i[2]).doubleValue() <= 9.33498) {
+        } else if ((Double) i[2] <= 9.33498) {
             p = UCIClassifier.N12b8501d192(i);
-        } else if (((Double) i[2]).doubleValue() > 9.33498) {
+        } else if ((Double) i[2] > 9.33498) {
             p = UCIClassifier.N24fe9ad1198(i);
         }
         return p;
@@ -2252,9 +2252,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= -3.396216) {
+        } else if ((Double) i[4] <= -3.396216) {
             p = UCIClassifier.N293a985193(i);
-        } else if (((Double) i[4]).doubleValue() > -3.396216) {
+        } else if ((Double) i[4] > -3.396216) {
             p = 5;
         }
         return p;
@@ -2263,9 +2263,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 5;
-        } else if (((Double) i[12]).doubleValue() <= 2.568958) {
+        } else if ((Double) i[12] <= 2.568958) {
             p = UCIClassifier.N2c5e5c15194(i);
-        } else if (((Double) i[12]).doubleValue() > 2.568958) {
+        } else if ((Double) i[12] > 2.568958) {
             p = UCIClassifier.N75157f77196(i);
         }
         return p;
@@ -2274,9 +2274,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 3;
-        } else if (((Double) i[12]).doubleValue() <= 2.499915) {
+        } else if ((Double) i[12] <= 2.499915) {
             p = UCIClassifier.N66ef7d74195(i);
-        } else if (((Double) i[12]).doubleValue() > 2.499915) {
+        } else if ((Double) i[12] > 2.499915) {
             p = 5;
         }
         return p;
@@ -2285,9 +2285,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 5;
-        } else if (((Double) i[3]).doubleValue() <= -2.453303) {
+        } else if ((Double) i[3] <= -2.453303) {
             p = 5;
-        } else if (((Double) i[3]).doubleValue() > -2.453303) {
+        } else if ((Double) i[3] > -2.453303) {
             p = 3;
         }
         return p;
@@ -2296,9 +2296,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= -3.498443) {
+        } else if ((Double) i[4] <= -3.498443) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() > -3.498443) {
+        } else if ((Double) i[4] > -3.498443) {
             p = UCIClassifier.N566399ae197(i);
         }
         return p;
@@ -2307,9 +2307,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[7] == null) {
             p = 3;
-        } else if (((Double) i[7]).doubleValue() <= 5.303316) {
+        } else if ((Double) i[7] <= 5.303316) {
             p = 3;
-        } else if (((Double) i[7]).doubleValue() > 5.303316) {
+        } else if ((Double) i[7] > 5.303316) {
             p = 5;
         }
         return p;
@@ -2318,9 +2318,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 5;
-        } else if (((Double) i[9]).doubleValue() <= 6574.35791) {
+        } else if ((Double) i[9] <= 6574.35791) {
             p = 5;
-        } else if (((Double) i[9]).doubleValue() > 6574.35791) {
+        } else if ((Double) i[9] > 6574.35791) {
             p = UCIClassifier.N47662250199(i);
         }
         return p;
@@ -2329,9 +2329,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 3;
-        } else if (((Double) i[8]).doubleValue() <= 121.792183) {
+        } else if ((Double) i[8] <= 121.792183) {
             p = UCIClassifier.N256d6cf200(i);
-        } else if (((Double) i[8]).doubleValue() > 121.792183) {
+        } else if ((Double) i[8] > 121.792183) {
             p = UCIClassifier.N1330b13c201(i);
         }
         return p;
@@ -2340,9 +2340,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() <= 17.217524) {
+        } else if ((Double) i[5] <= 17.217524) {
             p = 3;
-        } else if (((Double) i[5]).doubleValue() > 17.217524) {
+        } else if ((Double) i[5] > 17.217524) {
             p = 5;
         }
         return p;
@@ -2351,9 +2351,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 5;
-        } else if (((Double) i[8]).doubleValue() <= 121.992386) {
+        } else if ((Double) i[8] <= 121.992386) {
             p = 5;
-        } else if (((Double) i[8]).doubleValue() > 121.992386) {
+        } else if ((Double) i[8] > 121.992386) {
             p = UCIClassifier.N61c3e3fb202(i);
         }
         return p;
@@ -2362,9 +2362,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 3;
-        } else if (((Double) i[8]).doubleValue() <= 122.258484) {
+        } else if ((Double) i[8] <= 122.258484) {
             p = 3;
-        } else if (((Double) i[8]).doubleValue() > 122.258484) {
+        } else if ((Double) i[8] > 122.258484) {
             p = UCIClassifier.N3aca5e2203(i);
         }
         return p;
@@ -2373,9 +2373,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 5;
-        } else if (((Double) i[3]).doubleValue() <= -2.195144) {
+        } else if ((Double) i[3] <= -2.195144) {
             p = 5;
-        } else if (((Double) i[3]).doubleValue() > -2.195144) {
+        } else if ((Double) i[3] > -2.195144) {
             p = 3;
         }
         return p;
@@ -2384,9 +2384,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[12] == null) {
             p = 4;
-        } else if (((Double) i[12]).doubleValue() <= 0.162787) {
+        } else if ((Double) i[12] <= 0.162787) {
             p = 4;
-        } else if (((Double) i[12]).doubleValue() > 0.162787) {
+        } else if ((Double) i[12] > 0.162787) {
             p = UCIClassifier.N5e8518d4205(i);
         }
         return p;
@@ -2395,9 +2395,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 6685.70166) {
+        } else if ((Double) i[9] <= 6685.70166) {
             p = UCIClassifier.N742136c6206(i);
-        } else if (((Double) i[9]).doubleValue() > 6685.70166) {
+        } else if ((Double) i[9] > 6685.70166) {
             p = UCIClassifier.N30933cba207(i);
         }
         return p;
@@ -2406,9 +2406,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= -1.784408) {
+        } else if ((Double) i[4] <= -1.784408) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() > -1.784408) {
+        } else if ((Double) i[4] > -1.784408) {
             p = 4;
         }
         return p;
@@ -2417,9 +2417,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[9] == null) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() <= 10187.660156) {
+        } else if ((Double) i[9] <= 10187.660156) {
             p = 3;
-        } else if (((Double) i[9]).doubleValue() > 10187.660156) {
+        } else if ((Double) i[9] > 10187.660156) {
             p = UCIClassifier.N1277f040208(i);
         }
         return p;
@@ -2428,9 +2428,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 5;
-        } else if (((Double) i[8]).doubleValue() <= 122.181946) {
+        } else if ((Double) i[8] <= 122.181946) {
             p = 5;
-        } else if (((Double) i[8]).doubleValue() > 122.181946) {
+        } else if ((Double) i[8] > 122.181946) {
             p = 3;
         }
         return p;
@@ -2439,9 +2439,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[6] == null) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() <= 5.693575) {
+        } else if ((Double) i[6] <= 5.693575) {
             p = 5;
-        } else if (((Double) i[6]).doubleValue() > 5.693575) {
+        } else if ((Double) i[6] > 5.693575) {
             p = UCIClassifier.N6745934e210(i);
         }
         return p;
@@ -2450,9 +2450,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= -4.222781) {
+        } else if ((Double) i[4] <= -4.222781) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() > -4.222781) {
+        } else if ((Double) i[4] > -4.222781) {
             p = UCIClassifier.N8ca1ada211(i);
         }
         return p;
@@ -2461,9 +2461,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 3;
-        } else if (((Double) i[4]).doubleValue() <= -2.144297) {
+        } else if ((Double) i[4] <= -2.144297) {
             p = UCIClassifier.Nca8e2b8212(i);
-        } else if (((Double) i[4]).doubleValue() > -2.144297) {
+        } else if ((Double) i[4] > -2.144297) {
             p = 3;
         }
         return p;
@@ -2472,9 +2472,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[8] == null) {
             p = 3;
-        } else if (((Double) i[8]).doubleValue() <= 127.820206) {
+        } else if ((Double) i[8] <= 127.820206) {
             p = UCIClassifier.N23bca486213(i);
-        } else if (((Double) i[8]).doubleValue() > 127.820206) {
+        } else if ((Double) i[8] > 127.820206) {
             p = 5;
         }
         return p;
@@ -2483,9 +2483,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 5;
-        } else if (((Double) i[5]).doubleValue() <= 11.608488) {
+        } else if ((Double) i[5] <= 11.608488) {
             p = UCIClassifier.N35d56bbe214(i);
-        } else if (((Double) i[5]).doubleValue() > 11.608488) {
+        } else if ((Double) i[5] > 11.608488) {
             p = 3;
         }
         return p;
@@ -2494,9 +2494,9 @@ public class UCIClassifier {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 5;
-        } else if (((Double) i[2]).doubleValue() <= 8.825693) {
+        } else if ((Double) i[2] <= 8.825693) {
             p = 5;
-        } else if (((Double) i[2]).doubleValue() > 8.825693) {
+        } else if ((Double) i[2] > 8.825693) {
             p = 3;
         }
         return p;

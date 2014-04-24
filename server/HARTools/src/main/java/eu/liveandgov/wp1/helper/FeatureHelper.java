@@ -18,8 +18,6 @@ public class FeatureHelper {
 
     private static DescriptiveStatistics stats = new DescriptiveStatistics();
 
-    private static float[] lastInput = null;
-
     private static void use(float[] input) {
         stats.clear();
         for (float v : input) {

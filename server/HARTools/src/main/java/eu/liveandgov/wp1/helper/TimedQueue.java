@@ -64,8 +64,8 @@ public class TimedQueue<V> {
 
     public ArrayList<V> toArrayList() {
         ArrayList<V> list = new ArrayList<V>();
-        for(TimeQueueEntry e : queue) {
-            list.add((V) e.value);
+        for(TimeQueueEntry<V> e : queue) {
+            list.add(e.value);
         }
         return list;
     }
