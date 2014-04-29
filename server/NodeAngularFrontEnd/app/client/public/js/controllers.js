@@ -27,8 +27,10 @@ app.controller('recCtrl',
 
   // get all trips (init)
   this.query = function() {
-    $scope.trips = Trip.query();
+    Trip.query().then(function(data) { $scope.trips = data });
   };
+
+  if (!$scope.trips || !$scope.trips.length) this.query();
 
   // update a trip's name FIXME abstract for all fields
   this.update = function(trip, data) {
@@ -68,6 +70,8 @@ app.controller('recCtrl',
     return Trip.extent(trip);
   };
 
+  /* ... */
+
   // change location path
   this.to = function(loc) {
     $location.path(loc);
@@ -94,5 +98,29 @@ app.controller('rawCtrl',
   $scope.onBrushExtent = function(trip, extent) {
     Trip.updateExtent(trip, extent);
     Trip.loadMoreData(trip, extent);
+  };
+});
+
+
+// FIXME DRY
+app.controller('navCtrl', function ($scope, $rootScope, $route, Data) {
+  this.is = function(loc) {
+    return ($route.current && $route.current.name == loc) ? true : false;
+  };
+
+  // this.deselectTrip = function () {
+  //   delete $rootScope.trip;
+  // };
+
+  // this.clearBrush = function () {
+  //   $rootScope.trip.extent = undefined;
+  // };
+
+  this.loadMoreData = function(sensor) {
+  //   Data.sensor('gra', $rootScope.trip.extent, 'more');
+  //   Data.sensor('acc', $rootScope.trip.extent, 'more');
+  //   Data.sensor('lac', $rootScope.trip.extent, 'more');
+  //   $scope.digest();
+  //   // $scope.apply();
   };
 });

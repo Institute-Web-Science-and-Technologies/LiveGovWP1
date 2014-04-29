@@ -16,24 +16,36 @@ app.service('Config', function() {
   };
 });
 
+/*
+    DIRECTIVES <-> CONTROLLER <-> TRIP SERVICE <-> DATA FACTORY
+ */
+
+// trip service is called by controller, calls data service
 app.service('Trip', ['$http', '$q', 'Config', 'Data', function($http, $q, Config, Data) { // FIXME
   var trips = [];
   var selectedTrip;
 
   return {
+    // select a trip and call data factory
     select: function(trip) {
       if (!arguments.length) {
         selectedTrip = undefined;
         return;
       }
 
-      if (trip === selectedTrip) {
-        if (this.hasData(trip)) {
+      selectedTrip = trip;
+
+      // FIXME!
+      if ((trip == selectedTrip) || (this.hasData(trip))) { // ? === ==
+        // if (this.hasData(trip)) {
+          console.log("has data, not loading");
           return;
-        }
+        // }
       }
 
-      selectedTrip = trip;
+      // console.log(trip == selectedTrip, this.hasData(trip));
+      // console.info('LOAD "' + trip.id + '", 8, 1:');
+
 
       Data.geo(trip);
       var t = new Date();
@@ -43,14 +55,16 @@ app.service('Trip', ['$http', '$q', 'Config', 'Data', function($http, $q, Config
         trip.domain.y.extent(data.extent(Config.xDomain()));
       });
 
-      return trip; // split -> loadData
+      return trip; // FIXME split -> loadData
     },
 
+    // test if a trip is selected
     selected: function(trip) {
       if (!arguments.length) return selectedTrip;
       return trip === selectedTrip;
     },
 
+    // test if trip data is loaded
     hasData: function(trip) {
       if (!arguments.length) return;
       return Config.sensors()
@@ -58,12 +72,15 @@ app.service('Trip', ['$http', '$q', 'Config', 'Data', function($http, $q, Config
       .reduce(function (a, b) { return a + b; });
     },
 
+    // load (more) data for a trip
+    // obj is optional: { extent: Array[2], windowSize: number }
     loadData: function(trip, obj) {
       // Data.sensor($scope.trip, extent).then(function(data) {
       //   $scope.trip.domain.y.extent(data, Config.xDomain());
       // });
     },
 
+    // test if a trip has extent set (zoomed in)
     extent: function(trip, extent) {
       if (!arguments.length || !selectedTrip) return;
       return (trip ? trip.extent : selectedTrip.extent);
@@ -73,6 +90,7 @@ app.service('Trip', ['$http', '$q', 'Config', 'Data', function($http, $q, Config
       // });
     },
 
+    // get all trips (init)
     query: function() {
       var deferred = $q.defer();
       $http.get('/trips')
@@ -103,8 +121,9 @@ app.service('Trip', ['$http', '$q', 'Config', 'Data', function($http, $q, Config
       return deferred.promise;
     },
 
+    // update a trip's name FIXME abstract for all fields
     update: function (trip, data) {
-      trip.name = name; // client side update
+      trip.name = data.name; // client side update
 
       $http({ method: 'POST', url: '/trips/' + trip.id, data: data })
       .success(function(data, status, headers, config) {
@@ -113,6 +132,7 @@ app.service('Trip', ['$http', '$q', 'Config', 'Data', function($http, $q, Config
       .error(function(data, status, headers, config) {});
     },
 
+    // delete a trip
     delete: function (trip) {
       trips.splice(trips.indexOf(trip), 1); // client side removal
 
@@ -125,8 +145,10 @@ app.service('Trip', ['$http', '$q', 'Config', 'Data', function($http, $q, Config
   };
 }]);
 
+// data factory is called by trip service only
 app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
   return {
+    // load sensor data
     sensor: function (trip, obj) {
       var t = new Date();
 
@@ -136,6 +158,10 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
         // FIXME
         // startTime/endTime -> extent[0,1]
         // windowSize -> arg.windowSize || Config.windowSize()
+
+        var startTime = obj.extent[0];
+        var endTime = obj.extent[1];
+        var windowSize = obj.windowSize || Config.windowSize();
 
         $http({
           method: "GET",
@@ -169,6 +195,7 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
       return $q.all(promises);
     },
 
+    // load har and gps data, return feature collection
     geo: function(trip) {
 
       function calculateDistance(a, b) {
@@ -192,6 +219,35 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
             'activity': activity
           }
         };
+      }
+
+      // FIXME MOVE TO HELPERS
+      // get array element which occures the most
+      function getMaxOccurrence(array) {
+        if (!array.length) return null;
+        var len = array.length;
+        var modeMap = {};
+        var maxEl = array[0];
+        var maxCount = 1;
+        for (var i = 0; i < len; i++) {
+          var el = array[i];
+          if (modeMap[el] === null) modeMap[el] = 1;
+          else modeMap[el]++;
+          if (modeMap[el] > maxCount) {
+            maxEl = el;
+            maxCount = modeMap[el];
+          }
+        }
+        return maxEl;
+      }
+
+      // FIXME MOVE TO HELPERS
+      function topActivity(har, t0, t1) {
+        return getMaxOccurrence(har.map(function (d) {
+          if (d.ts >= t0 && d.ts <= t1) { // get tags between t0 and t1
+            return d.tag.replace(/\"/g, ""); // remove quotes
+          }}).filter(function (d) { return d; }) // remove undefined
+        );
       }
 
       var gps = $http.get('/trips/' + trip.id + '/gps');
