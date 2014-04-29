@@ -18,6 +18,7 @@ import eu.liveandgov.wp1.pipeline.impl.Serializer;
 import eu.liveandgov.wp1.pipeline.impl.StartsWith;
 import eu.liveandgov.wp1.pps.PPSPipeline;
 import eu.liveandgov.wp1.pps.api.AggregatingPS;
+import eu.liveandgov.wp1.pps.api.ProximityService;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.connectors.impl.SensorEmitter;
 import eu.liveandgov.wp1.serialization.impl.GPSSerialization;
@@ -36,7 +37,7 @@ public class PPSAdapter implements Consumer<Item> {
 
     private final SensorEmitter sensorEmitter;
 
-    public PPSAdapter(String key, AggregatingPS ps) {
+    public PPSAdapter(String key, ProximityService ps) {
         filter = new ClassFilter<GPS>(GPS.class);
 
         // So apparently the PPS takes quite some time, so we use a Player to play all GPS samples

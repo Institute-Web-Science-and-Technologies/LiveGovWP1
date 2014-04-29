@@ -81,8 +81,6 @@ public class ServiceSensorControl extends Service {
 
     // INDICES
     public StaticIPS staticIPS;
-    public OSMIPPS osmIPPS;
-    public AggregatingPS aggregatorPS;
 
     // SENSOR CONSUMERS
     public Persistor persistor;
@@ -126,7 +124,7 @@ public class ServiceSensorControl extends Service {
         File sensorFile = new File(getFilesDir(), SENSOR_FILENAME);
         File stageFile = new File(getFilesDir(), STAGE_FILENAME);
 
-        // Init indices
+        // Init index
         staticIPS = new StaticIPS(
                 PPSOptions.INDEX_HORIZONTAL_RESOLUTION,
                 PPSOptions.INDEX_VERTICAL_RESOLUTION,
@@ -144,24 +142,12 @@ public class ServiceSensorControl extends Service {
                 PPSOptions.HELSINKI_LON_FIELD,
                 PPSOptions.PROXIMITY);
 
-        osmIPPS = new OSMIPPS(
-                PPSOptions.INDEX_HORIZONTAL_RESOLUTION,
-                PPSOptions.INDEX_VERTICAL_RESOLUTION,
-                PPSOptions.INDEX_BY_CENTROID,
-                PPSOptions.INDEX_STORE_DEGREE,
-                PPSOptions.OSMIPPS_BASE_URL,
-                PPSOptions.PROXIMITY);
-
-        aggregatorPS = new AggregatingPS();
-        aggregatorPS.getProximityServices().add(staticIPS);
-        aggregatorPS.getProximityServices().add(osmIPPS);
-
         // Init sensor consumers
         final ZMQStreamer zmqStreamer = new ZMQStreamer();
         streamer = zmqStreamer.itemNode;
 
         harPipeline = new HARAdapter();
-        ppsPipeline = new PPSAdapter("platform", aggregatorPS);
+        ppsPipeline = new PPSAdapter("platform", staticIPS);
         waitingPipeline = new WaitingAdapter("platform", WaitingOptions.WAITING_TRESHOLD);
         gpsCache = new GpsCache();
         persistor = ZIPPED_PERSISTOR ?
@@ -292,14 +278,12 @@ public class ServiceSensorControl extends Service {
 
         // On har-stop, save indices
         staticIPS.trySave(new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE));
-        osmIPPS.trySave(new File(getFilesDir(), PPSOptions.OSMIPPS_INDEX_FILE));
 
     }
 
     private void doStartHAR() {
         // On har-start, load indices
         staticIPS.tryLoad(new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE));
-        osmIPPS.tryLoad(new File(getFilesDir(), PPSOptions.OSMIPPS_INDEX_FILE));
 
         isHAR = true;
         connectorThread.addConsumer(waitingPipeline);

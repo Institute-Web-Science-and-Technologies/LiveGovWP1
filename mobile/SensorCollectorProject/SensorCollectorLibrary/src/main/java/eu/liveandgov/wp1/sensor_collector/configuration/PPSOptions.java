@@ -13,8 +13,8 @@ public class PPSOptions {
 
     public static final int INDEX_STORE_DEGREE = 8192;
 
-    public static final String OSMIPPS_BASE_URL = "http://overpass.osm.rambler.ru/cgi/";
-    public static final String OSMIPPS_INDEX_FILE = "osmipps.index";
+    // public static final String OSMIPPS_BASE_URL = "http://overpass.osm.rambler.ru/cgi/";
+    // public static final String OSMIPPS_INDEX_FILE = "osmipps.index";
 
     public static final String HELSINKIIPPS_ASSET = "helsinki-stops.csv";
     public static final int HELSINKI_ID_FIELD = 2;
