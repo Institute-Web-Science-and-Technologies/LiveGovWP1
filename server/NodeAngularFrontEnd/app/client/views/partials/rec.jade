@@ -1,0 +1,28 @@
+table#rec.table
+	thead
+		tr
+			th
+				a(ng-click="predicate='id'; reverse=!reverse") id
+			th
+				a(ng-click="predicate='user'; reverse=!reverse") user
+			th
+				a(ng-click="predicate='start'; reverse=!reverse") start
+			th
+				a(ng-click="predicate='duration'; reverse=!reverse") duration
+			th
+				a(ng-click="predicate='tags'; reverse=!reverse") tags
+			th
+				a(ng-click="predicate='name'; reverse=!reverse") name
+			th
+
+			tbody
+				tr(ng-repeat="trip in trips | orderBy:predicate:reverse", ng-class='{selected:rec.selected(trip)}')
+					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')", ng-class='{hasData:rec.hasData(trip)}') {{ trip.id }}
+					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.user }}
+					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.start | date:'yyyy-MM-dd HH:mm:ss Z' }}
+					td(ng-click="rec.select(trip)", ng-dblclick="rec.select(trip); rec.to('/raw')") {{ trip.duration | date:'HH:mm:ss.sss' }}
+					td
+					td.name(editable-text="trip.name", onaftersave="rec.update(trip, {name: $data})", buttons="no", e-style="width: 200px; height: 37px") {{ trip.name }}
+					td.delete(ng-click="rec.delete(trip)") DEL
+
+// ex:ft=jade
