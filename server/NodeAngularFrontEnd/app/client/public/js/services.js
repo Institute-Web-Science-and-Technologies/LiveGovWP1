@@ -48,11 +48,14 @@ app.service('Trip', ['$http', '$q', 'Config', 'Data', function($http, $q, Config
 
 
       Data.geo(trip);
+
+
+
       var t = new Date();
       Data.sensor(trip, Config.sensors()).then(function(data) {
         console.info('all sensor data has arrived (' + ((new Date() - t) / 1000) + " ms)");
         trip.domain.x.extent(data.extent(Config.xDomain()));
-        trip.domain.y.extent(data.extent(Config.xDomain()));
+        trip.domain.y.extent(data.extent(Config.xDomain())); // FIXME comment ?
       });
 
       return trip; // FIXME split -> loadData

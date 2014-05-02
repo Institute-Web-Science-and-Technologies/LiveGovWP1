@@ -1,9 +1,8 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
-var concat = require('gulp-concat');
-var sass = require('gulp-ruby-sass');
+var sass = require('gulp-ruby-sass'); // "better" than gulp-sass
 var nodemon = require('gulp-nodemon');
-var plumber = require('gulp-plumber');
+var plumber = require('gulp-plumber'); // error handling
 var autoprefixer = require('gulp-autoprefixer');
 
 var onError = function (err) {
@@ -11,6 +10,7 @@ var onError = function (err) {
   console.log(err);
 };
 
+// recompile sass files (two short beeps = success, anything else: probably
 gulp.task('sass', function () {
   gulp.src('../client/public/css/*.scss')
     .pipe(plumber({ errorHandler: onError }))
@@ -22,10 +22,12 @@ gulp.task('sass', function () {
     .pipe(gulp.dest('../client/public/css'));
 });
 
+// watch stuff for changes
 gulp.task('watch', function () {
   gulp.watch(['../client/public/css/*.scss'], ['sass']);
 });
 
+// start the server using nodemon (so it restarts if neccessary)
 gulp.task('develop', function () {
   nodemon({
     script: 'server.js',
@@ -38,4 +40,9 @@ gulp.task('develop', function () {
     .on('restart', []);
 });
 
+// development mode: compile sass files, watch them for changes and start the
+// server on port 4001
 gulp.task('default', ['sass', 'watch', 'develop']);
+
+// production mode: start the server on port 3001
+gulp.task('production', []);
