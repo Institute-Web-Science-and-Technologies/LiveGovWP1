@@ -1,4 +1,6 @@
-'use strict';
+/* jshint strict:true, devel:true, debug:true */
+/* globals d3 */
+'use strict'; // jshint -W097
 
 if (!d3.custom) d3.custom = {};
 
@@ -14,7 +16,7 @@ d3.custom.chartBrush = function module() {
     xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(Math.max(width / 75, 2)),
     yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(Math.max(height / 25, 2)),
     brush = d3.svg.brush(),
-    extent = [];
+    extent;
 
   var dispatch = d3.dispatch('brushed', 'brushended'); // exposed functions
 
@@ -48,7 +50,7 @@ d3.custom.chartBrush = function module() {
         .on("brushend", brushended);
 
       // programatically set brush extent if it's set
-      if (extent.length) brush.extent(extent);
+      if (extent) brush.extent(extent);
 
       // draw the actual brush rectangle
       svg.append("g")

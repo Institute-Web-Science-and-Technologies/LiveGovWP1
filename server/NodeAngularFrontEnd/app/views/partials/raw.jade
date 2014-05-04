@@ -11,9 +11,9 @@
     | lac: {{ trip.data.sensors.lac.length }}
 
   raw
-    brush.bru(extent="trip.extent", domain="trip.domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)")
-    chart.gra(extent="trip.extent", domain="trip.domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)", data="trip.data.sensors.gra")
-    chart.acc(extent="trip.extent", domain="trip.domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)", data="trip.data.sensors.acc")
-    chart.lac(extent="trip.extent", domain="trip.domain", on-Brush-Extent="onBrushExtent(args)", load-More-Data="loadMoreData(args)", data="trip.data.sensors.lac")
+    brush.bru(extent="trip.extent", domain="trip.domain", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+    chart.gra(extent="trip.extent", domain="trip.domain", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)", data="trip.data.sensors.gra")
+    chart.acc(extent="trip.extent", domain="trip.domain", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)", data="trip.data.sensors.acc")
+    chart.lac(extent="trip.extent", domain="trip.domain", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)", data="trip.data.sensors.lac")
 
 // ex:ft=jade

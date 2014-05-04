@@ -20,14 +20,76 @@ app.service('Config', function() {
     DIRECTIVES <-> CONTROLLER <-> TRIP SERVICE <-> DATA FACTORY
  */
 
-// trip service is called by controller, calls data service
-app.service('Trip', ['$http', '$q', 'Config', 'Data', function($http, $q, Config, Data) { // FIXME
-  var trips = [];
-  var selectedTrip;
+// Trip.loadTrips():
+// 1. load trip data and populate the trip table view ('/rec')
+
+// Trip.select():
+// 2. user selects a trip
+
+// Trip.loadData():
+// 3. load sensor data for that trip
+
+app.service('Trip',
+  ['$http', '$q', 'Config', 'Data', function($http, $q, Config, Data) {
+
+  var trips = []; // all data is stored in here
+  var selectedTrip; // a copy(?) of the currently selected trip object
 
   return {
+
+    // called unconditionally by the record controller. returns a promise on
+    // the trip object. if it's already populated, just resolve the promise
+    // with it, else send an xhr request to our api, (hopefully) receive the
+    // data and prepare it first.
+
+    loadTrips: function() {
+      var deferred = $q.defer();
+
+      if (trips.length) {
+        deferred.resolve(trips);
+      } else {
+
+        // do the xhr request on '/trips' to get the trip list and immediately
+        // return a promise on the to be received and prepared data. see
+        // this.query() in the record controller (recCtrl).
+
+        $http.get('/trips')
+        .success(function(data, status, headers, config) {
+
+          // set up trip object architecture
+          trips = data.map(function(d) {
+            d = {
+              name: d.name,
+              id: d.trip_id,
+              user: d.user_id,
+              start: +d.start_ts,
+              stop: +d.stop_ts,
+              duration: +d.stop_ts - (+d.start_ts) - 3600000, // minus one hour due to wrong timestamps in db
+              extent: [],
+              domain: { x: [], y: [] },
+              data: { sensors: {}, geo: [] } // feature collection
+            };
+
+            // create empty sensor objects
+            Config.sensors().map(function (sensor) { d.data.sensors[sensor] = []; });
+
+            return d;
+          });
+
+          deferred.resolve(trips);
+        })
+        .error(function(data, status, headers, config) {
+          console.error("Could not load trips!");
+          deferred.reject();
+        });
+      }
+
+      return deferred.promise;
+    },
+
     // select a trip and call data factory
     select: function(trip) {
+      // call w/o args to clear trip selection
       if (!arguments.length) {
         selectedTrip = undefined;
         return;
@@ -35,30 +97,37 @@ app.service('Trip', ['$http', '$q', 'Config', 'Data', function($http, $q, Config
 
       selectedTrip = trip;
 
-      // FIXME!
-      if ((trip == selectedTrip) || (this.hasData(trip))) { // ? === ==
-        // if (this.hasData(trip)) {
-          console.log("has data, not loading");
-          return;
-        // }
-      }
+      // load trip data if neccessary
+      if (!this.hasData(trip)) this.loadData(trip);
 
-      // console.log(trip == selectedTrip, this.hasData(trip));
-      // console.info('LOAD "' + trip.id + '", 8, 1:');
+      return;
+    },
 
-
-      Data.geo(trip);
-
-
-
+    // load (more) data for a trip
+    // obj is optional: { extent: Array[2], windowSize: number }
+    loadData: function(trip, obj) {
+      var that = this;
       var t = new Date();
-      Data.sensor(trip, Config.sensors()).then(function(data) {
-        console.info('all sensor data has arrived (' + ((new Date() - t) / 1000) + " ms)");
-        trip.domain.x.extent(data.extent(Config.xDomain()));
-        trip.domain.y.extent(data.extent(Config.xDomain())); // FIXME comment ?
-      });
+      console.info(trip.id + ": loading sensor and geo data");
 
-      return trip; // FIXME split -> loadData
+      // if (obj) {
+      //   console.log(obj);
+      //   debugger
+      // }
+
+      Data.geo(trip); // TODO do only when neccessary
+
+      // load sensor data. calls Data.sensor() for every sensor given in
+      // Config.sensors(). when all sensor data has arrived, update the trips
+      // x and y domain (which is the min and max timestamp for the x-axis and
+      // min and max sensor data for the y-axis. see Config.xDomain() and
+      // Config.yDomain())
+
+      Data.sensor(trip, obj).then(function(data) {
+        trip.domain.x = data.extent(Config.xDomain());
+        trip.domain.y = data.extent(Config.yDomain());
+        console.info(trip.id + ": done (" + ((new Date() - t) / 1000) + " ms, " + that.hasData(trip) + ")", trip);
+      });
     },
 
     // test if a trip is selected
@@ -71,57 +140,8 @@ app.service('Trip', ['$http', '$q', 'Config', 'Data', function($http, $q, Config
     hasData: function(trip) {
       if (!arguments.length) return;
       return Config.sensors()
-      .map(function (d) { return trip.data.sensors[d].length; })
-      .reduce(function (a, b) { return a + b; });
-    },
-
-    // load (more) data for a trip
-    // obj is optional: { extent: Array[2], windowSize: number }
-    loadData: function(trip, obj) {
-      // Data.sensor($scope.trip, extent).then(function(data) {
-      //   $scope.trip.domain.y.extent(data, Config.xDomain());
-      // });
-    },
-
-    // test if a trip has extent set (zoomed in)
-    extent: function(trip, extent) {
-      if (!arguments.length || !selectedTrip) return;
-      return (trip ? trip.extent : selectedTrip.extent);
-      // console.log('CTRL  EXTENT 3:', extent, $rootScope.trip.extent);
-      // $scope.$apply(function() {
-      //   $scope.trip.extent = extent;
-      // });
-    },
-
-    // get all trips (init)
-    query: function() {
-      var deferred = $q.defer();
-      $http.get('/trips')
-      .success(function(data, status, headers, config) {
-        trips = data.map(function(d) {
-          d = {
-            name: d.name,
-            id: d.trip_id,
-            user: d.user_id,
-            start: +d.start_ts,
-            stop: +d.stop_ts,
-            duration: +d.stop_ts - (+d.start_ts) - 3600000, // minus one hour due to wrong timestamps in db
-            extent: [],
-            domain: { x: [], y: [] },
-            data: { sensors: {}, geo: [] } // feature collection
-          };
-
-          // create empty sensor objects
-          Config.sensors().map(function (sensor) { d.data.sensors[sensor] = []; });
-
-          return d;
-        });
-
-        deferred.resolve(trips);
-      })
-      .error(function(data, status, headers, config) { deferred.reject(); });
-
-      return deferred.promise;
+        .map(function (d) { return trip.data.sensors[d].length; })
+        .reduce(function (a, b) { return a + b; });
     },
 
     // update a trip's name FIXME abstract for all fields
@@ -158,18 +178,14 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
       var promises = Config.sensors().map(function(sensor) {
         var deferred = $q.defer();
 
-        // FIXME
-        // startTime/endTime -> extent[0,1]
-        // windowSize -> arg.windowSize || Config.windowSize()
-
-        var startTime = obj.extent[0];
-        var endTime = obj.extent[1];
-        var windowSize = obj.windowSize || Config.windowSize();
-
         $http({
           method: "GET",
           url: '/trips/' + trip.id + '/' + sensor + '/window',
-          params: { 'window': windowSize, 'startTime': startTime, 'endTime': endTime }
+          params: {
+            'window':    (obj && obj.hasOwnProperty('windowSize') ? obj.windowSize : Config.windowSize()),
+            'startTime': (obj && obj.hasOwnProperty('extent')     ? obj.extent[0] : undefined),
+            'endTime':   (obj && obj.hasOwnProperty('extent')     ? obj.extent[1] : undefined)
+          }
         })
         .success(function (data, status, headers, config) {
 
@@ -184,9 +200,9 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
         // defer merged data
         deferred.resolve(trip.data.sensors[sensor]);
 
-        console.info(sensor + ' data for trip ' + trip.id + ' ready (' + ((new Date() - t) / 1000) + " ms)");
         })
         .error(function (data, status, headers, config) {
+          console.warn('Problems getting sensor data! ' + sensor + ' data for trip ' + trip.id + ' ready (' + ((new Date() - t) / 1000) + " ms)");
           deferred.reject();
         });
 

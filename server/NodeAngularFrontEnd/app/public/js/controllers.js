@@ -25,12 +25,14 @@ app.controller('recCtrl',
       - all functions return some useful value
      */
 
-  // get all trips (init)
-  this.query = function() {
-    Trip.query().then(function(data) { $scope.trips = data });
-  };
+  // as the controller is initialized every time it's accessed by pointing the
+  // brower to '/rec', it's $scope will be empty at first at this point. so
+  // unconditionally call the trip service and receive our trip object, which
+  // is either already prepared or freshly created.
 
-  if (!$scope.trips || !$scope.trips.length) this.query();
+  Trip.loadTrips().then(function(data) {
+    $scope.trips = data;
+  });
 
   // update a trip's name FIXME abstract for all fields
   this.update = function(trip, data) {
@@ -66,9 +68,9 @@ app.controller('recCtrl',
   };
 
   // test if a trip has extent set (zoomed in)
-  this.extent = function(trip, extent) {
-    return Trip.extent(trip);
-  };
+  // this.extent = function(trip, extent) {
+  //   return Trip.extent(trip);
+  // };
 
   /* ... */
 
@@ -95,9 +97,15 @@ app.controller('rawCtrl',
   $scope.trip = Trip.selected();
 
   // update scope (called by directive)
-  $scope.onBrushExtent = function(trip, extent) {
-    Trip.updateExtent(trip, extent);
-    Trip.loadMoreData(trip, extent);
+  $scope.updateExtent = function(extent) {
+    $scope.$apply(function() {
+      $scope.trip.extent = extent;
+    });
+  };
+
+  // load more data
+  $scope.loadMoreData = function(extent) {
+    Trip.loadData($scope.trip, {extent: extent, windowSize: 200});
   };
 });
 
@@ -106,21 +114,5 @@ app.controller('rawCtrl',
 app.controller('navCtrl', function ($scope, $rootScope, $route, Data) {
   this.is = function(loc) {
     return ($route.current && $route.current.name == loc) ? true : false;
-  };
-
-  // this.deselectTrip = function () {
-  //   delete $rootScope.trip;
-  // };
-
-  // this.clearBrush = function () {
-  //   $rootScope.trip.extent = undefined;
-  // };
-
-  this.loadMoreData = function(sensor) {
-  //   Data.sensor('gra', $rootScope.trip.extent, 'more');
-  //   Data.sensor('acc', $rootScope.trip.extent, 'more');
-  //   Data.sensor('lac', $rootScope.trip.extent, 'more');
-  //   $scope.digest();
-  //   // $scope.apply();
   };
 });

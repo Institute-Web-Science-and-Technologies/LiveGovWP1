@@ -16,14 +16,12 @@ d3.custom.lineChart = function module() {
     xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(Math.max(width / 75, 2)),
     yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(Math.max(height / 25, 2)),
     brush = d3.svg.brush(),
-    extent = [];
+    extent;
 
   var dispatch = d3.dispatch('brushended'); // exposed functions
 
   function exports(selection) {
     selection.each(function(d, i) {
-
-      debugger
 
       if (!d) return;
 
@@ -31,22 +29,15 @@ d3.custom.lineChart = function module() {
 
       var chartName = this.classList[0];
 
-      // FIXME don't recalculate extent
-      // if (extent.length) {
-      //   xScale.domain(extent);
-      // } else {
-      //   dispatch('domain')
-      //   xScale.domain(data.extent([d.starttime, d.endtime]));
-      //   }))));
-      // }
+      if (extent) xScale.domain(extent);
 
       // FIXME expose
       var line = d3.svg.line().interpolate("linear")
         .x(function(d) {
-          return xScale(d[0]);
+          return xScale(d[0]); // timestamp
         })
         .y(function(d) {
-          return yScale(d[1]);
+          return yScale(d[1]); // sensor value
         });
 
       if (d3.select(this).select('svg').empty()) {
@@ -69,10 +60,6 @@ d3.custom.lineChart = function module() {
 
       // select svg element
       var svg = d3.select(this).select('svg').data(data);
-
-      // create brush
-      brush.x(xScale)
-        .on("brushend", brushended);
 
       var chart = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
@@ -108,6 +95,10 @@ d3.custom.lineChart = function module() {
         .attr("transform", "translate(-3,0)") // ?
         .call(yAxis);
 
+      // create brush
+      brush.x(xScale)
+        .on("brushend", brushended);
+
       var gBrush = chart.append("g")
         .attr("class", "brush")
         .call(brush)
@@ -122,9 +113,8 @@ d3.custom.lineChart = function module() {
 
         // this first clears the brush, and then tells it to redraw
         // https://groups.google.com/d/msg/d3-js/SN4-kJD6_2Q/SmQNwLm-5bwJ
-        chart.select(".brush").call(brush.clear());
-
-        xScale.domain(brush.extent()); // scale the x-domain to the extent (zoom in)
+        // chart.select(".brush").call(brush.clear());
+        d3.selectAll('chart').select('.brush').call(brush.clear()); // FIXME works, but the above would be better
 
         svg.transition().duration(2000).select(".x.axis").call(xAxis);
 
@@ -146,25 +136,6 @@ d3.custom.lineChart = function module() {
           .selectAll(".line2")
           .attr("d", line(data.map(function(d) {return [d.ts, d.avgz]; })));
       }
-
-      // function transition_data() {
-      //   this.svg.selectAll(".line0").attr("d", line(data.map(function (d) { return [d.ts, d.avgx]; })));
-      //   this.svg.selectAll(".line1").attr("d", line(data.map(function (d) { return [d.ts, d.avgy]; })));
-      //   this.svg.selectAll(".line2").attr("d", line(data.map(function (d) { return [d.ts, d.avgz]; })));
-      // }
-
-      // function reset_axis() {
-      //   svg.transition().duration(500)
-      //     .select(".x.axis")
-      //     .call(xAxis);
-      // }
-
-      // function clear_brush() {
-      //   if (!data) { console.error('clear_brush has no data'); return; }
-      //   xScale.domain(d3.extent([].concat.apply([], data.map(function (d) { return [d.starttime, d.endtime]; }))));
-      //   transition_data();
-      //   reset_axis();
-      // }
     });
   }
 

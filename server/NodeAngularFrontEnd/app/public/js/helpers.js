@@ -20,14 +20,21 @@
     if (!this.length) return array;
     if (!array.length) return this;
 
+    // sort by timestamp first, then remove the ones where a[i+1].endtime is
+    // bigger than a[i].endtime
+
     return this.concat(array)
       .sort(function(a,b) {
         return d3.ascending(a.ts, b.ts);
       })
       .filter(function(d,i,a) { // true returns d
-        return (a[i+1] ? (a[i].ts <= a[i+1].ts) : true);
+        return (a[i+1] ? (a[i].endtime <= a[i+1].endtime) : true);
+      })
+      .filter(function(d,i,a) { // FIXME there are still remaining entries after the first filter run
+        return (a[i+1] ? (a[i].endtime <= a[i+1].endtime) : true);
       });
   };
+
 
   Array.prototype.extent = function(a) {
     return d3.extent(this.select(a)); // e.g. ['avgx, avgy, avgz']
