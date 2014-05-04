@@ -10,39 +10,42 @@ var onError = function (err) {
   console.log(err);
 };
 
-// recompile sass files (two short beeps = success, anything else: probably
+// recompile sass files (two short beeps: success, anything else: probably failure)
 gulp.task('sass', function () {
-  gulp.src('../client/public/css/*.scss')
+  gulp.src('public/css/*.scss')
     .pipe(plumber({ errorHandler: onError }))
     .pipe(sass({
       sourcemap: true,
       style: process.env.NODE_ENV === 'develop' ? 'expanded' : 'compressed'
     }))
     .pipe(autoprefixer("last 1 version", "> 1%", "ie 8", "ie 7"))
-    .pipe(gulp.dest('../client/public/css'));
+    .pipe(gulp.dest('public/css'));
 });
 
 // watch stuff for changes
 gulp.task('watch', function () {
-  gulp.watch(['../client/public/css/*.scss'], ['sass']);
+  gulp.watch(['public/css/*.scss'], ['sass']);
 });
 
 // start the server using nodemon (so it restarts if neccessary)
-gulp.task('develop', function () {
+gulp.task('server', function () {
   nodemon({
     script: 'server.js',
     verbose: true,
     ext: 'html js jade',
-    env: { 'NODE_ENV': 'development', 'PORT': 3000 },
+    env: {
+      'NODE_ENV': 'development',
+      'PORT': process.env.NODE_ENV === 'develop' ? 4001 : 3001
+    },
     ignore: ['Gulpfile.js', '.sass-cache/*']
   })
     .on('change', [])
     .on('restart', []);
 });
 
-// development mode: compile sass files, watch them for changes and start the
-// server on port 4001
-gulp.task('default', ['sass', 'watch', 'develop']);
+// development mode: compile sass files once, then watch them for changes and
+// start the server on port 4001
+gulp.task('default', ['sass', 'watch', 'server']);
 
 // production mode: start the server on port 3001
-gulp.task('production', []);
+gulp.task('production', ['server']);

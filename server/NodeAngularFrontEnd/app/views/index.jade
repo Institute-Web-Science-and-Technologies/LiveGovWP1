@@ -13,12 +13,13 @@ html(lang="en", ng-app="inspectionFrontEnd")
     //- To ensure CSS files are downloaded in parallel, always include
     //- external CSS before external JavaScript.
 
-    link(href="/lib/leaflet-dist/leaflet.css", rel="stylesheet")
-    link(href="/lib/bootstrap/dist/css/bootstrap.min.css", rel="stylesheet")
-    link(href="/lib/angular-xeditable/dist/css/xeditable.css", rel="stylesheet")
-    link(href="/app/css/001.css", rel="stylesheet")
+    link(href="/bower_components/leaflet-dist/leaflet.css", rel="stylesheet")
+    link(href="/bower_components/bootstrap/dist/css/bootstrap.min.css", rel="stylesheet")
+    link(href="/bower_components/angular-xeditable/dist/css/xeditable.css", rel="stylesheet")
 
-    script(src="/lib/angular/angular.js")
+    link(href="/css/001.css", rel="stylesheet")
+
+    script(src="/bower_components/angular/angular.js")
 
   body
     header
@@ -44,25 +45,25 @@ html(lang="en", ng-app="inspectionFrontEnd")
       div(ng-view)
 
   //- Angular
-  script(src="/lib/angular-resource/angular-resource.js")
-  script(src="/lib/angular-route/angular-route.js")
-  script(src="/lib/angular-xeditable/dist/js/xeditable.js")
-  script(src="/lib/d3/d3.js")
-  script(src="/lib/geojson-utils.js") // FIXME
-  script(src="/lib/jquery/dist/jquery.js")
-  script(src="/lib/leaflet-dist/leaflet.js")
-  script(src="/lib/moment/min/moment.min.js")
+  script(src="/bower_components/angular-resource/angular-resource.js")
+  script(src="/bower_components/angular-route/angular-route.js")
+  script(src="/bower_components/angular-xeditable/dist/js/xeditable.js")
+  script(src="/bower_components/d3/d3.js")
+  script(src="/bower_components/geojson-utils.js") // FIXME
+  script(src="/bower_components/jquery/dist/jquery.js")
+  script(src="/bower_components/leaflet-dist/leaflet.js")
+  script(src="/bower_components/moment/min/moment.min.js")
 
   //- Angular Application
-  script(src="/app/js/helpers.js")
-  script(src="/app/js/reusable/chart.js")
-  script(src="/app/js/reusable/brush.js")
-  script(src="/app/js/modules.js")
-  script(src="/app/js/controllers.js")
-  script(src="/app/js/directives.js")
-  //- script(src="/app/js/reusable/map.js") // actually a directive
-  script(src="/app/js/filters.js")
-  script(src="/app/js/services.js")
-  script(src="/app/js/routes.js")
+  script(src="/js/helpers.js")
+  script(src="/js/reusable/chart.js")
+  script(src="/js/reusable/brush.js")
+  script(src="/js/modules.js")
+  script(src="/js/controllers.js")
+  script(src="/js/directives.js")
+  //- script(src="/js/reusable/map.js") // actually a directive
+  script(src="/js/filters.js")
+  script(src="/js/services.js")
+  script(src="/js/routes.js")
 
 // ex:ft=jade

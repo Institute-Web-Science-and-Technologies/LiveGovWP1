@@ -2,12 +2,11 @@ var express = require('express');
 var path = require('path');
 var app = express();
 
-app.set('port', process.env.PORT || 3000);
-app.set('views', path.join(__dirname, '/../client/views'));
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use('/app', express.static(path.join(__dirname, '/../client/public')));
-app.use('/lib', express.static(path.join(__dirname, '/../client/bower_components')));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('bower_components', express.static(path.join(__dirname, 'bower_components')));
 
 // middleware
 app.use(require('body-parser')()); // previously bodyParser, json and urlencoded
@@ -15,7 +14,11 @@ app.use(require('method-override')());
 app.use(require('compression')());
 
 if (process.env.NODE_ENV == 'development') {
+  app.set('port', process.env.PORT || 4001);
+  app.use(require('errorhandler')({ dumpExceptions: true, showStack: true }));
   app.use(require('morgan')()); // logger
+} else {
+  app.set('port', process.env.PORT || 3001);
   app.use(require('errorhandler')());
 }
 
