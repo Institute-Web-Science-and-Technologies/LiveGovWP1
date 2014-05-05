@@ -36,10 +36,8 @@ html(lang="en", ng-app="inspectionFrontEnd")
             a(href="/#/har") Activity Recognition
 
         ul.nav.navbar-nav.pull-right
-          li(ng-class="{'hidden':nav.selected()}", ng-click="nav.loadMoreData()")
-            a.clear-button Load More Data
           li
-            a.trip-indicator(ng-class="{'selected':nav.selected()}") {{ trip.id || "PLEASE SELECT A TRIP" }}
+            a
 
     #body
       div(ng-view)

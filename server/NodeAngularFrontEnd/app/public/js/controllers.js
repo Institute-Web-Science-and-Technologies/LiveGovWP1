@@ -111,8 +111,12 @@ app.controller('rawCtrl',
 
 
 // FIXME DRY
-app.controller('navCtrl', function ($scope, $rootScope, $route, Data) {
+app.controller('navCtrl', function ($route, Trip) {
   this.is = function(loc) {
     return ($route.current && $route.current.name == loc) ? true : false;
+  };
+
+  this.selected = function(trip) {
+    return Trip.selected(trip);
   };
 });

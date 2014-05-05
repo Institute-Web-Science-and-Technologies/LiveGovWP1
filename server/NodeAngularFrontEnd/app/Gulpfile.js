@@ -37,7 +37,7 @@ gulp.task('server', function () {
       'NODE_ENV': 'development',
       'PORT': process.env.NODE_ENV === 'develop' ? 4001 : 3001
     },
-    ignore: ['Gulpfile.js', '.sass-cache/*']
+    ignore: ['Gulpfile.js', '.sass-cache/*', '.DS_Store', '*.css', '*.map']
   })
     .on('change', [])
     .on('restart', []);
