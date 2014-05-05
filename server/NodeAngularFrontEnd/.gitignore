@@ -19,3 +19,5 @@ NodeAngularFrontEnd.sublime-*
 *.css
 *.css.map
 .sass-cache
+
+*sublime-*
