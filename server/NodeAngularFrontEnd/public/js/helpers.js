@@ -35,7 +35,6 @@
       });
   };
 
-
   Array.prototype.extent = function(a) {
     return d3.extent(this.select(a)); // e.g. ['avgx, avgy, avgz']
   };

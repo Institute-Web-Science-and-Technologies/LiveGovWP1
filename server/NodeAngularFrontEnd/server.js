@@ -8,9 +8,6 @@ app.set('view engine', 'jade');
 app.use('/bower_components', express.static(path.join(__dirname, 'bower_components')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/app', express.static(path.join(__dirname, 'public'))); // ?
-// app.use('/lib', express.static(path.join(__dirname, 'bower_components')));
-
 // middleware
 app.use(require('body-parser')()); // previously bodyParser, json and urlencoded
 app.use(require('method-override')());

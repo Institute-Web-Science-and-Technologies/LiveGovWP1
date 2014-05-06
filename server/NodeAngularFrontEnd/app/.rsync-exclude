@@ -1,5 +1,0 @@
-bower_components
-node_modules
-.sass-cache
-public/css/*.css
-public/css/*.map

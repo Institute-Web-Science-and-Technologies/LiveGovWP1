@@ -1,0 +1,72 @@
+doctype html
+
+html(lang="en", ng-app="inspectionFrontEnd")
+  head
+    meta(charset="utf-8")
+    title= title
+
+    //- base(href="/")
+
+    meta(name="google" content="notranslate")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+
+    //- FIXME bootstrap should be considered harmful. s/bootstrap/bourbon-neat
+    //- FIXME find a proper substitution for geojson-utils.js
+    //- TODO concat and minify everything as good as possible for production env
+
+    //- NOTE to ensure css files are downloaded in parallel, always include
+    //- external css before external javascript
+
+    //- NOTE be careful to specify paths relative to the current directory
+
+    link(href="./bower_components/leaflet-dist/leaflet.css", rel="stylesheet")
+    link(href="./bower_components/bootstrap/dist/css/bootstrap.min.css", rel="stylesheet")
+    link(href="./bower_components/angular-xeditable/dist/css/xeditable.css", rel="stylesheet")
+
+    link(href="./css/001.css", rel="stylesheet")
+
+    script(src="./bower_components/angular/angular.js")
+
+  body
+    header
+      nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation" ng-controller="navCtrl as nav")
+        ul.nav.navbar-nav
+          li(ng-class='{active:nav.loc("rec")}')
+            a(href="#/rec") Recordings
+          li(ng-class='{active:nav.loc("raw"), disabled:nav.selected()}')
+            a(href="#/raw") Raw Data
+          li(ng-class='{active:nav.loc("har"), disabled:nav.selected()}')
+            a(href="#/har") Activity Recognition
+
+        ul.nav.navbar-nav.pull-right
+          li
+            a
+
+    #container
+      div(ng-view)
+
+  script(src="./bower_components/angular-resource/angular-resource.js")
+  script(src="./bower_components/angular-route/angular-route.js")
+  script(src="./bower_components/angular-xeditable/dist/js/xeditable.js")
+  script(src="./bower_components/d3/d3.js")
+  script(src="./bower_components/jquery/dist/jquery.js")
+  script(src="./bower_components/leaflet-dist/leaflet.js")
+  script(src="./bower_components/moment/min/moment.min.js")
+
+  //- custom helpers
+  script(src="./js/helpers.js")
+
+  //- d3 sensor charts, brush, leaflet map
+  script(src="./js/reusable/chart.js")
+  script(src="./js/reusable/brush.js")
+  script(src="./js/reusable/map.js")
+
+  //- angular
+  script(src="./js/modules.js")
+  script(src="./js/controllers.js")
+  script(src="./js/directives.js")
+  script(src="./js/filters.js")
+  script(src="./js/services.js")
+  script(src="./js/routes.js")
+
+//- ex:ft=jade

@@ -1,6 +1,7 @@
 #raw
-  //- map(data="data.geo")
-  //-   #map
+
+  map(data="trip.data.geo")
+    #map
 
   pre
     | domain x: {{ trip.domain.x }} {{ trip.domain.x[0] | date:'HH:mm:ss' }} {{ trip.domain.x[1] | date:'HH:mm:ss' }} {{trip.domain.x[0] | duration:trip.domain.x[1] | date:'HH:mm:ss'}}
@@ -9,6 +10,8 @@
     | acc: {{ trip.data.sensors.acc.length }}
     | gra: {{ trip.data.sensors.gra.length }}
     | lac: {{ trip.data.sensors.lac.length }}
+
+  //- FIXME pass the whole trip instead (see loadMoreData in services)
 
   raw
     brush.bru(extent="trip.extent", domain="trip.domain", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")

@@ -11,28 +11,28 @@ app.config(function ($routeProvider, $locationProvider) {
 
 	$routeProvider
 		.when('/rec', {
-			templateUrl: '/partials/rec',
+			templateUrl: 'partials/rec',
 			controller: 'recCtrl',
 			controllerAs: 'rec',
 			name: 'rec'
 		})
 
 		.when('/rec/:trip_id', {
-			templateUrl: '/partials/rec',
+			templateUrl: 'partials/rec',
 			controller: 'recCtrl',
 			controllerAs: 'rec',
 			name: 'rec'
 		})
 
 		.when('/raw', {
-			templateUrl: '/partials/raw',
+			templateUrl: 'partials/raw',
 			controller: 'rawCtrl',
 			controllerAs: 'raw',
 			name: 'raw'
 		})
 
 		.when('/raw/:trip_id', {
-			templateUrl: '/partials/raw',
+			templateUrl: 'partials/raw',
 			controller: 'rawCtrl',
 			controllerAs: 'raw',
 			name: 'raw'

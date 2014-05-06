@@ -49,11 +49,11 @@ app.service('Trip',
         deferred.resolve(trips);
       } else {
 
-        // do the xhr request on '/trips' to get the trip list and immediately
+        // do the xhr request on 'trips' to get the trip list and immediately
         // return a promise on the to be received and prepared data. see
         // this.query() in the record controller (recCtrl).
 
-        $http.get('/trips')
+        $http.get('trips')
         .success(function(data, status, headers, config) {
 
           // set up trip object architecture
@@ -148,7 +148,7 @@ app.service('Trip',
     update: function (trip, data) {
       trip.name = data.name; // client side update
 
-      $http({ method: 'POST', url: '/trips/' + trip.id, data: data })
+      $http({ method: 'POST', url: 'trips/' + trip.id, data: data })
       .success(function(data, status, headers, config) {
         console.info("trip updated:", trip.trip_id);
       })
@@ -159,7 +159,7 @@ app.service('Trip',
     delete: function (trip) {
       trips.splice(trips.indexOf(trip), 1); // client side removal
 
-      $http({ method: 'DELETE', url: '/trips/' + trip.id })
+      $http({ method: 'DELETE', url: 'trips/' + trip.id })
       .success(function(data, status, headers, config) {
         console.info("trip deleted:", trip.id);
       })
@@ -180,7 +180,7 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
 
         $http({
           method: "GET",
-          url: '/trips/' + trip.id + '/' + sensor + '/window',
+          url: 'trips/' + trip.id + '/' + sensor + '/window',
           params: {
             'window':    (obj && obj.hasOwnProperty('windowSize') ? obj.windowSize : Config.windowSize()),
             'startTime': (obj && obj.hasOwnProperty('extent')     ? obj.extent[0] : undefined),
@@ -269,8 +269,8 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
         );
       }
 
-      var gps = $http.get('/trips/' + trip.id + '/gps');
-      var har = $http.get('/trips/' + trip.id + '/har');
+      var gps = $http.get('trips/' + trip.id + '/gps');
+      var har = $http.get('trips/' + trip.id + '/har');
 
       var deferred = $q.defer();
       var t = new Date();
