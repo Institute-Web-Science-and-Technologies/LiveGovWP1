@@ -11,5 +11,70 @@ body
   margin-left auto
   margin-right auto
   height 600px
-  
 
+.showTrip
+  cursor pointer
+
+/* jquery.filterTable */
+
+.filter-table .quick
+  margin-left 0.5em
+  font-size 0.8em
+  text-decoration none
+
+.fitler-table .quick:hover
+  text-decoration underline
+
+td.alt
+  background-color #ffc
+  background-color rgba(255, 255, 0, 0.2)
+
+/* TableSorter */
+
+th.tablesorter-header
+  background-size 12px
+  background-position right center
+  background-repeat no-repeat
+
+th.tablesorter-header.tablesorter-headerAsc
+  background-image url('/images/triangle-asc.png')
+
+th.tablesorter-header.tablesorter-headerDesc
+  background-image url('/images/triangle-desc.png')
+
+/* x-editable */
+
+td.tripName.editable.editable-click.editable-unsaved
+  font-weight normal
+  color #FF4C4C
+
+a.tripName.editable
+  border-bottom: none
+
+a.tripName.editable:hover
+  border-bottom: none
+
+td.tripName.editable
+  border-bottom: none
+
+#tripTable > input
+  padding 0
+  margin 0
+  font-size inherit
+
+td.tripName.editable:hover
+  border-bottom 1px dotted #222
+
+.editable-click > a
+  text-decoration none
+  color: #222
+
+/* delete button */
+
+td.deleteTrip > a
+  text-decoration none
+  color #222
+
+td.deleteTrip > a:hover
+  text-decoration none
+  color #FF4C4C

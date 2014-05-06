@@ -13,7 +13,7 @@ function getById (id, options, callback) {
 
   pg.connect(config.pgCon, function (err, client, done) {
     if(err) { callback(err); done(); return; }
-    var query = 'SELECT ts,tag FROM tags WHERE id=$1 ORDER BY ts';
+    var query = 'SELECT ts,tag FROM sensor_tags WHERE trip_id=$1 ORDER BY ts';
     var values = [id];
     if(options.limit) {
       query += ' LIMIT $2';

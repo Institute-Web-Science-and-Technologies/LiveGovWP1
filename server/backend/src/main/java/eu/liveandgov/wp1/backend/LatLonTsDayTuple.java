@@ -10,6 +10,8 @@ import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
+import org.json.JSONObject;
+
 public class LatLonTsDayTuple {
 	
 	private float m_lat;
@@ -97,5 +99,15 @@ public class LatLonTsDayTuple {
 	}
 	public double getLon() {
 		return m_lng;
+	}
+	
+	public JSONObject getJson() {
+		JSONObject responseJSON = new JSONObject();
+		responseJSON.put("lat", m_lat);
+		responseJSON.put("lng", m_lng);
+		ft.setTimeZone(TimeZone.getTimeZone( "Europe/Helsinki" ));
+		responseJSON.put("ts", ft.format(m_dateTime));
+		responseJSON.put("day", m_day);
+		return responseJSON;
 	}
 }

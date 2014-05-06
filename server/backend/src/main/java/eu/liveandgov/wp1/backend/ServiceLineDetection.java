@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 
@@ -43,7 +45,7 @@ public class ServiceLineDetection extends HttpServlet {
 	static final int timeTableToleranceInMeter = 50;
 	
 	ExecutorService liveApiExecutor;
-	
+	Logger mLogger;
 	/**
 	 * @throws IOException 
 	 * @see HttpServlet#HttpServlet()
@@ -53,6 +55,7 @@ public class ServiceLineDetection extends HttpServlet {
 		transportationMeans = initTransportationMeans();
 		db = new PostgresqlDatabase("liveandgov", "liveandgov");
 		liveApiExecutor = Executors.newCachedThreadPool();
+		mLogger = Util.SLDLogger.log();
 	}
 
 	/**
@@ -69,21 +72,29 @@ public class ServiceLineDetection extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		// check it user is valid
+		long startTs = System.currentTimeMillis();
+		JSONObject logJSON = new JSONObject();
+		
+		// check if user is valid
 		if(!isUsernameValid(request)){
 			PrintWriter out = response.getWriter();
-			out.println("{\"error\":\"username required\"}");
-			Util.SLDLogger.log().warn("Request without username");
+			String error = "{\"error\":\"username required\"}";
+			out.println(error);
+			mLogger.warn(error);
 			return;
 		}
 		ArrayList<LatLonTsDayTuple> coordinates = new ArrayList<LatLonTsDayTuple>();
 		// parse data and get the most recent GPS coordinate
 		LatLonTsDayTuple latestLatLonTsDayTuple = parseLonLatTsDayTuples(request,coordinates);
 		
+		logJSON.put("inputCoordinates", latLonArrayToJsonList(coordinates));
+		
 		// compute the time difference
 		// between now and the latest 
 		// Helsinki timestamp.
 		long timeDiff = System.currentTimeMillis() - latestLatLonTsDayTuple.getTime();
+		
+		logJSON.put("timeDiffLatestCoordinate", timeDiff);
 		
 		// check if the most recent timestamp is actual enough to query the real time API
 		Future<List<VehicleInfo>> liveApiResult = null;
@@ -118,24 +129,28 @@ public class ServiceLineDetection extends HttpServlet {
 			response.setContentType("application/json");
 			PrintWriter out = response.getWriter();
 			out.println(responseJSON.toString());
-			Util.SLDLogger.log().info(getLogString(request.getHeader("username"),latestLatLonTsDayTuple,allTrips));
-			//ZMQ.context();
+			
+			String username = request.getHeader("username");
+			logJSON.put("username",username);
+			
+			if(!username.equals("test_user")){
+				logJSON.put("response",responseJSON);
+			}
+			logJSON.put("responseTime", System.currentTimeMillis()-startTs);
+			mLogger.info(logJSON.toString());
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			Util.SLDLogger.log().error(e);
+			mLogger.error(e);
 		}
 	}
 
-	private String getLogString(String username, LatLonTsDayTuple latestLatLonTsDayTuple, List<JSONObject> allTrips) {
-		
-		String ret = "SLD,"+System.currentTimeMillis()+","+username+",";
-		ret+= latestLatLonTsDayTuple.getTime() + " ";
-		ret+= latestLatLonTsDayTuple.getLonLatPoint() + " ";
-		for(JSONObject o: allTrips) {
-			ret+= o.getString("route_id") + "/" + o.getInt("score") + " ";
+	private List<JSONObject> latLonArrayToJsonList(ArrayList<LatLonTsDayTuple> coordinates) {
+		List<JSONObject> allTrips = new ArrayList<JSONObject>();
+		for(LatLonTsDayTuple t:coordinates){
+			allTrips.add(t.getJson());
 		}
-		return ret;
+		return allTrips;
 	}
 
 	/**
