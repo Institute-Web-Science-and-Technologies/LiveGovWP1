@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.zip.GZIPInputStream;
 
 import javax.servlet.ServletException;
@@ -35,10 +36,8 @@ import static java.lang.System.currentTimeMillis;
 @WebServlet("/api")
 public class HarService extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-    static final String OUT_DIR = ".";
+    static final String OUT_DIR = "/srv/liveandgov/HARRawFiles/";
     private static final String FIELD_NAME_UPFILE = "upfile";
-    private static final Logger Log = Logger.getLogger(HarService.class);
-
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -53,6 +52,8 @@ public class HarService extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		PrintWriter out = response.getWriter();
+		out.println("Try Post");
 	}
 
 	/**
@@ -64,8 +65,7 @@ public class HarService extends HttpServlet {
         InputStream fileStream = getStreamFromField(request, FIELD_NAME_UPFILE);
 
         if (fileStream == null) {
-            Log.error("Field not found: " + FIELD_NAME_UPFILE);
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        	response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
@@ -77,22 +77,16 @@ public class HarService extends HttpServlet {
         try {
             bytesWritten = writeStreamToFile(fileStream, outFile);
         } catch (IOException e) {
-            Log.error("Error writing output file:",e);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
         // Success
-        Log.info("Received file " + fileName + " of length " + bytesWritten);
-
-        // Insert directly to database
 
         BufferedReader reader;
         if (! isCompressed(request)) {
-            Log.info("Opening Text Reader");
-            reader = new BufferedReader(new FileReader(outFile));
+        	reader = new BufferedReader(new FileReader(outFile));
         } else {
-            Log.info("Opening GZIP Reader");
             reader = new BufferedReader(new InputStreamReader(new GZIPInputStream( new FileInputStream(outFile)), "UTF8"));
         }
         
@@ -127,7 +121,6 @@ public class HarService extends HttpServlet {
             // Check that we have a file upload request
             boolean isMultipart = ServletFileUpload.isMultipartContent(req);
             if (!isMultipart) {
-                Log.error("Received non-multipart POST request");
                 return null;
             }
 
@@ -142,15 +135,12 @@ public class HarService extends HttpServlet {
                 String name = item.getFieldName();
 
                 if (!name.equals(FIELD_NAME_UPFILE)) {
-                    Log.info("Found unknown field " + name);
                     continue;
                 }
                 return item.openStream();
             }
         } catch (FileUploadException e) {
-            Log.error("Error parsing the upfile", e);
         } catch (IOException e) {
-            Log.error("Network error while parsing file.", e);
         }
         return null;
     }

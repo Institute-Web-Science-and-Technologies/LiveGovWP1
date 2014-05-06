@@ -10,7 +10,7 @@
 import requests # if not avaialbel do `sudo easy_install requests`
 import sys
 
-DEFAULT_HOST = "LG"
+DEFAULT_HOST = "141.26.248.40"
 
 def get_servlet_url(host):
     return "http://" + host +":8080/HAR/api"
