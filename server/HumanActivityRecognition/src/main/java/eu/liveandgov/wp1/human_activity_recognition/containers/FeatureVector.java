@@ -8,6 +8,7 @@ import eu.liveandgov.wp1.human_activity_recognition.helper.FeatureHelper;
 public class FeatureVector {
 
     public String tag;
+    public String id;
 
     // STATISTICAL FEATURES
     public float xMean;
@@ -30,8 +31,9 @@ public class FeatureVector {
 
     // TODO: Historgram Features
 
-    public FeatureVector(TaggedWindow m) {
+    public FeatureVector(CountWindow m) {
         tag = m.tag;
+        id = m.id;
 
         xMean = FeatureHelper.mean(m.x);
         xVar = FeatureHelper.var(m.x);
@@ -52,13 +54,17 @@ public class FeatureVector {
 
 
     public static String getCsvHead() {
-        return "xMean,yMean,zMean,xVar,yVar,zVar,s2Mean,s2Var,tilt,energy,kurtosis,tag";
+        return "id,tag,xMean,yMean,zMean,xVar,yVar,zVar,s2Mean,s2Var,tilt,energy,kurtosis";
     }
 
     public String toCSV() {
-        return String.format("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%s",
-            xMean, yMean, zMean, xVar, yVar, zVar, s2Mean, s2Var, tilt, energy, kurtosis, tag
+        return String.format("%s,%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
+            id, tag, xMean, yMean, zMean, xVar, yVar, zVar, s2Mean, s2Var, tilt, energy, kurtosis
         );
+    }
+
+    public String toString() {
+        return toCSV();
     }
 
 

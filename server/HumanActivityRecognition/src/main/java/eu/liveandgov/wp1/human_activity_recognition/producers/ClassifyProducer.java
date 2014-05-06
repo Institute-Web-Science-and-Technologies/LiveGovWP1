@@ -20,4 +20,8 @@ public class ClassifyProducer extends Producer<String> implements Consumer<Featu
         }
     }
 
+    public void clear() {
+        consumer.clear();
+    }
+
 }

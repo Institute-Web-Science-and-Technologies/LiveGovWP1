@@ -1,2 +1,5 @@
 .DS_Storage
 node_modules/
+.important
+./public/stylesheets/style.css
+public/stylesheets/style.css

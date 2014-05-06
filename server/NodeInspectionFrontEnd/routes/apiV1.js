@@ -3,7 +3,9 @@ var gps = require('../models/GPS.js')
   , acc = require('../models/Accelerometer.js')
   , lac = require('../models/LinearAcceleration.js')
   , gra = require('../models/Gravity.js')
-  , tag = require('../models/Tags.js');
+  , tag = require('../models/Tags.js')
+  , trainingWindow = require('../models/TrainingWindow.js')
+  , har = require('../models/HAR.js');
 
 function getAllIds(req, res) {
   meta.getAllIds(function (err, data) {
@@ -29,11 +31,20 @@ function getGPSCount (req, res) {
   });
 }
 
+function getGPSNearToTS (req, res) {
+  var ts = req.params.ts;
+  var id = req.params.id;
+  gps.getNearestToTimeWithId(id, ts, function (err, data) {
+    if(err) { res.send(err); console.error(err); return; }
+    return res.send(data);
+  });
+}
+
 function getAccWindow (req, res) {
   var options = { windows: 200 };
   if(req.query.windows)   options.windows = parseInt(req.query.windows);
-  if(req.query.startTime) options.startTime = new Date(parseInt(req.query.startTime));
-  if(req.query.endTime)   options.endTime = new Date(parseInt(req.query.endTime));
+  if(req.query.startTime) options.startTime = parseInt(req.query.startTime);
+  if(req.query.endTime)   options.endTime = parseInt(req.query.endTime);
   acc.getWindowsForId(req.params.id, options, function (err, data) {
     if(err) { res.send(err); console.error(err); return; }
     return res.send(data);
@@ -50,8 +61,8 @@ function getAccCount (req, res) {
 function getLacWindow (req, res) {
   var options = { windows: 200 };
   if(req.query.windows)   options.windows = parseInt(req.query.windows);
-  if(req.query.startTime) options.startTime = new Date(parseInt(req.query.startTime));
-  if(req.query.endTime)   options.endTime = new Date(parseInt(req.query.endTime));
+  if(req.query.startTime) options.startTime = parseInt(req.query.startTime);
+  if(req.query.endTime)   options.endTime = parseInt(req.query.endTime);
   lac.getWindowsForId(req.params.id, options, function (err, data) {
     if(err) { res.send(err); console.error(err); return; }
     return res.send(data);
@@ -68,8 +79,8 @@ function getLacCount (req, res) {
 function getGraWindow (req, res) {
   var options = { windows: 200 };
   if(req.query.windows)   options.windows = parseInt(req.query.windows);
-  if(req.query.startTime) options.startTime = new Date(parseInt(req.query.startTime));
-  if(req.query.endTime)   options.endTime = new Date(parseInt(req.query.endTime));
+  if(req.query.startTime) options.startTime = parseInt(req.query.startTime);
+  if(req.query.endTime)   options.endTime = parseInt(req.query.endTime);
   gra.getWindowsForId(req.params.id, options, function (err, data) {
     if(err) { res.send(err); console.error(err); return; }
     return res.send(data);
@@ -90,8 +101,22 @@ function getTags (req, res) {
   });
 }
 
+function postWindow (req, res) {
+  trainingWindow.saveWindow(req.body.tag, req.params.id, req.body.start, req.body.end, function (err) {
+    res.send(err);
+  });
+}
+
+function getHAR (req, res) {
+  har.getById(req.params.id, function (err, data) {
+    if(err) { res.send(err); console.error(err); return; }
+    return res.send(data);
+  });
+}
+
 module.exports = {
   getGPS: getGPS,
+  getGPSNearToTS: getGPSNearToTS,
   getGPSCount: getGPSCount,
   getAllIds: getAllIds,
   getAccWindow: getAccWindow,
@@ -100,5 +125,7 @@ module.exports = {
   getLacCount: getLacCount,
   getGraWindow: getGraWindow,
   getGraCount: getGraCount,
-  getTags: getTags
+  getTags: getTags,
+  postWindow: postWindow,
+  getHAR: getHAR
 };
