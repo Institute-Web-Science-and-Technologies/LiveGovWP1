@@ -1,41 +1,22 @@
-/* jshint -W097 */
-'use strict';
+/* jshint strict:true, devel:true, debug:true */
+/* globals app */
+'use strict'; // jshint -W097
 
-/* global app:true, console:true, confirm:true */
-
-/* ROUTES */
+//- NOTE be careful to specify paths relative to the current directory
 
 app.config(function ($routeProvider, $locationProvider) {
 	// $locationProvider.html5Mode(true);
 	// $locationProvider.hashPrefix('!');
 
 	$routeProvider
-		.when('/rec', {
-			templateUrl: 'partials/rec',
+		.when('/rec', { // relative to hash (e.g. localhost:3001/#/rec)
+			templateUrl: './partials/rec', // relative to host (e.g. localhost:3001/partials/rec)
 			controller: 'recCtrl',
-			controllerAs: 'rec',
-			name: 'rec'
-		})
-
-		.when('/rec/:trip_id', {
-			templateUrl: 'partials/rec',
-			controller: 'recCtrl',
-			controllerAs: 'rec',
-			name: 'rec'
 		})
 
 		.when('/raw', {
-			templateUrl: 'partials/raw',
+			templateUrl: './partials/raw',
 			controller: 'rawCtrl',
-			controllerAs: 'raw',
-			name: 'raw'
-		})
-
-		.when('/raw/:trip_id', {
-			templateUrl: 'partials/raw',
-			controller: 'rawCtrl',
-			controllerAs: 'raw',
-			name: 'raw'
 		})
 
 		.otherwise({

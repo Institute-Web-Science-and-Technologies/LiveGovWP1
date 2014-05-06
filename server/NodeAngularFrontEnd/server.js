@@ -9,7 +9,7 @@ app.use('/bower_components', express.static(path.join(__dirname, 'bower_componen
 app.use(express.static(path.join(__dirname, 'public')));
 
 // middleware
-app.use(require('body-parser')()); // previously bodyParser, json and urlencoded
+app.use(require('body-parser')());
 app.use(require('method-override')());
 app.use(require('compression')());
 
