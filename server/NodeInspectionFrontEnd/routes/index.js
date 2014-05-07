@@ -38,6 +38,6 @@ exports.index = function(req, res){
       });
     }], function (err, result) {
       if(err) { res.send(err); return; }
-      res.render('index', { title: 'LiveGovWP1', devices: result[0], serviceLines: result[1] });
+      res.render('index', { title: 'LiveGovWP1', trips: result[0], serviceLines: result[1] });
     });
 };

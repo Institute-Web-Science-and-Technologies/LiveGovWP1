@@ -29,7 +29,7 @@ function getWindowsForId (id, options, callback) {
                     FROM (\
                       SELECT x, y, z, ts\
                       , NTILE($1) OVER (ORDER BY ts) AS w\
-                      FROM accelerometer WHERE id=$2 {{LIMIT_TIME}}) A\
+                      FROM sensor_accelerometer WHERE trip_id=$2 {{LIMIT_TIME}}) A\
                     GROUP BY w\
                     ORDER BY w;";
     var limitTime = "";
@@ -61,14 +61,45 @@ function getWindowsForId (id, options, callback) {
           avgZ: e.avgz,
           minZ: e.minz,
           maxZ: e.maxz,
-          startTime: e.starttime.getTime(),
-          endTime: e.endtime.getTime(),
-          midTime: new Date((e.endtime.getTime() + e.starttime.getTime()) / 2).getTime()
+          startTime: parseInt(e.starttime),
+          endTime: parseInt(e.endtime),
+          midTime: (parseInt(e.starttime) + parseInt(e.endtime)) / 2
         };
       });
       callback(null, data);
     });
   }) ;
+}
+
+function getRawForId (id, options, callback) {
+  if(_.isFunction(options)) {
+    // Check if we want to use the default options
+    callback = options;
+  } else if(!_.isObject(options)) {
+    throw new TypeError("Bad arguments");
+  }
+  pg.connect(config.pgCon, function (err, client, done) {
+    if(err) { callback(err); done(); return; }
+    var query = 'SELECT * FROM sensor_accelerometer WHERE trip_id=$1'
+    var values = [id];
+    if(options.startTime && !options.endTime) {
+      limitTime = "AND ts>=$2";
+      values.push(options.startTime);
+    } else if(!options.startTime && options.endTime) {
+      limitTime = "AND ts<=$2";
+      values.push(options.endTime);
+    } else if(options.startTime && options.endTime) {
+      limitTime = "AND ts>=$2 AND ts<=$3";
+      values.push(options.startTime);
+      values.push(options.endTime);
+    }
+    query += limitTime;
+    client.query(query, values, function (err, result) {
+      done();
+      if(err) { callback(err); return; }
+      callback(null, result.rows);
+    });
+  });
 }
 
 function getCountForId (id, options, callback) {
@@ -81,7 +112,7 @@ function getCountForId (id, options, callback) {
 
   pg.connect(config.pgCon, function (err, client, done) {
     if(err) { callback(err); done(); return; }
-    var query = 'SELECT COUNT(*) FROM accelerometer WHERE id=$1;';
+    var query = 'SELECT COUNT(*) FROM sensor_accelerometer WHERE trip_id=$1;';
     client.query(query, [id], function (err, result) {
       done();
       if(err) { callback(err); return; }
@@ -90,11 +121,8 @@ function getCountForId (id, options, callback) {
   });
 }
 
-function getById (id, options, callback) {
-  
-}
-
 module.exports = {
   getWindowsForId: getWindowsForId,
-  getCountForId: getCountForId
+  getCountForId: getCountForId,
+  getRawForId: getRawForId
 };

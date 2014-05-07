@@ -1,5 +1,5 @@
 (function () {
-  window.apiUrl = window.apiUrl || "http://localhost:3000/api/1";
+  window.apiUrl = window.apiUrl || "/api/1";
 
 
   function showTagsForId (id) {
@@ -14,8 +14,21 @@
       data.forEach(function (e) {
         $tbody.append("<tr><td>"+e.ts+"</td><td>"+e.tag+"</td></tr>");
       });
+      window.setMarks(data);
     });
   }
 
   window.showTagsForId = showTagsForId;
+
+  $(document).ready(function () {
+    $("#tripTable").tablesorter();
+    $('#tripTable').filterTable();
+    $.fn.editable.defaults.mode = 'inline';
+    $('.tripName').editable({
+      type: 'text',
+      showbuttons: false,
+      clear: false,
+      emptytext: ''
+    });
+  });
 })();

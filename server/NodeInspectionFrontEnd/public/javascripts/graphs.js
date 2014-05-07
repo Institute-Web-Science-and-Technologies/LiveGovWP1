@@ -1,6 +1,9 @@
 // This file handels the graph display
 (function() {
-  window.apiUrl = window.apiUrl || "http://localhost:3000/api/1";
+  window.apiUrl = window.apiUrl || "/api/1";
+
+  var plotData = {};
+  var tagMarks = {};
 
   var fplot = function(e,data,options){
     var jqParent, jqHidden;
@@ -23,8 +26,15 @@
     return plot;
   };
 
-  function showDataInId (id, data) {
-    if(!data) { console.log("No data for", id); return; }
+  function showDataInId (id, data, marks) {
+    marks = marks || tagMarks;
+    if(!data || data.length === 0) { console.log("No data for", id); return; }
+    window.currentWindow = {
+      min: data[0].startTime,
+      max: data[data.length-1].endTime
+    };
+    var meta = "From: " + Math.floor(data[0].startTime) + " To: " + Math.floor(data[data.length-1].endTime);
+    $(".metaLabel").text(meta);
     var labelId = id.replace("Plot", "Label");
     $(labelId).text(data.length);
     var avgX = [];
@@ -41,6 +51,7 @@
 
     data.forEach(function (item) {
       var ts = new Date(item.midTime);
+      
       avgX.push([ts, item.avgX]);
       maxX.push([ts, item.maxX]);
       minX.push([ts, item.minX]);
@@ -56,14 +67,14 @@
     
     var plotData = [
       { label: "avgX", data: avgX },
-      { label: "maxX", data: maxX },
-      { label: "minX", data: minX },
+      //{ label: "maxX", data: maxX },
+      //{ label: "minX", data: minX },
       { label: "avgY", data: avgY },
-      { label: "maxY", data: maxY },
-      { label: "minY", data: minY },
-      { label: "avgZ", data: avgZ },
-      { label: "maxZ", data: maxZ },
-      { label: "minZ", data: minZ }
+      //{ label: "maxY", data: maxY },
+      //{ label: "minY", data: minY },
+      { label: "avgZ", data: avgZ }
+      //{ label: "maxZ", data: maxZ },
+      //{ label: "minZ", data: minZ }
     ];
     var plotOptions = {
       series: {
@@ -79,29 +90,63 @@
       },
       selection: {
         mode: "x"
-      }
+      },
     };
+    if (marks && marks !== {}) {
+      plotOptions.grid = {
+        markings: marks
+      }
+    }
     fplot($(id)[0], plotData, plotOptions);
   }
 
   function zoom(id, ranges) {
     $.ajax({
-      url: apiUrl + "/" + id + "/acc?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
+      url: apiUrl + "/" + id + "/acc?startTime=" + ranges.xaxis.from.toFixed(0) + "&endTime=" +ranges.xaxis.to.toFixed(0)
     }).done(function (data) {
       showDataInId("#accPlot", data);
+      plotData.acc = data;
     });
     $.ajax({
       url: apiUrl + "/" + id + "/lac?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
     }).done(function (data) {
       showDataInId("#lacPlot", data);
+      plotData.lac = data;
     });
     $.ajax({
       url: apiUrl + "/" + id + "/gra?startTime=" + ranges.xaxis.from.toFixed(1) + "&endTime=" +ranges.xaxis.to.toFixed(1)
     }).done(function (data) {
       showDataInId("#graPlot", data);
+      plotData.gra = data;
     });
-    var meta = "From: " + Math.floor(ranges.xaxis.from) + " To: " + Math.floor(ranges.xaxis.to);
-    $(".metaLabel").text(meta);
+  }
+
+  function setMarks (marks) {
+    var markings = [];
+    marks.forEach(function (m) {
+      var ts = parseInt(m.ts);
+      markings.push({xaxis: {from: ts, to: ts}, color: "#00bb00" });
+    });
+    tagMarks = markings;
+    if (plotData && plotData.acc) {
+      showDataInId("#accPlot", plotData.acc, markings);
+    }
+    if (plotData && plotData.lac) {
+      showDataInId("#lacPlot", plotData.lac, markings);
+    }
+    if (plotData && plotData.gra) {
+      showDataInId("#graPlot", plotData.gra, markings);
+    }
+  }
+
+  function limitToTime (start, end) {
+    var ranges = {
+      xaxis: {
+        from: start.getTime(),
+        to: end.getTime()
+      }
+    };
+    zoom(window.currentDevId, ranges);
   }
 
   function showAccelerometerForId(id) {
@@ -141,4 +186,6 @@
   window.showAccelerometerForId = showAccelerometerForId;
   window.showLinearAccelerationForId = showLinearAccelerationForId;
   window.showGravityForId = showGravityForId;
+  window.limitToTime = limitToTime;
+  window.setMarks = setMarks;
 })();

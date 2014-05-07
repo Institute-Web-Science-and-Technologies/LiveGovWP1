@@ -19,3 +19,9 @@ NodeAngularFrontEnd.sublime-*
 *.css
 *.css.map
 .sass-cache
+
+server/node_modules
+client/public/lib
+client/public/css/style.css
+npm-debug.log
+_trash
