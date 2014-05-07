@@ -10,15 +10,11 @@
 import requests # if not avaialbel do `sudo easy_install requests`
 import sys
 
-DEFAULT_HOST = "141.26.248.40"
-
-def get_servlet_url(host):
-    return "http://" + host +":8080/HAR/api"
-
+SERVICE_URL = "http://mobile-sensing.west.uni-koblenz.de/HAR/api"
 
 def main():
     filename = ""
-    endpoint = get_servlet_url(DEFAULT_HOST)
+    endpoint = SERVICE_URL
 
     if (len(sys.argv) == 2):
         filename = sys.argv[1]
