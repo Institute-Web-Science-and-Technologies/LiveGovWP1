@@ -7,7 +7,7 @@ import java.util.Map;
 import static eu.liveandgov.wp1.packaging.PackagingCommons.*;
 
 /**
- * <p>Packaging of the google play activity item</p>
+ * <p>Forwarding of the google play activity item</p>
  * Created by Lukas Härtel on 17.03.14.
  */
 public class GoogleActivityPackaging extends AbstractPackaging<GoogleActivity> {
@@ -27,7 +27,7 @@ public class GoogleActivityPackaging extends AbstractPackaging<GoogleActivity> {
     public static final String FIELD_CONFIDENCE = "confidence";
 
     @Override
-    protected void pack(Map<String, Object> result, GoogleActivity item) {
+    protected void packRest(Map<String, Object> result, GoogleActivity item) {
         result.put(FIELD_ACTIVITY, item.activity);
         result.put(FIELD_CONFIDENCE, item.confidence);
     }

@@ -8,7 +8,7 @@ import java.util.Map;
 import static eu.liveandgov.wp1.packaging.PackagingCommons.*;
 
 /**
- * <p>Packaging of a motion item</p>
+ * <p>Forwarding of a motion item</p>
  * Created by Lukas Härtel on 17.03.14.
  */
 public class MotionPackaging extends AbstractPackaging<Motion> {
@@ -28,7 +28,7 @@ public class MotionPackaging extends AbstractPackaging<Motion> {
     public static final String FIELD_Z = "z";
 
     @Override
-    protected void pack(Map<String, Object> result, Motion item) {
+    protected void packRest(Map<String, Object> result, Motion item) {
         result.put(FIELD_X, item.values[0]);
         result.put(FIELD_Y, item.values[1]);
         result.put(FIELD_Z, item.values[2]);

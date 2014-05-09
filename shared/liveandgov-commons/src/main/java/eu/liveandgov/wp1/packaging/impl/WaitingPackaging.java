@@ -5,7 +5,7 @@ import eu.liveandgov.wp1.data.impl.Waiting;
 import java.util.Map;
 
 /**
- * <p>Packaging of the waiting item</p>
+ * <p>Forwarding of the waiting item</p>
  * Created by Lukas Härtel on 17.03.14.
  */
 public class WaitingPackaging extends AbstractPackaging<Waiting> {
@@ -25,7 +25,7 @@ public class WaitingPackaging extends AbstractPackaging<Waiting> {
     public static final String FIELD_AT = "at";
 
     @Override
-    protected void pack(Map<String, Object> result, Waiting item) {
+    protected void packRest(Map<String, Object> result, Waiting item) {
         result.put(FIELD_KEY, item.key);
         result.put(FIELD_DURATION, item.duration);
         result.put(FIELD_AT, item.at);

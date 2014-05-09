@@ -11,11 +11,11 @@ import java.util.Map;
 public class UnsupportedPackaging<Data> implements Packaging<Data> {
     @Override
     public Map<String, ?> pack(Data item) {
-        throw new UnsupportedOperationException("Packaging not supported");
+        throw new UnsupportedOperationException("Forwarding not supported");
     }
 
     @Override
     public Data unPack(Map<String, ?> map) {
-        throw new UnsupportedOperationException("Packaging not supported");
+        throw new UnsupportedOperationException("Forwarding not supported");
     }
 }

@@ -10,7 +10,7 @@ public interface Packaging<Data> {
     /**
      * Packs the data into a map
      *
-     * @param data The data to pack
+     * @param data The data to packRest
      * @return Returns the packaged data
      */
     public Map<String, ?> pack(Data data);
@@ -18,7 +18,7 @@ public interface Packaging<Data> {
     /**
      * Un-packs the data from a map
      *
-     * @param map The map to un-pack from
+     * @param map The map to un-packRest from
      * @return Returns the data object
      */
     public Data unPack(Map<String, ?> map);
