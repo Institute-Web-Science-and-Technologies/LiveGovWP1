@@ -14,7 +14,6 @@ URLs:
 * [Legacy Inspection Front End](http://mobile-sensing.west.uni-koblenz.de:3000/)
 * [Legacy Sensor Collector](http://mobile-sensing.west.uni-koblenz.de/)
 
-
 ### Contributors:
 * [Heinrich Hartmann](https://github.com/HeinrichHartmann)
 * Christoph Schaefer
