@@ -12,4 +12,6 @@ public interface Forwarding<Data> {
      * @param target The target function
      */
     public void forward(Data data, Receiver target);
+
+    public Data unForward(Provider source);
 }

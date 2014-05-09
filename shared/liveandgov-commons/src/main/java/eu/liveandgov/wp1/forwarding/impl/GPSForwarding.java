@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.forwarding.impl;
 
 import eu.liveandgov.wp1.data.impl.GPS;
+import eu.liveandgov.wp1.forwarding.Provider;
 import eu.liveandgov.wp1.forwarding.Receiver;
 
 import java.util.Map;
@@ -13,7 +14,7 @@ public class GPSForwarding extends AbstractForwarding<GPS> {
     /**
      * The one instance of the forwarding
      */
-    public static final GPSForwarding GPS_PACKAGING = new GPSForwarding();
+    public static final GPSForwarding GPS_FORWARDING = new GPSForwarding();
 
     /**
      * Hidden constructor
@@ -32,5 +33,14 @@ public class GPSForwarding extends AbstractForwarding<GPS> {
 
         if (item.alt != null)
             target.receive(FIELD_ALTITUDE, item.alt);
+    }
+
+    @Override
+    protected GPS unForwardRest(String type, long timestamp, String device, Provider source) {
+        double lat = (Double) source.provide(FIELD_LATITUDE);
+        double lon = (Double) source.provide(FIELD_LONGITUDE);
+        Double alt = source.contains(FIELD_ALTITUDE) ? (Double) source.provide(FIELD_ALTITUDE) : null;
+
+        return new GPS(timestamp, device, lat, lon, alt);
     }
 }

@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.forwarding.impl;
 
 import eu.liveandgov.wp1.data.impl.Activity;
+import eu.liveandgov.wp1.forwarding.Provider;
 import eu.liveandgov.wp1.forwarding.Receiver;
 
 import java.util.Map;
@@ -13,7 +14,7 @@ public class ActivityForwarding extends AbstractForwarding<Activity> {
     /**
      * The one instance of the forwarding
      */
-    public static final ActivityForwarding ACTIVITY_PACKAGING = new ActivityForwarding();
+    public static final ActivityForwarding ACTIVITY_FORWARDING = new ActivityForwarding();
 
     /**
      * Hidden constructor
@@ -26,5 +27,12 @@ public class ActivityForwarding extends AbstractForwarding<Activity> {
     @Override
     protected void forwardRest(Activity activity, Receiver target) {
         target.receive(FIELD_ACTIVITY, activity.activity);
+    }
+
+    @Override
+    protected Activity unForwardRest(String type, long timestamp, String device, Provider source) {
+        String activity = (String) source.provide(FIELD_ACTIVITY);
+
+        return new Activity(timestamp, device, activity);
     }
 }

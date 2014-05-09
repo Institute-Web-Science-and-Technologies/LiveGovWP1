@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.forwarding.Forwarding;
 import eu.liveandgov.wp1.forwarding.ForwardingCommons;
+import eu.liveandgov.wp1.forwarding.Provider;
 import eu.liveandgov.wp1.forwarding.Receiver;
 
 import java.util.Map;
@@ -29,8 +30,29 @@ public abstract class AbstractForwarding<Data extends Item> implements Forwardin
 
     /**
      * Forwards all non-basic elements
-     * @param data
-     * @param target
+     *
+     * @param data   The source item
+     * @param target The receiver of the forwarding
      */
     protected abstract void forwardRest(Data data, Receiver target);
+
+    @Override
+    public Data unForward(Provider source) {
+        String type = (String) source.provide(ForwardingCommons.FIELD_TYPE);
+        long timestamp = (Long) source.provide(ForwardingCommons.FIELD_TIMESTAMP);
+        String device = (String) source.provide(ForwardingCommons.FIELD_DEVICE);
+
+        return unForwardRest(type, timestamp, device, source);
+    }
+
+    /**
+     * Unforwards all non-basic elements
+     *
+     * @param type      The type
+     * @param timestamp The timestamp
+     * @param device    The device
+     * @param source    The source provider
+     * @return Returns the un-forwarded item
+     */
+    protected abstract Data unForwardRest(String type, long timestamp, String device, Provider source);
 }

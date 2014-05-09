@@ -2,12 +2,10 @@ package eu.liveandgov.wp1.pipeline.impl;
 
 import com.sun.rowset.JdbcRowSetImpl;
 import eu.liveandgov.wp1.pipeline.Pipeline;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
-import javax.sql.RowSetMetaData;
 import javax.sql.rowset.JdbcRowSet;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -194,5 +192,54 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private void executeOne(String command) {
+
+        try {
+            Connection connection = DriverManager.getConnection(url, username, password);
+            PreparedStatement statement = connection.prepareStatement(command);
+
+            statement.execute();
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void createCatalog(String def, boolean force) {
+        StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+
+        if (force) {
+            stringBuilder.append("DROP TABLE IF EXISTS ");
+            stringBuilder.append(catalog);
+            stringBuilder.append(';');
+
+            stringBuilder.append("CREATE TABLE ");
+            stringBuilder.append(catalog);
+            stringBuilder.append('(');
+            stringBuilder.append(def);
+            stringBuilder.append(");");
+        } else {
+
+            stringBuilder.append("CREATE TABLE IF NOT EXISTS");
+            stringBuilder.append(catalog);
+            stringBuilder.append('(');
+            stringBuilder.append(def);
+            stringBuilder.append(");");
+        }
+
+        executeOne(stringBuilder.toString());
+    }
+
+    public void dropCatalog() {
+        StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+
+        stringBuilder.append("DROP TABLE IF EXISTS ");
+        stringBuilder.append(catalog);
+        stringBuilder.append(';');
+
+        executeOne(stringBuilder.toString());
     }
 }

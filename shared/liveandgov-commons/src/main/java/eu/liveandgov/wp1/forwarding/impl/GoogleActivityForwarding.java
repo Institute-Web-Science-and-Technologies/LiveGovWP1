@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.forwarding.impl;
 
 import eu.liveandgov.wp1.data.impl.GoogleActivity;
+import eu.liveandgov.wp1.forwarding.Provider;
 import eu.liveandgov.wp1.forwarding.Receiver;
 
 import java.util.Map;
@@ -15,7 +16,7 @@ public class GoogleActivityForwarding extends AbstractForwarding<GoogleActivity>
     /**
      * The one instance of the forwarding
      */
-    public static final GoogleActivityForwarding GOOGLE_ACTIVITY_PACKAGING = new GoogleActivityForwarding();
+    public static final GoogleActivityForwarding GOOGLE_ACTIVITY_FORWARDING = new GoogleActivityForwarding();
 
     /**
      * Hidden constructor
@@ -31,5 +32,13 @@ public class GoogleActivityForwarding extends AbstractForwarding<GoogleActivity>
     protected void forwardRest(GoogleActivity item, Receiver target) {
         target.receive(FIELD_ACTIVITY, item.activity);
         target.receive(FIELD_CONFIDENCE, item.confidence);
+    }
+
+    @Override
+    protected GoogleActivity unForwardRest(String type, long timestamp, String device, Provider source) {
+        String activity = (String) source.provide(FIELD_ACTIVITY);
+        int confidence = (Integer) source.provide(FIELD_CONFIDENCE);
+
+        return new GoogleActivity(timestamp, device, activity, confidence);
     }
 }

@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.forwarding.impl;
 
 import eu.liveandgov.wp1.data.impl.Proximity;
+import eu.liveandgov.wp1.forwarding.Provider;
 import eu.liveandgov.wp1.forwarding.Receiver;
 
 import java.util.Map;
@@ -13,7 +14,7 @@ public class ProximityForwarding extends AbstractForwarding<Proximity> {
     /**
      * The one instance of the forwarding
      */
-    public static final ProximityForwarding PROXIMITY_PACKAGING = new ProximityForwarding();
+    public static final ProximityForwarding PROXIMITY_FORWARDING = new ProximityForwarding();
 
     /**
      * Hidden constructor
@@ -30,5 +31,14 @@ public class ProximityForwarding extends AbstractForwarding<Proximity> {
         target.receive(FIELD_KEY, item.key);
         target.receive(FIELD_IN, item.in);
         target.receive(FIELD_OF, item.of);
+    }
+
+    @Override
+    protected Proximity unForwardRest(String type, long timestamp, String device, Provider source) {
+        String key = (String) source.provide(FIELD_KEY);
+        boolean in = (Boolean) source.provide(FIELD_IN);
+        String of = (String) source.provide(FIELD_OF);
+
+        return new Proximity(timestamp, device, key, in, of);
     }
 }

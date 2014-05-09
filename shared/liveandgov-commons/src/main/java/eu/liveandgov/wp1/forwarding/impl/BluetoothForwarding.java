@@ -10,7 +10,7 @@ public class BluetoothForwarding extends UnsupportedForwarding<Bluetooth> {
     /**
      * The one instance of the forwarding
      */
-    public static final BluetoothForwarding BLUETOOTH_PACKAGING = new BluetoothForwarding();
+    public static final BluetoothForwarding BLUETOOTH_FORWARDING = new BluetoothForwarding();
 
     /**
      * Hidden constructor

@@ -10,7 +10,7 @@ public class GSMForwarding extends UnsupportedForwarding<GSM> {
     /**
      * The one instance of the forwarding
      */
-    public static final GSMForwarding GSM_PACKAGING = new GSMForwarding();
+    public static final GSMForwarding GSM_FORWARDING = new GSMForwarding();
 
     /**
      * Hidden constructor

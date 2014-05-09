@@ -10,7 +10,7 @@ public class WiFiForwarding extends UnsupportedForwarding<WiFi> {
     /**
      * The one instance of the forwarding
      */
-    public static final WiFiForwarding WI_FI_PACKAGING = new WiFiForwarding();
+    public static final WiFiForwarding WI_FI_FORWARDING = new WiFiForwarding();
 
     /**
      * Hidden constructor
