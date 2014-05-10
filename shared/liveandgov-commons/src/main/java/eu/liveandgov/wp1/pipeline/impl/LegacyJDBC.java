@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Deprecated
 /**
  * <p>Database producer</p>
  * Created by Lukas Härtel on 24.02.14.

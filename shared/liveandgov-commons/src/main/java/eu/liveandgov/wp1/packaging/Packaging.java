@@ -2,6 +2,7 @@ package eu.liveandgov.wp1.packaging;
 
 import java.util.Map;
 
+@Deprecated
 /**
  * <p>Base  class for packaging and un-packaging to and from maps</p>
  * Created by Lukas Härtel on 17.03.14.

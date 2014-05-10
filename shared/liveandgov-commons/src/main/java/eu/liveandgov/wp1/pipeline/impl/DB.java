@@ -1,98 +1,192 @@
 package eu.liveandgov.wp1.pipeline.impl;
 
-import com.sun.rowset.JdbcRowSetImpl;
+import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.Pipeline;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
-import javax.sql.rowset.JdbcRowSet;
 import java.sql.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * <p>Database-pivot for storing and loading items of the specified type</p>
  * Created by Lukas Härtel on 09.05.2014.
+ *
+ * @param <I> The type of the ingoing values
+ * @param <O> The type of the outgoing values
  */
 public abstract class DB<I, O> extends Pipeline<I, O> {
     /**
-     * Scheduler for the automatic closer
+     * Reasonable default for the connection timeout
      */
-    private final ScheduledExecutorService scheduledExecutorService;
+    public static final long DEFAULT_CONNECTION_DELAY = 10;
+    /**
+     * Reasonable default for the connection timeout
+     */
+    public static final TimeUnit DEFAULT_CONNECTION_UNIT = TimeUnit.SECONDS;
 
     /**
-     * Automatic closing delay
+     * Reasonable default for the insertion timeout
      */
-    private final long delay;
+    public static final long DEFAULT_INSERT_DELAY = 25;
 
     /**
-     * Unit of the automatic closing delay
+     * Reasonable default for the insertion timeout
      */
-    private final TimeUnit unit;
+    public static final TimeUnit DEFAULT_INSERT_UNIT = TimeUnit.MILLISECONDS;
 
     /**
-     * URL of the source
+     * Reasonable default for the selection timeout
      */
-    private final String url;
+    public static final long DEFAULT_SELECT_DELAY = 200;
 
     /**
-     * Username in the source domain
+     * Reasonable default for the selection timeout
      */
-    private final String username;
+    public static final TimeUnit DEFAULT_SELECT_UNIT = TimeUnit.MILLISECONDS;
 
     /**
-     * Password in the source domain
+     * The scheduler handling the delaying operations
      */
-    private final String password;
+    public final ScheduledExecutorService scheduledExecutorService;
 
     /**
-     * Identity of the catalog
+     * The time the connection is kept open if no operation occurs
      */
-    private final String catalog;
+    public final long closeConnectionDelay;
 
     /**
-     * Active row set or null if none active
+     * The unit of {@link #closeConnectionDelay}
      */
-    private JdbcRowSet activeSet;
+    public final TimeUnit closeConnectionUnit;
 
     /**
-     * Meta-data of the active row set
+     * The time inserts are withheld if no operations occur
      */
-    private ResultSetMetaData activeMetaData;
+    public final long insertDelay;
 
     /**
-     * The future that represents the automatic closing routine
+     * The unit of {@link #insertDelay}
      */
-    private Future<?> activeAutomaticDisconnect;
+    public final TimeUnit insertUnit;
 
     /**
-     * Constructs the database-pivot
+     * The time selects for read are kept open if no requests occur
+     */
+    public final long closeSelectDelay;
+
+    /**
+     * The unit of {@link #closeSelectDelay}
+     */
+    public final TimeUnit closeSelectUnit;
+
+    /**
+     * The URL of the database
+     */
+    public final String url;
+
+    /**
+     * The username to use at the database
+     */
+    public final String username;
+
+    /**
+     * The password to use for the database
+     */
+    public final String password;
+
+    /**
+     * The table to access at the database
+     */
+    public final String table;
+
+    /**
+     * The active connection or null if inactive
+     */
+    private Connection connection;
+
+    /**
+     * The statement of the input insertion
+     */
+    private PreparedStatement insertStatement;
+
+    /**
+     * The statement of the output selection
+     */
+    private PreparedStatement selectStatement;
+
+    /**
+     * The closing future of the connection
+     */
+    private Future<?> pendingCloseConnection;
+
+    /**
+     * The insertion future of the connection
+     */
+    private Future<?> pendingInsert;
+
+    /**
+     * The closing future of the selection
+     */
+    private Future<?> pendingCloseSelect;
+
+    /**
+     * Constructs a new database-pivot
      *
-     * @param scheduledExecutorService Scheduler for the automatic closer
-     * @param delay                    Automatic closing delay
-     * @param unit                     Unit of the automatic closing delay
-     * @param url                      URL of the source
-     * @param username                 Username in the source domain
-     * @param password                 Password in the source domain
-     * @param catalog                  Identity of the catalog
+     * @param scheduledExecutorService The scheduler handling the delaying operations
+     * @param closeConnectionDelay     The time the connection is kept open if no operation occurs
+     * @param closeConnectionUnit      The unit of {@link #closeConnectionDelay}
+     * @param insertDelay              The time inserts are withheld if no operations occur
+     * @param insertUnit               The unit of {@link #insertDelay}
+     * @param closeSelectDelay         The time selects for read are kept open if no requests occur
+     * @param closeSelectUnit          The unit of {@link #closeSelectDelay}
+     * @param url                      The URL of the database
+     * @param username                 The username to use at the database
+     * @param password                 The password to use for the database
+     * @param table                    The table to access at the database
      */
-    public DB(ScheduledExecutorService scheduledExecutorService, long delay, TimeUnit unit, String url, String username, String password, String catalog) {
+    public DB(ScheduledExecutorService scheduledExecutorService, long closeConnectionDelay, TimeUnit closeConnectionUnit, long insertDelay, TimeUnit insertUnit, long closeSelectDelay, TimeUnit closeSelectUnit, String url, String username, String password, String table) {
+
         this.scheduledExecutorService = scheduledExecutorService;
-        this.delay = delay;
-        this.unit = unit;
+        this.closeConnectionDelay = closeConnectionDelay;
+        this.closeConnectionUnit = closeConnectionUnit;
+        this.insertDelay = insertDelay;
+        this.insertUnit = insertUnit;
+        this.closeSelectDelay = closeSelectDelay;
+        this.closeSelectUnit = closeSelectUnit;
         this.url = url;
         this.username = username;
         this.password = password;
-        this.catalog = catalog;
+        this.table = table;
 
-        activeSet = null;
-        activeAutomaticDisconnect = null;
+        connection = null;
+        selectStatement = null;
+        insertStatement = null;
+        pendingCloseConnection = null;
+        pendingInsert = null;
+        pendingCloseSelect = null;
     }
 
     /**
-     * Adds a JDBC driver by its classes name
+     * Constructs a new database-pivot with reasonable defaults
      *
-     * @param className The class name
-     * @return Returns true if successfully added
+     * @param scheduledExecutorService The scheduler handling the delaying operations
+     * @param url                      The URL of the database
+     * @param username                 The username to use at the database
+     * @param password                 The password to use for the database
+     * @param table                    The table to access at the database
+     */
+    public DB(ScheduledExecutorService scheduledExecutorService, String url, String username, String password, String table) {
+        this(scheduledExecutorService, DEFAULT_CONNECTION_DELAY, DEFAULT_CONNECTION_UNIT, DEFAULT_INSERT_DELAY, DEFAULT_INSERT_UNIT, DEFAULT_SELECT_DELAY, DEFAULT_SELECT_UNIT, url, username, password, table);
+    }
+
+
+    /**
+     * Adds the driver by its class name
+     *
+     * @param className The class-name of the driver
+     * @return Returns true if driver was found and thereby registered
      */
     public boolean addDriver(String className) {
         try {
@@ -104,142 +198,265 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
     }
 
     /**
-     * Keeps an existing connection alive and creates a new automatically terminated connection if not
-     */
-    private void touch() {
-        if (activeSet != null) {
-            if (activeAutomaticDisconnect != null)
-                activeAutomaticDisconnect.cancel(true);
-
-            activeAutomaticDisconnect = scheduledExecutorService.schedule(disconnection, delay, unit);
-        } else {
-            activeSet = new JdbcRowSetImpl();
-
-            try {
-                activeSet.setUrl(url);
-                activeSet.setUsername(username);
-                activeSet.setPassword(password);
-                activeSet.setCommand("SELECT * FROM " + catalog);
-
-                activeMetaData = activeSet.getMetaData();
-
-                activeAutomaticDisconnect = scheduledExecutorService.schedule(disconnection, delay, unit);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    /**
-     * Runnable that manages disconnection of the pending connection
-     */
-    private final Runnable disconnection = new Runnable() {
-        @Override
-        public void run() {
-            activeAutomaticDisconnect = null;
-            try {
-                activeSet.close();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            activeSet = null;
-            activeMetaData = null;
-        }
-    };
-
-    @Override
-    public void push(I i) {
-        touch();
-
-        try {
-            activeSet.moveToInsertRow();
-
-            write(i, activeMetaData, activeSet);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Should write the instance of i into the result sets current position with the update* methods
+     * This method is used to bridge the ingoing elements to the outgoing elements
      *
-     * @param i   The item to write
-     * @param set The target set
-     * @throws SQLException May throw an SQL exception
+     * @param i The ingoing element
+     * @return Returns the corresponding outgoing element
      */
-    protected abstract void write(I i, ResultSetMetaData metaData, ResultSet set) throws SQLException;
+    protected abstract O transform(I i);
 
     /**
-     * Should read one instance from the result sets current position with the get* methods
-     *
-     * @param metaData The meta data of the catalog
-     * @param set      The set to read from
-     * @return
-     * @throws SQLException
+     * Selects all items of the table and produces them if a consumer is attached
      */
-    protected abstract O read(ResultSetMetaData metaData, ResultSet set) throws SQLException;
-
-    public void download() {
-        touch();
+    public void load() {
+        // If consumer is the empty consumer, don't do it
+        if (getConsumer() == Consumer.EMPTY_CONSUMER)
+            return;
 
         try {
-            activeSet.beforeFirst();
+            // Acquire the selector
+            acquireSelectResult();
 
-            while (activeSet.next()) {
-                produce(read(activeMetaData, activeSet));
+            // Execute the selector
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            // Produce all items
+            while (resultSet.next()) {
+                produce(read(resultSet));
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void executeOne(String command) {
-
-        try {
-            Connection connection = DriverManager.getConnection(url, username, password);
-            PreparedStatement statement = connection.prepareStatement(command);
-
-            statement.execute();
-            statement.close();
-            connection.close();
+            // Close the result
+            resultSet.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        // Delay the corresponding lifetime objects
+        delayCloseSelect();
+        delayCloseConnection();
     }
 
-    public void createCatalog(String def, boolean force) {
-        StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
 
-        if (force) {
-            stringBuilder.append("DROP TABLE IF EXISTS ");
-            stringBuilder.append(catalog);
-            stringBuilder.append(';');
+    @Override
+    public void push(I i) {
+        try {
+            // Acquire the insert statement
+            acquireInsertStatement();
 
-            stringBuilder.append("CREATE TABLE ");
-            stringBuilder.append(catalog);
-            stringBuilder.append('(');
-            stringBuilder.append(def);
-            stringBuilder.append(");");
-        } else {
+            // Fill up the insert statement
+            write(i, insertStatement);
 
-            stringBuilder.append("CREATE TABLE IF NOT EXISTS");
-            stringBuilder.append(catalog);
-            stringBuilder.append('(');
-            stringBuilder.append(def);
-            stringBuilder.append(");");
+            // Add the item to the batch
+            insertStatement.addBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
-        executeOne(stringBuilder.toString());
+        // If  consumer is not the empty consumer, push the transformed inptu
+        if (getConsumer() != Consumer.EMPTY_CONSUMER)
+            produce(transform(i));
+
+        // Delay the corresponding lifetime objects
+        delayPerformInsert();
+        delayCloseConnection();
     }
 
-    public void dropCatalog() {
-        StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+    /**
+     * Reads the current row from the passed result set
+     *
+     * @param resultSet The result set to read from
+     * @return Returns the output object
+     * @throws SQLException Thrown from used SQL methods
+     */
+    protected abstract O read(ResultSet resultSet) throws SQLException;
 
-        stringBuilder.append("DROP TABLE IF EXISTS ");
-        stringBuilder.append(catalog);
-        stringBuilder.append(';');
+    /**
+     * Writes to the prepared statements parameter indices
+     *
+     * @param i               The element to write
+     * @param insertStatement The statement to write to
+     * @throws SQLException Thrown from used SQL methods
+     */
+    protected abstract void write(I i, PreparedStatement insertStatement) throws SQLException;
 
-        executeOne(stringBuilder.toString());
+    /**
+     * Acquires a connection if none present
+     *
+     * @throws SQLException Thrown from used SQL methods
+     */
+    private void acquireConnection() throws SQLException {
+        // If no connection open, consult the driver manager for one
+        if (connection == null)
+            connection = DriverManager.getConnection(url, username, password);
     }
+
+    /**
+     * Delays the closing of an open connection
+     */
+    private void delayCloseConnection() {
+        // If no connection open this method is of no use
+        if (connection == null)
+            return;
+
+        // If a pending operation is there, cancel it
+        if (pendingCloseConnection != null)
+            pendingCloseConnection.cancel(true);
+
+        // Schedule the closing
+        pendingCloseConnection = scheduledExecutorService.schedule(closeConnection, closeConnectionDelay, closeConnectionUnit);
+    }
+
+    /**
+     * Acquires a connection and the insert statement if none present
+     *
+     * @throws SQLException Thrown from used SQL methods
+     */
+    protected void acquireInsertStatement() throws SQLException {
+        // Make sure we have connectivity
+        acquireConnection();
+
+        // If statement exists stop execution
+        if (insertStatement == null) {
+            // Prepare a meta-statement to get the count of columns we have to fill
+            PreparedStatement info = connection.prepareStatement("SELECT * FROM " + table + " LIMIT 0;");
+            int cc = info.getMetaData().getColumnCount();
+            info.close();
+
+            // Build the real statement
+            StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+            stringBuilder.append("INSERT INTO ");
+            stringBuilder.append(table);
+            stringBuilder.append(" VALUES(");
+
+            if (cc > 0) {
+                stringBuilder.append("?");
+                for (int i = 1; i < cc; i++)
+                    stringBuilder.append(",?");
+            }
+
+            stringBuilder.append(");");
+
+            // Prepare with connection
+            insertStatement = connection.prepareStatement(stringBuilder.toString());
+        }
+    }
+
+    /**
+     * Delays the execution and closing of an open insert
+     */
+    private void delayPerformInsert() {
+        // If no insert pending this method is of no use
+        if (insertStatement == null)
+            return;
+
+        // If a pending operation is there, cancel it
+        if (pendingInsert != null)
+            pendingInsert.cancel(true);
+
+        // Schedule the execution and closing
+        pendingInsert = scheduledExecutorService.schedule(performInsert, insertDelay, insertUnit);
+    }
+
+
+    /**
+     * Acquires a connection and the select statement if none present
+     *
+     * @throws SQLException Thrown from used SQL methods
+     */
+    private void acquireSelectResult() throws SQLException {
+        // Make sure we have connectivity
+        acquireConnection();
+
+        // If statement exists stop execution, else prepare the statement
+        if (selectStatement == null)
+            selectStatement = connection.prepareStatement("SELECT * FROM " + table + ";");
+    }
+
+    /**
+     * Delays the execution and closing of an open select
+     */
+    private void delayCloseSelect() {
+        // If no select pending this method is of no use
+        if (selectStatement == null)
+            return;
+
+        // If a pending operation is there, cancel it
+        if (pendingCloseSelect != null)
+            pendingCloseSelect.cancel(true);
+
+        // Schedule and closing
+        pendingCloseSelect = scheduledExecutorService.schedule(closeSelect, closeSelectDelay, closeSelectUnit);
+    }
+
+    /**
+     * Ignores the timed aggregation and inserts all pending items right now, stopping all pending inserts
+     */
+    public void insertNow() {
+        if (pendingInsert != null) {
+            pendingInsert.cancel(true);
+            pendingInsert = null;
+        }
+
+        try {
+            insertStatement.executeBatch();
+            insertStatement.close();
+            insertStatement = null;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    /**
+     * Handler for the connection closer
+     */
+    private final Runnable closeConnection = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                pendingCloseConnection = null;
+
+                connection.close();
+                connection = null;
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    };
+
+    /**
+     * Handler for the insertion executor and closer
+     */
+    private final Runnable performInsert = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                pendingInsert = null;
+
+                insertStatement.executeBatch();
+                insertStatement.close();
+                insertStatement = null;
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    };
+
+    /**
+     * Handler for the selection closer
+     */
+    private final Runnable closeSelect = new Runnable() {
+        @Override
+        public void run() {
+
+            try {
+                pendingCloseSelect = null;
+
+                selectStatement.close();
+                selectStatement = null;
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    };
 }
