@@ -1,5 +1,6 @@
 package eu.liveandgov.wp1.pipeline.impl;
 
+import eu.liveandgov.wp1.data.CallbackSet;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.Pipeline;
 import eu.liveandgov.wp1.util.LocalBuilder;
@@ -13,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * <p>Database-pivot for storing and loading items of the specified type</p>
  * <p>Auto-incremented columns are usually neglected but can be forced write-required by specifying {@link #manual}</p>
+ * <p>Auto-generated keys are available by registring a listener to newly generated keys at {@link #keysGenerated}</p>
  * Created by Lukas Härtel on 09.05.2014.
  *
  * @param <I> The type of the ingoing values
@@ -155,6 +157,12 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
     public final Set<String> manual;
 
     /**
+     * <p>The callback set that allows applications to listen to keys that have been created upon insertion</p>
+     * <p>The conversion for output used by the table mapper is used to convert newly generated rows</p>
+     */
+    public final CallbackSet<O> keysGenerated;
+
+    /**
      * Automatic insert-execution count
      */
     public long autoInsertCount;
@@ -230,6 +238,8 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
 
         manual = new TreeSet<String>();
 
+        keysGenerated = new CallbackSet<O>();
+
         insertPendingCount = 0;
         autoInsertCount = DEFAULT_AUTO_INSERT_COUNT;
 
@@ -271,14 +281,6 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
     }
 
     /**
-     * This method is used to bridge the ingoing elements to the outgoing elements
-     *
-     * @param i The ingoing element
-     * @return Returns the corresponding outgoing element
-     */
-    protected abstract O transform(I i);
-
-    /**
      * Selects all items of the table and produces them if a consumer is attached
      */
     public void load() {
@@ -293,23 +295,8 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
             // Execute the selector
             final ResultSet resultSet = selectStatement.executeQuery();
 
-            // Make set of available columns
-            final Set<String> columns = new TreeSet<String>();
-            for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++)
-                columns.add(resultSet.getMetaData().getColumnName(i));
-
-            // Make reader for each column
-            RowReader rowReader = new RowReader() {
-                @Override
-                public Set<String> available() {
-                    return Collections.unmodifiableSet(columns);
-                }
-
-                @Override
-                public Object read(String column) throws SQLException {
-                    return resultSet.getObject(column);
-                }
-            };
+            // Make the row reader
+            RowReader rowReader = toRowReader(resultSet);
 
             // Produce all items
             while (resultSet.next()) {
@@ -325,6 +312,33 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
         // Delay the corresponding lifetime objects
         delayCloseSelect();
         delayCloseConnection();
+    }
+
+    /**
+     * Converts a result set to a row reader
+     *
+     * @param resultSet The result set to convert
+     * @return Returns a new anonymous row reader
+     * @throws SQLException Exception that may be thrown on meta extraction
+     */
+    private RowReader toRowReader(final ResultSet resultSet) throws SQLException {
+        // Make set of available columns
+        final Set<String> columns = new TreeSet<String>();
+        for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++)
+            columns.add(resultSet.getMetaData().getColumnName(i));
+
+        // Make reader for each column
+        return new RowReader() {
+            @Override
+            public Set<String> available() {
+                return Collections.unmodifiableSet(columns);
+            }
+
+            @Override
+            public Object read(String column) throws SQLException {
+                return resultSet.getObject(column);
+            }
+        };
     }
 
 
@@ -357,10 +371,6 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-        // If  consumer is not the empty consumer, push the transformed input
-        if (getConsumer() != Consumer.EMPTY_CONSUMER)
-            produce(transform(i));
 
         // Delay the corresponding lifetime objects
         delayPerformInsert();
@@ -482,7 +492,7 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
             stringBuilder.append(");");
 
             // Prepare with connection
-            insertStatement = connection.prepareStatement(stringBuilder.toString());
+            insertStatement = connection.prepareStatement(stringBuilder.toString(), Statement.RETURN_GENERATED_KEYS);
         }
     }
 
@@ -542,16 +552,7 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
             pendingInsert = null;
         }
 
-        try {
-            insertStatement.executeBatch();
-            insertStatement.close();
-            insertStatement = null;
-
-            insertPendingCount = 0;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
+        executeInsertBatch();
     }
 
     /**
@@ -577,19 +578,46 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
     private final Runnable performInsert = new Runnable() {
         @Override
         public void run() {
-            try {
-                pendingInsert = null;
+            pendingInsert = null;
 
-                insertStatement.executeBatch();
-                insertStatement.close();
-                insertStatement = null;
-
-                insertPendingCount = 0;
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            executeInsertBatch();
         }
     };
+
+    /**
+     * Performs the actions on insertion
+     */
+    private void executeInsertBatch() {
+        try {
+            // Do execute the batch
+            insertStatement.executeBatch();
+
+            // Check if generated keys are required
+            if (!keysGenerated.getCallbacks().isEmpty()) {
+                // If required, get the keys
+                ResultSet generatedKeys = insertStatement.getGeneratedKeys();
+                ResultSetMetaData metaData = generatedKeys.getMetaData();
+
+                // Make the row reader
+                RowReader rowReader = toRowReader(generatedKeys);
+
+                // Iterate them
+                while (generatedKeys.next()) {
+                    // Invoke the callback
+                    keysGenerated.call(read(rowReader));
+                }
+            }
+
+            // Close the statement and reset
+            insertStatement.close();
+            insertStatement = null;
+
+            insertPendingCount = 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Handler for the selection closer

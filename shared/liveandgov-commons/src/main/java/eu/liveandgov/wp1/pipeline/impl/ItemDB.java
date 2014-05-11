@@ -26,11 +26,6 @@ public class ItemDB extends DB<Item, Item> {
     }
 
     @Override
-    protected Item transform(Item item) {
-        return item;
-    }
-
-    @Override
     protected Item read(final RowReader rowReader) throws SQLException {
         return ItemForwarding.ITEM_FORWARDING.unForward(new Provider() {
             @Override

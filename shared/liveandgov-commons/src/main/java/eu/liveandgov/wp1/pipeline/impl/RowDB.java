@@ -21,11 +21,6 @@ public class RowDB extends DB<Map<String, Object>, Map<String, Object>> {
     }
 
     @Override
-    protected Map<String, Object> transform(Map<String, Object> in) {
-        return in;
-    }
-
-    @Override
     protected Map<String, Object> read(RowReader rowReader) throws SQLException {
 
         Map<String, Object> result = new TreeMap<String, Object>();
