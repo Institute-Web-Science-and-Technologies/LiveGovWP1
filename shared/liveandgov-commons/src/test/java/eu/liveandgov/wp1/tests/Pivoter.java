@@ -56,12 +56,13 @@ public class Pivoter {
         });
 
         Map<String, Object> oneTrip = new TreeMap<String, Object>();
-        oneTrip.put("start_ts", 6);
-        oneTrip.put("stop_ts", 7);
+        oneTrip.put("trip_id", 1234);
+        oneTrip.put("start_ts", 2000);
+        oneTrip.put("stop_ts", 4001);
         oneTrip.put("user_id", "Kekeke");
         oneTrip.put("name", "Schli schla");
-        trip.push(oneTrip);
-        trip.insertNow();
+
+        trip.update(oneTrip);
 
         scheduledExecutorService.shutdown();
         scheduledExecutorService.awaitTermination(3L, TimeUnit.SECONDS);

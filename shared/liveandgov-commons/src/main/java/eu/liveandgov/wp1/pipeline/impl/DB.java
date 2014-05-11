@@ -178,6 +178,11 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
     private int insertPendingCount;
 
     /**
+     * The columns not needed for insertion, usually the key columns
+     */
+    private Set<String> insertOmittedColumns;
+
+    /**
      * The columns needed for the insertion so excluding auto-incrementing and non read-only
      */
     private Map<String, Integer> insertColumns;
@@ -315,6 +320,99 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
     }
 
     /**
+     * Updates the given item by inferred key
+     *
+     * @param i The item to update
+     * @return Returns true if changed
+     */
+    public boolean update(I i) {
+        try {
+            // Acquire insert statement, this will update column names and indices
+            acquireInsertStatement();
+
+            return update(i, new ArrayList<String>(insertOmittedColumns));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Updates the given item by the passed keys
+     *
+     * @param i    The item to update
+     * @param keys The key components of the item
+     * @return Returns true if changed
+     */
+    public boolean update(final I i, final List<String> keys) {
+        try {
+            // Acquire insert statement, this will update column names and indices
+            acquireInsertStatement();
+
+            StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+            stringBuilder.append("UPDATE ");
+            stringBuilder.append(table);
+            stringBuilder.append(" SET ");
+
+            boolean separate = false;
+            for (String c : insertColumns.keySet()) {
+                if (separate)
+                    stringBuilder.append(", ");
+
+                stringBuilder.append(c);
+                stringBuilder.append(" = ?");
+
+                separate = true;
+            }
+
+            stringBuilder.append(" WHERE ");
+
+            separate = false;
+            for (String c : keys) {
+                if (separate)
+                    stringBuilder.append(" AND ");
+
+                stringBuilder.append(c);
+                stringBuilder.append(" = ?");
+
+                separate = true;
+            }
+
+            final PreparedStatement updateStatement = connection.prepareStatement(stringBuilder.toString());
+
+            RowWriter dataWriter = new RowWriter() {
+                @Override
+                public Set<String> required() {
+                    return Collections.unmodifiableSet(insertColumns.keySet());
+                }
+
+                @Override
+                public void write(String column, Object value) throws SQLException {
+                    updateStatement.setObject(insertColumns.get(column), value);
+                }
+            };
+
+            RowWriter keyWriter = new RowWriter() {
+                @Override
+                public Set<String> required() {
+                    return Collections.unmodifiableSet(new TreeSet<String>(keys));
+                }
+
+                @Override
+                public void write(String column, Object value) throws SQLException {
+                    updateStatement.setObject(insertColumns.size() + 1 + keys.indexOf(column), value);
+                }
+            };
+
+            write(i, dataWriter);
+            write(i, keyWriter);
+
+            return updateStatement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Converts a result set to a row reader
      *
      * @param resultSet The result set to convert
@@ -442,6 +540,7 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
             ResultSetMetaData metaData = info.getMetaData();
 
             // Make a dynamic store for the required column names
+            insertOmittedColumns = new TreeSet<String>();
             insertColumns = new TreeMap<String, Integer>();
 
             // Build the real statement
@@ -454,8 +553,10 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
             boolean separate = false;
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
                 // Skip non-requirements
-                if ((metaData.isAutoIncrement(i) && !manual.contains(metaData.getColumnName(i))) || metaData.isReadOnly(i))
+                if ((metaData.isAutoIncrement(i) && !manual.contains(metaData.getColumnName(i))) || metaData.isReadOnly(i)) {
+                    insertOmittedColumns.add(metaData.getColumnName(i));
                     continue;
+                }
 
                 // If separation needed, do it
                 if (separate)
