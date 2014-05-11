@@ -2,9 +2,12 @@
 /* globals app, d3 */
 'use strict'; // jshint -W097
 
-app.controller('recCtrl',
-  function($scope, $location, $route, $q, Config, Trip) {
+/*
+  See 'Controllers' section in README.md for documentation.
+ */
 
+app.controller('tripCtrl',
+  function($scope, $location, $route, $q, Config, Trip) {
 
   Trip.loadTrips().then(function(data) {
     $scope.trips = data;
