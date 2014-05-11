@@ -5,18 +5,61 @@ import eu.liveandgov.wp1.pipeline.Pipeline;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.sql.*;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
  * <p>Database-pivot for storing and loading items of the specified type</p>
+ * <p>Auto-incremented columns are usually neglected but can be forced write-required by specifying {@link #manual}</p>
  * Created by Lukas Härtel on 09.05.2014.
  *
  * @param <I> The type of the ingoing values
  * @param <O> The type of the outgoing values
  */
 public abstract class DB<I, O> extends Pipeline<I, O> {
+    /**
+     * Interface for writing a row
+     */
+    public static interface RowWriter {
+        /**
+         * The required columns
+         *
+         * @return Returns an unmodifiable set of column names
+         */
+        public Set<String> required();
+
+        /**
+         * Writes the column with the given value
+         *
+         * @param column The column to write, needs to exist
+         * @param value  The value to write
+         * @throws SQLException An SQL exception that may be thrown on writing
+         */
+        public void write(String column, Object value) throws SQLException;
+    }
+
+    /**
+     * Interface for reading a row
+     */
+    public static interface RowReader {
+        /**
+         * The available columns
+         *
+         * @return Returns an unmodifiable set of column names
+         */
+        public Set<String> available();
+
+        /**
+         * Reads the columns value
+         *
+         * @param column The column to read, needs to exist
+         * @throws SQLException An SQL exception that may be thrown on reading
+         */
+        public Object read(String column) throws SQLException;
+    }
+
     /**
      * Reasonable default for the connection timeout
      */
@@ -45,6 +88,11 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
      * Reasonable default for the selection timeout
      */
     public static final TimeUnit DEFAULT_SELECT_UNIT = TimeUnit.MILLISECONDS;
+
+    /**
+     * Reasonable default for the auto-insert count
+     */
+    public static final long DEFAULT_AUTO_INSERT_COUNT = 8192;
 
     /**
      * The scheduler handling the delaying operations
@@ -102,9 +150,29 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
     public final String table;
 
     /**
+     * The auto-generated columns that will be manually inserted
+     */
+    public final Set<String> manual;
+
+    /**
+     * Automatic insert-execution count
+     */
+    public long autoInsertCount;
+
+    /**
      * The active connection or null if inactive
      */
     private Connection connection;
+
+    /**
+     * Amount of pending inserts for batch
+     */
+    private int insertPendingCount;
+
+    /**
+     * The columns needed for the insertion so excluding auto-incrementing and non read-only
+     */
+    private Map<String, Integer> insertColumns;
 
     /**
      * The statement of the input insertion
@@ -159,6 +227,11 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
         this.username = username;
         this.password = password;
         this.table = table;
+
+        manual = new TreeSet<String>();
+
+        insertPendingCount = 0;
+        autoInsertCount = DEFAULT_AUTO_INSERT_COUNT;
 
         connection = null;
         selectStatement = null;
@@ -218,11 +291,29 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
             acquireSelectResult();
 
             // Execute the selector
-            ResultSet resultSet = selectStatement.executeQuery();
+            final ResultSet resultSet = selectStatement.executeQuery();
+
+            // Make set of available columns
+            final Set<String> columns = new TreeSet<String>();
+            for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++)
+                columns.add(resultSet.getMetaData().getColumnName(i));
+
+            // Make reader for each column
+            RowReader rowReader = new RowReader() {
+                @Override
+                public Set<String> available() {
+                    return Collections.unmodifiableSet(columns);
+                }
+
+                @Override
+                public Object read(String column) throws SQLException {
+                    return resultSet.getObject(column);
+                }
+            };
 
             // Produce all items
             while (resultSet.next()) {
-                produce(read(resultSet));
+                produce(read(rowReader));
             }
 
             // Close the result
@@ -243,41 +334,60 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
             // Acquire the insert statement
             acquireInsertStatement();
 
+            // Make row writer
+            RowWriter rowWriter = new RowWriter() {
+                @Override
+                public Set<String> required() {
+                    return Collections.unmodifiableSet(insertColumns.keySet());
+                }
+
+                @Override
+                public void write(String column, Object value) throws SQLException {
+                    insertStatement.setObject(insertColumns.get(column), value);
+                }
+            };
+
             // Fill up the insert statement
-            write(i, insertStatement);
+            write(i, rowWriter);
 
             // Add the item to the batch
             insertStatement.addBatch();
+            insertPendingCount++;
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
-        // If  consumer is not the empty consumer, push the transformed inptu
+        // If  consumer is not the empty consumer, push the transformed input
         if (getConsumer() != Consumer.EMPTY_CONSUMER)
             produce(transform(i));
 
         // Delay the corresponding lifetime objects
         delayPerformInsert();
         delayCloseConnection();
+
+        if (insertPendingCount >= autoInsertCount)
+            insertNow();
+
     }
 
     /**
      * Reads the current row from the passed result set
      *
-     * @param resultSet The result set to read from
+     * @param rowReader The reader to read from
      * @return Returns the output object
      * @throws SQLException Thrown from used SQL methods
      */
-    protected abstract O read(ResultSet resultSet) throws SQLException;
+    protected abstract O read(RowReader rowReader) throws SQLException;
 
     /**
      * Writes to the prepared statements parameter indices
      *
-     * @param i               The element to write
-     * @param insertStatement The statement to write to
+     * @param i         The element to write
+     * @param rowWriter The writer to write to
      * @throws SQLException Thrown from used SQL methods
      */
-    protected abstract void write(I i, PreparedStatement insertStatement) throws SQLException;
+    protected abstract void write(I i, RowWriter rowWriter) throws SQLException;
 
     /**
      * Acquires a connection if none present
@@ -319,19 +429,54 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
         if (insertStatement == null) {
             // Prepare a meta-statement to get the count of columns we have to fill
             PreparedStatement info = connection.prepareStatement("SELECT * FROM " + table + " LIMIT 0;");
-            int cc = info.getMetaData().getColumnCount();
-            info.close();
+            ResultSetMetaData metaData = info.getMetaData();
+
+            // Make a dynamic store for the required column names
+            insertColumns = new TreeMap<String, Integer>();
 
             // Build the real statement
             StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
             stringBuilder.append("INSERT INTO ");
             stringBuilder.append(table);
-            stringBuilder.append(" VALUES(");
+            stringBuilder.append("(");
 
-            if (cc > 0) {
+            // Go over each column
+            boolean separate = false;
+            for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                // Skip non-requirements
+                if ((metaData.isAutoIncrement(i) && !manual.contains(metaData.getColumnName(i))) || metaData.isReadOnly(i))
+                    continue;
+
+                // If separation needed, do it
+                if (separate)
+                    stringBuilder.append(", ");
+
+                // Add name of the required column to the required column names and the statement
+                insertColumns.put(metaData.getColumnName(i), insertColumns.size() + 1);
+                stringBuilder.append(metaData.getColumnName(i));
+
+                // Set separation required
+                separate = true;
+            }
+
+            // Close the meta-statement
+            info.close();
+
+            // Split
+            stringBuilder.append(") VALUES (");
+
+            // Go over the amount of columns
+            separate = false;
+            for (int i = 1; i <= insertColumns.size(); i++) {
+                // If separation needed, do it
+                if (separate)
+                    stringBuilder.append(", ");
+
+                // Add a corresponding parameter
                 stringBuilder.append("?");
-                for (int i = 1; i < cc; i++)
-                    stringBuilder.append(",?");
+
+                // Set separation required
+                separate = true;
             }
 
             stringBuilder.append(");");
@@ -401,6 +546,8 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
             insertStatement.executeBatch();
             insertStatement.close();
             insertStatement = null;
+
+            insertPendingCount = 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -436,6 +583,8 @@ public abstract class DB<I, O> extends Pipeline<I, O> {
                 insertStatement.executeBatch();
                 insertStatement.close();
                 insertStatement = null;
+
+                insertPendingCount = 0;
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

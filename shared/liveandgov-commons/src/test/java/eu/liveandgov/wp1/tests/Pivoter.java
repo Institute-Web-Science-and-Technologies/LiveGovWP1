@@ -7,6 +7,8 @@ import eu.liveandgov.wp1.pipeline.impl.ItemDB;
 import eu.liveandgov.wp1.pipeline.impl.RowDB;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -33,24 +35,26 @@ public class Pivoter {
 
         itemDB.load();
 
-        RowDB trip = new RowDB(scheduledExecutorService, "jdbc:postgresql:data", "user", "default", "trip");
-        RowDB sensor_tags = new RowDB(scheduledExecutorService, "jdbc:postgresql:data", "user", "default", "sensor_tags");
 
-        trip.setConsumer(new Consumer<Object[]>() {
+        RowDB trip = new RowDB(scheduledExecutorService, "jdbc:postgresql:data", "user", "default", "trip");
+        //  trip.manual.add("trip_id");
+        //  trip.autoInsertCount = 1;
+
+        trip.setConsumer(new Consumer<Map<String, Object>>() {
             @Override
-            public void push(Object[] os) {
-                System.out.println(Arrays.toString(os));
+            public void push(Map<String, Object> stringObjectMap) {
+                System.out.println(stringObjectMap.toString());
             }
         });
-        sensor_tags.setConsumer(new Consumer<Object[]>() {
-            @Override
-            public void push(Object[] os) {
-                System.out.println(Arrays.toString(os));
-            }
-        });
+
+        Map<String, Object> oneTrip = new TreeMap<String, Object>();
+        oneTrip.put("start_ts", 6);
+        oneTrip.put("stop_ts", 7);
+        oneTrip.put("user_id", "Kekeke");
+        oneTrip.put("name", "Schli schla");
+        trip.push(oneTrip);
 
         trip.load();
-        sensor_tags.load();
 
         scheduledExecutorService.shutdown();
         scheduledExecutorService.awaitTermination(3L, TimeUnit.SECONDS);

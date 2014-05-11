@@ -31,88 +31,127 @@ public class ItemDB extends DB<Item, Item> {
     }
 
     @Override
-    protected Item read(final ResultSet resultSet) throws SQLException {
+    protected Item read(final RowReader rowReader) throws SQLException {
         return ItemForwarding.ITEM_FORWARDING.unForward(new Provider() {
-
-            private String lastComponent;
-
-            private Object lastValue;
-
-            private Object get(String component) {
-                try {
-                    if (Objects.equals(lastComponent, component))
-                        return lastValue;
-
-                    lastComponent = component;
-                    lastValue = null;
-
-                    ResultSetMetaData metaData = resultSet.getMetaData();
-
-                    for (int i = 1; i <= metaData.getColumnCount(); i++)
-                        if (Objects.equals(component, metaData.getColumnName(i))) {
-                            lastValue = resultSet.getObject(i);
-                            break;
-                        }
-                    return lastValue;
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-
             @Override
             public boolean contains(String component) {
-
-                return get(component) != null;
+                return rowReader.available().contains(component);
             }
 
             @Override
             public Object provide(String component) {
-                return get(component);
+                try {
+                    return rowReader.read(component);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
 
     @Override
-    protected void write(Item item, final PreparedStatement insertStatement) throws SQLException {
+    protected void write(Item item, final RowWriter rowWriter) throws SQLException {
         ItemForwarding.ITEM_FORWARDING.forward(item, new Receiver() {
-            private String lastComponent;
-
-            private int lastIndex;
-
-            private void put(String component, Object x) {
+            @Override
+            public void receive(String component, Object item) {
                 try {
-                    if (Objects.equals(lastComponent, component)) {
-                        if (lastIndex != 0)
-                            insertStatement.setObject(lastIndex, x);
-
-                        return;
-                    }
-
-                    lastComponent = component;
-                    lastIndex = 0;
-
-                    ResultSetMetaData metaData = insertStatement.getMetaData();
-
-                    for (int i = 1; i <= metaData.getColumnCount(); i++)
-                        if (Objects.equals(component, metaData.getColumnName(i))) {
-                            lastIndex = i;
-                            break;
-                        }
-
-                    if (lastIndex != 0)
-                        insertStatement.setObject(lastIndex, x);
-
+                    if (rowWriter.required().contains(component))
+                        rowWriter.write(component, item);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
             }
-
-
-            @Override
-            public void receive(String component, Object item) {
-                put(component, item);
-            }
         });
     }
+
+//    @Override
+//    protected Item transform(Item item) {
+//        return item;
+//    }
+//
+//    @Override
+//    protected Item read(final ResultSet resultSet) throws SQLException {
+//        return ItemForwarding.ITEM_FORWARDING.unForward(new Provider() {
+//
+//            private String lastComponent;
+//
+//            private Object lastValue;
+//
+//            private Object get(String component) {
+//                try {
+//                    if (Objects.equals(lastComponent, component))
+//                        return lastValue;
+//
+//                    lastComponent = component;
+//                    lastValue = null;
+//
+//                    ResultSetMetaData metaData = resultSet.getMetaData();
+//
+//                    for (int i = 1; i <= metaData.getColumnCount(); i++)
+//                        if (Objects.equals(component, metaData.getColumnName(i))) {
+//                            lastValue = resultSet.getObject(i);
+//                            break;
+//                        }
+//                    return lastValue;
+//                } catch (SQLException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//
+//
+//            @Override
+//            public boolean contains(String component) {
+//
+//                return get(component) != null;
+//            }
+//
+//            @Override
+//            public Object provide(String component) {
+//                return get(component);
+//            }
+//        });
+//    }
+//
+//    @Override
+//    protected void write(Item item, final PreparedStatement insertStatement) throws SQLException {
+//        ItemForwarding.ITEM_FORWARDING.forward(item, new Receiver() {
+//            private String lastComponent;
+//
+//            private int lastIndex;
+//
+//            private void put(String component, Object x) {
+//                try {
+//                    if (Objects.equals(lastComponent, component)) {
+//                        if (lastIndex != 0)
+//                            insertStatement.setObject(lastIndex, x);
+//
+//                        return;
+//                    }
+//
+//                    lastComponent = component;
+//                    lastIndex = 0;
+//
+//                    ResultSetMetaData metaData = insertStatement.getMetaData();
+//
+//                    for (int i = 1; i <= metaData.getColumnCount(); i++)
+//                        if (Objects.equals(component, metaData.getColumnName(i))) {
+//                            lastIndex = i;
+//                            break;
+//                        }
+//
+//                    if (lastIndex != 0)
+//                        insertStatement.setObject(lastIndex, x);
+//
+//                } catch (SQLException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//
+//
+//            @Override
+//            public void receive(String component, Object item) {
+//                put(component, item);
+//            }
+//        });
+//    }
 }
