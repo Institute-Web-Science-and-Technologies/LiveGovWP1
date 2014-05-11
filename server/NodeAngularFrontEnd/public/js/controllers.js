@@ -40,6 +40,11 @@ app.controller('tripCtrl',
     return Trip.hasData();
   };
 
+  // reset loaded trip data
+  this.reset = function(trip) {
+    return Trip.reset(trip);
+  };
+
   // load (more) data for a trip
   // obj is optional: { extent: Array[2], windowSize: number }
   this.loadData = function(trip, obj) {

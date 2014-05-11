@@ -144,6 +144,12 @@ app.service('Trip',
         .reduce(function (a, b) { return a + b; });
     },
 
+    reset: function (trip) {
+      Config.sensors().map(function (sensor) { trip.data.sensors[sensor] = []; });
+      trip.extent = [];
+      this.loadData(trip);
+    },
+
     // update a trip's name FIXME abstract for all fields
     update: function (trip, data) {
       trip.name = data.name; // client side update
