@@ -75,6 +75,12 @@ app.controller('tripCtrl',
     Trip.loadData($scope.trip, {extent: extent, windowSize: 200});
   };
 
+  // export data. format can be 'csv' or 'json'
+  this.download = function(trip, sensor, format) {
+    Trip.download(trip, sensor, format);
+  };
+
+});
 
 // FIXME DRY
 app.controller('navCtrl', function ($route, Trip) {

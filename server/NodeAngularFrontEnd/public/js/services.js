@@ -164,6 +164,13 @@ app.service('Trip',
         console.info("trip deleted:", trip.id);
       })
       .error(function(data, status, headers, config) {});
+    },
+
+    download: function (trip, sensor, format) {
+      $http({ method: 'GET', url: 'trips/' + trip.id + '/' + sensor + '.' + format })
+      .success(function(data, status, headers, config) {
+
+      });
     }
   };
 }]);
