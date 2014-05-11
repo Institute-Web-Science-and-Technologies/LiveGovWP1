@@ -108,33 +108,8 @@ d3.custom.lineChart = function module() {
       // if (extent.length) gBrush.call(brush.extent(extent));
 
       function brushended() {
-        // console.log('CHART EXTENT 1:', brush.extent().map(function (d) { return +d; }), extent);
         dispatch.brushended(brush.empty() ? [] : brush.extent().map(function(d) { return +d; }));
-
-        // this first clears the brush, and then tells it to redraw
-        // https://groups.google.com/d/msg/d3-js/SN4-kJD6_2Q/SmQNwLm-5bwJ
-        // chart.select(".brush").call(brush.clear());
-        d3.selectAll('chart').select('.brush').call(brush.clear()); // FIXME works, but the above would be better
-
-        svg.transition().duration(2000).select(".x.axis").call(xAxis);
-
-        svg
-          .transition()
-          .duration(2000)
-          .selectAll(".line0")
-          .attr("d", line(data.map(function(d) {return [d.ts, d.avgx]; })));
-
-        svg
-          .transition()
-          .duration(2000)
-          .selectAll(".line1")
-          .attr("d", line(data.map(function(d) {return [d.ts, d.avgy]; })));
-
-        svg
-          .transition()
-          .duration(2000)
-          .selectAll(".line2")
-          .attr("d", line(data.map(function(d) {return [d.ts, d.avgz]; })));
+        d3.selectAll('chart').select('.brush').call(brush.clear());
       }
     });
   }
