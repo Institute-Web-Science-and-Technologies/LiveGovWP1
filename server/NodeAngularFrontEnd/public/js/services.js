@@ -115,7 +115,11 @@ app.service('Trip',
       //   debugger
       // }
 
-      Data.geo(trip); // TODO do only when neccessary
+      Data.geo(trip).then(function(data) {
+
+      }); // TODO do only when neccessary
+
+      // debugger
 
       // load sensor data. calls Data.sensor() for every sensor given in
       // Config.sensors(). when all sensor data has arrived, update the trips
@@ -156,7 +160,7 @@ app.service('Trip',
 
       $http({ method: 'POST', url: 'trips/' + trip.id, data: data })
       .success(function(data, status, headers, config) {
-        console.info("trip updated:", trip.trip_id);
+        console.info("trip updated:", trip.id);
       })
       .error(function(data, status, headers, config) {});
     },
@@ -240,20 +244,7 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
         });
       }
 
-      function createFeature(coordinates, activity) {
-        return {
-          'type': 'Feature',
-          'geometry': {
-            'type': 'LineString',
-            'coordinates': coordinates // [g0, g1]
-          },
-          'properties': {
-            'activity': activity
-          }
-        };
-      }
-
-      // FIXME MOVE TO HELPERS
+      // FIXME -> HELPERS
       // get array element which occures the most
       function getMaxOccurrence(array) {
         if (!array.length) return null;
@@ -273,7 +264,7 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
         return maxEl;
       }
 
-      // FIXME MOVE TO HELPERS
+      // FIXME -> HELPERS
       function topActivity(har, t0, t1) {
         return getMaxOccurrence(har.map(function (d) {
           if (d.ts >= t0 && d.ts <= t1) { // get tags between t0 and t1
@@ -282,16 +273,28 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
         );
       }
 
-      var gps = $http.get('trips/' + trip.id + '/gps');
-      var har = $http.get('trips/' + trip.id + '/har');
+      function createFeature(coordinates, activity) {
+        return {
+          'type': 'Feature',
+          'geometry': {
+            'type': 'LineString',
+            'coordinates': coordinates // [g0, g1]
+          },
+          'properties': {
+            'activity': activity
+          }
+        };
+      }
 
       var deferred = $q.defer();
-      var t = new Date();
 
       var fc = {
         "type": "FeatureCollection",
         "features": []
       };
+
+      var gps = $http.get('trips/' + trip.id + '/gps');
+      var har = $http.get('trips/' + trip.id + '/har');
 
       $q.all([gps, har]).then(function(data) {
         var gps = data[0].data;
@@ -302,6 +305,7 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
 
         var n = 0;
 
+        // FIXME -> HELPERS
         for (var i = gpsLength - 1; i >= 0; --i) {
           if (gps[i - 1]) {
             var coordinates = [gps[i-1].lonlat.coordinates, gps[i].lonlat.coordinates];
@@ -319,6 +323,8 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
             var previousFeature = fc.features[fc.features.length - 1];
           }
         }
+
+        trip.data.geo = fc;
 
         deferred.resolve(fc);
       });

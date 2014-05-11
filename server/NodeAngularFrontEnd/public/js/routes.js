@@ -9,17 +9,23 @@ app.config(function ($routeProvider, $locationProvider) {
 	// $locationProvider.hashPrefix('!');
 
 	$routeProvider
-		.when('/rec', { // relative to hash (e.g. localhost:3001/#/rec)
+		.when('/rec', { // relative to hash sign (e.g. localhost:3001/#/rec)
 			templateUrl: './partials/rec', // relative to host (e.g. localhost:3001/partials/rec)
-			controller: 'recCtrl',
+			controller: 'tripCtrl',
+			controllerAs: 'ctrl'
 		})
 
 		.when('/raw', {
 			templateUrl: './partials/raw',
-			controller: 'rawCtrl',
+			controller: 'tripCtrl'
 		})
 
-		.otherwise({
-			redirectTo: '/rec'
-	});
+		.when('/har', {
+			templateUrl: './partials/har',
+			controller: 'tripCtrl'
+		});
+
+		// .otherwise({
+		// 	redirectTo: '/rec'
+		// });
 });

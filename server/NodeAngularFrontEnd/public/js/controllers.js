@@ -13,12 +13,17 @@ app.controller('tripCtrl',
     $scope.trips = data;
   });
 
-  // update a trip's name FIXME abstract for all fields
+  $scope.trip = Trip.selected();
+
+  // update a trip
+  // TODO debounce
   this.update = function(trip, data) {
-    Trip.save(trip, data);
+    // console.log(data);
+    Trip.update(trip, data);
   };
 
   // delete a trip
+  // TODO modal
   this.delete = function(trip) {
     if (confirm("Permanently delete trip " + trip.trip_id + "?")) {
       Trip.delete(trip);
@@ -51,11 +56,6 @@ app.controller('tripCtrl',
     Trip.loadData(trip, obj);
   };
 
-  // test if a trip has extent set (zoomed in)
-  // this.extent = function(trip, extent) {
-  //   return Trip.extent(trip);
-  // };
-
   /* ... */
 
   // change location path
@@ -87,7 +87,6 @@ app.controller('tripCtrl',
 
 });
 
-// FIXME DRY
 app.controller('navCtrl', function ($route, Trip) {
   this.is = function(loc) {
     return ($route.current && $route.current.name == loc) ? true : false;
