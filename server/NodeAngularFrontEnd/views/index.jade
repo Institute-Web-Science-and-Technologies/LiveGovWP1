@@ -10,18 +10,17 @@ html(lang="en", ng-app="inspectionFrontEnd")
     meta(name="google" content="notranslate")
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
 
-    //- FIXME bootstrap should be considered harmful. s/bootstrap/bourbon-neat
-    //- FIXME find a proper substitution for geojson-utils.js
+    //- TODO bootstrap should be considered harmful. s/bootstrap/bourbon-neat
+    //- TODO find a proper substitution for geojson-utils.js
     //- TODO concat and minify everything as good as possible for production env
 
-    //- NOTE to ensure css files are downloaded in parallel, always include
-    //- external css before external javascript
+    //- to ensure css files are downloaded in parallel, include external css
+    //- before external javascript
 
-    //- NOTE be careful to specify paths relative to the current directory
-
-    link(href="./bower_components/leaflet-dist/leaflet.css", rel="stylesheet")
-    link(href="./bower_components/bootstrap/dist/css/bootstrap.min.css", rel="stylesheet")
-    link(href="./bower_components/angular-xeditable/dist/css/xeditable.css", rel="stylesheet")
+    //- link(href='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.css', rel='stylesheet')
+    link(rel="stylesheet", href='./bower_components/mapbox.js/theme/style.css')
+    link(rel="stylesheet", href="./bower_components/bootstrap/dist/css/bootstrap.min.css")
+    link(rel="stylesheet", href="./bower_components/angular-xeditable/dist/css/xeditable.css")
 
     link(href="./css/001.css", rel="stylesheet")
 
@@ -50,8 +49,9 @@ html(lang="en", ng-app="inspectionFrontEnd")
   script(src="./bower_components/angular-xeditable/dist/js/xeditable.js")
   script(src="./bower_components/d3/d3.js")
   script(src="./bower_components/jquery/dist/jquery.js")
-  script(src="./bower_components/leaflet-dist/leaflet.js")
   script(src="./bower_components/moment/min/moment.min.js")
+  script(src='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js')
+  //- script(src='./bower_components/mapbox.js/mapbox.js')
 
   //- custom helpers
   script(src="./js/helpers.js")
@@ -63,10 +63,10 @@ html(lang="en", ng-app="inspectionFrontEnd")
 
   //- angular
   script(src="./js/modules.js")
+  script(src="./js/services.js")
   script(src="./js/controllers.js")
   script(src="./js/directives.js")
   script(src="./js/filters.js")
-  script(src="./js/services.js")
   script(src="./js/routes.js")
 
 //- ex:ft=jade
