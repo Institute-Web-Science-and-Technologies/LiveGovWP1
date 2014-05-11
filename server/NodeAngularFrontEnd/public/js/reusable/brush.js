@@ -9,7 +9,7 @@ d3.custom.chartBrush = function module() {
   // default values. may be overwritten by exported functions.
 
   var margin = {top: 8, right: 8, bottom: 8, left: 8 }, // FIXME
-    width = d3.select(this)[0].parentNode.offsetWidth - ((margin.left + margin.right) * 3) - 1,
+    width = d3.select('brush')[0][0].offsetWidth - margin.left - margin.right,
     height = 64,
     xScale = d3.time.scale().range([0, width]),
     yScale = d3.scale.linear().range([height, 0]),
@@ -24,6 +24,8 @@ d3.custom.chartBrush = function module() {
     selection.each(function(d, i) {
       if (!d) return;
 
+      console.log(width);
+
       var domain = d.domain; // d.domain = { 'x': Array[2], 'y': Array[2] }
 
       xScale.domain(domain.x);
@@ -35,7 +37,10 @@ d3.custom.chartBrush = function module() {
           .append('svg')
             .classed('brush', true)
             .attr("width", width)
-            .attr("height", height);
+            .attr("height", height)
+          .append("rect")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom);
       }
 
       // select svg element
@@ -57,15 +62,15 @@ d3.custom.chartBrush = function module() {
         .attr("class", "brush")
         .call(brush)
         .selectAll("rect")
+        .attr("transform", "translate(" - margin.left + ",0)")
         .attr("height", height - 1); // ?
 
       function brushed() {
-        // console.log('BRUSH EXTENT 1:', brush.extent().map(function (d) { return +d; }), extent);
         dispatch.brushed(brush.empty() ? [] : brush.extent().map(function(d) { return +d; }));
       }
 
       function brushended() {
-        if (!d3.event.sourceEvent) return; // only transition after input
+        // if (!d3.event.sourceEvent) return; // only transition after input
         dispatch.brushended(brush.extent().map(function(d) { return +d; }));
       }
     });
@@ -74,7 +79,6 @@ d3.custom.chartBrush = function module() {
   // expose extent setter/getter
   exports.extent = function(_) {
     if (!arguments.length) return extent;
-    // console.log('BRUSH EXTENT 5:', _, extent);
     extent = _;
     return this; // calls chartBrush
   };

@@ -6,10 +6,10 @@ if (!d3.custom) d3.custom = {};
 
 d3.custom.lineChart = function module() {
 
-  // default values. may be overwritten by exported functions.
+  // default values may be overwritten by exported functions
 
-  var margin = {top: 8, right: 8, bottom: 40, left: 40 }, // FIXME
-    width = d3.select(this)[0].parentNode.offsetWidth - ((margin.left + margin.right) * 3) - 1,
+  var margin = {top: 24, right: 24, bottom: 24, left: 24 }, // FIXME
+    width = d3.select('chart')[0][0].offsetWidth - margin.left - margin.right,
     height = 120,
     xScale = d3.time.scale().range([0, width]),
     yScale = d3.scale.linear().range([height, 0]),
@@ -27,11 +27,12 @@ d3.custom.lineChart = function module() {
 
       var data = d.data;
 
+      console.log('chartwidth', width);
+
       var chartName = this.classList[0];
 
       if (extent) xScale.domain(extent);
 
-      // FIXME expose
       var line = d3.svg.line().interpolate("linear")
         .x(function(d) {
           return xScale(d[0]); // timestamp
@@ -51,12 +52,13 @@ d3.custom.lineChart = function module() {
           .append("clipPath")
             .attr("id", "clip")
           .append("rect")
-            .attr("width", width)
-            .attr("height", height);
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom);
+
       }
 
-      // remove old children of svg element
-      d3.select(this).select('svg').selectAll("*").remove();
+      // remove old charts from svg element
+      d3.select(this).select('svg').selectAll("g.chart").remove();
 
       // select svg element
       var svg = d3.select(this).select('svg').data(data);
@@ -105,8 +107,6 @@ d3.custom.lineChart = function module() {
         .selectAll("rect")
         .attr("height", height);
 
-      // if (extent.length) gBrush.call(brush.extent(extent));
-
       function brushended() {
         dispatch.brushended(brush.empty() ? [] : brush.extent().map(function(d) { return +d; }));
         d3.selectAll('chart').select('.brush').call(brush.clear());
@@ -128,11 +128,9 @@ d3.custom.lineChart = function module() {
     return this;
   };
 
-
-  exports.extent = function(_) {
-    if (!arguments.length) return extent;
-    // console.log('CHART EXTENT 5:', _, extent);
-    extent = _;
+  exports.width = function(_) {
+    if (!arguments.length) return width;
+    width = parseInt(_);
     return this;
   };
 
