@@ -5,30 +5,6 @@
 app.controller('recCtrl',
   function($scope, $location, $route, $q, Config, Trip) {
 
-    /*
-      1. gather input
-      2. perform work
-      3. deliver results
-      4. handle failure
-    */
-
-    /*
-      - only controllers modify scope
-      - only controllers communicate with services (though directives could)
-      - rootScope is not used
-      - passed trip variable is always trip object
-      - tell, don't ask (avoid watching)
-      - code does not repeat (dry)
-      - all business logic happens in services
-      - directives <-> controller <-> trip service <-> data factory
-      - all parameters are optional
-      - all functions return some useful value
-     */
-
-  // as the controller is initialized every time it's accessed by pointing the
-  // brower to '/rec', it's $scope will be empty at first at this point. so
-  // unconditionally call the trip service and receive our trip object, which
-  // is either already prepared or freshly created.
 
   Trip.loadTrips().then(function(data) {
     $scope.trips = data;
