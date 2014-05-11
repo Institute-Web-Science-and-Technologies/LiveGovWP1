@@ -1,18 +1,22 @@
 /* jshint strict:true, devel:true, debug:true */
-/* globals app, d3 */
+/* globals angular, app, d3, L */
 'use strict'; // jshint -W097
 
-app.directive('brush', [
+app.directive('brush', ['$window',
   function($window) {
     return {
       restrict: 'E',
-      scope: {data: '=', domain: '=', extent: '=', updateExtent: '&', loadMoreData: '&'},
+      scope: {trip: '=', updateExtent: '&', loadMoreData: '&'},
       link: function($scope, $element, $attributes) {
         var brush = d3.custom.chartBrush();
-        var brushElement = d3.select($element[0]); // brushes 'this'
+        var brushElement = d3.select($element[0]); // brush's 'this' in selection.each
+
+        angular.element($window).bind('resize', function() {
+          brushElement
+            .call(brush);
+        });
 
         brush.on('brushed', function(d, i) {
-          // $log('BRUSH EXTENT 2:', d, $scope.extent);
           $scope.updateExtent({args: d});
         });
 
@@ -20,15 +24,13 @@ app.directive('brush', [
           $scope.loadMoreData({args: d});
         });
 
-        $scope.$watchCollection('domain', function(domain, oldDomain) {
-          if (domain && domain.x.length && domain.y.length) {
-            brushElement.datum({domain: domain}).call(brush);
-          }
-        });
-
-        $scope.$watchCollection('extent', function(extent, oldExtent) {
-          if (extent && extent.length) {
-            brushElement.call(brush.extent($scope.extent));
+        $scope.$watchCollection('[trip.domain.x, trip.domain.y, trip.extent]', function(val, oldVal) {
+          if ($scope.trip.domain.x.length && $scope.trip.domain.y.length) {
+            brushElement
+            .datum({domain: $scope.trip.domain})
+            .call(brush
+              .extent($scope.trip.extent.length ? $scope.trip.extent : '')
+              );
           }
         });
 
@@ -38,42 +40,63 @@ app.directive('brush', [
 ]);
 
 app.directive('chart', [
-  function($window) {
+  function() {
     return {
       restrict: 'E',
-      scope: {data: '=', domain: '=', extent: '=', updateExtent: '&', loadMoreData: '&'},
+      scope: {trip: '=', updateExtent: '&', loadMoreData: '&'},
       link: function($scope, $element, $attributes) {
 
         var chart = d3.custom.lineChart();
-        var chartElement = d3.select($element[0]); // chart's this
+        var chartElement = d3.select($element[0]); // chart's 'this' in selection.each
+
+        var sensor = $attributes.class; // gra, acc or lac
+
+        // $scope.$watch(function () {
+        //     return angular.element(window)[0].innerWidth;
+        // }, function () {
+        //     // return scope.render(scope.data);
+        //     console.log(angular.element(window)[0].innerWidth);
+        // });
+        // console.log($window);
+
+        function getWidth() {
+          return $element[0].parentNode.offsetWidth;
+          // return $($element[0]).width();
+          // return $($element[0]).width();
+        }
+
+        // console.log(getWidth(), "getWidth");
+
+        // $scope.$watch("$element[0].offsetWidth", function(oldVal, newVal) {
+        //   console.log(oldVal, newVal);
+        // });
+
+
+        // window.onresize = function() {
+          // console.log("bla", getWidth());
+          // console.log("bla", $($element[0]).width());
+          // console.log("bla", $($element[0]).width());
+          // chartElement.call(chart.width($(iElement[0]).width()));
+        // };
 
         chart.on('brushended', function(d, i) {
           $scope.updateExtent({args: d});
           $scope.loadMoreData({args: d});
         });
 
-        // draw the chart as soon as data is ready
-        $scope.$watchCollection('data', function(data, oldData) {
-          if (data && data.length && $scope.domain.x.length && $scope.domain.y.length) {
+        // draw the chart as soon as data is ready or if any of it's values change
+        $scope.$watchCollection('[trip.data.sensors[sensor], trip.domain.x, trip.domain.y, trip.extent]', function(val, oldVal) {
+          if ($scope.trip.data.sensors[sensor].length && $scope.trip.domain.x.length && $scope.trip.domain.y.length) {
             chartElement
-            .datum({data: data})
+            .datum({data: $scope.trip.data.sensors[sensor]})
             .call(chart
-              .xScale($scope.extent.length ? $scope.extent : $scope.domain.x)
-              .yScale($scope.domain.y)
+              .xScale($scope.trip.extent.length ? $scope.trip.extent : $scope.trip.domain.x)
+              .yScale($scope.trip.domain.y)
+              // .width(getWidth())
             );
           }
         });
 
-        // FIXME get rid of this watch and communicate via event listener
-        // watch for extent changes and change the chart's domains accordingly
-        $scope.$watchCollection('extent', function(extent, oldExtent) {
-          if (extent && extent.length && $scope.data.length && $scope.domain.x.length && $scope.domain.y.length) {
-          chartElement
-            .call(chart
-              .extent($scope.extent.length ? $scope.extent : $scope.domain.x)
-            );
-          }
-        });
       }
     };
   }
