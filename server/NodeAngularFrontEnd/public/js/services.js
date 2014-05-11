@@ -100,7 +100,7 @@ app.service('Trip',
       // load trip data if neccessary
       if (!this.hasData(trip)) this.loadData(trip);
 
-      return;
+      return trip;
     },
 
     // load (more) data for a trip
