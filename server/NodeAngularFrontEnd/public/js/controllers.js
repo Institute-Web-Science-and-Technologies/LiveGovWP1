@@ -63,18 +63,6 @@ app.controller('tripCtrl',
     return ($route.current && $route.current.name == loc);
   };
 
-});
-
-app.controller('rawCtrl',
-  function($scope, $location, Trip) {
-
-  if (!Trip.selected()) {
-    $location.path('/rec');
-    return;
-  }
-
-  $scope.trip = Trip.selected();
-
   // update scope (called by directive)
   $scope.updateExtent = function(extent) {
     $scope.$apply(function() {
@@ -86,7 +74,6 @@ app.controller('rawCtrl',
   $scope.loadMoreData = function(extent) {
     Trip.loadData($scope.trip, {extent: extent, windowSize: 200});
   };
-});
 
 
 // FIXME DRY
