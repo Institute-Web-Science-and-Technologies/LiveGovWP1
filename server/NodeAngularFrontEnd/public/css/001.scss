@@ -1,218 +1,202 @@
 @mixin unselectable {
-  // make table cells unclickable to allow double clicking without selecting anything
+  // makes table cells unclickable to allow double clicking without selecting anything
   -webkit-user-select: none;
   -moz-user-select: none;
   -khtml-user-select: none;
   -ms-user-select: none;
 }
 
+// base colors
+
 $color1: #fece09;
 $color2: #0b66ff;
+
+// chart colors
+
+$chart-line-x: #000;
+$chart-line-y: #dc143c;
+$chart-line-z: #1e90ff;
+
+// table colors
+
+$table-row-hovered: lighten($color2, 45%);
+$table-row-selected: lighten($color1, 45%);
+$table-row-selected-hovered: lighten($color1, 35%);
 
 /*   GLOBAL   */
 
 body {
-  padding-top: 50px;
-  // font-family: 'Roboto' sans-serif;
+  padding-top: 50px; // navbar
   -webkit-font-smoothing: antialiased;
 }
 
-// .triangle {
-//   font-size: 0.8em;
-//   color: #428bca;
-// }
-
 /*   REC TABLE   */
 
-
-// a.trip-indicator {
-//   color: #cd5c5c !important;
-//   &.selected {
-//     color: #ffd700 !important;
-//   }
-// }
-
 tbody {
-  tr {
-    &:hover {
-      // table row, hovered
-      background-color: lighten($color2, 45%);
-    }
-    &.selected {
-      // selected table row
-      background-color: lighten($color1, 45%);
-      &:hover {
-        // selected table row, hovered
-        background-color: lighten($color1, 35%);
-      }
-    }
-  }
   td {
     @include unselectable;
-    // the x-editable 'name' column
-    &.name {
-      width: 200px;
-    }
+    vertical-align: middle;
+    line-height: 100%;
+    height: 100%;
+    white-space: nowrap;
+
+
     &.hasData {
       background-color: #c4ffc2;
     }
-    // the 'del' button on the far right
-    &.destroy {
+    &.button {
       text-align: center;
       font-weight: bold;
-      color: #cd5c5c;
+      color: #496ab6;
       width: 2.2em;
       &:hover {
-        background-color: #cd5c5c;
+        background-color: #496ab6;
         color: #fff;
+      }
+    }
+    &.reset {
+      color: #fb8c04;
+      &:hover {
+        background-color: #fb8c04;
+      }
+    }
+    &.delete {
+      color: #cd5c5c;
+      &:hover {
+        background-color: #cd5c5c;
+      }
+    }
+    input {
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: 0;
+    }
+    input:focus {
+      outline: 0;
+    }
+  }
+}
+
+#rec {
+  tbody {
+    tr {
+      &:hover {
+        background-color: lighten($color2, 45%);
+      }
+      &.selected {
+        background-color: lighten($color1, 45%);
+        &:hover {
+          background-color: lighten($color1, 35%);
+        }
       }
     }
   }
 }
 
+/*   MAP   */
 
-// li.disabled a.red {
-//   color: #cd5c5c !important;
-// }
+#map {
+  height: 384px;
+}
 
-
-// /*   RAW DATA VIEW   */
-
-// #raw {
-//   margin: 24px;
-// }
-
-// #left {
-//   display: table-cell;
-//   width: 100%;
-//   white-space: nowrap;
-//   padding: 0 24px 0 0;
-// }
-
-// #right {
-//   display: table-cell;
-//   min-width: 500px;
-//   vertical-align: top;
-// }
-
-// #map {
-//   height: 384px;
-//   width: 100%;
-// }
-
-// .legend {
-//   line-height: 18px;
-//   color: #555;
-//   background: #fff;
-//   padding: 8px;
-//   i {
-//     width: 18px;
-//     height: 18px;
-//     float: left;
-//     margin-right: 8px;
-//     opacity: 0.7;
-//   }
-// }
-
-// rawh2 {
-//   width: 100%;
-//   background-color: #ccc;
-//   padding-top: 24px;
-// }
-
-/*   HAR VIEW   */
-
-// #har {
-//   margin: 24px;
-//   #map {
-//     height: 768px;
-//   }
-// }
-
-/*   D3 CHARTS   */
+/*   SVG   */
 
 svg {
   font: 12px sans-serif;
+
+  .axis line,
+  .axis path {
+    fill: none;
+    shape-rendering: crispEdges;
+    stroke: #777;
+  }
+
+  .line {
+    stroke: #000;
+    stroke-width: 0.75px;
+    fill: none;
+  }
+
+  .line1 {
+    stroke: #dc143c;
+  }
+
+  .line2 {
+    stroke: #1e90ff;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #fff;
+    shape-rendering: crispEdges;
+  }
 }
 
-.axis line,
-.axis path {
+.legend {
+  &.x {
+    color: $chart-line-x;
+    margin-right: 5px;
+  }
+
+  &.y {
+    color: $chart-line-y;
+    margin-right: 5px;
+  }
+
+  &.z {
+    color: $chart-line-z;
+  }
+}
+
+.panel-title > span {
+  padding: 0 5px;
+  border-right: 1px solid #ccc;
+}
+
+.panel-title > span:first-child {
+  padding-right: 0;
+  border-right: none;
+}
+
+.list-group-item {
+  font-weight: bold;
+  text-align: center;
+  &.x {
+    color: #000;
+  }
+  &.y {
+    color: #dc143c;
+  }
+  &.z {
+    color: #1e90ff;
+  }
+}
+
+
+
+brush {
   fill: none;
-  shape-rendering: crispEdges;
-  stroke: #777;
+  clip-path: url(#clip);
 }
-
-// .x.axis path {
-//   display: none;
-// }
-
-.line {
-  stroke: #000;
-  stroke-width: 0.75px;
-  fill: none;
-}
-
-.line1 {
-  stroke: #dc143c;
-}
-
-.line2 {
-  stroke: #1e90ff;
-}
-
-// .brush {
-//   // background-color: #e6e6e6;
-//   fill: none;
-// }
-
-// .brush .extent {
-//   stroke: #fff;
-//   fill-opacity: .125;
-//   shape-rendering: crispEdges;
-// }
-
-// .area {
-//   // fill: steelblue;
-//   clip-path: url(#clip);
-// }
-
-
-// .brush .resize {
-//   color: black;
-// }
-
-
-// brush {
-//   width: 100%;
-//   fill: none;
-// }
-
-// .area {
-//   fill: steelblue;
-//   clip-path: url(#clip);
-// }
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #fff;
-  shape-rendering: crispEdges;
-}
-
-// brush {
-//   fill: none;
-//   clip-path: url(#clip);
-// }
 
 pre {
   padding: 8px;
-  margin: 8px;
+}
+
+brush {
+  width: 100%;
+  display: inline-block;
+}
+
+chart {
+  width: 100%;
+  display: inline-block;
 }
 
 .brush {
-  padding: 8px;
-  margin: 8px;
-  border: 1px solid #ccc;
   border-radius: 4px;
   background-color: #f5f5f5;
 }
@@ -223,17 +207,11 @@ pre {
   shape-rendering: crispEdges;
 }
 
+#container {
+  margin: 8px;
+}
 
-
-
-
-
-/* debug */
-
-// * { background-color: rgba(255,0,0,.2); }
-// * * { background-color: rgba(0,255,0,.2); }
-// * * * { background-color: rgba(0,0,255,.2); }
-// * * * * { background-color: rgba(255,0,255,.2); }
-// * * * * * { background-color: rgba(0,255,255,.2); }
-// * * * * * * { background-color: rgba(255,255,0,.2); }
-
+.btn-toolbar {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
