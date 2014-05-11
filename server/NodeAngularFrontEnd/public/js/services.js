@@ -234,6 +234,7 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
     // load har and gps data, return feature collection
     geo: function(trip) {
 
+      // FIXME -> HELPERS
       function calculateDistance(a, b) {
         return gju.pointDistance({
           type: 'Point',
