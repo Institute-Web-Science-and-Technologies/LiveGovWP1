@@ -27,7 +27,7 @@ bower:
 
 npm:
 	@echo installing node modules
-	@npm --loglevel warn install $(ENVIRONMENT)
+	@npm install $(ENVIRONMENT)
 
 clean:
 	@rm -rf $(REMOVEFILES)

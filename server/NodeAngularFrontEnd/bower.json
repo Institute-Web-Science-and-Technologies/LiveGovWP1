@@ -1,11 +1,12 @@
 {
-  "name": "client",
-  "version": "0.3.3",
+  "name": "NodeAngularFrontEnd",
+  "version": "1.9.2",
   "homepage": "https://github.com/rwilhelm/LiveGovWP1",
   "authors": [
-    "René Wilhelm <rene.wilhelm@gmail.com>"
+    "René Wilhelm <rene.wilhelm@gmail.com>"
   ],
   "license": "MIT",
+  "private": true,
   "ignore": [
     "**/.*",
     "node_modules",
@@ -14,17 +15,12 @@
     "tests"
   ],
   "dependencies": {
+    "angular-resource": "~1.2.14",
+    "angular-route": "~1.2.14",
     "angular-xeditable": "~0.1.8",
     "bootstrap": "~3.1.1",
     "d3": "~3.4.3",
-    "jquery": "~2.1.0",
-    "leaflet-dist": "~0.7.2",
-    "moment": "~2.5.1",
-    "angular": "~1.2.14",
-    "angular-mocks": "~1.2.14",
-    "angular-route": "~1.2.14",
-    "angular-resource": "~1.2.14",
-    "angular-sanitize": "~1.2.14",
-    "angular-animate": "~1.2.14"
+    "mapbox.js": "~1.6.2",
+    "moment": "~2.5.1"
   }
 }
