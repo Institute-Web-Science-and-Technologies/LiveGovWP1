@@ -24,6 +24,10 @@ body {
 }
 
 /*   REC TABLE   */
+button:focus {
+  outline-color: transparent !important;
+  outline-style: none !important;
+}
 
 tbody {
   td {
