@@ -8,7 +8,7 @@ d3.custom.lineChart = function module() {
 
   // default values may be overwritten by exported functions
 
-  var margin = {top: 24, right: 24, bottom: 24, left: 24 }, // FIXME
+  var margin = {top: 2, right: 1, bottom: 21, left: 24 }, // FIXED!
     width = d3.select('chart')[0][0].offsetWidth - margin.left - margin.right,
     height = 120,
     xScale = d3.time.scale().range([0, width]),
@@ -54,7 +54,6 @@ d3.custom.lineChart = function module() {
           .append("rect")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom);
-
       }
 
       // remove old charts from svg element
@@ -64,7 +63,7 @@ d3.custom.lineChart = function module() {
       var svg = d3.select(this).select('svg').data(data);
 
       var chart = svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .attr("transform", "translate(" + (margin.left + 0) + "," + (margin.top + 0) + ")")
         .attr("class", "chart");
 
       // x-graph
@@ -94,7 +93,7 @@ d3.custom.lineChart = function module() {
       // y-axis
       chart.append("g")
         .attr("class", "y axis")
-        .attr("transform", "translate(-3,0)") // ?
+        .attr("transform", "translate(-3," + margin.top + ")") // ?
         .call(yAxis);
 
       // create brush
