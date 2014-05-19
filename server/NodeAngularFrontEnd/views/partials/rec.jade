@@ -1,4 +1,7 @@
 div(ng-controller="tripCtrl as ctrl")
+
+  a.btn.btn-warning.btn-sm(ng-click='hideSome = !hideSome', ng-class='{active:hideSome}') zero duration trips are {{hideSome ? 'hidden' : 'shown'}}
+
   table#rec.table
     thead
       tr
@@ -17,7 +20,7 @@ div(ng-controller="tripCtrl as ctrl")
         th
 
         tbody
-          tr(ng-repeat="trip in trips | orderBy:predicate:reverse", ng-class='{selected:ctrl.selected(trip)}')
+          tr(ng-repeat="trip in trips | orderBy:predicate:reverse", ng-class='{selected:ctrl.selected(trip)}', ng-hide="hideSome && trip.duration >= -3600000 && trip.duration < -3500000")
             td(ng-click="ctrl.select(trip)", ng-class='{hasData:ctrl.hasData(trip)}', title='data amount: {{ctrl.hasData(trip)}}') {{ trip.id }}
             td(ng-click="ctrl.select(trip)") {{ trip.user }}
             td(ng-click="ctrl.select(trip)") {{ trip.start | date:'yyyy-MM-dd HH:mm:ss' }}
