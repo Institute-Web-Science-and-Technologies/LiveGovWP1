@@ -100,14 +100,14 @@
             android:onClick="onDeleteButtonClick" />
 
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/textViewAnnotation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Annotation"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <RelativeLayout
-            android:id="@+id/RelativeLayout"
+            android:id="@+id/RelativeLayoutAnnotation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
 

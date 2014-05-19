@@ -330,8 +330,6 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doDisableRecording() {
-        connectorThread.removeConsumer(persistor);
-        isRecording = false;
 
         final Tag stopRecordingTag = new Tag(
                 System.currentTimeMillis(),
@@ -339,6 +337,9 @@ public class ServiceSensorControl extends Service {
                 IntentAPI.VALUE_STOP_RECORDING);
 
         persistor.push(stopRecordingTag);
+
+        connectorThread.removeConsumer(persistor);
+        isRecording = false;
 
         // API EXTENSIONS are triggered on together with recording
         if (API_EXTENSIONS) {

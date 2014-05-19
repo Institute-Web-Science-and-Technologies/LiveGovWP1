@@ -17,7 +17,7 @@ public class SensorCollectionOptions {
     public static final long MONITORING_RATE = 2000L;
 
     // CONNECTIVITY //
-    public static String REMOTE_HOST = "mobile-sensing.west.uni-koblenz.de"; // LG Server
+    public static String REMOTE_HOST = "liveandgov.uni-koblenz.de"; // LG Server
     public static String UPLOAD_URL = "http://" + REMOTE_HOST + "/storage/upload/";
     public static String STREAMING_ZMQ_SOCKET = "tcp://" + REMOTE_HOST + ":5555";
 
@@ -32,17 +32,17 @@ public class SensorCollectionOptions {
 
     // Motion sensors
     public static final int REC_ACC = SensorOptions.ON_GAME;
-    public static final int REC_LINEAR_ACC = SensorOptions.OFF;
-    public static final int REC_GRAVITY_ACC = SensorOptions.OFF;
-    public static final int REC_GYROSCOPE = SensorOptions.ON_GAME;
-    public static final int REC_MAGNETOMETER = SensorOptions.ON_GAME;
-    public static final int REC_ROTATION = SensorOptions.ON_GAME;
+    public static final int REC_LINEAR_ACC = SensorOptions.ON_GAME;
+    public static final int REC_GRAVITY_ACC = SensorOptions.ON_GAME;
+    public static final int REC_GYROSCOPE = SensorOptions.OFF;
+    public static final int REC_MAGNETOMETER = SensorOptions.OFF;
+    public static final int REC_ROTATION = SensorOptions.OFF;
 
     // Network samples
     public static final boolean REC_WIFI = true;   // wifi
-    public static final int WIFI_SCAN_DELAY_MS = 20000; // delay in milli seconds
-    public static final boolean REC_BLT = true;    // Bluetooth
-    public static final int BLT_SCAN_DELAY_MS = 20000; // delay in milli seconds
+    public static final int WIFI_SCAN_DELAY_MS = 30000; // delay in milli seconds
+    public static final boolean REC_BLT = false;    // Bluetooth
+    public static final int BLT_SCAN_DELAY_MS = 30000; // delay in milli seconds
     public static final boolean REC_GSM = true;    // GSM
     public static final int GSM_SCAN_DELAY_MS = 20000; // delay in milli seconds
 
@@ -54,7 +54,7 @@ public class SensorCollectionOptions {
     /**
      * Record Activity using the new Google Activity API
      */
-    public static final boolean REC_G_ACT = false;
+    public static final boolean REC_G_ACT = true;
 
     public static class SensorOptions {
         public static int OFF = -1;
