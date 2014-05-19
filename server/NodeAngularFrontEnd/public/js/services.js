@@ -95,7 +95,12 @@ app.service('Trip',
         return;
       }
 
-      selectedTrip = trip;
+      if (typeof trip == "object") {
+        selectedTrip = trip;
+      } else if (typeof trip == "string") {
+        // selectedTrip = trips.find()
+      }
+
 
       // load trip data if neccessary
       if (!this.hasData(trip)) this.loadData(trip);
