@@ -27,6 +27,22 @@
     }).pop();
   };
 
+
+  // Object.prototype.getById = function(id) {
+  //   return this.filter()
+
+  //   // var that = this;
+  //   // return function(that, id) {
+  //   //   var i=0, len=that.length;
+  //   //   for (; i<len; i++) {
+  //   //     if (+that[i].id == +id) {
+  //   //       return that[i];
+  //   //     }
+  //   //   }
+  //   //   return null;
+  //   // };
+  // };
+
   // FIXME abstract
   // calculate the most popular tag between t0 and t1
   function topActivity(har, t0, t1) {
