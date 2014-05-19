@@ -53,6 +53,8 @@ app.service('Trip',
         // return a promise on the to be received and prepared data. see
         // this.query() in the record controller (recCtrl).
 
+        console.log('loading trip list');
+
         $http.get('trips')
         .success(function(data, status, headers, config) {
 
