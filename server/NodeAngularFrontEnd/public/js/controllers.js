@@ -76,7 +76,7 @@ app.controller('tripCtrl',
 
   // test if trip data is loaded
   this.hasData = function(trip) {
-    return Trip.hasData();
+    return Trip.hasData(trip);
   };
 
   // reset loaded trip data
