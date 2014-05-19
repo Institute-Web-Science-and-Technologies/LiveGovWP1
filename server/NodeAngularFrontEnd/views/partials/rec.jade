@@ -18,7 +18,7 @@ div(ng-controller="tripCtrl as ctrl")
 
         tbody
           tr(ng-repeat="trip in trips | orderBy:predicate:reverse", ng-class='{selected:ctrl.selected(trip)}')
-            td(ng-click="ctrl.select(trip)", ng-class='{hasData:ctrl.hasData(trip)}') {{ trip.id }}
+            td(ng-click="ctrl.select(trip)", ng-class='{hasData:ctrl.hasData(trip)}', title='data amount: {{ctrl.hasData(trip)}}') {{ trip.id }}
             td(ng-click="ctrl.select(trip)") {{ trip.user }}
             td(ng-click="ctrl.select(trip)") {{ trip.start | date:'yyyy-MM-dd HH:mm:ss' }}
             td(ng-click="ctrl.select(trip)") {{ trip.duration | date:'HH:mm:ss' }}
