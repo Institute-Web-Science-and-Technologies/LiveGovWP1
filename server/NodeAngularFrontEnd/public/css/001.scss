@@ -55,8 +55,10 @@ tbody {
     }
     &.delete {
       color: #cd5c5c;
+      font-weight: bold;
       &:hover {
         background-color: #cd5c5c;
+        color: #fff;
       }
     }
     input {
@@ -77,11 +79,20 @@ tbody {
     tr {
       &:hover {
         background-color: lighten($color2, 45%);
+        input {
+          background-color: lighten($color2, 45%);
+        }
       }
       &.selected {
         background-color: lighten($color1, 45%);
+        input {
+          background-color: lighten($color1, 45%);
+        }
         &:hover {
           background-color: lighten($color1, 35%);
+          input {
+          background-color: lighten($color1, 35%);
+          }
         }
       }
     }
