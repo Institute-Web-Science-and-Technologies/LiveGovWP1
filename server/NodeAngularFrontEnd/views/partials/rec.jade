@@ -1,28 +1,30 @@
-table#rec.table
-	thead
-		tr
-			th
-				a(ng-click="predicate='id'; reverse=!reverse") id
-			th
-				a(ng-click="predicate='user'; reverse=!reverse") user
-			th
-				a(ng-click="predicate='start'; reverse=!reverse") start
-			th
-				a(ng-click="predicate='duration'; reverse=!reverse") duration
-			th
-				a(ng-click="predicate='tags'; reverse=!reverse") tags
-			th
-				a(ng-click="predicate='name'; reverse=!reverse") name
-			th
+div(ng-controller="tripCtrl as ctrl")
+  table#rec.table
+    thead
+      tr
+        th
+          a(ng-click="predicate='id'; reverse=!reverse") id
+        th
+          a(ng-click="predicate='user'; reverse=!reverse") user
+        th
+          a(ng-click="predicate='start'; reverse=!reverse") start
+        th
+          a(ng-click="predicate='duration'; reverse=!reverse") duration
+        th
+          a(ng-click="predicate='tags'; reverse=!reverse") tags
+        th
+          a(ng-click="predicate='name'; reverse=!reverse") name
+        th
 
-			tbody
-				tr(ng-repeat="trip in trips | orderBy:predicate:reverse", ng-class='{selected:ctrl.selected(trip)}')
-					td(ng-click="ctrl.select(trip)", ng-class='{hasData:ctrl.hasData(trip)}') {{ trip.id }}
-					td(ng-click="ctrl.select(trip)") {{ trip.user }}
-					td(ng-click="ctrl.select(trip)") {{ trip.start | date:'yyyy-MM-dd HH:mm:ss' }}
-					td(ng-click="ctrl.select(trip)") {{ trip.duration | date:'HH:mm:ss' }}
-					td
-					td.name(editable-text="trip.name", onaftersave="ctrl.update(trip, {name: $data})", buttons="no", e-style="width: 200px; height: 37px") {{ trip.name }}
-					td.delete(ng-click="ctrl.delete(trip)") DEL
+        tbody
+          tr(ng-repeat="trip in trips | orderBy:predicate:reverse", ng-class='{selected:ctrl.selected(trip)}')
+            td(ng-click="ctrl.select(trip)", ng-class='{hasData:ctrl.hasData(trip)}') {{ trip.id }}
+            td(ng-click="ctrl.select(trip)") {{ trip.user }}
+            td(ng-click="ctrl.select(trip)") {{ trip.start | date:'yyyy-MM-dd HH:mm:ss' }}
+            td(ng-click="ctrl.select(trip)") {{ trip.duration | date:'HH:mm:ss' }}
+            td
+            td
+              input(type='text', ng-model='trip.name', ng-change="ctrl.update(trip, {name: trip.name})", placeholder='no name')
+            td.delete(ng-click="ctrl.delete(trip)") DEL
 
 // ex:ft=jade

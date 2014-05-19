@@ -25,7 +25,7 @@ app.directive('brush', ['$window',
         });
 
         $scope.$watchCollection('[trip.domain.x, trip.domain.y, trip.extent]', function(val, oldVal) {
-          if ($scope.trip.domain.x.length && $scope.trip.domain.y.length) {
+          if ($scope.trip && $scope.trip.domain.x.length && $scope.trip.domain.y.length) {
             brushElement
             .datum({domain: $scope.trip.domain})
             .call(brush
@@ -86,7 +86,7 @@ app.directive('chart', [
 
         // draw the chart as soon as data is ready or if any of it's values change
         $scope.$watchCollection('[trip.data.sensors[sensor], trip.domain.x, trip.domain.y, trip.extent]', function(val, oldVal) {
-          if ($scope.trip.data.sensors[sensor].length && $scope.trip.domain.x.length && $scope.trip.domain.y.length) {
+          if ($scope.trip && $scope.trip.data.sensors[sensor].length && $scope.trip.domain.x.length && $scope.trip.domain.y.length) {
             chartElement
             .datum({data: $scope.trip.data.sensors[sensor]})
             .call(chart
@@ -114,58 +114,42 @@ app.directive('map', [
         // 2. draw geojson to map
         // 3. add legend
 
-        var map = L.mapbox.map('map', 'rene.i6mdi15p'); // mapbox id
-
-        var legend = L.control({
-          position: 'topright'
+        var map = L.mapbox.map('map', 'rene.i6mdi15p', { // mapbox id
+          legendControl: {
+            position: 'topright'
+          },
+          zoomControl: false
         });
 
+        new L.Control.Zoom({ position: 'topright' }).addTo(map);
 
         var geoJson;
 
+        // FIXME -> HELPERS(?)
+        // give array as argument (abstract!)
+        // returns activities in a manually sorted order
+        function sortActivities(activities) {
+          var a = ['driving', 'running', 'walking', 'standing', 'sitting', 'on table', 'unknown'];
+          return a.map(function (d) {
+            return activities[activities.indexOf(d)];
+          });
+        }
 
-        var activities = $scope.trip.data.geo.features.map(function (d) {
-          return d.properties.activity;
-        });
+        var legend = L.control({position: 'topright'});
 
-        // FIXME -> HELPERS
-        activities[activities.indexOf(null)] = "unknown"; // change null to "unknown"
+        // requires sortActivities
+        legend.onAdd = function (map) {
+          // var div = L.DomUtil.create('div', 'info legend leaflet-bar', this.legend);
+          var div = L.DomUtil.create('div', 'info legend leaflet-bar');
 
-        // FIXME -> HELPERS
-        activities = activities.sort().filter(function (el, i, a) {
-          if (i == a.indexOf(el)) return 1;
-          return 0;
-        }); // sort unique
+          // sort activities before generating legend
+          var a = sortActivities(activities).filter(function (n) { return n; });
 
-        // FIXME -> HELPERS
-        activities.filter(function (n) {
-          return n;
-        }); // remove undefined
-
-        function drawLegend() {
-
-          // FIXME -> HELPERS(?)
-          // give array as argument (abstract!)
-          // returns activities in a manually sorted order
-          function sortActivities(activities) {
-            var a = ['driving', 'running', 'walking', 'standing', 'sitting', 'on table', 'unknown'];
-            return a.map(function (d) {
-              return activities[activities.indexOf(d)];
-            });
+          for (var i = 0; i < a.length; i++) {
+            div.innerHTML += '<i style="background:' + getColor(a[i]) + '"></i>' + a[i] + '<br>';
           }
 
-          // requires sortActivities
-          legend.onAdd = function (map) {
-            var div = L.DomUtil.create('div', 'info legend leaflet-bar', this.legend);
-
-            // sort activities before generating legend
-            var a = sortActivities(activities).filter(function (n) { return n; });
-
-            for (var i = 0; i < a.length; i++) {
-              div.innerHTML += '<i style="background:' + getColor(a[i]) + '"></i>' + a[i] + '<br>';
-            }
-            return div;
-          };
+          return div;
 
         };
 
@@ -243,13 +227,32 @@ app.directive('map', [
 
 
 
-      $scope.$watchCollection('trip.data.geo', function(val, oldVal) {
-        if (Object.keys($scope.trip.data.geo).length) {
+      $scope.$watchCollection('[trip, trip.data.geo]', function(val, oldVal) {
+        if ($scope.trip && $scope.trip.data && $scope.trip.data.geo && Object.keys($scope.trip.data.geo).length) {
           console.log('geo data is ready!', $scope.trip.data.geo);
+
+            var activities = $scope.trip.data.geo.features.map(function (d) {
+              return d.properties.activity;
+            });
+
+            // FIXME -> HELPERS
+            activities[activities.indexOf(null)] = "unknown"; // change null to "unknown"
+
+            // FIXME -> HELPERS
+            activities = activities.sort().filter(function (el, i, a) {
+              if (i == a.indexOf(el)) return 1;
+              return 0;
+            }); // sort unique
+
+            // FIXME -> HELPERS
+            activities.filter(function (n) {
+              return n;
+            }); // remove undefined
+
 
           // map.featureLayer.setGeoJSON(val);
 
-          // legend.addTo(map);
+          // legend.addTo(document.getElementById('legend').innerHTML);
 
           // Draw geoJSON object to map
           geoJson  = L.geoJson($scope.trip.data.geo, {
@@ -259,10 +262,14 @@ app.directive('map', [
 
           // Zoom map to fit our route
           map.fitBounds(geoJson.getBounds());
+          // drawLegend();
+          // debugger
+          // map.legendControl.addLegend(legend);
+          // map.addControl(L.mapbox.legendControl());
+          // map.legendControl.addLegend(document.getElementById('legend').innerHTML);
 
-          map.addControl(L.mapbox.legendControl());
         } else {
-          console.log('no geo data', $scope.trip.data.geo.length);
+          console.log('no geo data');
         }
       });
 

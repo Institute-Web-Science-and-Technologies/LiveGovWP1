@@ -6,14 +6,34 @@
   See 'Controllers' section in README.md for documentation.
  */
 
+app.controller('mainCtrl', ['$scope', '$route', function($scope, $route) {
+  console.log('loading mainCtrl');
+
+  $scope.$on('$routeChangeSuccess', function() {
+    console.log('route changed');
+    $scope.template = $route.current.templateUrl;
+  });
+}]);
+
 app.controller('tripCtrl',
-  function($scope, $location, $route, $q, Config, Trip) {
+  function($scope, $location, $route, $routeParams, $q, Config, Trip) {
+
+  console.log('loading tripCtrl');
 
   Trip.loadTrips().then(function(data) {
     $scope.trips = data;
-  });
 
-  $scope.trip = Trip.selected();
+    if ($routeParams.trip_id) {
+      console.log('trip id is set by route params to', $routeParams.trip_id);
+      $scope.trip = $scope.trips.filter(function(d) {
+        return d.id == $routeParams.trip_id;
+      })[0];
+      Trip.select($scope.trip);
+    } else {
+      $scope.trip = Trip.selected();
+    }
+
+  });
 
   // update a trip
   // TODO debounce
@@ -30,8 +50,22 @@ app.controller('tripCtrl',
     }
   };
 
+  this.updateUrl = function(trip) {
+    var c = $location.path().split('/');
+    var i = c.indexOf($routeParams.trip_id);
+
+    if (i == -1) {
+      c.push(trip.id);
+    } else {
+      c[i] = trip.id;
+    }
+
+    $location.url(c.join('/')).replace();
+  };
+
   // select a trip
   this.select = function(trip) {
+    this.updateUrl(trip);
     Trip.select(trip);
   };
 
@@ -85,14 +119,23 @@ app.controller('tripCtrl',
     Trip.download(trip, sensor, format);
   };
 
-});
-
-app.controller('navCtrl', function ($route, Trip) {
   this.is = function(loc) {
     return ($route.current && $route.current.name == loc) ? true : false;
   };
+});
+
+app.controller('navCtrl', function ($route, $scope, $routeParams, Trip) {
+  console.log('loading navCtrl');
+
+  $scope.$on('$routeChangeSuccess', function() {
+    $scope.trip_id = $routeParams.trip_id;
+  });
 
   this.selected = function(trip) {
     return Trip.selected(trip);
+  };
+
+  this.loc = function(loc) {
+    return ($route.current && $route.current.name == loc);
   };
 });

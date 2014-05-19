@@ -1,4 +1,4 @@
-#har
+div(ng-controller="tripCtrl as ctrl")#har
 
   .container-fluid
     .row
@@ -32,63 +32,52 @@
                   td.button.reset(ng-click="ctrl.reset(trip)") RESET
                   td.button.delete(ng-click="ctrl.delete(trip)") DELETE
     .row
-      .col-xs-12
+      .col-xs-10.col-lg-11
         map(trip="trip")
           #map
+
+      .col-xs-2.col-lg-1
+        h4 Map
+        .map-legend
+          .driving Driving
+          .running Running
+          .walking Walking
+          .standing Standing
+          .sitting Sitting
+          .on-table On Table
+          .unknown Unknown
+
     .row
-      .col-xs-12
-        #brush
-          .panel.panel-default
-            .panel-heading
-              h4.panel-title
-                &nbsp;
-                span(ng-if="trip.extent.length").pull-right {{ trip.extent[0] | duration:trip.extent[1] | date:'HH:mm:ss' }}
-            #gra.panel-collapse.collapse.in
-              .panel-body
-                brush(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+      .col-xs-10.col-lg-11
+        brush(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+      .col-xs-2.col-lg-1
+        .chart-legend
+          .x x
+          .y y
+          .z z
 
-    #charts.panel-group.row
-      .col-xs-12
-        .panel.panel-default
-          .panel-heading
-            h4.panel-title(data-toggle='collapse', data-parent='#charts', data-target='#gra') Gravity
-              span.pull-right {{ trip.data.sensors.gra.length }}
-              span.legend.pull-right
-                span.legend.x x
-                span.legend.y y
-                span.legend.z z
-              span.pull-right
-                a(ng-href="./trips/{{trip.id}}/gra.csv", download='livegov-trip-{{trip.id}}-sensor-gra.csv') export
-          #gra.panel-collapse.collapse.in
-            .panel-body
-              chart.gra(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+    .row
+      .col-xs-10.col-lg-11
+        chart.gra(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+      .col-xs-2.col-lg-1
+        h4 Gravity
+        div {{ trip.data.sensors.gra.length }}
+        a(ng-href="./trips/{{trip.id}}/gra.csv", download='livegov-trip-{{trip.id}}-sensor-gra.csv') export
 
-        .panel.panel-default
-          .panel-heading
-            h4.panel-title(data-toggle='collapse', data-parent='#charts', data-target='#acc') Acceleration
-              span.pull-right {{ trip.data.sensors.acc.length }}
-              span.legend.pull-right
-                span.legend.x x
-                span.legend.y y
-                span.legend.z z
-              span.pull-right
-                a(ng-href="./trips/{{trip.id}}/acc.csv", download='livegov-trip-{{trip.id}}-sensor-acc.csv') export
-          #acc.panel-collapse.collapse.in
-            .panel-body
-              chart.acc(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+    .row
+      .col-xs-10.col-lg-11
+        chart.acc(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+      .col-xs-2.col-lg-1
+        h4 Acceleration
+        div {{ trip.data.sensors.acc.length }}
+        a(ng-href="./trips/{{trip.id}}/acc.csv", download='livegov-trip-{{trip.id}}-sensor-acc.csv') export
 
-        .panel.panel-default
-          .panel-heading
-            h4.panel-title(data-toggle='collapse', data-parent='#charts', data-target='#lac') Linear Acceleration
-              span.pull-right {{ trip.data.sensors.lac.length }}
-              span.legend.pull-right
-                span.legend.x x
-                span.legend.y y
-                span.legend.z z
-              span.pull-right
-                a(ng-href="./trips/{{trip.id}}/lac.csv", download='livegov-trip-{{trip.id}}-sensor-lac.csv') export
-          #lac.panel-collapse.collapse.in
-            .panel-body
-              chart.lac(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+    .row
+      .col-xs-10.col-lg-11
+        chart.lac(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+      .col-xs-2.col-lg-1
+        h4 Linear Acceleration
+        div {{ trip.data.sensors.lac.length }}
+        a(ng-href="./trips/{{trip.id}}/lac.csv", download='livegov-trip-{{trip.id}}-sensor-lac.csv') export
 
 // ex:ft=jade

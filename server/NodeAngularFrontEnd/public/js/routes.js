@@ -5,27 +5,26 @@
 //- NOTE be careful to specify paths relative to the current directory
 
 app.config(function ($routeProvider, $locationProvider) {
-	// $locationProvider.html5Mode(true);
-	// $locationProvider.hashPrefix('!');
+  // $locationProvider.html5Mode(true);
+  // $locationProvider.hashPrefix('!');
 
-	$routeProvider
-		.when('/rec', { // relative to hash sign (e.g. localhost:3001/#/rec)
-			templateUrl: './partials/rec', // relative to host (e.g. localhost:3001/partials/rec)
-			controller: 'tripCtrl',
-			controllerAs: 'ctrl'
-		})
+  // NOTE
+  // paths must be relative and without leading ./ (e.g. localhost:3001/#/rec)
 
-		.when('/raw', {
-			templateUrl: './partials/raw',
-			controller: 'tripCtrl'
-		})
+  $routeProvider
+    .when('/rec/:trip_id?', {
+      templateUrl: 'partials/rec',
+    })
 
-		.when('/har', {
-			templateUrl: './partials/har',
-			controller: 'tripCtrl'
-		});
+    .when('/raw/:trip_id?', {
+      templateUrl: 'partials/raw',
+    })
 
-		// .otherwise({
-		// 	redirectTo: '/rec'
-		// });
+    .when('/har/:trip_id?', {
+      templateUrl: 'partials/har',
+    })
+
+    .otherwise({
+     redirectTo: '/rec/:trip_id?'
+    });
 });

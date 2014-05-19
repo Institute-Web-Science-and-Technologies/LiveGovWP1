@@ -26,27 +26,26 @@ html(lang="en", ng-app="inspectionFrontEnd")
 
     script(src="./bower_components/angular/angular.js")
 
-  body
+  body(ng-controller="mainCtrl as main")
     header
-      nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation" ng-controller="navCtrl as nav")
+      nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation" ng-controller="navCtrl as ctrl")
         ul.nav.navbar-nav
-          li(ng-class='{active:nav.loc("rec")}')
-            a(href="#/rec") Recordings
-          li(ng-class='{active:nav.loc("raw"), disabled:nav.selected()}')
-            a(href="#/raw") Raw Data
-          li(ng-class='{active:nav.loc("har"), disabled:nav.selected()}')
-            a(href="#/har") Activity Recognition
+          li(ng-class='{active:ctrl.loc("rec")}')
+            a(href="#/rec/{{trip_id}}") Recordings
+          li(ng-class='{active:ctrl.loc("raw"), disabled:ctrl.selected()}')
+            a(href="#/raw/{{trip_id}}") Raw Data
+          li(ng-class='{active:ctrl.loc("har"), disabled:ctrl.selected()}')
+            a(href="#/har/{{trip_id}}") Activity Recognition
 
         ul.nav.navbar-nav.pull-right
           li
             a
 
     #container
-      div(ng-view)
+      div(ng-include src="template")
 
   script(src="./bower_components/angular-resource/angular-resource.js")
   script(src="./bower_components/angular-route/angular-route.js")
-  script(src="./bower_components/angular-xeditable/dist/js/xeditable.js")
   script(src="./bower_components/d3/d3.js")
   script(src="./bower_components/jquery/dist/jquery.js")
   script(src="./bower_components/moment/min/moment.min.js")
