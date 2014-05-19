@@ -1,5 +1,7 @@
 var pg = require("pg");
 
+// FIXME what a mess!
+
 module.exports = {
 	query: function(statement, callback) {
 		pg.connect("pg://postgres:liveandgov@localhost/liveandgov", function(err, client, done) {
@@ -16,7 +18,7 @@ module.exports = {
 	index: function(callback) {
 		var text = "SELECT * FROM trip ORDER BY trip_id DESC";
 		var statement = {
-			name: "allTrips",
+			name: "getAllTrips",
 			text: text
 		};
 
@@ -31,6 +33,7 @@ module.exports = {
 
 		if (params.uuid !== undefined) {
 			statement = {
+				name: "getOneTripByUserId",
 				text: "SELECT * FROM trip WHERE user_id = $1",
 				values: [params.uuid]
 			};
@@ -45,13 +48,14 @@ module.exports = {
 				case "tag": sensor = "sensor_tags"; break;
 			}
 			statement = {
+				name: "getSensor",
 				text: "SELECT * FROM " + sensor + " WHERE trip_id = $1",
 				// text: "SELECT ts, x, y, z FROM " + sensor + " WHERE trip_id = $1",
 				values: [params.trip_id]
 			};
 		} else {
 			statement = {
-				name: "showTrip",
+				name: "getOneTripByTripId",
 				text: "SELECT * FROM trip WHERE trip_id = $1",
 				values: [params.trip_id]
 			};
@@ -65,6 +69,7 @@ module.exports = {
 
 	gps: function(params, body, callback) {
 		var statement = {
+			name: "getGps",
 			text: "SELECT ts, ST_AsGeoJSON(lonlat)::json AS lonlat from sensor_gps WHERE trip_id = $1",
 			values: [params.trip_id]
 		};
@@ -77,6 +82,7 @@ module.exports = {
 
 	update: function(params, body, callback) {
 		var statement = {
+			name: "updateTrip",
 			text: "UPDATE trip SET name = $2 WHERE trip_id = $1",
 			values: [params.trip_id, body.name]
 		};
@@ -89,6 +95,7 @@ module.exports = {
 
 	destroy: function(params, callback) {
 		var statement = {
+			name: "deleteTrip",
 			text: "DELETE FROM trip WHERE trip_id = $1",
 			values: [params.trip_id]
 		};
@@ -125,6 +132,7 @@ module.exports = {
 		}
 
 		var statement = {
+			name: "getSensorWindow",
 			text: text.replace("{{LIMIT_TIME}}", " " + limitTime),
 			values: values
 		};
