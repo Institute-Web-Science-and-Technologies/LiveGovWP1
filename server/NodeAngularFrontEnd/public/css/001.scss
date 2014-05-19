@@ -10,13 +10,6 @@
 
 $color1: #fece09;
 $color2: #0b66ff;
-
-// chart colors
-
-$chart-line-x: #000;
-$chart-line-y: #dc143c;
-$chart-line-z: #1e90ff;
-
 // table colors
 
 $table-row-hovered: lighten($color2, 45%);
@@ -104,13 +97,25 @@ tbody {
 /*   SVG   */
 
 svg {
-  font: 12px sans-serif;
+  font: 11px sans-serif;
+
+  // .axis {
+  //   stroke: #999;
+  //   shape-rendering: crispEdges;
+  // }
+
+  // .axis {
+  //   stroke: #333;
+  //   path: #333;
+  // }
 
   .axis line,
   .axis path {
     fill: none;
+    stroke: #666;
+    stroke-width: 1;
     shape-rendering: crispEdges;
-    stroke: #777;
+    // stroke-dasharray: 20,20;
   }
 
   .line {
@@ -127,27 +132,75 @@ svg {
     stroke: #1e90ff;
   }
 
-  .axis path,
-  .axis line {
-    fill: none;
-    stroke: #fff;
-    shape-rendering: crispEdges;
+  .label {
+    // stroke: #666;
+    stroke-width: 1;
+    // shape-rendering: crispEdges;
+    // color: #333;
+    font: 10px sans-serif;
+    fill: #333;
   }
 }
 
-.legend {
-  &.x {
-    color: $chart-line-x;
-    margin-right: 5px;
-  }
+// har colors
+$har-driving: #377eb8;
+$har-running: #e41a1c;
+$har-walking: #ff7f00;
+$har-standing: #4daf4a;
+$har-sitting: #984ea3;
+$har-on-table: #a65628;
+$har-unknown: #777777;
 
-  &.y {
-    color: $chart-line-y;
-    margin-right: 5px;
+.map-legend {
+  div {
+    padding-left: 0.5em;
+    &.driving {
+      border-left: 1.5em solid $har-driving;
+    }
+    &.running {
+      border-left: 1.5em solid $har-running;
+    }
+    &.walking {
+      border-left: 1.5em solid $har-walking;
+    }
+    &.standing {
+      border-left: 1.5em solid $har-standing;
+    }
+    &.sitting {
+      border-left: 1.5em solid $har-sitting;
+    }
+    &.on-table {
+      border-left: 1.5em solid $har-on-table;
+    }
+    &.unknown {
+      border-left: 1.5em solid $har-unknown;
+    }
   }
+}
 
-  &.z {
-    color: $chart-line-z;
+.row {
+  margin: 20px 0;
+}
+
+// chart colors
+$chart-line-x: #000;
+$chart-line-y: #dc143c;
+$chart-line-z: #1e90ff;
+
+.chart-legend {
+  div {
+    padding-left: 0.5em;
+    &.x {
+      border-left: 1.5em solid $chart-line-x;
+    }
+
+    &.y {
+      border-left: 1.5em solid $chart-line-y;
+    }
+
+    &.z {
+      border-left: 1.5em solid $chart-line-z;
+    }
   }
 }
 
@@ -174,8 +227,6 @@ svg {
     color: #1e90ff;
   }
 }
-
-
 
 brush {
   fill: none;
