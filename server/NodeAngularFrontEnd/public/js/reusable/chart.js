@@ -58,6 +58,7 @@ d3.custom.lineChart = function module() {
 
       // remove old charts from svg element
       d3.select(this).select('svg').selectAll("g.chart").remove();
+      d3.select(this).select('svg').selectAll("text").remove();
 
       // select svg element
       var svg = d3.select(this).select('svg').data(data);
@@ -65,6 +66,23 @@ d3.custom.lineChart = function module() {
       var chart = svg.append("g")
         .attr("transform", "translate(" + (margin.left + 0) + "," + (margin.top + 0) + ")")
         .attr("class", "chart");
+
+      chart.append("text")
+          .attr("class", "x label")
+          .attr("text-anchor", "end")
+          .attr("x", width)
+          .attr("y", height)
+          .text("time");
+
+      chart.append("text")
+          .attr("class", "y label")
+          .attr("text-anchor", "start")
+          // .attr("y", 0)
+          .attr("x", 0)
+          .attr("y", (10 - 3)) // font size - axis shift
+          // .attr("dy", ".75em")
+          // .attr("transform", "rotate(-90)")
+          .text("sensor value");
 
       // x-graph
       chart.append("path")
