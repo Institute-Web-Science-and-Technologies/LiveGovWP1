@@ -32,10 +32,12 @@ html(lang="en", ng-app="inspectionFrontEnd")
         ul.nav.navbar-nav
           li(ng-class='{active:ctrl.loc("rec")}')
             a(href="#/rec/{{trip_id}}") Recordings
-          li(ng-class='{active:ctrl.loc("raw"), disabled:ctrl.selected()}')
-            a(href="#/raw/{{trip_id}}") Raw Data
-          li(ng-class='{active:ctrl.loc("har"), disabled:ctrl.selected()}')
-            a(href="#/har/{{trip_id}}") Activity Recognition
+          li(ng-class='{active:ctrl.loc("raw"), disabled:!ctrl.selected()}')
+            a(ng-hide='!ctrl.selected()', href="#/raw/{{trip_id}}") Raw Data
+            a(ng-show='!ctrl.selected()', href="") Raw Data
+          li(ng-class='{active:ctrl.loc("har"), disabled:!ctrl.selected()}')
+            a(ng-hide='!ctrl.selected()', ng-href="#/har/{{trip_id}}") Activity Recognition
+            a(ng-show='!ctrl.selected()', ng-href="") Activity Recognition
 
         ul.nav.navbar-nav.pull-right
           li
