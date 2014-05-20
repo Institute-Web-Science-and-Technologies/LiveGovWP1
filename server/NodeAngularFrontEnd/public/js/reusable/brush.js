@@ -4,7 +4,7 @@
 
 if (!d3.custom) d3.custom = {};
 
-d3.custom.chartBrush = function module() {
+d3.custom.chartBrush = function () {
 
   // default values. may be overwritten by exported functions.
 
@@ -23,8 +23,6 @@ d3.custom.chartBrush = function module() {
   function exports(selection) {
     selection.each(function(d, i) {
       if (!d) return;
-
-      console.log(width);
 
       var domain = d.domain; // d.domain = { 'x': Array[2], 'y': Array[2] }
 
@@ -55,7 +53,12 @@ d3.custom.chartBrush = function module() {
         .on("brushend", brushended);
 
       // programatically set brush extent if it's set
-      if (extent) brush.extent(extent);
+      if (extent) {
+        console.log('brush extent', extent);
+        brush.extent(extent);
+      } else {
+        brush.clear();
+      }
 
       // draw the actual brush rectangle
       svg.append("g")

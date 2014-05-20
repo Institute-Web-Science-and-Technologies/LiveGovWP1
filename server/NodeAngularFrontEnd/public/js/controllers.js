@@ -54,6 +54,7 @@ app.controller('tripCtrl',
       Trip.select($scope.trip);
     } else {
       $scope.trip = Trip.selected();
+      // debugger
     }
 
   });
@@ -127,6 +128,8 @@ app.controller('tripCtrl',
 
   // reset loaded trip data
   this.reset = function(trip) {
+    // debugger
+    console.log('reset -> trip.extent', trip.extent);
     return Trip.reset(trip);
   };
 
@@ -157,6 +160,7 @@ app.controller('tripCtrl',
 
   // update scope (called by directive)
   $scope.updateExtent = function(extent) {
+    console.log('tripCtrl updateExtent', extent);
     $scope.$apply(function() {
       $scope.trip.extent = extent;
     });
@@ -184,8 +188,8 @@ app.controller('navCtrl', function ($route, $scope, $routeParams, Trip) {
     $scope.trip_id = $routeParams.trip_id;
   });
 
-  this.selected = function(trip) {
-    return Trip.selected(trip);
+  this.selected = function() {
+    return Trip.selected();
   };
 
   this.loc = function(loc) {

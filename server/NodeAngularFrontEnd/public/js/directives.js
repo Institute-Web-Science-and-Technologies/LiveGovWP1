@@ -11,12 +11,13 @@ app.directive('brush', ['$window',
         var brush = d3.custom.chartBrush();
         var brushElement = d3.select($element[0]); // brush's 'this' in selection.each
 
-        angular.element($window).bind('resize', function() {
-          brushElement
-            .call(brush);
-        });
+        // angular.element($window).bind('resize', function() {
+        //   brushElement
+        //     .call(brush);
+        // });
 
         brush.on('brushed', function(d, i) {
+          console.log('brush on brushed', d, i);
           $scope.updateExtent({args: d});
         });
 
@@ -51,33 +52,9 @@ app.directive('chart', [
 
         var sensor = $attributes.class; // gra, acc or lac
 
-        // $scope.$watch(function () {
-        //     return angular.element(window)[0].innerWidth;
-        // }, function () {
-        //     // return scope.render(scope.data);
-        //     console.log(angular.element(window)[0].innerWidth);
-        // });
-        // console.log($window);
-
         function getWidth() {
           return $element[0].parentNode.offsetWidth;
-          // return $($element[0]).width();
-          // return $($element[0]).width();
         }
-
-        // console.log(getWidth(), "getWidth");
-
-        // $scope.$watch("$element[0].offsetWidth", function(oldVal, newVal) {
-        //   console.log(oldVal, newVal);
-        // });
-
-
-        // window.onresize = function() {
-          // console.log("bla", getWidth());
-          // console.log("bla", $($element[0]).width());
-          // console.log("bla", $($element[0]).width());
-          // chartElement.call(chart.width($(iElement[0]).width()));
-        // };
 
         chart.on('brushended', function(d, i) {
           $scope.updateExtent({args: d});
@@ -92,7 +69,6 @@ app.directive('chart', [
             .call(chart
               .xScale($scope.trip.extent.length ? $scope.trip.extent : $scope.trip.domain.x)
               .yScale($scope.trip.domain.y)
-              // .width(getWidth())
             );
           }
         });
@@ -283,7 +259,6 @@ app.directive('map', [
 
       // // Zoom map to fit our route
       // map.fitBounds(geoJson.getBounds());
-
     } // end link
   }; // end return
 }]);

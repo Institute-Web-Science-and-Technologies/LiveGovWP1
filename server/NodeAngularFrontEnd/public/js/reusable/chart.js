@@ -4,7 +4,7 @@
 
 if (!d3.custom) d3.custom = {};
 
-d3.custom.lineChart = function module() {
+d3.custom.lineChart = function () {
 
   // default values may be overwritten by exported functions
 
@@ -31,7 +31,10 @@ d3.custom.lineChart = function module() {
 
       var chartName = this.classList[0];
 
-      if (extent) xScale.domain(extent);
+      if (extent) {
+        console.log('chart extent', extent);
+        xScale.domain(extent);
+      }
 
       var line = d3.svg.line().interpolate("linear")
         .x(function(d) {

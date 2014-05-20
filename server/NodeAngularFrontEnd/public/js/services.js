@@ -69,7 +69,8 @@ app.service('Trip',
               duration: +d.stop_ts - (+d.start_ts) - 3600000, // minus one hour due to wrong timestamps in db
               extent: [],
               domain: { x: [], y: [] },
-              data: { sensors: {}, geo: [] } // feature collection
+              data: { sensors: {}, geo: [] }, // feature collection
+              love: false
             };
 
             // create empty sensor objects
@@ -115,7 +116,7 @@ app.service('Trip',
     loadData: function(trip, obj) {
       var that = this;
       var t = new Date();
-      console.info(trip.id + ": loading sensor and geo data");
+      console.info(trip.id + ": loading data");
 
       // if (obj) {
       //   console.log(obj);
@@ -143,7 +144,9 @@ app.service('Trip',
 
     // test if a trip is selected
     selected: function(trip) {
-      if (!arguments.length) return selectedTrip;
+      if (!arguments.length) {
+        return selectedTrip ? selectedTrip : false;
+      }
       return trip === selectedTrip;
     },
 
@@ -249,7 +252,7 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
 
         })
         .error(function (data, status, headers, config) {
-          console.warn('Problems getting sensor data! ' + sensor + ' data for trip ' + trip.id + ' ready (' + ((new Date() - t) / 1000) + " ms)");
+          console.warn('Problems getting', sensor, 'sensor data for trip', trip.id, ('!', '(' + ((new Date() - t) / 1000) + " ms)"));
           deferred.reject();
         });
 
