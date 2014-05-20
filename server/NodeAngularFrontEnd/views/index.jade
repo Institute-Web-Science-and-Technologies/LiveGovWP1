@@ -41,7 +41,7 @@ html(lang="en", ng-app="inspectionFrontEnd")
 
         ul.nav.navbar-nav.pull-right
           li
-            a
+            a(ng-cloak, ng-class="{errors:$root.httpRequestErrors}", title='the number in parentheses displays the currently running http/xhr requests') {{ $root.httpRequests ? 'loading... (' + $root.httpRequests + ')' : 'ready' }}
 
     #container
       div(ng-include src="template")
