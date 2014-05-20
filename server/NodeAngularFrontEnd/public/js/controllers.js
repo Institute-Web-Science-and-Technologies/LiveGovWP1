@@ -79,6 +79,22 @@ app.controller('tripCtrl',
     return Trip.hasData(trip);
   };
 
+  this.hasDuration = function(trip) {
+    return Trip.hasDuration(trip);
+  };
+
+  this.hasName = function(trip) {
+    return Trip.hasName(trip);
+  };
+
+  this.hasLove = function(trip) {
+    return Trip.hasLove(trip);
+  };
+
+  this.toggleLove = function(trip) {
+    return Trip.toggleLove(trip);
+  };
+
   // reset loaded trip data
   this.reset = function(trip) {
     return Trip.reset(trip);

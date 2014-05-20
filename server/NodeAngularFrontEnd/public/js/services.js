@@ -155,9 +155,32 @@ app.service('Trip',
         .reduce(function (a, b) { return a + b; });
     },
 
+    hasName: function(trip) {
+      if (!arguments.length || !trip) return;
+      return (trip.name ? true : false);
+    },
+
+    hasDuration: function(trip) {
+      if (!arguments.length) return;
+      return (trip.duration >= -3600000 && trip.duration <= -3500000) ? false : true;
+    },
+
+    hasLove: function(trip) {
+      if (!arguments.length || !trip) return;
+      return (trip.love ? true : false);
+    },
+
+    toggleLove: function(trip) {
+      if (!arguments.length) return;
+      return trip.love = (trip.love ? false : true);
+    },
+
     reset: function (trip) {
+      // empty sensor arrays
       Config.sensors().map(function (sensor) { trip.data.sensors[sensor] = []; });
+      // clear extent
       trip.extent = [];
+      // load data
       this.loadData(trip);
     },
 

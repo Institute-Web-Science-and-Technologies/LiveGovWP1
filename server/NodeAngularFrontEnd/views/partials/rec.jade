@@ -1,6 +1,11 @@
 div(ng-controller="tripCtrl as ctrl")
 
-  a.btn.btn-warning.btn-sm(ng-click='hideSome = !hideSome', ng-class='{active:hideSome}') zero duration trips are {{hideSome ? 'hidden' : 'shown'}}
+  div.btn-group
+    a.btn.btn-default.btn-sm(ng-click='ctrl.select()', ng-class='{disabled:ctrl.selected()}') deselect trip
+    a.btn.btn-default.btn-sm(ng-click='hasDuration = !hasDuration', ng-class='{active:hasDuration}') has duration
+    a.btn.btn-default.btn-sm(ng-click='hasLove = !hasLove', ng-class='{active:hasLove}') has love
+    a.btn.btn-default.btn-sm(ng-click='hasData = !hasData', ng-class='{active:hasData}') has data
+    a.btn.btn-default.btn-sm(ng-click='hasName = !hasName', ng-class='{active:hasName}') has name
 
   table#rec.table
     thead
@@ -20,7 +25,7 @@ div(ng-controller="tripCtrl as ctrl")
         th
 
         tbody
-          tr(ng-repeat="trip in trips | orderBy:predicate:reverse", ng-class='{selected:ctrl.selected(trip)}', ng-hide="hideSome && trip.duration >= -3600000 && trip.duration < -3500000")
+          tr(ng-repeat="trip in trips | orderBy:predicate:reverse", ng-class='{selected:ctrl.selected(trip)}', ng-hide="(hasData && !ctrl.hasData(trip)) || (hasDuration && !ctrl.hasDuration(trip)) || (hasLove && !ctrl.hasLove(trip)) || (hasName && !ctrl.hasName(trip))")
             td(ng-click="ctrl.select(trip)", ng-class='{hasData:ctrl.hasData(trip)}', title='data amount: {{ctrl.hasData(trip)}}') {{ trip.id }}
             td(ng-click="ctrl.select(trip)") {{ trip.user }}
             td(ng-click="ctrl.select(trip)") {{ trip.start | date:'yyyy-MM-dd HH:mm:ss' }}
