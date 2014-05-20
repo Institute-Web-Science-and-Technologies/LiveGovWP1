@@ -18,7 +18,7 @@ public class SensorCollectionOptions {
 
     // CONNECTIVITY //
     public static String REMOTE_HOST = "liveandgov.uni-koblenz.de"; // LG Server
-    public static String UPLOAD_URL = "http://" + REMOTE_HOST + "/storage/upload/";
+    public static String UPLOAD_URL = "http://" + REMOTE_HOST + "/ft2/storage/upload/";
     public static String STREAMING_ZMQ_SOCKET = "tcp://" + REMOTE_HOST + ":5555";
 
     public static final boolean ZIPPED_PERSISTOR = true;
