@@ -23,9 +23,12 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.SimpleLayout;
 
 import eu.liveandgov.wp1.HARPipeline;
+import eu.liveandgov.wp1.server.har_service.PostgresqlDB;
 import eu.liveandgov.wp1.server.har_service.SSFReader;
 import eu.liveandgov.wp1.server.har_service.StringProducer;
 import static java.lang.System.currentTimeMillis;
@@ -38,7 +41,19 @@ public class HarService extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     static final String OUT_DIR = "/srv/liveandgov/HARRawFiles/";
     private static final String FIELD_NAME_UPFILE = "upfile";
-       
+    private static Logger Log = Logger.getLogger(HarService.class);
+    
+    static {
+        try {
+            SimpleLayout layout = new SimpleLayout();
+            FileAppender appender = null;
+            appender = new FileAppender(layout,"/var/log/HARService.log",true);
+            Logger.getRootLogger().addAppender(appender);
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+   
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -52,20 +67,31 @@ public class HarService extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		PrintWriter out = response.getWriter();
-		out.println("Try Post");
+		PrintWriter writer = response.getWriter();
+        writer.write(
+                "<html>" +
+                "<h1>HAR Service</h1>" +
+                "<form action=\"\" enctype=\"multipart/form-data\" method=\"post\">" +
+                "Classify: <input type=\"file\" name=\"upfile\" size=\"40\"/><br/>" +
+                "<input type=\"submit\" value=\"Submit\">" +
+                "</form>" +
+                "</html>"
+                );
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Log.info("Incoming POST request from " + request.getRemoteAddr());
 
+		PostgresqlDB db = new PostgresqlDB();
         // Retrieve Upfile
         InputStream fileStream = getStreamFromField(request, FIELD_NAME_UPFILE);
 
         if (fileStream == null) {
-        	response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            Log.error("Field not found: " + FIELD_NAME_UPFILE);
+        		response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
@@ -77,15 +103,17 @@ public class HarService extends HttpServlet {
         try {
             bytesWritten = writeStreamToFile(fileStream, outFile);
         } catch (IOException e) {
+            Log.error("Error writing output file:",e);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
         // Success
+        Log.info("Received file " + fileName + " of length " + bytesWritten);
 
         BufferedReader reader;
         if (! isCompressed(request)) {
-        	reader = new BufferedReader(new FileReader(outFile));
+        		reader = new BufferedReader(new FileReader(outFile));
         } else {
             reader = new BufferedReader(new InputStreamReader(new GZIPInputStream( new FileInputStream(outFile)), "UTF8"));
         }
@@ -104,6 +132,10 @@ public class HarService extends HttpServlet {
                 stringProducer.getActivity()
         );
         response.setStatus(HttpServletResponse.SC_ACCEPTED);
+        
+        // Insert into database
+        db.logResult(pr.getID(), stringProducer.getActivity());
+        Log.info("Recognized activity " + stringProducer.getActivity() + " for device " + pr.getID());
 	}
 	
 	

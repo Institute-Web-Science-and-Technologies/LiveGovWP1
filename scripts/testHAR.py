@@ -10,10 +10,10 @@
 import requests # if not avaialbel do `sudo easy_install requests`
 import sys
 
-DEFAULT_HOST = "141.26.248.40"
+DEFAULT_HOST = "liveandgov.uni-koblenz.de"
 
 def get_servlet_url(host):
-    return "http://" + host +":8080/HAR/api"
+    return "http://" + host +"/HAR/api"
 
 
 def main():
