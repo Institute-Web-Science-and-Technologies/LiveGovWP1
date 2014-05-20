@@ -77,7 +77,9 @@ app.controller('tripCtrl',
     var c = $location.path().split('/');
     var i = c.indexOf($routeParams.trip_id);
 
-    if (i == -1) {
+    if (!arguments.length) {
+      c.pop();
+    } else if (i == -1) {
       c.push(trip.id);
     } else {
       c[i] = trip.id;
@@ -88,8 +90,13 @@ app.controller('tripCtrl',
 
   // select a trip
   this.select = function(trip) {
-    this.updateUrl(trip);
-    Trip.select(trip);
+    if (!arguments.length) {
+      this.updateUrl();
+      Trip.select();
+    } else {
+      this.updateUrl(trip);
+      Trip.select(trip);
+    }
   };
 
   // test if a trip is selected
