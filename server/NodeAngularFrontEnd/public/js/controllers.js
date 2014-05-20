@@ -148,6 +148,13 @@ app.controller('tripCtrl',
     return ($route.current && $route.current.name == loc);
   };
 
+  this.loadMoreData = function(trip) {
+    console.log(Trip.hasData($scope.trip));
+    var newWindowSize = Math.floor(Math.abs((Trip.hasData(trip) / 3) + 200)); // oO
+    Trip.loadData($scope.trip, {windowSize: newWindowSize});
+  }
+
+
   // update scope (called by directive)
   $scope.updateExtent = function(extent) {
     $scope.$apply(function() {
