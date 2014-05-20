@@ -6,12 +6,35 @@
   See 'Controllers' section in README.md for documentation.
  */
 
-app.controller('mainCtrl', ['$scope', '$route', function($scope, $route) {
+app.controller('mainCtrl', ['$scope', '$rootScope', '$route', function($scope, $rootScope, $route) {
   console.log('loading mainCtrl');
+
+  if (!$rootScope.httpRequests) $rootScope.httpRequests = 0;
+  if (!$rootScope.httpRequestErrors) $rootScope.httpRequestErrors = false;
 
   $scope.$on('$routeChangeSuccess', function() {
     console.log('route changed');
     $scope.template = $route.current.templateUrl;
+  });
+
+  $scope.$on('httpRequest', function(e) {
+    // console.log('http request started');
+    $rootScope.httpRequests++;
+  });
+
+  $scope.$on('httpResponse', function(e) {
+    // console.log('http request finished');
+    $rootScope.httpRequests--;
+  });
+
+  $scope.$on('httpRequestError', function(e) {
+    console.error('http request error');
+    $rootScope.httpRequestErrors = true;
+  });
+
+  $scope.$on('httpResponseError', function(e) {
+    console.error('http response error');
+    $rootScope.httpRequests--;
   });
 }]);
 
