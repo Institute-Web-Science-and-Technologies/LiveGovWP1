@@ -63,7 +63,7 @@ app.service('Trip',
             d = {
               name: d.name,
               id: d.trip_id,
-              user: d.user_id,
+              user: d.user_id.replace(/['"]+/g, ''),
               start: +d.start_ts,
               stop: +d.stop_ts,
               duration: +d.stop_ts - (+d.start_ts) - 3600000, // minus one hour due to wrong timestamps in db
