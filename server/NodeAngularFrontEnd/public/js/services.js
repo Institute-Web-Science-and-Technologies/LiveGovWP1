@@ -92,18 +92,13 @@ app.service('Trip',
 
     // select a trip and call data factory
     select: function(trip) {
-      // call w/o args to clear trip selection
+      // call w/o args to clear trip selection TODO
       if (!arguments.length) {
         selectedTrip = undefined;
         return;
       }
 
-      if (typeof trip == "object") {
-        selectedTrip = trip;
-      } else if (typeof trip == "string") {
-        // selectedTrip = trips.find()
-      }
-
+      selectedTrip = trip;
 
       // load trip data if neccessary
       if (!this.hasData(trip)) this.loadData(trip);
