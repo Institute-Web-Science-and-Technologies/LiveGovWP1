@@ -66,4 +66,108 @@ div(ng-controller="tripCtrl as ctrl")#raw
         div {{ trip.data.sensors.lac.length }}
         a(ng-href="./trips/{{trip.id}}/lac.csv", download='livegov-trip-{{trip.id}}-sensor-lac.csv') export
 
+    .row
+      .col-xs-4.col-lg-4
+        h4 Gravity Data
+        .table-responsive
+          table.table.table-condensed.table-hover.sensor-data-table
+            thead
+              tr
+                //- th minx
+                //- th miny
+                //- th minz
+                th x
+                th y
+                th z
+                //- th maxx
+                //- th maxy
+                //- th maxz
+                //- th starttime
+                th timestamp
+                //- th endtime
+
+                tbody
+                  tr(ng-repeat="d in trip.data.sensors.gra")
+                    //- td.minx {{ d.minx }}
+                    //- td.miny {{ d.miny }}
+                    //- td.minz {{ d.minz }}
+                    td.avgx {{ d.avgx | number:15 }}
+                    td.avgy {{ d.avgy | number:15 }}
+                    td.avgz {{ d.avgz | number:15 }}
+                    //- td.maxx {{ d.maxx }}
+                    //- td.maxy {{ d.maxy }}
+                    //- td.maxz {{ d.maxz }}
+                    //- td.starttime {{ d.starttime | date:'HH:mm:ss' }}
+                    td.ts {{ d.ts | date:'HH:mm:ss' }}
+                    //- td.endtime {{ d.endtime | date:'HH:mm:ss' }}
+
+      .col-xs-4.col-lg-4
+        h4 Acceleration Data
+        .table-responsive
+          table.table.table-condensed.table-hover.sensor-data-table
+            thead
+              tr
+                //- th minx
+                //- th miny
+                //- th minz
+                th x
+                th y
+                th z
+                //- th maxx
+                //- th maxy
+                //- th maxz
+                //- th starttime
+                th timestamp
+                //- th endtime
+
+                tbody
+                  tr(ng-repeat="d in trip.data.sensors.acc")
+                    //- td.minx {{ d.minx }}
+                    //- td.miny {{ d.miny }}
+                    //- td.minz {{ d.minz }}
+                    td.avgx {{ d.avgx | number:15 }}
+                    td.avgy {{ d.avgy | number:15 }}
+                    td.avgz {{ d.avgz | number:15 }}
+                    //- td.maxx {{ d.maxx }}
+                    //- td.maxy {{ d.maxy }}
+                    //- td.maxz {{ d.maxz }}
+                    //- td.starttime {{ d.starttime | date:'HH:mm:ss' }}
+                    td.ts {{ d.ts | date:'HH:mm:ss' }}
+                    //- td.endtime {{ d.endtime | date:'HH:mm:ss' }}
+
+      .col-xs-4.col-lg-4
+        h4 Linear Acceleration Data
+        .table-responsive
+          table.table.table-condensed.table-hover.sensor-data-table
+            thead
+              tr
+                //- th minx
+                //- th miny
+                //- th minz
+                th x
+                th y
+                th z
+                //- th maxx
+                //- th maxy
+                //- th maxz
+                //- th starttime
+                th timestamp
+                //- th endtime
+
+                tbody
+                  tr(ng-repeat="d in trip.data.sensors.lac")
+                    //- td.minx {{ d.minx }}
+                    //- td.miny {{ d.miny }}
+                    //- td.minz {{ d.minz }}
+                    td.avgx {{ d.avgx | number:15 }}
+                    td.avgy {{ d.avgy | number:15 }}
+                    td.avgz {{ d.avgz | number:15 }}
+                    //- td.maxx {{ d.maxx }}
+                    //- td.maxy {{ d.maxy }}
+                    //- td.maxz {{ d.maxz }}
+                    //- td.starttime {{ d.starttime | date:'HH:mm:ss' }}
+                    td.ts {{ d.ts | date:'HH:mm:ss' }}
+                    //- td.endtime {{ d.endtime | date:'HH:mm:ss' }}
+
 // ex:ft=jade
+
