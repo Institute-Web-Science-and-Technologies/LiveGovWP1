@@ -142,8 +142,9 @@ app.controller('tripCtrl',
   /* ... */
 
   // change location path
-  this.to = function(loc) {
-    $location.path(loc);
+  this.to = function(loc, trip) {
+    console.log(loc);
+    $location.path(loc + "/" + trip.id);
   };
 
   // test for current route (used by navbar)
