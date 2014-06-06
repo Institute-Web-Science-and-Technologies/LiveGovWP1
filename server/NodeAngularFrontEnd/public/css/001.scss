@@ -18,6 +18,11 @@ $table-row-selected-hovered: lighten($color1, 35%);
 
 /*   GLOBAL   */
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   padding-top: 50px; // navbar
   -webkit-font-smoothing: antialiased;
@@ -86,8 +91,11 @@ tbody {
   font-size: 0.7em;
   text-align: right;
   font-family: monospace;
+  &tbody {
+    max-height: 100px;
+    overflow: scroll;
+  }
 
-  padding: 2px;
 }
 
 #rec {
@@ -287,8 +295,57 @@ chart {
 }
 
 .brush {
-  border-radius: 4px;
+  // border-radius: 4px;
   background-color: #f5f5f5;
+  padding: 0;
+  margin: 0;
+}
+
+.row.brush {
+  position: absolute;
+  y: 100%;
+}
+
+#main {
+  overflow: auto;
+  margin-bottom: 50px;
+  min-height: 100%;
+}
+
+#bottom {
+  // border: 2px solid #e53972;
+  position: fixed;
+  // bottom: -50px;
+  // margin-top: -50px;
+  height: 50px;
+  // clear: both;
+  // padding-top: 20px;
+  background-color: red;
+  display: block;
+  width: 100%;
+  clear: both;
+  left: 0;
+  right: 0;
+  padding: 0;
+  bottom: 0;
+}
+
+.container-fluid {
+  &.data-tables {
+    margin-bottom: 50px;
+  }
+
+  &.minimap {
+    height: 50px;
+    position: absolute;
+    bottom: -50px;
+    left: 0;
+    right: 0;
+  }
+}
+
+.minimap {
+
 }
 
 .brush .extent {

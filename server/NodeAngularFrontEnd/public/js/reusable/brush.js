@@ -8,9 +8,9 @@ d3.custom.chartBrush = function () {
 
   // default values. may be overwritten by exported functions.
 
-  var margin = {top: 8, right: 8, bottom: 8, left: 8 }, // FIXME
+  var margin = {top: 0, right: 0, bottom: 0, left: 0 }, // FIXME
     width = d3.select('brush')[0][0].offsetWidth - margin.left - margin.right,
-    height = 64,
+    height = 50,
     xScale = d3.time.scale().range([0, width]),
     yScale = d3.scale.linear().range([height, 0]),
     xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(Math.max(width / 75, 2)),
@@ -65,8 +65,8 @@ d3.custom.chartBrush = function () {
         .attr("class", "brush")
         .call(brush)
         .selectAll("rect")
-        .attr("transform", "translate(" - margin.left + ",0)")
-        .attr("height", height - 1); // ?
+        // .attr("transform", "translate(" - margin.left + ",0)")
+        .attr("height", height); // ?
 
       function brushed() {
         dispatch.brushed(brush.empty() ? [] : brush.extent().map(function(d) { return +d; }));

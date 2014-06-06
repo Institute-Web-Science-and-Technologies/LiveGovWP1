@@ -1,173 +1,171 @@
 div(ng-controller="tripCtrl as ctrl")#raw
 
-  .container-fluid
-    .row
-      .col-xs-12
-        div.btn-group.pull-right
-          a.btn.btn-default.btn-sm(ng-click='ctrl.toggleLove(trip)' , ng-class='{active:ctrl.hasLove(trip)}') {{ ctrl.hasLove(trip) ? 'unlove' : 'love' }}
-          a.btn.btn-default.btn-sm(ng-click="ctrl.loadMoreData(trip)") load more data
-          a.btn.btn-default.btn-sm(ng-click="ctrl.reset(trip)") reset
-          a.btn.btn-danger.btn-sm(ng-click='ctrl.select()', ng-class='{disabled:ctrl.selected()}') delete
+  #main
 
-  .container-fluid
-    .row
-      .col-xs-12
-        table.table
-          thead
-            tr
-              th id
-              th user
-              th date
-              th duration
-              th tags
-              th name
+    .container-fluid
+      .row
+        .col-xs-12
+          div.btn-group.pull-right
+            a.btn.btn-default.btn-sm(ng-click='ctrl.toggleLove(trip)' , ng-class='{active:ctrl.hasLove(trip)}') {{ ctrl.hasLove(trip) ? 'unlove' : 'love' }}
+            a.btn.btn-default.btn-sm(ng-click="ctrl.loadMoreData(trip)") load more data
+            a.btn.btn-default.btn-sm(ng-click="ctrl.reset(trip)") reset
+            a.btn.btn-danger.btn-sm(ng-click='ctrl.select()', ng-class='{disabled:ctrl.selected()}') delete
 
-              tbody
+    .container-fluid
+      .row
+        .col-xs-12
+          table.table
+            thead
+              tr
+                th id
+                th user
+                th date
+                th duration
+                th tags
+                th name
+
+                tbody
+                  tr
+                    td.id {{ trip.id }}
+                    td.user {{ trip.user }}
+                    td.date {{ trip.start | date:'yyyy-MM-dd HH:mm:ss' }}
+                    td.duration {{ trip.duration | date:'HH:mm:ss' }}
+                    td.tags
+                      input(type='text', ng-model='trip.tags', ng-change="ctrl.update(trip, {tags: trip.tags})", placeholder='no tags')
+                    td.name
+                      input(type='text', ng-model='trip.name', ng-change="ctrl.update(trip, {name: trip.name})", placeholder='no name')
+
+    .container-fluid.charts
+      .row
+        .col-xs-10.col-lg-11
+          chart.gra(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+        .col-xs-2.col-lg-1
+          h4 Gravity
+          div {{ trip.data.sensors.gra.length }}
+          a(ng-href="./trips/{{trip.id}}/gra.csv", download='livegov-trip-{{trip.id}}-sensor-gra.csv') export
+
+      .row
+        .col-xs-10.col-lg-11
+          chart.acc(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+        .col-xs-2.col-lg-1
+          h4 Acceleration
+          div {{ trip.data.sensors.acc.length }}
+          a(ng-href="./trips/{{trip.id}}/acc.csv", download='livegov-trip-{{trip.id}}-sensor-acc.csv') export
+
+      .row
+        .col-xs-10.col-lg-11
+          chart.lac(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+        .col-xs-2.col-lg-1
+          h4 Linear Acceleration
+          div {{ trip.data.sensors.lac.length }}
+          a(ng-href="./trips/{{trip.id}}/lac.csv", download='livegov-trip-{{trip.id}}-sensor-lac.csv') export
+
+    .container-fluid.data-tables
+      .row
+        .col-xs-4.col-lg-4
+          h4 Gravity Data
+          .table-responsive
+            table.table.table-condensed.table-hover.sensor-data-table
+              thead
                 tr
-                  td.id {{ trip.id }}
-                  td.user {{ trip.user }}
-                  td.date {{ trip.start | date:'yyyy-MM-dd HH:mm:ss' }}
-                  td.duration {{ trip.duration | date:'HH:mm:ss' }}
-                  td.tags
-                    input(type='text', ng-model='trip.tags', ng-change="ctrl.update(trip, {tags: trip.tags})", placeholder='no tags')
-                  td.name
-                    input(type='text', ng-model='trip.name', ng-change="ctrl.update(trip, {name: trip.name})", placeholder='no name')
+                  //- th minx
+                  //- th miny
+                  //- th minz
+                  th x
+                  th y
+                  th z
+                  //- th maxx
+                  //- th maxy
+                  //- th maxz
+                  //- th starttime
+                  th timestamp
+                  //- th endtime
 
-    .row
-      .col-xs-10.col-lg-11
-        brush(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
-      .col-xs-2.col-lg-1
-        .chart-legend
-          .x x
-          .y y
-          .z z
+                  tbody
+                    tr(ng-repeat="d in trip.data.sensors.gra")
+                      //- td.minx {{ d.minx }}
+                      //- td.miny {{ d.miny }}
+                      //- td.minz {{ d.minz }}
+                      td.avgx {{ d.avgx | number:15 }}
+                      td.avgy {{ d.avgy | number:15 }}
+                      td.avgz {{ d.avgz | number:15 }}
+                      //- td.maxx {{ d.maxx }}
+                      //- td.maxy {{ d.maxy }}
+                      //- td.maxz {{ d.maxz }}
+                      //- td.starttime {{ d.starttime | date:'HH:mm:ss' }}
+                      td.ts {{ d.ts | date:'HH:mm:ss' }}
+                      //- td.endtime {{ d.endtime | date:'HH:mm:ss' }}
 
-    .row
-      .col-xs-10.col-lg-11
-        chart.gra(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
-      .col-xs-2.col-lg-1
-        h4 Gravity
-        div {{ trip.data.sensors.gra.length }}
-        a(ng-href="./trips/{{trip.id}}/gra.csv", download='livegov-trip-{{trip.id}}-sensor-gra.csv') export
+        .col-xs-4.col-lg-4
+          h4 Acceleration Data
+          .table-responsive
+            table.table.table-condensed.table-hover.sensor-data-table
+              thead
+                tr
+                  //- th minx
+                  //- th miny
+                  //- th minz
+                  th x
+                  th y
+                  th z
+                  //- th maxx
+                  //- th maxy
+                  //- th maxz
+                  //- th starttime
+                  th timestamp
+                  //- th endtime
 
-    .row
-      .col-xs-10.col-lg-11
-        chart.acc(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
-      .col-xs-2.col-lg-1
-        h4 Acceleration
-        div {{ trip.data.sensors.acc.length }}
-        a(ng-href="./trips/{{trip.id}}/acc.csv", download='livegov-trip-{{trip.id}}-sensor-acc.csv') export
+                  tbody
+                    tr(ng-repeat="d in trip.data.sensors.acc")
+                      //- td.minx {{ d.minx }}
+                      //- td.miny {{ d.miny }}
+                      //- td.minz {{ d.minz }}
+                      td.avgx {{ d.avgx | number:15 }}
+                      td.avgy {{ d.avgy | number:15 }}
+                      td.avgz {{ d.avgz | number:15 }}
+                      //- td.maxx {{ d.maxx }}
+                      //- td.maxy {{ d.maxy }}
+                      //- td.maxz {{ d.maxz }}
+                      //- td.starttime {{ d.starttime | date:'HH:mm:ss' }}
+                      td.ts {{ d.ts | date:'HH:mm:ss' }}
+                      //- td.endtime {{ d.endtime | date:'HH:mm:ss' }}
 
-    .row
-      .col-xs-10.col-lg-11
-        chart.lac(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
-      .col-xs-2.col-lg-1
-        h4 Linear Acceleration
-        div {{ trip.data.sensors.lac.length }}
-        a(ng-href="./trips/{{trip.id}}/lac.csv", download='livegov-trip-{{trip.id}}-sensor-lac.csv') export
+        .col-xs-4.col-lg-4
+          h4 Linear Acceleration Data
+          .table-responsive
+            table.table.table-condensed.table-hover.sensor-data-table
+              thead
+                tr
+                  //- th minx
+                  //- th miny
+                  //- th minz
+                  th x
+                  th y
+                  th z
+                  //- th maxx
+                  //- th maxy
+                  //- th maxz
+                  //- th starttime
+                  th timestamp
+                  //- th endtime
 
-    .row
-      .col-xs-4.col-lg-4
-        h4 Gravity Data
-        .table-responsive
-          table.table.table-condensed.table-hover.sensor-data-table
-            thead
-              tr
-                //- th minx
-                //- th miny
-                //- th minz
-                th x
-                th y
-                th z
-                //- th maxx
-                //- th maxy
-                //- th maxz
-                //- th starttime
-                th timestamp
-                //- th endtime
+                  tbody
+                    tr(ng-repeat="d in trip.data.sensors.lac")
+                      //- td.minx {{ d.minx }}
+                      //- td.miny {{ d.miny }}
+                      //- td.minz {{ d.minz }}
+                      td.avgx {{ d.avgx | number:15 }}
+                      td.avgy {{ d.avgy | number:15 }}
+                      td.avgz {{ d.avgz | number:15 }}
+                      //- td.maxx {{ d.maxx }}
+                      //- td.maxy {{ d.maxy }}
+                      //- td.maxz {{ d.maxz }}
+                      //- td.starttime {{ d.starttime | date:'HH:mm:ss' }}
+                      td.ts {{ d.ts | date:'HH:mm:ss' }}
+                      //- td.endtime {{ d.endtime | date:'HH:mm:ss' }}
 
-                tbody
-                  tr(ng-repeat="d in trip.data.sensors.gra")
-                    //- td.minx {{ d.minx }}
-                    //- td.miny {{ d.miny }}
-                    //- td.minz {{ d.minz }}
-                    td.avgx {{ d.avgx | number:15 }}
-                    td.avgy {{ d.avgy | number:15 }}
-                    td.avgz {{ d.avgz | number:15 }}
-                    //- td.maxx {{ d.maxx }}
-                    //- td.maxy {{ d.maxy }}
-                    //- td.maxz {{ d.maxz }}
-                    //- td.starttime {{ d.starttime | date:'HH:mm:ss' }}
-                    td.ts {{ d.ts | date:'HH:mm:ss' }}
-                    //- td.endtime {{ d.endtime | date:'HH:mm:ss' }}
-
-      .col-xs-4.col-lg-4
-        h4 Acceleration Data
-        .table-responsive
-          table.table.table-condensed.table-hover.sensor-data-table
-            thead
-              tr
-                //- th minx
-                //- th miny
-                //- th minz
-                th x
-                th y
-                th z
-                //- th maxx
-                //- th maxy
-                //- th maxz
-                //- th starttime
-                th timestamp
-                //- th endtime
-
-                tbody
-                  tr(ng-repeat="d in trip.data.sensors.acc")
-                    //- td.minx {{ d.minx }}
-                    //- td.miny {{ d.miny }}
-                    //- td.minz {{ d.minz }}
-                    td.avgx {{ d.avgx | number:15 }}
-                    td.avgy {{ d.avgy | number:15 }}
-                    td.avgz {{ d.avgz | number:15 }}
-                    //- td.maxx {{ d.maxx }}
-                    //- td.maxy {{ d.maxy }}
-                    //- td.maxz {{ d.maxz }}
-                    //- td.starttime {{ d.starttime | date:'HH:mm:ss' }}
-                    td.ts {{ d.ts | date:'HH:mm:ss' }}
-                    //- td.endtime {{ d.endtime | date:'HH:mm:ss' }}
-
-      .col-xs-4.col-lg-4
-        h4 Linear Acceleration Data
-        .table-responsive
-          table.table.table-condensed.table-hover.sensor-data-table
-            thead
-              tr
-                //- th minx
-                //- th miny
-                //- th minz
-                th x
-                th y
-                th z
-                //- th maxx
-                //- th maxy
-                //- th maxz
-                //- th starttime
-                th timestamp
-                //- th endtime
-
-                tbody
-                  tr(ng-repeat="d in trip.data.sensors.lac")
-                    //- td.minx {{ d.minx }}
-                    //- td.miny {{ d.miny }}
-                    //- td.minz {{ d.minz }}
-                    td.avgx {{ d.avgx | number:15 }}
-                    td.avgy {{ d.avgy | number:15 }}
-                    td.avgz {{ d.avgz | number:15 }}
-                    //- td.maxx {{ d.maxx }}
-                    //- td.maxy {{ d.maxy }}
-                    //- td.maxz {{ d.maxz }}
-                    //- td.starttime {{ d.starttime | date:'HH:mm:ss' }}
-                    td.ts {{ d.ts | date:'HH:mm:ss' }}
-                    //- td.endtime {{ d.endtime | date:'HH:mm:ss' }}
+  #bottom
+    brush(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
 
 // ex:ft=jade
 
