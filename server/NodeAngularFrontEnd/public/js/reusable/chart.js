@@ -62,6 +62,7 @@ d3.custom.lineChart = function () {
       // remove old charts from svg element
       d3.select(this).select('svg').selectAll("g.chart").remove();
       d3.select(this).select('svg').selectAll("text").remove();
+      d3.select(this).select('svg').selectAll("circle").remove();
 
       // select svg element
       var svg = d3.select(this).select('svg').data(data);
@@ -80,11 +81,8 @@ d3.custom.lineChart = function () {
       chart.append("text")
           .attr("class", "y label")
           .attr("text-anchor", "start")
-          // .attr("y", 0)
           .attr("x", 0)
           .attr("y", (10 - 3)) // font size - axis shift
-          // .attr("dy", ".75em")
-          // .attr("transform", "rotate(-90)")
           .text("sensor value");
 
       // x-graph
@@ -93,17 +91,44 @@ d3.custom.lineChart = function () {
         .attr("clip-path", "url(#clip)")
         .attr("d", line(data.map(function(d) { return [d.ts, d.avgx]; })));
 
+      svg.selectAll("line0")
+        .data(data)
+        .enter().append("svg:circle")
+        .attr("transform", "translate(" + (margin.left + 0) + "," + (margin.top + 0) + ")")
+        .attr("cx", function(d) { return xScale(d.ts); })
+        .attr("cy", function(d) { return yScale(d.avgx); })
+        .attr("r", 1.5)
+        .attr("class", "circle circle0");
+
       // y-graph
       chart.append("path")
         .attr("class", "line line1")
         .attr("clip-path", "url(#clip)")
         .attr("d", line(data.map(function(d) { return [d.ts, d.avgy]; })));
 
+      svg.selectAll("line1")
+        .data(data)
+        .enter().append("svg:circle")
+        .attr("transform", "translate(" + (margin.left + 0) + "," + (margin.top + 0) + ")")
+        .attr("cx", function(d) { return xScale(d.ts); })
+        .attr("cy", function(d) { return yScale(d.avgy); })
+        .attr("r", 1.5)
+        .attr("class", "circle circle1");
+
       // z-graph
       chart.append("path")
         .attr("class", "line line2")
         .attr("clip-path", "url(#clip)")
         .attr("d", line(data.map(function(d) { return [d.ts, d.avgz]; })));
+
+      svg.selectAll("line2")
+        .data(data)
+        .enter().append("svg:circle")
+        .attr("transform", "translate(" + (margin.left + 0) + "," + (margin.top + 0) + ")")
+        .attr("cx", function(d) { return xScale(d.ts); })
+        .attr("cy", function(d) { return yScale(d.avgz); })
+        .attr("r", 1.5)
+        .attr("class", "circle circle2");
 
       // x-axis
       chart.append("g")
