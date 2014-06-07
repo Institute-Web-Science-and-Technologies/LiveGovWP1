@@ -4,17 +4,15 @@
 
 if (!d3.custom) d3.custom = {};
 
-d3.custom.chartBrush = function () {
+d3.custom.miniMap = function () {
 
   // default values. may be overwritten by exported functions.
 
-  var margin = {top: 0, right: 0, bottom: 0, left: 0 }, // FIXME
+  var margin = {top: 0, right: 0, bottom: 0, left: 0 },
     width = d3.select('brush')[0][0].offsetWidth - margin.left - margin.right,
     height = 50,
     xScale = d3.time.scale().range([0, width]),
     yScale = d3.scale.linear().range([height, 0]),
-    xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(Math.max(width / 75, 2)),
-    yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(Math.max(height / 25, 2)),
     brush = d3.svg.brush(),
     extent;
 
@@ -54,7 +52,6 @@ d3.custom.chartBrush = function () {
 
       // programatically set brush extent if it's set
       if (extent) {
-        console.log('brush extent', extent);
         brush.extent(extent);
       } else {
         brush.clear();
@@ -86,8 +83,7 @@ d3.custom.chartBrush = function () {
         .attr("class", "brush")
         .call(brush)
         .selectAll("rect")
-        // .attr("transform", "translate(" - margin.left + ",0)")
-        .attr("height", height); // ?
+        .attr("height", height);
 
       function brushed() {
         dispatch.brushed(brush.empty() ? [] : brush.extent().map(function(d) { return +d; }));
@@ -104,7 +100,7 @@ d3.custom.chartBrush = function () {
   exports.extent = function(_) {
     if (!arguments.length) return extent;
     extent = _;
-    return this; // calls chartBrush
+    return this; // calls miniMap
   };
 
   d3.rebind(exports, dispatch, 'on');

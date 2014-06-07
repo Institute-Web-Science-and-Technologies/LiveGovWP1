@@ -18,12 +18,12 @@
   };
 
   // return the most occurring element of an array
-  // NOTE: returns latest touched element if there are multiple top counts
+  // NOTE: returns last touched element if there are multiple top counts
   Array.prototype.most = function() {
     var that = this;
     return this.slice().sort(function(a, b) {
-        return that.filter(function(v){ return v === a }).length -
-               that.filter(function(v){ return v === b }).length;
+        return that.filter(function(v){ return v === a; }).length -
+               that.filter(function(v){ return v === b; }).length;
     }).pop();
   };
 

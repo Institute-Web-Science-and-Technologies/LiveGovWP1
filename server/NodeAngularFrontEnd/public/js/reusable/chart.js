@@ -27,7 +27,7 @@ d3.custom.lineChart = function () {
 
       var data = d.data;
 
-      console.log('chartwidth', width);
+      // console.log('chartwidth', width);
 
       var chartName = this.classList[0];
 

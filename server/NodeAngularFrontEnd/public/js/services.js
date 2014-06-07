@@ -111,7 +111,7 @@ app.service('Trip',
     loadData: function(trip, obj) {
       var that = this;
       var t = new Date();
-      console.info(trip.id + ": loading data");
+      // console.info(trip.id + ": loading data");
 
       // if (obj) {
       //   console.log(obj);
