@@ -28,8 +28,71 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.walking {
+  fill: #99cc99;
+  background-color: #99cc99;
+}
+.running {
+  fill: #f2777a;
+  background-color: #f2777a;
+}
+.driving {
+  fill: #ffcc66;
+  background-color: #ffcc66;
+}
+.sitting {
+  fill: #b4886f;
+  background-color: #b4886f;
+}
+.on-table {
+  fill: #66cccc;
+  background-color: #66cccc;
+}
+.standing {
+  fill: #6699cc;
+  background-color: #6699cc;
+}
+
+.tag {
+  text-align: left
+}
 .error {
   color: #f2777a;
+}
+
+td.minimap-preview {
+  padding: 0 !important;
+  // line-height: 37px;
+  width: 200px;
+  // overflow: auto;
+}
+
+div.minimap-preview {
+  width: 100%;
+  height: 100%;
+  // display: inline-block;
+  position: relative;
+}
+
+minimap-preview {
+  position: absolute;
+  // box-sizing: border-box;
+  // padding: 0;
+
+  // padding: 0;
+  // max-width: 100px;
+  & > svg {
+    width: 100%;
+    height: 100%;
+  }
+  // margin: 0;
+  // display: inline-block;
+  // width: 100%;
+  // min-height: 100%;
+  // max-height: 100%;
+  width: 100%;
+  height: 100%;
+  // line-height: 100%;
 }
 
 /*   REC TABLE   */
@@ -296,7 +359,7 @@ chart {
 
 .brush {
   // border-radius: 4px;
-  background-color: #f5f5f5;
+  background-color: rgba(0,0,0,0.2); //#f5f5f5;
   padding: 0;
   margin: 0;
 }
@@ -320,7 +383,8 @@ chart {
   height: 50px;
   // clear: both;
   // padding-top: 20px;
-  background-color: red;
+  // background-color: rgba(254, 206, 9, 0.5);
+  background-color: white;
   display: block;
   width: 100%;
   clear: both;
@@ -349,8 +413,11 @@ chart {
 }
 
 .brush .extent {
-  stroke: darken(#f5f5f5, 30%);
-  fill-opacity: 0.125;
+  // stroke: darken(#f5f5f5, 30%);
+  stroke: none;
+  // fill: #fb6068;
+  fill: #1d1f21;
+  fill-opacity: 0.5;
   shape-rendering: crispEdges;
 }
 

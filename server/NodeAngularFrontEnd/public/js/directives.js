@@ -26,34 +26,34 @@ app.directive('minimapPreview', ['$window',
   }
 ]);
 
-app.directive('brush', ['$window',
+app.directive('minimap', ['$window',
   function($window) {
     return {
       restrict: 'E',
       scope: {trip: '=', updateExtent: '&', loadMoreData: '&'},
       link: function($scope, $element, $attributes) {
-        var brush = d3.custom.chartBrush();
-        var brushElement = d3.select($element[0]); // brush's 'this' in selection.each
+        var minimap = d3.custom.miniMap();
+        var minimapElement = d3.select($element[0]); // minimap's 'this' in selection.each
 
         // angular.element($window).bind('resize', function() {
-        //   brushElement
-        //     .call(brush);
+        //   minimapElement
+        //     .call(minimap);
         // });
 
-        brush.on('brushed', function(d, i) {
-          // console.log('brush on brushed', d, i);
+        minimap.on('minimaped', function(d, i) {
+          // console.log('minimap on minimaped', d, i);
           $scope.updateExtent({args: d});
         });
 
-        brush.on('brushended', function(d, i) {
+        minimap.on('minimapended', function(d, i) {
           $scope.loadMoreData({args: d});
         });
 
         $scope.$watchCollection('[trip.domain.x, trip.domain.y, trip.extent]', function(val, oldVal) {
           if ($scope.trip && $scope.trip.domain.x.length && $scope.trip.domain.y.length) {
-            brushElement
+            minimapElement
             .datum({domain: $scope.trip.domain, har: $scope.trip.data.har})
-            .call(brush
+            .call(minimap
               .extent($scope.trip.extent.length ? $scope.trip.extent : '')
               );
           }

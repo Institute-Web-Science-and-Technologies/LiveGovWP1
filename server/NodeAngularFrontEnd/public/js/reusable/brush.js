@@ -60,7 +60,28 @@ d3.custom.chartBrush = function () {
         brush.clear();
       }
 
-      // draw the actual brush rectangle
+      // iterate through each har tag and draw colored rectangles into our svg
+      // element.
+      d.har.forEach(function(d, i, a) {
+        svg.append("rect")
+          .attr("width", function(d) {
+            return xScale(a[i][1]) - xScale(a[i][0]);
+          })
+          .attr("height", height)
+          .attr("x", function() {
+            return xScale(a[i][0]);
+          })
+          .attr("y", 0)
+          .attr("class", a[i][2].replace(/ /g, '-')) // har tag
+          .on("mouseover", function() {
+            d3.select("text").enter().append("text")
+              .text(function(d) { return d.tag; })
+              .attr("x", function(d) { return x(d.x); })
+              .attr("y", function (d) { return y(d.y); });
+            });
+      });
+
+      // draw the actually clickable brush rectangle
       svg.append("g")
         .attr("class", "brush")
         .call(brush)
