@@ -1,0 +1,74 @@
+doctype html
+
+html(lang="en", ng-app="inspectionFrontEnd")
+  head
+    meta(charset="utf-8")
+    title= title
+
+    //- base(href="/")
+
+    meta(name="google" content="notranslate")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+
+    //- TODO bootstrap should be considered harmful. s/bootstrap/bourbon-neat
+    //- TODO find a proper substitution for geojson-utils.js
+    //- TODO concat and minify everything as good as possible for production env
+
+    //- to ensure css files are downloaded in parallel, include external css
+    //- before external javascript
+
+    //- link(href='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.css', rel='stylesheet')
+    link(rel="stylesheet", href='./bower_components/mapbox.js/theme/style.css')
+    link(rel="stylesheet", href="./bower_components/bootstrap/dist/css/bootstrap.min.css")
+    link(rel="stylesheet", href="./bower_components/angular-xeditable/dist/css/xeditable.css")
+
+    link(href="./css/001.css", rel="stylesheet")
+
+    script(src="./bower_components/angular/angular.js")
+
+  body(ng-controller="mainCtrl as main")
+    header
+      nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation" ng-controller="navCtrl as ctrl")
+        ul.nav.navbar-nav
+          li(ng-class='{active:ctrl.loc("rec")}')
+            a(href="#/rec/{{trip_id}}") Recordings
+          li(ng-class='{active:ctrl.loc("raw"), disabled:!ctrl.selected()}')
+            a(ng-hide='!ctrl.selected()', href="#/raw/{{trip_id}}") Raw Data
+            a(ng-show='!ctrl.selected()', href="") Raw Data
+          li(ng-class='{active:ctrl.loc("har"), disabled:!ctrl.selected()}')
+            a(ng-hide='!ctrl.selected()', ng-href="#/har/{{trip_id}}") Activity Recognition
+            a(ng-show='!ctrl.selected()', ng-href="") Activity Recognition
+
+        ul.nav.navbar-nav.pull-right
+          li
+            a(ng-cloak, ng-class="{errors:$root.httpRequestErrors}", title='the number in parentheses displays the currently running http/xhr requests') {{ $root.httpRequests ? 'loading... (' + $root.httpRequests + ')' : 'ready' }}
+
+    #container
+      div(ng-include src="template")
+
+  script(src="./bower_components/angular-resource/angular-resource.js")
+  script(src="./bower_components/angular-route/angular-route.js")
+  script(src="./bower_components/d3/d3.js")
+  script(src="./bower_components/jquery/dist/jquery.js")
+  script(src="./bower_components/moment/min/moment.min.js")
+  script(src='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js')
+  //- script(src='./bower_components/mapbox.js/mapbox.js')
+
+  //- custom helpers
+  script(src="./js/helpers.js")
+
+  //- d3 sensor charts, brush, leaflet map
+  script(src="./js/reusable/chart.js")
+  script(src="./js/reusable/brush.js")
+  script(src="./js/reusable/minimap-preview.js")
+  script(src="./js/reusable/map.js")
+
+  //- angular
+  script(src="./js/modules.js")
+  script(src="./js/services.js")
+  script(src="./js/controllers.js")
+  script(src="./js/directives.js")
+  script(src="./js/filters.js")
+  script(src="./js/routes.js")
+
+//- ex:ft=jade
