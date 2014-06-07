@@ -2,6 +2,30 @@
 /* globals angular, app, d3, L */
 'use strict'; // jshint -W097
 
+app.directive('minimapPreview', ['$window',
+  function($window) {
+    return {
+      restrict: 'EA',
+      replace: true,
+      scope: {har: '=', domain: '='},
+      link: function($scope, $element, $attributes) {
+        var minimapPreview = d3.custom.minimapPreview();
+        var minimapPreviewElement = d3.select($element[0]); // brush's 'this' in selection.each
+
+        $scope.$watchCollection('[domain.x, domain.y, har]', function(val, oldVal) {
+          console.log('almost...');
+          if ($scope.har && $scope.domain.x.length && $scope.domain.y.length) {
+            console.log(' ready!');
+            minimapPreviewElement
+            .datum({domain: $scope.domain, har: $scope.har})
+            .call(minimapPreview);
+          }
+        });
+      }
+    };
+  }
+]);
+
 app.directive('brush', ['$window',
   function($window) {
     return {
@@ -17,7 +41,7 @@ app.directive('brush', ['$window',
         // });
 
         brush.on('brushed', function(d, i) {
-          console.log('brush on brushed', d, i);
+          // console.log('brush on brushed', d, i);
           $scope.updateExtent({args: d});
         });
 
@@ -28,7 +52,7 @@ app.directive('brush', ['$window',
         $scope.$watchCollection('[trip.domain.x, trip.domain.y, trip.extent]', function(val, oldVal) {
           if ($scope.trip && $scope.trip.domain.x.length && $scope.trip.domain.y.length) {
             brushElement
-            .datum({domain: $scope.trip.domain})
+            .datum({domain: $scope.trip.domain, har: $scope.trip.data.har})
             .call(brush
               .extent($scope.trip.extent.length ? $scope.trip.extent : '')
               );

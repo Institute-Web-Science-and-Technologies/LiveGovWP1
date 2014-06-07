@@ -30,7 +30,9 @@ div(ng-controller="tripCtrl as ctrl")
             td(ng-click="ctrl.select(trip); ctrl.to('raw', trip)") {{ trip.user }}
             td(ng-click="ctrl.select(trip); ctrl.to('raw', trip)") {{ trip.start | date:'yyyy-MM-dd HH:mm:ss' }}
             td(ng-click="ctrl.select(trip); ctrl.to('raw', trip)") {{ trip.duration | date:'HH:mm:ss' }}
-            td
+            td.minimap-preview
+              div.minimap-preview
+                minimap-preview(domain='trip.domain', har='trip.data.har')
             td
               input(type='text', ng-model='trip.name', ng-change="ctrl.update(trip, {name: trip.name})", placeholder='no name')
             td.delete(ng-click="ctrl.delete(trip)") DEL

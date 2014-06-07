@@ -161,7 +161,7 @@ app.controller('tripCtrl',
 
   // update scope (called by directive)
   $scope.updateExtent = function(extent) {
-    console.log('tripCtrl updateExtent', extent);
+    // console.log('tripCtrl updateExtent', extent);
     $scope.$apply(function() {
       $scope.trip.extent = extent;
     });
