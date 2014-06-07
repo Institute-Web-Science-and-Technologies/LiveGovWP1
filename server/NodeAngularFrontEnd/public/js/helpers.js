@@ -28,6 +28,18 @@
   };
 
 
+  Array.prototype.summarize = function(val) { // har tags [{ts: string, tag: string}]
+    var j=0;
+    return this.map(function(c, i, a) {
+      if (a[i+1]) {
+        if (a[i+1][val] !== a[i][val]) {
+          var r = [a[j].ts, a[i].ts, a[i].tag];
+          j=i+1;
+          return r;
+        }
+      }
+    }).filter(function(d) { return d; });
+  };
   // Object.prototype.getById = function(id) {
   //   return this.filter()
 
