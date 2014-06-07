@@ -22,6 +22,9 @@ app.filter('duration', function () {
   // var t = new Date();
   return function (start_ts, stop_ts) {
     // console.info("duration filter took " + ((new Date() - t) / 1000) + " ms");
-		return stop_ts - start_ts - 3600000; // dirty fix for gmt+1: duration minus 1h
+    return stop_ts - start_ts; // - 3600000; // dirty fix for gmt+1: duration minus 1h
+  };
+});
+
 	};
 });
