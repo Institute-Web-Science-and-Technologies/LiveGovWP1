@@ -23,9 +23,9 @@ Testing Tools:
 * [Heinrich Hartmann](https://github.com/HeinrichHartmann)
 * Christoph Schaefer
 * Richard Schütz
-* Christoph Ehlen
-* Lukas Härtel
-* Rene Wilhelm
+* [Christoph Ehlen](https://github.com/cEhlen)
+* [Lukas Härtel](https://github.com/lukashaertel)
+* [René Wilhelm](https://github.com/rwilhelm/)
 
 ### Acknowledgements:
 This software is part of the [Live+Gov](http://liveandgov.eu) project and is financially supported by
