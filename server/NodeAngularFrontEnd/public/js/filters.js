@@ -26,5 +26,9 @@ app.filter('duration', function () {
   };
 });
 
+app.filter('detox', function () {
+  return function (string) {
+    if (!arguments.length || !string) return;
+		return string.replace(/ /g, '-');
 	};
 });
