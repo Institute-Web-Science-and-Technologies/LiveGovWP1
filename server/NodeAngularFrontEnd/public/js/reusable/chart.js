@@ -89,14 +89,14 @@ d3.custom.lineChart = function () {
       chart.append("path")
         .attr("class", "line line0")
         .attr("clip-path", "url(#clip)")
-        .attr("d", line(data.map(function(d) { return [d.ts, d.avgx]; })));
+        .attr("d", line(data.map(function(d) { return [d.ts, d.x]; })));
 
       svg.selectAll("line0")
         .data(data)
         .enter().append("svg:circle")
         .attr("transform", "translate(" + (margin.left + 0) + "," + (margin.top + 0) + ")")
         .attr("cx", function(d) { return xScale(d.ts); })
-        .attr("cy", function(d) { return yScale(d.avgx); })
+        .attr("cy", function(d) { return yScale(d.x); })
         .attr("r", 1.5)
         .attr("class", "circle circle0");
 
@@ -104,14 +104,14 @@ d3.custom.lineChart = function () {
       chart.append("path")
         .attr("class", "line line1")
         .attr("clip-path", "url(#clip)")
-        .attr("d", line(data.map(function(d) { return [d.ts, d.avgy]; })));
+        .attr("d", line(data.map(function(d) { return [d.ts, d.y]; })));
 
       svg.selectAll("line1")
         .data(data)
         .enter().append("svg:circle")
         .attr("transform", "translate(" + (margin.left + 0) + "," + (margin.top + 0) + ")")
         .attr("cx", function(d) { return xScale(d.ts); })
-        .attr("cy", function(d) { return yScale(d.avgy); })
+        .attr("cy", function(d) { return yScale(d.y); })
         .attr("r", 1.5)
         .attr("class", "circle circle1");
 
@@ -119,14 +119,14 @@ d3.custom.lineChart = function () {
       chart.append("path")
         .attr("class", "line line2")
         .attr("clip-path", "url(#clip)")
-        .attr("d", line(data.map(function(d) { return [d.ts, d.avgz]; })));
+        .attr("d", line(data.map(function(d) { return [d.ts, d.z]; })));
 
       svg.selectAll("line2")
         .data(data)
         .enter().append("svg:circle")
         .attr("transform", "translate(" + (margin.left + 0) + "," + (margin.top + 0) + ")")
         .attr("cx", function(d) { return xScale(d.ts); })
-        .attr("cy", function(d) { return yScale(d.avgz); })
+        .attr("cy", function(d) { return yScale(d.z); })
         .attr("r", 1.5)
         .attr("class", "circle circle2");
 

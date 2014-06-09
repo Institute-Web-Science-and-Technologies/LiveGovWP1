@@ -84,9 +84,9 @@ div(ng-controller="tripCtrl as ctrl")#raw
 
                   tbody
                     tr(ng-repeat="d in trip.data.sensors.gra", ng-class='d.tag | detox', ng-hide='ctrl.matchExtent(d)')
-                      td.avgx {{ d.avgx | number:15 }}
-                      td.avgy {{ d.avgy | number:15 }}
-                      td.avgz {{ d.avgz | number:15 }}
+                      td.x {{ d.x | number:15 }}
+                      td.y {{ d.y | number:15 }}
+                      td.z {{ d.z | number:15 }}
                       td.ts {{ d.ts | date:'HH:mm:ss.mm' }}
                       td.tag {{ d.tag }}
 
@@ -105,9 +105,9 @@ div(ng-controller="tripCtrl as ctrl")#raw
 
                   tbody
                     tr(ng-repeat="d in trip.data.sensors.acc", ng-class='d.tag | detox', ng-hide='ctrl.matchExtent(d)')
-                      td.avgx {{ d.avgx | number:15 }}
-                      td.avgy {{ d.avgy | number:15 }}
-                      td.avgz {{ d.avgz | number:15 }}
+                      td.x {{ d.x | number:15 }}
+                      td.y {{ d.y | number:15 }}
+                      td.z {{ d.z | number:15 }}
                       td.ts {{ d.ts | date:'HH:mm:ss.mm' }}
                       td.tag {{ d.tag }}
 
@@ -126,9 +126,9 @@ div(ng-controller="tripCtrl as ctrl")#raw
 
                   tbody
                     tr(ng-repeat="d in trip.data.sensors.lac", ng-class='d.tag | detox', ng-hide='!ctrl.matchExtent(d)')
-                      td.avgx {{ d.avgx | number:15 }}
-                      td.avgy {{ d.avgy | number:15 }}
-                      td.avgz {{ d.avgz | number:15 }}
+                      td.x {{ d.x | number:15 }}
+                      td.y {{ d.y | number:15 }}
+                      td.z {{ d.z | number:15 }}
                       td.ts {{ d.ts | date:'HH:mm:ss.mm' }}
                       td.tag {{ d.tag }}
 

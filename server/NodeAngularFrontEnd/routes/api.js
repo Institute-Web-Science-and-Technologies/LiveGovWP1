@@ -45,8 +45,10 @@ module.exports = function(api) {
     var extent = this.query.e ? extentToSQL(this.query.e) : '';
     var result, q;
 
+    console.log(this.params.sensor);
     switch (this.params.sensor) {
       case 'gps':
+        console.log('gps');
         q = 'SELECT ts, ST_AsGeoJSON(lonlat)::json AS lonlat FROM ' + schemas[this.params.sensor] + ' WHERE trip_id = ' + this.params.trip_id + extent;
         break;
       case 'lac':
@@ -59,6 +61,7 @@ module.exports = function(api) {
         }
         /* falls through */
       default:
+        console.log('default');
         q = 'SELECT * FROM ' + schemas[this.params.sensor] + ' WHERE trip_id = ' + this.params.trip_id + extent;
     }
 

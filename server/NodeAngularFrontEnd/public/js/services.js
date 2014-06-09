@@ -5,8 +5,8 @@
 app.service('Config', function() {
   var sensors = ['acc', 'gra', 'lac']; // used sensors
   var xDomain = ['starttime', 'endtime']; // by which values x-domain is calculated
-  var yDomain = ['avgx', 'avgy', 'avgz']; // ... y-domain ...
-  var ntile = 200; // default window size
+  var yDomain = ['x', 'y', 'z']; // ... y-domain ...
+  var windowSize = 200; // default window size
 
   return {
     sensors: function() { return sensors; },
