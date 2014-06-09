@@ -180,6 +180,10 @@ app.controller('tripCtrl',
   this.is = function(loc) {
     return ($route.current && $route.current.name == loc) ? true : false;
   };
+
+  this.matchExtent = function(d) {
+    return (d.ts >= $scope.trip.extent[0] && d.ts <= $scope.trip.extent[1]) ? true : false;
+  };
 });
 
 app.controller('navCtrl', function ($route, $scope, $routeParams, Trip) {
