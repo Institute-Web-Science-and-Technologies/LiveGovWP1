@@ -46,6 +46,7 @@ app.controller('tripCtrl',
   Trip.loadTrips().then(function(data) {
     $scope.trips = data;
 
+
     if ($routeParams.trip_id) {
       console.log('trip id is set by route params to', $routeParams.trip_id);
       $scope.trip = $scope.trips.filter(function(d) {
@@ -160,10 +161,10 @@ app.controller('tripCtrl',
 
   this.loadMoreData = function(trip) {
     console.log(Trip.hasData($scope.trip));
-    var newWindowSize = Math.floor(Math.abs((Trip.hasData(trip) / 3) + 200)); // oO
-    Trip.loadData($scope.trip, {windowSize: newWindowSize});
-  }
-
+    Trip.loadData($scope.trip, {
+      windowSize: Math.floor(Math.abs((Trip.hasData(trip) / 3) + 200))
+    });
+  };
 
   // update scope (called by directive)
   $scope.updateExtent = function(extent) {

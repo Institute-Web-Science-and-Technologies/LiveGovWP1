@@ -265,8 +265,6 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
     sensor: function (trip, obj) {
       var t = new Date();
 
-      console.warn('query!', obj);
-
       var promises = Config.sensors().map(function(sensor) {
         var deferred = $q.defer();
 
@@ -279,7 +277,6 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
           }
         })
         .success(function (data, status, headers, config) {
-
           data.forEach(function(d) {
             d.ts         = (+d.starttime + (+d.endtime)) / 2;
             d.starttime  = +d.starttime;
@@ -309,7 +306,6 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
       var deferred = $q.defer();
       $http.get('api/trips/' + trip.id + '/sensors/har')
       .success(function(data) {
-        console.log(data);
         var harTags = data.map(function(d) {
           return {
             ts: d.ts,
@@ -319,6 +315,9 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
         deferred.resolve(harTags);
       });
       return deferred.promise;
+    },
+
+    gps: function(trip) {
     },
 
     // load har and gps data, return feature collection
