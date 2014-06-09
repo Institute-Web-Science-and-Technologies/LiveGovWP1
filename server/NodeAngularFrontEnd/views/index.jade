@@ -29,6 +29,7 @@ html(lang="en", ng-app="inspectionFrontEnd")
     script(src="./bower_components/angular/angular.js")
 
   body(ng-controller="mainCtrl as main")
+
     header
       nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation" ng-controller="navCtrl as ctrl")
         ul.nav.navbar-nav
@@ -46,7 +47,11 @@ html(lang="en", ng-app="inspectionFrontEnd")
             a(ng-cloak, ng-class="{errors:$root.httpRequestErrors}", title='the number in parentheses displays the currently running http/xhr requests') {{ $root.httpRequests ? 'loading... (' + $root.httpRequests + ')' : 'ready' }}
 
     #container
+      #example
+        p example
+      script(type="text/jsx", src="/data-table.js")
       div(ng-include src="template")
+
 
   script(src="./bower_components/angular-resource/angular-resource.js")
   script(src="./bower_components/angular-route/angular-route.js")
@@ -54,6 +59,10 @@ html(lang="en", ng-app="inspectionFrontEnd")
   script(src="./bower_components/d3-tip/index.js")
   script(src="./bower_components/jquery/dist/jquery.js")
   script(src="./bower_components/moment/min/moment.min.js")
+  script(src="./bower_components/underscore/underscore-min.js")
+  script(src="./bower_components/react/react.js")
+  script(src="./bower_components/react/JSXTransformer.js")
+  script(src="./bower_components/ngReact/ngReact.js")
   script(src='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js')
   //- script(src='./bower_components/mapbox.js/mapbox.js')
 

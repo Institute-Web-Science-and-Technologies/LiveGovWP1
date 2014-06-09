@@ -5,4 +5,5 @@
 var app = angular.module('inspectionFrontEnd', [
   'ngRoute',
   'ngResource',
+  'ngReact'
   ]);
