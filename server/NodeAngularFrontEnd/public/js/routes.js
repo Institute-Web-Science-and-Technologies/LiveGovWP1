@@ -13,15 +13,15 @@ app.config(function ($routeProvider, $locationProvider) {
 
   $routeProvider
     .when('/rec/:trip_id?', {
-      templateUrl: 'partials/rec',
+      templateUrl: 'templates/rec',
     })
 
     .when('/raw/:trip_id?', {
-      templateUrl: 'partials/raw',
+      templateUrl: 'templates/raw',
     })
 
     .when('/har/:trip_id?', {
-      templateUrl: 'partials/har',
+      templateUrl: 'templates/har',
     })
 
     .otherwise({

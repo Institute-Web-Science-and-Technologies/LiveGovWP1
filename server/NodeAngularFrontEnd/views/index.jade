@@ -22,11 +22,14 @@ html(lang="en", ng-app="inspectionFrontEnd")
     link(rel="stylesheet", href="./bower_components/bootstrap/dist/css/bootstrap.min.css")
     link(rel="stylesheet", href="./bower_components/angular-xeditable/dist/css/xeditable.css")
 
+    link(rel="import", href="../bower_components/polymer/polymer.html")
+
     link(href="./css/001.css", rel="stylesheet")
 
     script(src="./bower_components/angular/angular.js")
 
   body(ng-controller="mainCtrl as main")
+
     header
       nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation" ng-controller="navCtrl as ctrl")
         ul.nav.navbar-nav
@@ -44,13 +47,22 @@ html(lang="en", ng-app="inspectionFrontEnd")
             a(ng-cloak, ng-class="{errors:$root.httpRequestErrors}", title='the number in parentheses displays the currently running http/xhr requests') {{ $root.httpRequests ? 'loading... (' + $root.httpRequests + ')' : 'ready' }}
 
     #container
+      #example
+        p example
+      script(type="text/jsx", src="/data-table.js")
       div(ng-include src="template")
+
 
   script(src="./bower_components/angular-resource/angular-resource.js")
   script(src="./bower_components/angular-route/angular-route.js")
   script(src="./bower_components/d3/d3.js")
+  script(src="./bower_components/d3-tip/index.js")
   script(src="./bower_components/jquery/dist/jquery.js")
   script(src="./bower_components/moment/min/moment.min.js")
+  script(src="./bower_components/underscore/underscore-min.js")
+  script(src="./bower_components/react/react.js")
+  script(src="./bower_components/react/JSXTransformer.js")
+  script(src="./bower_components/ngReact/ngReact.js")
   script(src='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js')
   //- script(src='./bower_components/mapbox.js/mapbox.js')
 
@@ -59,7 +71,7 @@ html(lang="en", ng-app="inspectionFrontEnd")
 
   //- d3 sensor charts, brush, leaflet map
   script(src="./js/reusable/chart.js")
-  script(src="./js/reusable/brush.js")
+  script(src="./js/reusable/minimap.js")
   script(src="./js/reusable/minimap-preview.js")
   script(src="./js/reusable/map.js")
 

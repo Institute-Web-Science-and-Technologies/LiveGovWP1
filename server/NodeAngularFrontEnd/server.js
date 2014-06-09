@@ -1,28 +1,34 @@
-var express = require('express');
-var path = require('path');
-var app = express();
+// jshint esnext:true
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+var config = require('./config');
+var app = require('koa')();
 
-app.use('/bower_components', express.static(path.join(__dirname, 'bower_components')));
-app.use(express.static(path.join(__dirname, 'public')));
+var Router = require('koa-router');
+var mount = require('koa-mount');
+var serve = require('koa-static');
 
-// middleware
-app.use(require('body-parser')());
-app.use(require('method-override')());
-app.use(require('compression')());
+app.use(serve('public'));
+app.use(mount('/bower_components', serve('bower_components')));
 
-if (process.env.NODE_ENV == 'development') {
-  app.set('port', process.env.PORT || 4001);
-  app.use(require('errorhandler')({ dumpExceptions: true, showStack: true }));
-  app.use(require('morgan')()); // logger
-} else {
-  app.set('port', process.env.PORT || 3001);
-  app.use(require('errorhandler')());
-}
+app.use(require('koa-logger')());
+app.use(require('koa-body')());
 
-require('./routes')(app);
-// console.log(app.routes);
+app.use(require('koa-views')('views', {
+  default: 'jade',
+  cache: false
+}));
 
-app.listen(app.get('port'));
+var pg = require ('koa-pg');
+app.use(pg('pg://postgres:liveandgov@localhost:3333/liveandgov'));
+
+// api routes (responds json)
+var api = new Router();
+require('./routes/api')(api);
+app.use(mount('/api', api.middleware()));
+
+// basic routes (renders template)
+var routes = new Router();
+require('./routes')(routes);
+app.use(mount('/', routes.middleware()));
+
+app.listen(3512);

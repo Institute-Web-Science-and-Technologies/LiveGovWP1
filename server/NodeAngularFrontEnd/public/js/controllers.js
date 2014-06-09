@@ -46,6 +46,7 @@ app.controller('tripCtrl',
   Trip.loadTrips().then(function(data) {
     $scope.trips = data;
 
+
     if ($routeParams.trip_id) {
       console.log('trip id is set by route params to', $routeParams.trip_id);
       $scope.trip = $scope.trips.filter(function(d) {
@@ -56,6 +57,8 @@ app.controller('tripCtrl',
       $scope.trip = Trip.selected();
       // debugger
     }
+
+    Trip.sensorCounts($scope.trip);
 
   });
 
@@ -98,6 +101,10 @@ app.controller('tripCtrl',
       this.updateUrl(trip);
       Trip.select(trip);
     }
+  };
+
+  this.sensorCounts = function(trip) {
+    Trip.sensorCounts();
   };
 
   // test if a trip is selected
@@ -154,10 +161,10 @@ app.controller('tripCtrl',
 
   this.loadMoreData = function(trip) {
     console.log(Trip.hasData($scope.trip));
-    var newWindowSize = Math.floor(Math.abs((Trip.hasData(trip) / 3) + 200)); // oO
-    Trip.loadData($scope.trip, {windowSize: newWindowSize});
-  }
-
+    Trip.loadData($scope.trip, {
+      windowSize: Math.floor(Math.abs((Trip.hasData(trip) / 3) + 200))
+    });
+  };
 
   // update scope (called by directive)
   $scope.updateExtent = function(extent) {
@@ -179,6 +186,10 @@ app.controller('tripCtrl',
 
   this.is = function(loc) {
     return ($route.current && $route.current.name == loc) ? true : false;
+  };
+
+  this.matchExtent = function(d) {
+    return (d.ts >= $scope.trip.extent[0] && d.ts <= $scope.trip.extent[1]) ? true : false;
   };
 });
 

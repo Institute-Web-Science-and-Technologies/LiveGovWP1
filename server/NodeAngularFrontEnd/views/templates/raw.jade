@@ -1,4 +1,5 @@
 div(ng-controller="tripCtrl as ctrl")#raw
+  p {{ trip.extent }}
 
   #main
 
@@ -23,6 +24,8 @@ div(ng-controller="tripCtrl as ctrl")#raw
                 th duration
                 th tags
                 th name
+                th has gps?
+                th has har?
 
                 tbody
                   tr
@@ -34,6 +37,8 @@ div(ng-controller="tripCtrl as ctrl")#raw
                       input(type='text', ng-model='trip.tags', ng-change="ctrl.update(trip, {tags: trip.tags})", placeholder='no tags')
                     td.name
                       input(type='text', ng-model='trip.name', ng-change="ctrl.update(trip, {name: trip.name})", placeholder='no name')
+                    td.gps {{ trip.data.gps.length }}
+                    td.har {{ trip.data.har.length }}
 
     .container-fluid.charts
       .row
@@ -41,7 +46,7 @@ div(ng-controller="tripCtrl as ctrl")#raw
           chart.gra(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
         .col-xs-2.col-lg-1
           h4 Gravity
-          div {{ trip.data.sensors.gra.length }}
+          div {{ trip.data.sensors.gra.length }}/{{ trip.data.counts.gra }}
           a(ng-href="./trips/{{trip.id}}/gra.csv", download='livegov-trip-{{trip.id}}-sensor-gra.csv') export
 
       .row
@@ -49,7 +54,7 @@ div(ng-controller="tripCtrl as ctrl")#raw
           chart.acc(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
         .col-xs-2.col-lg-1
           h4 Acceleration
-          div {{ trip.data.sensors.acc.length }}
+          div {{ trip.data.sensors.acc.length }}/{{ trip.data.counts.acc }}
           a(ng-href="./trips/{{trip.id}}/acc.csv", download='livegov-trip-{{trip.id}}-sensor-acc.csv') export
 
       .row
@@ -57,13 +62,13 @@ div(ng-controller="tripCtrl as ctrl")#raw
           chart.lac(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
         .col-xs-2.col-lg-1
           h4 Linear Acceleration
-          div {{ trip.data.sensors.lac.length }}
+          div {{ trip.data.sensors.lac.length }}/{{ trip.data.counts.lac }}
           a(ng-href="./trips/{{trip.id}}/lac.csv", download='livegov-trip-{{trip.id}}-sensor-lac.csv') export
 
     .container-fluid.data-tables
       .row
-        .col-xs-6.col-lg-6
-          h4 Gravity Data
+        .col-xs-4.col-lg-4
+          h4 Gravity Data {{ trip.data.sensors.gra | matchExtent:trip.extent }}/{{ trip.data.sensors.gra.length }}
           .table-responsive
             table.table.table-condensed.table-hover.sensor-data-table
               thead
@@ -75,16 +80,16 @@ div(ng-controller="tripCtrl as ctrl")#raw
                   th tag
 
                   tbody
-                    tr(ng-repeat="d in trip.data.sensors.gra", ng-class='d.tag | detox')
-                      td.avgx {{ d.avgx | number:15 }}
-                      td.avgy {{ d.avgy | number:15 }}
-                      td.avgz {{ d.avgz | number:15 }}
+                    tr(ng-repeat="d in trip.data.sensors.gra", ng-class='d.tag | detox', ng-hide='ctrl.matchExtent(d)')
+                      td.x {{ d.x | number:15 }}
+                      td.y {{ d.y | number:15 }}
+                      td.z {{ d.z | number:15 }}
                       td.ts {{ d.ts | date:'HH:mm:ss.mm' }}
                       td.tag {{ d.tag }}
 
 
-        .col-xs-6.col-lg-6
-          h4 Acceleration Data
+        .col-xs-4.col-lg-4
+          h4 Acceleration Data {{ trip.data.sensors.acc | matchExtent:trip.extent }}/{{ trip.data.sensors.acc.length }}
           .table-responsive
             table.table.table-condensed.table-hover.sensor-data-table
               thead
@@ -96,16 +101,16 @@ div(ng-controller="tripCtrl as ctrl")#raw
                   th tag
 
                   tbody
-                    tr(ng-repeat="d in trip.data.sensors.acc", ng-class='d.tag | detox')
-                      td.avgx {{ d.avgx | number:15 }}
-                      td.avgy {{ d.avgy | number:15 }}
-                      td.avgz {{ d.avgz | number:15 }}
+                    tr(ng-repeat="d in trip.data.sensors.acc", ng-class='d.tag | detox', ng-hide='ctrl.matchExtent(d)')
+                      td.x {{ d.x | number:15 }}
+                      td.y {{ d.y | number:15 }}
+                      td.z {{ d.z | number:15 }}
                       td.ts {{ d.ts | date:'HH:mm:ss.mm' }}
                       td.tag {{ d.tag }}
 
 
-        .col-xs-6.col-lg-6
-          h4 Linear Acceleration Data
+        .col-xs-4.col-lg-4
+          h4 Linear Acceleration Data {{ trip.data.sensors.lac | matchExtent:trip.extent }}/{{ trip.data.sensors.lac.length }}
           .table-responsive
             table.table.table-condensed.table-hover.sensor-data-table
               thead
@@ -117,10 +122,10 @@ div(ng-controller="tripCtrl as ctrl")#raw
                   th tag
 
                   tbody
-                    tr(ng-repeat="d in trip.data.sensors.lac", ng-class='d.tag | detox')
-                      td.avgx {{ d.avgx | number:15 }}
-                      td.avgy {{ d.avgy | number:15 }}
-                      td.avgz {{ d.avgz | number:15 }}
+                    tr(ng-repeat="d in trip.data.sensors.lac", ng-class='d.tag | detox', ng-hide='!ctrl.matchExtent(d)')
+                      td.x {{ d.x | number:15 }}
+                      td.y {{ d.y | number:15 }}
+                      td.z {{ d.z | number:15 }}
                       td.ts {{ d.ts | date:'HH:mm:ss.mm' }}
                       td.tag {{ d.tag }}
 
@@ -144,7 +149,7 @@ div(ng-controller="tripCtrl as ctrl")#raw
 
 
   #bottom
-    brush(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+    minimap(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
 
 // ex:ft=jade
 

@@ -29,6 +29,15 @@ app.filter('duration', function () {
 app.filter('detox', function () {
   return function (string) {
     if (!arguments.length || !string) return;
-		return string.replace(/ /g, '-');
+    return string.replace(/ /g, '-');
+  };
+});
+
+app.filter('matchExtent', function () {
+  return function (sensorData, extent) {
+    if (!arguments.length || !sensorData || !extent) return;
+    return sensorData.filter(function(d) {
+      return d.ts >= extent[0] && d.ts <= extent[1];
+    }).length;
 	};
 });

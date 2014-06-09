@@ -5,7 +5,7 @@
 app.service('Config', function() {
   var sensors = ['acc', 'gra', 'lac']; // used sensors
   var xDomain = ['starttime', 'endtime']; // by which values x-domain is calculated
-  var yDomain = ['avgx', 'avgy', 'avgz']; // ... y-domain ...
+  var yDomain = ['x', 'y', 'z']; // ... y-domain ...
   var windowSize = 200; // default window size
 
   return {
@@ -55,7 +55,7 @@ app.service('Trip',
 
         console.log('loading trip list');
 
-        $http.get('trips')
+        $http.get('api/trips')
         .success(function(data, status, headers, config) {
 
           // set up trip object architecture
@@ -66,10 +66,10 @@ app.service('Trip',
               user: d.user_id.replace(/['"]+/g, ''),
               start: +d.start_ts,
               stop: +d.stop_ts,
-              duration: +d.stop_ts - (+d.start_ts), // - 3600000, // minus one hour due to wrong timestamps in db
+              duration: +d.stop_ts - (+d.start_ts) - 3600000, // minus one hour due to wrong timestamps in db
               extent: [],
               domain: { x: [], y: [] },
-              data: { sensors: {}, geo: [], har: [] }, // feature collection
+              data: { counts: {}, sensors: {}, geo: [], har: [] }, // feature collection
               love: false
             };
 
@@ -180,6 +180,33 @@ app.service('Trip',
       return (trip.duration >= -3600000 && trip.duration <= -3500000) ? false : true;
     },
 
+    sensorCounts: function(trip) {
+      var promises = Config.sensors().map(function(sensor) {
+        var deferred = $q.defer();
+
+        $http({
+          method: "GET",
+          url: 'api/trips/' + trip.id + '/sensors/' + sensor + '/count',
+        })
+        .success(function (data, status, headers, config) {
+          trip.data.counts[sensor] = +data[0].count;
+
+        // defer merged data
+        deferred.resolve(trip.data.counts[sensor]);
+
+        })
+        .error(function (data, status, headers, config) {
+          deferred.reject();
+        });
+
+        // return merged data as promise
+        return deferred.promise;
+
+
+      });
+
+    },
+
     hasLove: function(trip) {
       if (!arguments.length || !trip) return;
       return (trip.love ? true : false);
@@ -203,7 +230,7 @@ app.service('Trip',
     update: function (trip, data) {
       trip.name = data.name; // client side update
 
-      $http({ method: 'POST', url: 'trips/' + trip.id, data: data })
+      $http({ method: 'POST', url: 'api/trips/' + trip.id, data: data })
       .success(function(data, status, headers, config) {
         console.info("trip updated:", trip.id);
       })
@@ -214,7 +241,7 @@ app.service('Trip',
     delete: function (trip) {
       trips.splice(trips.indexOf(trip), 1); // client side removal
 
-      $http({ method: 'DELETE', url: 'trips/' + trip.id })
+      $http({ method: 'DELETE', url: 'api/trips/' + trip.id })
       .success(function(data, status, headers, config) {
         console.info("trip deleted:", trip.id);
       })
@@ -222,7 +249,7 @@ app.service('Trip',
     },
 
     download: function (trip, sensor, format) {
-      $http({ method: 'GET', url: 'trips/' + trip.id + '/' + sensor + '.' + format })
+      $http({ method: 'GET', url: 'api/trips/' + trip.id + '/sensors/' + sensor + '.' + format })
       .success(function(data, status, headers, config) {
 
       });
@@ -242,15 +269,13 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
 
         $http({
           method: "GET",
-          url: 'trips/' + trip.id + '/' + sensor + '/window',
+          url: 'api/trips/' + trip.id + '/sensors/' + sensor,
           params: {
-            'window':    (obj && obj.hasOwnProperty('windowSize') ? obj.windowSize : Config.windowSize()),
-            'startTime': (obj && obj.hasOwnProperty('extent')     ? obj.extent[0] : undefined),
-            'endTime':   (obj && obj.hasOwnProperty('extent')     ? obj.extent[1] : undefined)
+            'w': (obj && obj.hasOwnProperty('windowSize') ? obj.windowSize : Config.windowSize()),
+            'e': (obj && obj.hasOwnProperty('extent')     ? obj.extent : undefined),
           }
         })
         .success(function (data, status, headers, config) {
-
           data.forEach(function(d) {
             d.ts         = (+d.starttime + (+d.endtime)) / 2;
             d.starttime  = +d.starttime;
@@ -278,9 +303,8 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
 
     har: function(trip) {
       var deferred = $q.defer();
-      $http.get('trips/' + trip.id + '/har')
+      $http.get('api/trips/' + trip.id + '/sensors/har')
       .success(function(data) {
-        console.log(data);
         var harTags = data.map(function(d) {
           return {
             ts: d.ts,
@@ -290,6 +314,9 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
         deferred.resolve(harTags);
       });
       return deferred.promise;
+    },
+
+    gps: function(trip) {
     },
 
     // load har and gps data, return feature collection
@@ -355,8 +382,8 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
         "features": []
       };
 
-      var gps = $http.get('trips/' + trip.id + '/gps');
-      var har = $http.get('trips/' + trip.id + '/har');
+      var gps = $http.get('api/trips/' + trip.id + '/sensors/gps');
+      var har = $http.get('api/trips/' + trip.id + '/sensors/har');
 
       $q.all([gps, har]).then(function(data) {
         var gps = data[0].data;

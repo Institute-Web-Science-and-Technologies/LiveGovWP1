@@ -18,3 +18,6 @@ npm-debug.log
 *.tar.bz2
 
 *.log
+
+public/js/components/*.js
+public/js/components/.module-cache
