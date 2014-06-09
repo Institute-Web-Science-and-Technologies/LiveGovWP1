@@ -55,7 +55,7 @@ app.service('Trip',
 
         console.log('loading trip list');
 
-        $http.get('trips')
+        $http.get('api/trips')
         .success(function(data, status, headers, config) {
 
           // set up trip object architecture
@@ -203,7 +203,7 @@ app.service('Trip',
     update: function (trip, data) {
       trip.name = data.name; // client side update
 
-      $http({ method: 'POST', url: 'trips/' + trip.id, data: data })
+      $http({ method: 'POST', url: 'api/trips/' + trip.id, data: data })
       .success(function(data, status, headers, config) {
         console.info("trip updated:", trip.id);
       })
@@ -214,7 +214,7 @@ app.service('Trip',
     delete: function (trip) {
       trips.splice(trips.indexOf(trip), 1); // client side removal
 
-      $http({ method: 'DELETE', url: 'trips/' + trip.id })
+      $http({ method: 'DELETE', url: 'api/trips/' + trip.id })
       .success(function(data, status, headers, config) {
         console.info("trip deleted:", trip.id);
       })
@@ -222,7 +222,7 @@ app.service('Trip',
     },
 
     download: function (trip, sensor, format) {
-      $http({ method: 'GET', url: 'trips/' + trip.id + '/' + sensor + '.' + format })
+      $http({ method: 'GET', url: 'api/trips/' + trip.id + '/sensors/' + sensor + '.' + format })
       .success(function(data, status, headers, config) {
 
       });
@@ -242,7 +242,7 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
 
         $http({
           method: "GET",
-          url: 'trips/' + trip.id + '/' + sensor + '/window',
+          url: 'api/trips/' + trip.id + '/sensors/' + sensor,
           params: {
             'ntile':  (obj && obj.hasOwnProperty('ntile')  ? obj.windowSize : Config.ntile()),
             'extent': (obj && obj.hasOwnProperty('extent') ? obj.extent : undefined),
@@ -277,7 +277,7 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
 
     har: function(trip) {
       var deferred = $q.defer();
-      $http.get('trips/' + trip.id + '/har')
+      $http.get('api/trips/' + trip.id + '/sensors/har')
       .success(function(data) {
         console.log(data);
         var harTags = data.map(function(d) {
@@ -354,8 +354,8 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
         "features": []
       };
 
-      var gps = $http.get('trips/' + trip.id + '/gps');
-      var har = $http.get('trips/' + trip.id + '/har');
+      var gps = $http.get('api/trips/' + trip.id + '/sensors/gps');
+      var har = $http.get('api/trips/' + trip.id + '/sensors/har');
 
       $q.all([gps, har]).then(function(data) {
         var gps = data[0].data;
