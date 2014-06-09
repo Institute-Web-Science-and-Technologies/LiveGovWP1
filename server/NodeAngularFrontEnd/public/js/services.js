@@ -12,7 +12,7 @@ app.service('Config', function() {
     sensors: function() { return sensors; },
     xDomain: function() { return xDomain; },
     yDomain: function() { return yDomain; },
-    windowSize: function() { return ntile; },
+    windowSize: function() { return windowSize; },
   };
 });
 
@@ -246,8 +246,8 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
           method: "GET",
           url: 'api/trips/' + trip.id + '/sensors/' + sensor,
           params: {
-            'ntile':  (obj && obj.hasOwnProperty('ntile')  ? obj.windowSize : Config.ntile()),
-            'extent': (obj && obj.hasOwnProperty('extent') ? obj.extent : undefined),
+            'w': (obj && obj.hasOwnProperty('windowSize') ? obj.windowSize : Config.windowSize()),
+            'e': (obj && obj.hasOwnProperty('extent')     ? obj.extent : undefined),
           }
         })
         .success(function (data, status, headers, config) {

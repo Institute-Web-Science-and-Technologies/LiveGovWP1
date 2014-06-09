@@ -21,10 +21,9 @@ module.exports = function(api) {
     .post('updateTrip', '/trips/:trip_id', updateTrip)
     .delete('destroyTrip', '/trips/:trip_id', destroyTrip);
 
-  // arg: '1389559420371,1389559423048'
+  // arg: [ 1389559420371, 1389559423048 ]
   function extentToSQL(extent) {
-    var e = this.query.extent.split(',');
-    return ' AND ts >= ' + e[0] + ' AND ts <= ' + e[1];
+    return ' AND ts >= ' + extent[0] + ' AND ts <= ' + extent[1];
   }
 
   function *trips() {
@@ -43,16 +42,19 @@ module.exports = function(api) {
 
   function *sensor() {
     if (Object.keys(schemas).indexOf(this.params.sensor) < 0) return;
-    var extent = this.query.extent ? extentToSQL(extent) : '';
+    var extent = this.query.e ? extentToSQL(this.query.e) : '';
     var result, q;
 
     switch (this.params.sensor) {
       case 'gps':
         q = 'SELECT ts, ST_AsGeoJSON(lonlat)::json AS lonlat FROM ' + schemas[this.params.sensor] + ' WHERE trip_id = ' + this.params.trip_id + extent;
         break;
-      case 'lac' || 'acc' || 'gra':
-        if (this.query.ntile) { // query window size
-          q = 'SELECT avg(x) AS x, avg(y) AS y, avg(z) AS z, min(ts) AS starttime, max(ts) AS endtime FROM (SELECT x, y, z, ts, NTILE(' + this.query.ntile + ') OVER (ORDER BY ts) AS w FROM ' + schemas[this.params.sensor] + ' WHERE trip_id = ' + this.params.trip_id + extent + ') A GROUP BY w ORDER BY w';
+      case 'lac':
+      case 'acc':
+      case 'gra':
+        if (this.query.w) { // query window size
+          console.log('sensor');
+          q = 'SELECT avg(x) AS x, avg(y) AS y, avg(z) AS z, min(ts) AS starttime, max(ts) AS endtime FROM (SELECT x, y, z, ts, NTILE(' + this.query.w + ') OVER (ORDER BY ts) AS w FROM ' + schemas[this.params.sensor] + ' WHERE trip_id = ' + this.params.trip_id + extent + ') A GROUP BY w ORDER BY w';
           break;
         }
         /* falls through */
@@ -72,7 +74,7 @@ module.exports = function(api) {
 
   function *count() {
     if (Object.keys(schemas).indexOf(this.params.sensor) < 0) return;
-    var extent = this.query.extent ? extentToSQL(extent) : '';
+    var extent = this.query.e ? extentToSQL(this.query.e) : '';
     var q = "SELECT COUNT(ts) FROM " + schemas[this.params.sensor] + " WHERE trip_id = " + this.params.trip_id + extent;
     var result;
 
