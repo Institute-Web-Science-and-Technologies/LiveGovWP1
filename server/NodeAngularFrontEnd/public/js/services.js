@@ -237,6 +237,8 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
     sensor: function (trip, obj) {
       var t = new Date();
 
+      console.warn('query!', obj);
+
       var promises = Config.sensors().map(function(sensor) {
         var deferred = $q.defer();
 
