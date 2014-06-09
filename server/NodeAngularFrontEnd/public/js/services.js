@@ -189,7 +189,6 @@ app.service('Trip',
           url: 'api/trips/' + trip.id + '/sensors/' + sensor + '/count',
         })
         .success(function (data, status, headers, config) {
-          debugger
           trip.data.counts[sensor] = +data[0].count;
 
         // defer merged data
