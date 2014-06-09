@@ -57,6 +57,8 @@ app.controller('tripCtrl',
       // debugger
     }
 
+    Trip.sensorCounts($scope.trip);
+
   });
 
   // update a trip
@@ -98,6 +100,10 @@ app.controller('tripCtrl',
       this.updateUrl(trip);
       Trip.select(trip);
     }
+  };
+
+  this.sensorCounts = function(trip) {
+    Trip.sensorCounts();
   };
 
   // test if a trip is selected

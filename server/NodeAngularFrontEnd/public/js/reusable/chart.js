@@ -22,19 +22,10 @@ d3.custom.lineChart = function () {
 
   function exports(selection) {
     selection.each(function(d, i) {
-
       if (!d) return;
-
-      var data = d.data;
-
-      // console.log('chartwidth', width);
-
+      if (extent) xScale.domain(extent);
       var chartName = this.classList[0];
-
-      if (extent) {
-        console.log('chart extent', extent);
-        xScale.domain(extent);
-      }
+      var data = d.data;
 
       var line = d3.svg.line().interpolate("linear")
         .x(function(d) {

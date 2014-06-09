@@ -49,7 +49,7 @@ div(ng-controller="tripCtrl as ctrl")#raw
           chart.gra(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
         .col-xs-2.col-lg-1
           h4 Gravity
-          div {{ trip.data.sensors.gra.length }}
+          div {{ trip.data.sensors.gra.length }}/{{ trip.data.counts.gra }}
           a(ng-href="./trips/{{trip.id}}/gra.csv", download='livegov-trip-{{trip.id}}-sensor-gra.csv') export
 
       .row
@@ -57,7 +57,7 @@ div(ng-controller="tripCtrl as ctrl")#raw
           chart.acc(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
         .col-xs-2.col-lg-1
           h4 Acceleration
-          div {{ trip.data.sensors.acc.length }}
+          div {{ trip.data.sensors.acc.length }}/{{ trip.data.counts.acc }}
           a(ng-href="./trips/{{trip.id}}/acc.csv", download='livegov-trip-{{trip.id}}-sensor-acc.csv') export
 
       .row
@@ -65,7 +65,7 @@ div(ng-controller="tripCtrl as ctrl")#raw
           chart.lac(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
         .col-xs-2.col-lg-1
           h4 Linear Acceleration
-          div {{ trip.data.sensors.lac.length }}
+          div {{ trip.data.sensors.lac.length }}/{{ trip.data.counts.lac }}
           a(ng-href="./trips/{{trip.id}}/lac.csv", download='livegov-trip-{{trip.id}}-sensor-lac.csv') export
 
     .container-fluid.data-tables

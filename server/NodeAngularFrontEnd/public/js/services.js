@@ -69,7 +69,7 @@ app.service('Trip',
               duration: +d.stop_ts - (+d.start_ts), // - 3600000, // minus one hour due to wrong timestamps in db
               extent: [],
               domain: { x: [], y: [] },
-              data: { sensors: {}, geo: [], har: [] }, // feature collection
+              data: { counts: {}, sensors: {}, geo: [], har: [] }, // feature collection
               love: false
             };
 
@@ -178,6 +178,34 @@ app.service('Trip',
     hasDuration: function(trip) {
       if (!arguments.length) return;
       return (trip.duration >= -3600000 && trip.duration <= -3500000) ? false : true;
+    },
+
+    sensorCounts: function(trip) {
+      var promises = Config.sensors().map(function(sensor) {
+        var deferred = $q.defer();
+
+        $http({
+          method: "GET",
+          url: 'api/trips/' + trip.id + '/sensors/' + sensor + '/count',
+        })
+        .success(function (data, status, headers, config) {
+          debugger
+          trip.data.counts[sensor] = +data[0].count;
+
+        // defer merged data
+        deferred.resolve(trip.data.counts[sensor]);
+
+        })
+        .error(function (data, status, headers, config) {
+          deferred.reject();
+        });
+
+        // return merged data as promise
+        return deferred.promise;
+
+
+      });
+
     },
 
     hasLove: function(trip) {
