@@ -13,7 +13,7 @@ app.use(mount('/bower_components', serve('bower_components')));
 app.use(require('koa-logger')());
 app.use(require('koa-body')());
 
-app.use(require('koa-views')('views-koa', {
+app.use(require('koa-views')('views', {
   default: 'jade',
   cache: false
 }));
@@ -23,12 +23,12 @@ app.use(pg('pg://postgres:liveandgov@localhost:3333/liveandgov'));
 
 // api routes (responds json)
 var api = new Router();
-require('./routes-koa/apiv2')(api);
+require('./routes/api')(api);
 app.use(mount('/api', api.middleware()));
 
 // basic routes (renders template)
 var routes = new Router();
-require('./routes-koa')(routes);
+require('./routes')(routes);
 app.use(mount('/', routes.middleware()));
 
 app.listen(3512);
