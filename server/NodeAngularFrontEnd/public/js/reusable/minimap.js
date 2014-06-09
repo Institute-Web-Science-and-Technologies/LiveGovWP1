@@ -4,12 +4,15 @@
 
 if (!d3.custom) d3.custom = {};
 
-d3.custom.miniMap = function () {
+d3.custom.minimap = function () {
+
+  console.info('initializing minimap!');
 
   // default values. may be overwritten by exported functions.
+  var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return d; });
 
   var margin = {top: 0, right: 0, bottom: 0, left: 0 },
-    width = d3.select('brush')[0][0].offsetWidth - margin.left - margin.right,
+    width = d3.select('minimap')[0][0].offsetWidth - margin.left - margin.right,
     height = 50,
     xScale = d3.time.scale().range([0, width]),
     yScale = d3.scale.linear().range([height, 0]),
@@ -22,6 +25,8 @@ d3.custom.miniMap = function () {
     selection.each(function(d, i) {
       if (!d) return;
 
+      console.info('drawing minimap!');
+
       var domain = d.domain; // d.domain = { 'x': Array[2], 'y': Array[2] }
 
       xScale.domain(domain.x);
@@ -31,7 +36,7 @@ d3.custom.miniMap = function () {
       if (d3.select(this).select('svg').empty()) {
         d3.select(this)
           .append('svg')
-            .classed('brush', true)
+            .classed('minimap', true)
             .attr("width", width)
             .attr("height", height)
           .append("rect")
@@ -41,6 +46,9 @@ d3.custom.miniMap = function () {
 
       // select svg element
       var svg = d3.select(this).select('svg');
+
+      // initialize tooltip
+      svg.call(tip);
 
       // remove old children of svg element
       svg.selectAll("*").remove();
@@ -70,17 +78,13 @@ d3.custom.miniMap = function () {
           })
           .attr("y", 0)
           .attr("class", a[i][2].replace(/ /g, '-')) // har tag
-          .on("mouseover", function() {
-            d3.select("text").enter().append("text")
-              .text(function(d) { return d.tag; })
-              .attr("x", function(d) { return x(d.x); })
-              .attr("y", function (d) { return y(d.y); });
-            });
+          .on('mouseover', tip.show)
+          .on('mouseout', tip.hide);
       });
 
       // draw the actually clickable brush rectangle
       svg.append("g")
-        .attr("class", "brush")
+        .attr("class", "minimap")
         .call(brush)
         .selectAll("rect")
         .attr("height", height);
@@ -100,7 +104,7 @@ d3.custom.miniMap = function () {
   exports.extent = function(_) {
     if (!arguments.length) return extent;
     extent = _;
-    return this; // calls miniMap
+    return this; // calls minimap
   };
 
   d3.rebind(exports, dispatch, 'on');

@@ -32,20 +32,14 @@ app.directive('minimap', ['$window',
       restrict: 'E',
       scope: {trip: '=', updateExtent: '&', loadMoreData: '&'},
       link: function($scope, $element, $attributes) {
-        var minimap = d3.custom.miniMap();
+        var minimap = d3.custom.minimap();
         var minimapElement = d3.select($element[0]); // minimap's 'this' in selection.each
 
-        // angular.element($window).bind('resize', function() {
-        //   minimapElement
-        //     .call(minimap);
-        // });
-
-        minimap.on('minimaped', function(d, i) {
-          // console.log('minimap on minimaped', d, i);
+        minimap.on('brushed', function(d, i) {
           $scope.updateExtent({args: d});
         });
 
-        minimap.on('minimapended', function(d, i) {
+        minimap.on('brushended', function(d, i) {
           $scope.loadMoreData({args: d});
         });
 
