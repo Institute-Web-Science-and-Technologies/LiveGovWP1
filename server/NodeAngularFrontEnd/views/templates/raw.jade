@@ -1,0 +1,158 @@
+div(ng-controller="tripCtrl as ctrl")#raw
+
+  p {{ trip.extent }}
+
+  my-chart(trip='trip', senor='gra')
+
+  #main
+
+    .container-fluid
+      .row
+        .col-xs-12
+          div.btn-group.pull-right
+            a.btn.btn-default.btn-sm(ng-click='ctrl.toggleLove(trip)' , ng-class='{active:ctrl.hasLove(trip)}') {{ ctrl.hasLove(trip) ? 'unlove' : 'love' }}
+            a.btn.btn-default.btn-sm(ng-click="ctrl.loadMoreData(trip)") load more data
+            a.btn.btn-default.btn-sm(ng-click="ctrl.reset(trip)") reset
+            a.btn.btn-danger.btn-sm(ng-click='ctrl.select()', ng-class='{disabled:ctrl.selected()}') delete
+
+    .container-fluid
+      .row
+        .col-xs-12
+          table.table
+            thead
+              tr
+                th id
+                th user
+                th date
+                th duration
+                th tags
+                th name
+                th has gps?
+                th has har?
+
+                tbody
+                  tr
+                    td.id {{ trip.id }}
+                    td.user {{ trip.user }}
+                    td.date {{ trip.start | date:'yyyy-MM-dd HH:mm:ss' }}
+                    td.duration {{ trip.duration | date:'HH:mm:ss' }}
+                    td.tags
+                      input(type='text', ng-model='trip.tags', ng-change="ctrl.update(trip, {tags: trip.tags})", placeholder='no tags')
+                    td.name
+                      input(type='text', ng-model='trip.name', ng-change="ctrl.update(trip, {name: trip.name})", placeholder='no name')
+                    td.gps {{ trip.data.gps.length }}
+                    td.har {{ trip.data.har.length }}
+
+    .container-fluid.charts
+      .row
+        .col-xs-10.col-lg-11
+          chart.gra(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+        .col-xs-2.col-lg-1
+          h4 Gravity
+          div {{ trip.data.sensors.gra.length }}
+          a(ng-href="./trips/{{trip.id}}/gra.csv", download='livegov-trip-{{trip.id}}-sensor-gra.csv') export
+
+      .row
+        .col-xs-10.col-lg-11
+          chart.acc(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+        .col-xs-2.col-lg-1
+          h4 Acceleration
+          div {{ trip.data.sensors.acc.length }}
+          a(ng-href="./trips/{{trip.id}}/acc.csv", download='livegov-trip-{{trip.id}}-sensor-acc.csv') export
+
+      .row
+        .col-xs-10.col-lg-11
+          chart.lac(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+        .col-xs-2.col-lg-1
+          h4 Linear Acceleration
+          div {{ trip.data.sensors.lac.length }}
+          a(ng-href="./trips/{{trip.id}}/lac.csv", download='livegov-trip-{{trip.id}}-sensor-lac.csv') export
+
+    .container-fluid.data-tables
+      .row
+        .col-xs-4.col-lg-4
+          h4 Gravity Data {{ trip.data.sensors.gra | matchExtent:trip.extent }}/{{ trip.data.sensors.gra.length }}
+          .table-responsive
+            table.table.table-condensed.table-hover.sensor-data-table
+              thead
+                tr
+                  th x
+                  th y
+                  th z
+                  th timestamp
+                  th tag
+
+                  tbody
+                    tr(ng-repeat="d in trip.data.sensors.gra", ng-class='d.tag | detox', ng-hide='ctrl.matchExtent(d)')
+                      td.avgx {{ d.avgx | number:15 }}
+                      td.avgy {{ d.avgy | number:15 }}
+                      td.avgz {{ d.avgz | number:15 }}
+                      td.ts {{ d.ts | date:'HH:mm:ss.mm' }}
+                      td.tag {{ d.tag }}
+
+
+        .col-xs-4.col-lg-4
+          h4 Acceleration Data {{ trip.data.sensors.acc | matchExtent:trip.extent }}/{{ trip.data.sensors.acc.length }}
+          .table-responsive
+            table.table.table-condensed.table-hover.sensor-data-table
+              thead
+                tr
+                  th x
+                  th y
+                  th z
+                  th timestamp
+                  th tag
+
+                  tbody
+                    tr(ng-repeat="d in trip.data.sensors.acc", ng-class='d.tag | detox', ng-hide='ctrl.matchExtent(d)')
+                      td.avgx {{ d.avgx | number:15 }}
+                      td.avgy {{ d.avgy | number:15 }}
+                      td.avgz {{ d.avgz | number:15 }}
+                      td.ts {{ d.ts | date:'HH:mm:ss.mm' }}
+                      td.tag {{ d.tag }}
+
+
+        .col-xs-4.col-lg-4
+          h4 Linear Acceleration Data {{ trip.data.sensors.lac | matchExtent:trip.extent }}/{{ trip.data.sensors.lac.length }}
+          .table-responsive
+            table.table.table-condensed.table-hover.sensor-data-table
+              thead
+                tr
+                  th x
+                  th y
+                  th z
+                  th timestamp
+                  th tag
+
+                  tbody
+                    tr(ng-repeat="d in trip.data.sensors.lac", ng-class='d.tag | detox', ng-hide='!ctrl.matchExtent(d)')
+                      td.avgx {{ d.avgx | number:15 }}
+                      td.avgy {{ d.avgy | number:15 }}
+                      td.avgz {{ d.avgz | number:15 }}
+                      td.ts {{ d.ts | date:'HH:mm:ss.mm' }}
+                      td.tag {{ d.tag }}
+
+        .col-xs-6.col-lg-6
+          h4 HAR Tags
+          .table-responsive
+            table.table.table-condensed.table-hover.sensor-data-table
+              thead
+                tr
+                  th tag
+                  th starttime
+                  th endtime
+                  th duration
+
+                  tbody
+                    tr(ng-repeat="d in trip.data.har", ng-class='d[2] | detox')
+                      td.tag {{ d[2] }}
+                      td.starttime {{ d[0] | date:'HH:mm:ss.mm' }}
+                      td.endtime {{ d[1] | date:'HH:mm:ss.mm' }}
+                      td.duration {{ d[1]-d[0] | date:'HH:mm:ss.mm' }}
+
+
+  #bottom
+    minimap(trip="trip", update-Extent="updateExtent(args)", load-More-Data="loadMoreData(args)")
+
+// ex:ft=jade
+
