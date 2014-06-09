@@ -6,13 +6,13 @@ app.service('Config', function() {
   var sensors = ['acc', 'gra', 'lac']; // used sensors
   var xDomain = ['starttime', 'endtime']; // by which values x-domain is calculated
   var yDomain = ['avgx', 'avgy', 'avgz']; // ... y-domain ...
-  var windowSize = 200; // default window size
+  var ntile = 200; // default window size
 
   return {
     sensors: function() { return sensors; },
     xDomain: function() { return xDomain; },
     yDomain: function() { return yDomain; },
-    windowSize: function() { return windowSize; },
+    windowSize: function() { return ntile; },
   };
 });
 
@@ -244,9 +244,8 @@ app.factory('Data', ['$http', '$q', 'Config', function ($http, $q, Config) {
           method: "GET",
           url: 'trips/' + trip.id + '/' + sensor + '/window',
           params: {
-            'window':    (obj && obj.hasOwnProperty('windowSize') ? obj.windowSize : Config.windowSize()),
-            'startTime': (obj && obj.hasOwnProperty('extent')     ? obj.extent[0] : undefined),
-            'endTime':   (obj && obj.hasOwnProperty('extent')     ? obj.extent[1] : undefined)
+            'ntile':  (obj && obj.hasOwnProperty('ntile')  ? obj.windowSize : Config.ntile()),
+            'extent': (obj && obj.hasOwnProperty('extent') ? obj.extent : undefined),
           }
         })
         .success(function (data, status, headers, config) {
