@@ -40,16 +40,23 @@ function getdata(e){
 }
 
 
-function initilize(){
-	map = L.map('map').setView([60.41742, 25.105215], 15);
+function initialize(){
+	// map = L.map('map').setView([60.41742, 25.105215], 15);
 
    markers = L.layerGroup();
   //markers = new L.MarkerClusterGroup();
 
 
-	L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
-		maxZoom: 18
-	}).addTo(map);
+  var map = L.mapbox.map('map', 'rene.i6mdi15p', { // mapbox id
+    legendControl: {
+      position: 'topright'
+    },
+    maxZoom: 18
+  }).setView([60.41742, 25.105215], 15);
+
+  L.tileLayer('http://{s}.tiles.mapbox.com/v3/mapbox.mapbox-light/{z}/{x}/{y}.png', {
+  attribution: '',
+  }).addTo(map);
 
   // add a viewreset event listener for updating popups
   map.on('dragend', this.updateMap, this);
