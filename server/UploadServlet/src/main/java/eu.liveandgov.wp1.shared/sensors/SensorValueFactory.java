@@ -13,7 +13,7 @@ public class SensorValueFactory {
     /**
      * Factory Method that parses a .ssf-line to the corresponding AbstractSensorValue Object.
      *
-     * @param ssfLine
+     * @param line
      * @return SVO      AbstractSensorValue Object. Null if type not found.
      */
     public static SensorValueInterface parse(String line) throws ParseException {

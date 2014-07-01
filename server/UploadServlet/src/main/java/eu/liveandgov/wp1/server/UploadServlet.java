@@ -2,13 +2,14 @@ package eu.liveandgov.wp1.server;
 
 import eu.liveandgov.wp1.server.db_helper.BatchInserter;
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
-import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
-import org.jeromq.ZMQ;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,7 +20,6 @@ import java.sql.SQLException;
 import java.util.zip.GZIPInputStream;
 
 import static java.lang.System.currentTimeMillis;
-import static org.apache.commons.io.IOUtils.copy;
 
 /**
  * Implementation of a sensor data UploadServlet based on {@link org.apache.commons.fileupload}
@@ -38,7 +38,6 @@ public class UploadServlet extends HttpServlet {
     static final String OUT_DIR = "/srv/liveandgov/UploadServletRawFiles/";
     private static final String FIELD_NAME_UPFILE = "upfile";
     private static final Logger Log = Logger.getLogger(UploadServlet.class);
-    private static final String BROKER_ADDRESS = "tcp://127.0.0.1:50111";
 
     static {
         try {
@@ -131,9 +130,6 @@ public class UploadServlet extends HttpServlet {
             Log.info("Error reading file" + outFile.getAbsolutePath());
             e.printStackTrace();
         }
-
-        // NotifyPeers
-        notifyBroker(outFile.getAbsolutePath());
     }
 
     /**
@@ -209,26 +205,6 @@ public class UploadServlet extends HttpServlet {
             Log.error("Network error while parsing file.", e);
         }
         return null;
-    }
-
-    /**
-     * Sends a ZMQ Message to a specified broker, informing it about the arrival of a new file.
-     *
-     * @param message
-     */
-    private void notifyBroker(String message) {
-        Log.info("Sending ZMQ Message " + message + " to " + BROKER_ADDRESS);
-        // need to create new context for each request, since this many threads are used by servlet engine.
-        // for a discussion of performance issues see:
-        // http://stackoverflow.com/questions/16659577/zeromq-multithreading-create-sockets-on-demand-or-use-sockets-object-pool
-        //
-        // Surprisingly, this does not work with the PUB/SUB pattern, since the first few messages are
-        // always dropped while the connection is being setup:
-        // http://zguide.zeromq.org/page:all#Getting-the-Message-Out
-        ZMQ.Socket s = ZMQ.context().socket(ZMQ.PUSH);
-        s.connect(BROKER_ADDRESS);
-        s.send(message);
-        s.close();
     }
 
 }
