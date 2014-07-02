@@ -58,9 +58,9 @@ public class SensorCollectionOptions {
 
     public static class SensorOptions {
         public static int OFF = -1;
-        public static int ON_FASTEST = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_FASTEST : 10; // 100Hz
-        public static int ON_GAME = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_GAME : 25; // 40Hz
-        public static int ON_UI = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_UI : 50; // 20Hz
-        public static int ON_NORMAL = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_NORMAL : 100; // 10Hz
+        public static int ON_FASTEST = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_FASTEST : (10 * 1000); // 100Hz
+        public static int ON_GAME = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_GAME : (25 * 1000); // 40Hz
+        public static int ON_UI = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_UI : (50 * 1000); // 20Hz
+        public static int ON_NORMAL = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_NORMAL : (100 * 1000); // 10Hz
     }
 }
