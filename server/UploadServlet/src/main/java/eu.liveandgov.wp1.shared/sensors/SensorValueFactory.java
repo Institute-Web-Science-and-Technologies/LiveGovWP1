@@ -23,7 +23,12 @@ public class SensorValueFactory {
             if (fields.length != 4) throw new ParseException("Error parsing csv " + line,0);
 
             // parse fields
-            SampleType type = SampleType.valueOf(fields[0]);
+            SampleType type;
+            try{
+                type = SampleType.valueOf(fields[0]);
+            }catch(IllegalArgumentException e){
+                type = null;
+            }
             long timestamp = Long.parseLong(fields[1]);
             String id = fields[2];
             String value = fields[3];
