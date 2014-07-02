@@ -56,16 +56,18 @@ public class UploadServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Log.info("Incoming GET request from " + req.getRemoteAddr());
+
         PrintWriter writer = resp.getWriter();
         writer.write(
                 "<html>" +
-                "<h1>Upload Servlet</h1>" +
-                "<form action=\"\" enctype=\"multipart/form-data\" method=\"post\">" +
-                "Upload File: <input type=\"file\" name=\"upfile\" size=\"40\"/><br/>" +
-                "<input type=\"submit\" value=\"Submit\">" +
-                "</form>" +
-                "</html>"
-                );
+                        "<h1>Upload Servlet</h1>" +
+                        "<form action=\"\" enctype=\"multipart/form-data\" method=\"post\">" +
+                        "Upload File: <input type=\"file\" name=\"upfile\" size=\"40\"/><br/>" +
+                        "<input type=\"submit\" value=\"Submit\">" +
+                        "</form>" +
+                        "</html>"
+        );
     }
 
     /**

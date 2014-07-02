@@ -17,7 +17,7 @@ public class SensorCollectionOptions {
     public static final long MONITORING_RATE = 2000L;
 
     // CONNECTIVITY //
-    public static String REMOTE_HOST = "mobile-sensing.west.uni-koblenz.de"; // LG Server
+    public static String REMOTE_HOST = "liveandgov.uni-koblenz.de"; // LG Server
     public static String UPLOAD_URL = "http://" + REMOTE_HOST + "/storage/upload/";
     public static String STREAMING_ZMQ_SOCKET = "tcp://" + REMOTE_HOST + ":5555";
 
