@@ -5,6 +5,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
@@ -121,8 +122,8 @@ public class ServiceSensorControl extends Service {
 
         // INITIALIZATIONS
         // Warning: getFilesDir is only available after onCreate was called.
-        File sensorFile = new File(getFilesDir(), SENSOR_FILENAME);
-        File stageFile = new File(getFilesDir(), STAGE_FILENAME);
+        File sensorFile = new File(Environment.getExternalStorageDirectory(), SENSOR_FILENAME);
+        File stageFile = new File(Environment.getExternalStorageDirectory(), STAGE_FILENAME);
 
         // Init index
         staticIPS = new StaticIPS(
