@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.server.db_helper.inserter;
 
+import eu.liveandgov.wp1.data.impl.Acceleration;
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
-import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.AccSensorValue;
 
 import java.sql.SQLException;
 
@@ -12,7 +12,7 @@ import java.sql.SQLException;
  * Time: 2:45 PM
  * To change this template use File | Settings | File Templates.
  */
-public class AccInserter extends AbstractMotionValueInserter<AccSensorValue> {
+public class AccInserter extends AbstractMotionValueInserter<Acceleration> {
 
     public AccInserter(PostgresqlDatabase db) throws SQLException {
         super(db);

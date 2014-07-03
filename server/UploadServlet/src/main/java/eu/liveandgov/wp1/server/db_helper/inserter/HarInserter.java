@@ -1,8 +1,7 @@
 package eu.liveandgov.wp1.server.db_helper.inserter;
 
+import eu.liveandgov.wp1.data.impl.GoogleActivity;
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
-import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.GoogleActivitySensorValue;
-import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.TagSensorValue;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -14,7 +13,7 @@ import java.sql.SQLException;
  * Time: 2:45 PM
  * To change this template use File | Settings | File Templates.
  */
-public class HarInserter extends AbstractInserter<GoogleActivitySensorValue> {
+public class HarInserter extends AbstractInserter<GoogleActivity> {
 
     public HarInserter(PostgresqlDatabase db) throws SQLException {
         super(db);
@@ -31,9 +30,9 @@ public class HarInserter extends AbstractInserter<GoogleActivitySensorValue> {
     }
 
     @Override
-    public void insertValues(PreparedStatement insertStatement, GoogleActivitySensorValue asv, int tripId) throws SQLException {
+    public void insertValues(PreparedStatement insertStatement, GoogleActivity asv, int tripId) throws SQLException {
         insertStatement.setInt(1, tripId);
-        insertStatement.setLong(2, asv.timestamp);
+        insertStatement.setLong(2, asv.getTimestamp());
         insertStatement.setString(3, asv.activity);
     }
 }

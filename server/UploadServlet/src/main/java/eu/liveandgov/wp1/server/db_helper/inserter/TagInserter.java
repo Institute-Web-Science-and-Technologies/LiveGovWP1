@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.server.db_helper.inserter;
 
+import eu.liveandgov.wp1.data.impl.Tag;
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
-import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.TagSensorValue;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -13,7 +13,7 @@ import java.sql.SQLException;
  * Time: 2:45 PM
  * To change this template use File | Settings | File Templates.
  */
-public class TagInserter extends AbstractInserter<TagSensorValue> {
+public class TagInserter extends AbstractInserter<Tag> {
 
     public TagInserter(PostgresqlDatabase db) throws SQLException {
         super(db);
@@ -30,9 +30,9 @@ public class TagInserter extends AbstractInserter<TagSensorValue> {
     }
 
     @Override
-    public void insertValues(PreparedStatement insertStatement, TagSensorValue tsv, int tripId) throws SQLException {
+    public void insertValues(PreparedStatement insertStatement, Tag tsv, int tripId) throws SQLException {
         insertStatement.setInt(1, tripId);
-        insertStatement.setLong(2, tsv.timestamp);
+        insertStatement.setLong(2, tsv.getTimestamp());
         insertStatement.setString(3, tsv.tag);
     }
 }

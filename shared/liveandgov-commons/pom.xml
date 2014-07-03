@@ -23,9 +23,10 @@
     </licenses>
 
     <scm>
-        <url>https://raw.github.com/HeinrichHartmann/LiveGovWP1</url>
-        <connection>scm:git:git://github.com/HeinrichHartmann/LiveGovWP1.git</connection>
-        <developerConnection>scm:git:git@github.com:HeinrichHartmann/LiveGovWP1.git</developerConnection>
+        <url>https://raw.github.com/Institute-Web-Science-and-Technologies/LiveGovWP1</url>
+        <connection>scm:git:git://github.com/Institute-Web-Science-and-Technologies/LiveGovWP1.git</connection>
+        <developerConnection>scm:git:git@github.com:Institute-Web-Science-and-Technologies/LiveGovWP1.git
+        </developerConnection>
     </scm>
 
     <developers>
@@ -44,7 +45,7 @@
     <repositories>
         <repository>
             <id>LiveGovWp1-mvn-repo</id>
-            <url>https://raw.github.com/HeinrichHartmann/LiveGovWP1/mvn-repo</url>
+            <url>https://raw.github.com/Institute-Web-Science-and-Technologies/LiveGovWP1/mvn-repo</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
@@ -126,7 +127,7 @@
                     </includes>
                     <merge>true</merge>
                     <repositoryName>LiveGovWp1</repositoryName>
-                    <repositoryOwner>HeinrichHartmann</repositoryOwner>
+                    <repositoryOwner>Institute-Web-Science-and-Technologies</repositoryOwner>
                 </configuration>
                 <executions>
                     <execution>
