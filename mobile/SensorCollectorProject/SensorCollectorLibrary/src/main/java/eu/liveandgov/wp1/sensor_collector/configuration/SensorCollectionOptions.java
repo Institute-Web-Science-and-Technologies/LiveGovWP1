@@ -17,7 +17,7 @@ public class SensorCollectionOptions {
     public static final long MONITORING_RATE = 2000L;
 
     // CONNECTIVITY //
-    public static String REMOTE_HOST = "mobile-sensing.west.uni-koblenz.de"; // LG Server
+    public static String REMOTE_HOST = "liveandgov.uni-koblenz.de"; // LG Server
     public static String UPLOAD_URL = "http://" + REMOTE_HOST + "/storage/upload/";
     public static String STREAMING_ZMQ_SOCKET = "tcp://" + REMOTE_HOST + ":5555";
 
@@ -41,7 +41,7 @@ public class SensorCollectionOptions {
     // Network samples
     public static final boolean REC_WIFI = true;   // wifi
     public static final int WIFI_SCAN_DELAY_MS = 20000; // delay in milli seconds
-    public static final boolean REC_BLT = true;    // Bluetooth
+    public static final boolean REC_BLT = false;    // Bluetooth
     public static final int BLT_SCAN_DELAY_MS = 20000; // delay in milli seconds
     public static final boolean REC_GSM = true;    // GSM
     public static final int GSM_SCAN_DELAY_MS = 20000; // delay in milli seconds
@@ -58,9 +58,9 @@ public class SensorCollectionOptions {
 
     public static class SensorOptions {
         public static int OFF = -1;
-        public static int ON_FASTEST = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_FASTEST : 10; // 100Hz
-        public static int ON_GAME = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_GAME : 25; // 40Hz
-        public static int ON_UI = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_UI : 50; // 20Hz
-        public static int ON_NORMAL = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_NORMAL : 100; // 10Hz
+        public static int ON_FASTEST = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_FASTEST : (10 * 1000); // 100Hz
+        public static int ON_GAME = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_GAME : (25 * 1000); // 40Hz
+        public static int ON_UI = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_UI : (50 * 1000); // 20Hz
+        public static int ON_NORMAL = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_NORMAL : (100 * 1000); // 10Hz
     }
 }

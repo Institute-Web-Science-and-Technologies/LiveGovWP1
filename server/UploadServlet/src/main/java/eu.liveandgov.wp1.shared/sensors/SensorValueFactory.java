@@ -3,13 +3,25 @@ package eu.liveandgov.wp1.shared.sensors;
 import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.*;
 
 import java.text.ParseException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * User: hartmann
  * Date: 10/22/13
  */
 
+
 public class SensorValueFactory {
+
+    private static final Set<String> SampleTypeValues = new HashSet<String>();
+
+    static {
+        for (SampleType t: SampleType.values()) {
+            SampleTypeValues.add(t.toString());
+        }
+    }
+
     /**
      * Factory Method that parses a .ssf-line to the corresponding AbstractSensorValue Object.
      *
@@ -23,7 +35,11 @@ public class SensorValueFactory {
             if (fields.length != 4) throw new ParseException("Error parsing csv " + line,0);
 
             // parse fields
+            if (! SampleTypeValues.contains(fields[0])){
+                return null; // sensor type not supported
+            }
             SampleType type = SampleType.valueOf(fields[0]);
+
             long timestamp = Long.parseLong(fields[1]);
             String id = fields[2];
             String value = fields[3];
