@@ -10,7 +10,7 @@ import java.util.Map;
 import static eu.liveandgov.wp1.packaging.PackagingCommons.FIELD_TYPE;
 
 /**
- * <p>Packaging of a general item</p>
+ * <p>Forwarding of a general item</p>
  * Created by Lukas Härtel on 17.03.14.
  */
 public final class ItemPackaging implements Packaging<Item> {

@@ -5,7 +5,7 @@ import eu.liveandgov.wp1.data.impl.Proximity;
 import java.util.Map;
 
 /**
- * <p>Packaging of the proximity item</p>
+ * <p>Forwarding of the proximity item</p>
  * Created by Lukas Härtel on 17.03.14.
  */
 public class ProximityPackaging extends AbstractPackaging<Proximity> {
@@ -25,7 +25,7 @@ public class ProximityPackaging extends AbstractPackaging<Proximity> {
     public static final String FIELD_OF = "of";
 
     @Override
-    protected void pack(Map<String, Object> result, Proximity item) {
+    protected void packRest(Map<String, Object> result, Proximity item) {
         result.put(FIELD_KEY, item.key);
         result.put(FIELD_IN, item.in);
         result.put(FIELD_OF, item.of);

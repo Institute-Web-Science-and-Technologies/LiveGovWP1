@@ -11,6 +11,7 @@ import org.postgresql.util.PGobject;
 import java.sql.SQLException;
 import java.util.*;
 
+@Deprecated
 /**
  * <p>Point expander takes a map enriched with PGobjects or </p>
  * Created by Lukas Härtel on 18.03.14.

@@ -18,7 +18,6 @@ Testing Tools:
 * [Data Inspection Front End](http://liveandgov.uni-koblenz.de/storage/inspection)
 * [Service Line Detection Test](http://liveandgov.uni-koblenz.de/SLD/test)
 
-
 ### Contributors:
 * [Heinrich Hartmann](https://github.com/HeinrichHartmann)
 * Christoph Schaefer

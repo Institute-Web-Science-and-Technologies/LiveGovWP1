@@ -5,7 +5,7 @@ import eu.liveandgov.wp1.data.impl.Activity;
 import java.util.Map;
 
 /**
- * <p>Packaging of the activity item</p>
+ * <p>Forwarding of the activity item</p>
  * Created by Lukas Härtel on 17.03.14.
  */
 public class ActivityPackaging extends AbstractPackaging<Activity> {
@@ -23,7 +23,7 @@ public class ActivityPackaging extends AbstractPackaging<Activity> {
     public static final String FIELD_ACTIVITY = "activity";
 
     @Override
-    protected void pack(Map<String, Object> result, Activity item) {
+    protected void packRest(Map<String, Object> result, Activity item) {
         result.put(FIELD_ACTIVITY, item.activity);
     }
 

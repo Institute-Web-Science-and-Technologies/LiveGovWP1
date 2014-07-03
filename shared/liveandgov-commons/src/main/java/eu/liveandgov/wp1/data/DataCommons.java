@@ -21,4 +21,23 @@ public class DataCommons {
     public static final String TYPE_ERROR = "ERR";
     public static final String TYPE_PROXIMITY = "PRX";
     public static final String TYPE_WAITING = "WTN";
+
+    public static final String[] TYPES = {
+            TYPE_GPS,
+            TYPE_ACCELEROMETER,
+            TYPE_LINEAR_ACCELERATION,
+            TYPE_GRAVITY,
+            TYPE_GYROSCOPE,
+            TYPE_MAGNETOMETER,
+            TYPE_ROTATION,
+            TYPE_WIFI,
+            TYPE_BLUETOOTH,
+            TYPE_GSM,
+            TYPE_GOOGLE_ACTIVITY,
+            TYPE_ACTIVITY,
+            TYPE_TAG,
+            TYPE_ERROR,
+            TYPE_PROXIMITY,
+            TYPE_WAITING
+    };
 }

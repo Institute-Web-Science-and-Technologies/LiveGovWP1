@@ -11,11 +11,12 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Deprecated
 /**
  * <p>Database producer</p>
  * Created by Lukas Härtel on 24.02.14.
  */
-public class JDBC extends Producer<Map<String, Object>> {
+public class LegacyJDBC extends Producer<Map<String, Object>> {
     /**
      * URL of the source
      */
@@ -38,12 +39,17 @@ public class JDBC extends Producer<Map<String, Object>> {
      * @param username Username in the source domain
      * @param password Password in the source domain
      */
-    public JDBC(String url, String username, String password) {
+    public LegacyJDBC(String url, String username, String password) {
         this.url = url;
         this.username = username;
         this.password = password;
     }
 
+    /**
+     * Adds a JDBC driver by its classes name
+     * @param className The class name
+     * @return Returns true if successfully added
+     */
     public boolean addDriver(String className) {
         try {
             Class.forName(className);

@@ -67,25 +67,25 @@ public class JDJ {
             final String prefix = Iterables.getOnlyElement(args.get("left"), null);
             final String suffix = Iterables.getOnlyElement(args.get("right"), null);
 
-            final JDBC jdbc = new JDBC(host, user, password);
+            final LegacyJDBC legacyJdbc = new LegacyJDBC(host, user, password);
 
             if (Iterables.isEmpty(args.get("driver")))
-                jdbc.addDriver("org.postgresql.Driver");
+                legacyJdbc.addDriver("org.postgresql.Driver");
 
             for (String driver : args.get("driver"))
-                jdbc.addDriver(driver);
+                legacyJdbc.addDriver(driver);
 
             final MapJSON mjs = new MapJSON();
             final FromJSON fjs = new FromJSON();
             final Surround sur = new Surround(prefix, suffix);
             final LinesOut loc = new LinesOut(System.out);
 
-            jdbc.setConsumer(mjs);
+            legacyJdbc.setConsumer(mjs);
             mjs.setConsumer(fjs);
             fjs.setConsumer(sur);
             sur.setConsumer(loc);
 
-            jdbc.readAll(command);
+            legacyJdbc.readAll(command);
         }
     }
 }

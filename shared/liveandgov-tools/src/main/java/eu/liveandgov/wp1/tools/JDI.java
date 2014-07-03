@@ -6,7 +6,7 @@ import com.google.common.collect.Multimap;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.packaging.impl.ItemPackaging;
 import eu.liveandgov.wp1.pipeline.impl.ItemSerializer;
-import eu.liveandgov.wp1.pipeline.impl.JDBC;
+import eu.liveandgov.wp1.pipeline.impl.LegacyJDBC;
 import eu.liveandgov.wp1.pipeline.impl.LinesOut;
 import eu.liveandgov.wp1.pipeline.impl.UnPack;
 import eu.liveandgov.wp1.pipeline.impl.postgis.PointExpander;
@@ -88,13 +88,13 @@ public class JDI {
             final String user = Iterables.getOnlyElement(args.get("user"));
             final String password = Iterables.getOnlyElement(args.get("password"));
 
-            final JDBC jdbc = new JDBC(host, user, password);
+            final LegacyJDBC legacyJdbc = new LegacyJDBC(host, user, password);
 
             if (Iterables.isEmpty(args.get("driver")) && Iterables.isEmpty(args.get("nodriver")))
-                jdbc.addDriver("org.postgresql.Driver");
+                legacyJdbc.addDriver("org.postgresql.Driver");
 
             for (String driver : args.get("driver"))
-                jdbc.addDriver(driver);
+                legacyJdbc.addDriver(driver);
 
 
             // Setup PostGIS point expander
@@ -121,12 +121,12 @@ public class JDI {
             final ItemSerializer isr = new ItemSerializer();
             final LinesOut loc = new LinesOut(System.out);
 
-            jdbc.setConsumer(pex);
+            legacyJdbc.setConsumer(pex);
             pex.setConsumer(iup);
             iup.setConsumer(isr);
             isr.setConsumer(loc);
 
-            jdbc.readAll(command);
+            legacyJdbc.readAll(command);
         }
     }
 }

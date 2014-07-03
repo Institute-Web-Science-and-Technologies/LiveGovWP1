@@ -2,6 +2,7 @@ package eu.liveandgov.wp1.packaging.impl;
 
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.packaging.Packaging;
+import eu.liveandgov.wp1.packaging.PackagingCommons;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -17,7 +18,12 @@ public abstract class AbstractPackaging<Data extends Item> implements Packaging<
     public Map<String, ?> pack(Data data) {
         final Map<String, Object> result = new TreeMap<String, Object>();
 
-        pack(result, data);
+        result.put(PackagingCommons.FIELD_TYPE, data.getType());
+        result.put(PackagingCommons.FIELD_TIMESTAMP, data.getTimestamp());
+        result.put(PackagingCommons.FIELD_DEVICE, data.getDevice());
+
+        packRest(result, data);
+
         return result;
     }
 
@@ -28,7 +34,7 @@ public abstract class AbstractPackaging<Data extends Item> implements Packaging<
      * @param result The map to write to
      * @param item   The item of which to write the relevant data, i.e. not type, timestamp or device
      */
-    protected abstract void pack(Map<String, Object> result, Data item);
+    protected abstract void packRest(Map<String, Object> result, Data item);
 
 
     @Override

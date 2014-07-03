@@ -107,13 +107,13 @@ public class JDIA {
             }
 
             // Setup database driver
-            final JDBC jdbc = new JDBC(host, user, password);
+            final LegacyJDBC legacyJdbc = new LegacyJDBC(host, user, password);
 
             if (Iterables.isEmpty(args.get("driver")) && Iterables.isEmpty(args.get("nodriver")))
-                jdbc.addDriver("org.postgresql.Driver");
+                legacyJdbc.addDriver("org.postgresql.Driver");
 
             for (String driver : args.get("driver"))
-                jdbc.addDriver(driver);
+                legacyJdbc.addDriver(driver);
 
             // Setup PostGIS point expander
             final PointExpander pex = new PointExpander();
@@ -141,7 +141,7 @@ public class JDIA {
             final LinesOut loc = new LinesOut(System.out);
 
             // Connect it
-            jdbc.setConsumer(pex);
+            legacyJdbc.setConsumer(pex);
             pex.setConsumer(iup);
             iup.setConsumer(isr);
             isr.setConsumer(loc);
@@ -168,7 +168,7 @@ public class JDIA {
                 stringBuilder.append(table);
                 stringBuilder.append(".trip_id=trip.trip_id");
 
-                jdbc.readAll(stringBuilder.toString());
+                legacyJdbc.readAll(stringBuilder.toString());
             }
         }
     }

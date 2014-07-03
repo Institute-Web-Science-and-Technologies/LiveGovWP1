@@ -5,7 +5,7 @@ import eu.liveandgov.wp1.data.impl.Tag;
 import java.util.Map;
 
 /**
- * <p>Packaging of the tag item</p>
+ * <p>Forwarding of the tag item</p>
  * Created by Lukas Härtel on 17.03.14.
  */
 public class TagPackaging extends AbstractPackaging<Tag> {
@@ -23,7 +23,7 @@ public class TagPackaging extends AbstractPackaging<Tag> {
     public static final String FIELD_TAG = "tag";
 
     @Override
-    protected void pack(Map<String, Object> result, Tag item) {
+    protected void packRest(Map<String, Object> result, Tag item) {
         result.put(FIELD_TAG, item.tag);
     }
 
