@@ -43,6 +43,12 @@ public class BatchInserter {
         inserter.put(DataCommons.TYPE_TAG, new TagInserter(db));
         inserter.put(DataCommons.TYPE_GPS, new GpsInserter(db));
         inserter.put(DataCommons.TYPE_ACTIVITY, new HarInserter(db));
+
+        inserter.put(DataCommons.TYPE_GYROSCOPE, new GyrInserter(db));
+        inserter.put(DataCommons.TYPE_ROTATION, new RotInserter(db));
+        inserter.put(DataCommons.TYPE_MAGNETOMETER, new MagInserter(db));
+        inserter.put(DataCommons.TYPE_PROXIMITY, new PrxInserter(db));
+        inserter.put(DataCommons.TYPE_WAITING, new WtnInserter(db));
     }
 
     private static enum ParsingState {
@@ -216,7 +222,7 @@ public class BatchInserter {
         if (inserter.keySet().contains(type)) {
             inserter.get(type).batchInsert(svo, tripId);
         } else {
-            Log.warn("Sensortype " + type + "not supported, yet. Found in " + svo.toSerializedForm() );
+            Log.warn("Sensortype " + type + " not supported, yet. Found in " + svo.toSerializedForm() );
         }
 
     }

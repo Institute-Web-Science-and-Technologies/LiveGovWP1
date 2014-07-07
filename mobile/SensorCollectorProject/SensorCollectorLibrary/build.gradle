@@ -7,11 +7,11 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.android.tools.build:gradle:0.12.+'
     }
 }
 
-apply plugin: 'android-library'
+apply plugin: 'com.android.library'
 
 repositories {
     // Need to add new repositories also here!
@@ -24,10 +24,10 @@ repositories {
 
 android {
     compileSdkVersion 17
-    buildToolsVersion '19.0.3'
+    buildToolsVersion '19.1.0'
 
     defaultConfig {
-        minSdkVersion 8
+        minSdkVersion 9
         targetSdkVersion 17
     }
 
@@ -48,8 +48,8 @@ dependencies {
     compile 'eu.liveandgov:liveandgov-commons:1.0-SNAPSHOT'
     compile 'eu.liveandgov:liveandgov-proximity:1.0-SNAPSHOT'
     compile 'eu.liveandgov:liveandgov-har-tools:1.0-SNAPSHOT'
-    compile 'com.android.support:appcompat-v7:18.0.0'
-    compile 'com.google.android.gms:play-services:3.1.36'
+    compile 'com.android.support:appcompat-v7:19.1.0'
+    compile 'com.google.android.gms:play-services:4.3.23'
     compile 'org.apache.httpcomponents:httpmime:4.3-beta2'
     compile 'org.apache.httpcomponents:httpcore:4.3-beta2'
     compile 'org.apache.servicemix.bundles:org.apache.servicemix.bundles.commons-csv:1.0-r706899_5'
