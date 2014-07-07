@@ -1,5 +1,6 @@
 package eu.liveandgov.wp1.sensor_collector;
 
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
@@ -37,22 +38,22 @@ public class GlobalContext {
 
     public static LocationManager getLocationManager() {
         assertNotNull(context);
-        return (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+        return (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
     }
 
     public static SensorManager getSensorManager() {
         assertNotNull(context);
-        return (SensorManager) context.getSystemService(context.SENSOR_SERVICE);
+        return (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
     }
 
     public static WifiManager getWifiManager() {
         assertNotNull(context);
-        return (WifiManager) context.getSystemService(context.WIFI_SERVICE);
+        return (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     }
 
     public static TelephonyManager getTelephonyManager() {
         assertNotNull(context);
-        return (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
+        return (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
     }
 
     public static String getUserId() {

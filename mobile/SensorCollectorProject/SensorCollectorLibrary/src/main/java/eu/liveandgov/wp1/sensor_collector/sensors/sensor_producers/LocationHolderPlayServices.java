@@ -35,16 +35,6 @@ public class LocationHolderPlayServices extends LocationHolder implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
          {
-    /*
-    * Change these if you want to change the interval
-    */
-    private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
-    private static final int UPDATE_INTERVAL_IN_SECONDS = 5;
-
-    private static final int MILISECONDS_PER_SECOND = 1000;
-    private static final long UPDATE_INTERVAL = UPDATE_INTERVAL_IN_SECONDS * MILISECONDS_PER_SECOND;
-    private static final long FASTETST_INTERVAL = FASTEST_INTERVAL_IN_SECONDS * MILISECONDS_PER_SECOND;
-
     private static final String LOG_TAG = "LOC_P";
     private LocationClient locationClient;
     private LocationRequest locationRequest;
@@ -65,8 +55,8 @@ public class LocationHolderPlayServices extends LocationHolder implements
         locationClient.connect();
         locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(UPDATE_INTERVAL);
-        locationRequest.setFastestInterval(FASTETST_INTERVAL);
+        locationRequest.setInterval(SensorCollectionOptions.GPS_DELAY_MS);
+        locationRequest.setFastestInterval(SensorCollectionOptions.GPS_DELAY_MS);
 
         // Google Play Services
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(GlobalContext.context);
