@@ -5,6 +5,7 @@ import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,12 +27,12 @@ public class GpsInserter extends AbstractInserter<GPS> {
 
     @Override
     protected String getSchema() {
-        return "(trip_id INT, ts BIGINT, lonlat GEOGRAPHY(Point)),altitude FLOAT NULL";
+        return "(trip_id INT, ts BIGINT, lonlat GEOGRAPHY(Point),altitude FLOAT NULL)";
     }
 
     @Override
     protected String getValueString() {
-        return "(?, ?, ST_GeomFromText(?,4326))";
+        return "(?, ?, ST_GeomFromText(?,4326), ?)";
     }
 
     @Override
@@ -42,6 +43,8 @@ public class GpsInserter extends AbstractInserter<GPS> {
 
         if (gsv.alt != null)
             insertStatement.setDouble(4, gsv.alt);
+        else
+            insertStatement.setNull(4, Types.FLOAT);
     }
 
 }
