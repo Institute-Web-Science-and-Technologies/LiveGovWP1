@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
+import android.os.Environment;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
+import java.io.File;
 import java.util.concurrent.ScheduledExecutorService;
 
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
@@ -19,6 +22,8 @@ import static junit.framework.Assert.assertNotNull;
  * Created by hartmann on 9/29/13.
  */
 public class GlobalContext {
+    private static final String LOG_TAG = "GCX";
+
     public static ServiceSensorControl context;
 
     public static void set(ServiceSensorControl newContext) {
@@ -65,5 +70,18 @@ public class GlobalContext {
         Intent intent = new Intent(ExtendedIntentAPI.RETURN_LOG);
         intent.putExtra(ExtendedIntentAPI.FIELD_MESSAGE, message);
         context.sendBroadcast(intent);
+    }
+
+    public static File getFileRoot() {
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            Log.d(LOG_TAG, "Extenal storage available");
+            return Environment.getExternalStorageDirectory();
+        }
+
+        assertNotNull(context);
+
+        Log.d(LOG_TAG, "Extenal storage not available");
+        return context.getFilesDir();
+
     }
 }

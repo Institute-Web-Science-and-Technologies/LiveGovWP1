@@ -113,6 +113,7 @@ public class ServiceSensorControl extends Service {
         }
     }
 
+
     /* ANDROID LIFECYCLE */
     @Override
     public void onCreate() {
@@ -122,8 +123,8 @@ public class ServiceSensorControl extends Service {
 
         // INITIALIZATIONS
         // Warning: getFilesDir is only available after onCreate was called.
-        File sensorFile = new File(Environment.getExternalStorageDirectory(), SENSOR_FILENAME);
-        File stageFile = new File(Environment.getExternalStorageDirectory(), STAGE_FILENAME);
+        File sensorFile = new File(GlobalContext.getFileRoot(), SENSOR_FILENAME);
+        File stageFile = new File(GlobalContext.getFileRoot(), STAGE_FILENAME);
 
         // Init index
         staticIPS = new StaticIPS(
@@ -141,7 +142,8 @@ public class ServiceSensorControl extends Service {
                 PPSOptions.HELSINKI_ID_FIELD,
                 PPSOptions.HELSINKI_LAT_FIELD,
                 PPSOptions.HELSINKI_LON_FIELD,
-                PPSOptions.PROXIMITY);
+                PPSOptions.PROXIMITY
+        );
 
         // Init sensor consumers
         final ZMQStreamer zmqStreamer = new ZMQStreamer();

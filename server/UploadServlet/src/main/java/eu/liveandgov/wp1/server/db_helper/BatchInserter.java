@@ -25,7 +25,7 @@ public class BatchInserter {
 
     private static PostgresqlDatabase db;
 
-    private Map<String,AbstractInserter> inserter = new HashMap<String, AbstractInserter>();
+    private Map<String, AbstractInserter> inserter = new HashMap<String, AbstractInserter>();
 
     public static final String VALUE_STOP_RECORDING = "STOP_RECORDING";
     public static final String VALUE_START_RECORDING = "START_RECORDING";
@@ -61,8 +61,7 @@ public class BatchInserter {
     /**
      * Insert samples form ssf file into database
      *
-     *
-     * @param db            database to insert samples
+     * @param db database to insert samples
      * @return count        number of rows inserted
      * @throws IOException  thrown when error reading the file
      * @throws SQLException thrown on error writing the database
@@ -92,14 +91,12 @@ public class BatchInserter {
 
                 Item SVO = null;
                 try {
-                     SVO = ItemSerialization.ITEM_SERIALIZATION.deSerialize(line);
-                }
-                catch(NoSuchElementException e){
+                    SVO = ItemSerialization.ITEM_SERIALIZATION.deSerialize(line);
+                } catch (NoSuchElementException e) {
                     // This is thrown by the serializer, TODO: parse error type
                     Log.debug("Parser problem" + line);
-                }
-                catch(IllegalArgumentException e ){
-                    Log.debug("Illegal argument exception " + line);
+                } catch (IllegalArgumentException e) {
+                    Log.debug("Illegal argument exception on: " + line + "(" + e.getMessage() + ")" + e.getStackTrace()[0]);
                 }
 
                 if (SVO == null) {
@@ -120,20 +117,21 @@ public class BatchInserter {
                 }
 
                 // EXCEPTIONAL BEHAVIOR: long delay
-                if (! timeDeltaValid(lastTimestamp, SVO.getTimestamp())) {
+                if (!timeDeltaValid(lastTimestamp, SVO.getTimestamp())) {
                     Log.debug("Delay between timestamps too large.");
                     generateNewTripId = true;
                 }
                 lastTimestamp = SVO.getTimestamp();
 
                 // EXCEPTIONAL BEHAVIOR: new user ID
-                if (! lastUserId.equals(SVO.getDevice())) {
+                if (!lastUserId.equals(SVO.getDevice())) {
                     lastUserId = SVO.getDevice();
                     generateNewTripId = true;
                 }
 
                 if (generateNewTripId) {
-                    if (userIdChangeCount++ > MAX_TRIPS_PER_FILE) throw new IllegalStateException("Too many userIdChanges");
+                    if (userIdChangeCount++ > MAX_TRIPS_PER_FILE)
+                        throw new IllegalStateException("Too many userIdChanges");
 
                     tripId = generateNewTripId(SVO);
                     Log.info("Generated new trip_id: " + tripId);
@@ -152,7 +150,7 @@ public class BatchInserter {
 //                errorCount++;
 //            }
             catch (SQLException e) {
-                Log.error("Error writing to db: " + line,e);
+                Log.error("Error writing to db: " + line, e);
                 errorCount++;
             } catch (NullPointerException e) {
                 Log.error("Something odd went wrong:" + line, e);
@@ -210,7 +208,7 @@ public class BatchInserter {
     }
 
     private static boolean isStopRecording(Item svo) {
-        if (svo.getType()!= DataCommons.TYPE_TAG) return false;
+        if (svo.getType() != DataCommons.TYPE_TAG) return false;
         Log.debug("Checking for stop recording on: " + svo);
         Tag tsv = (Tag) svo;
         return VALUE_STOP_RECORDING.equals(tsv.tag);
@@ -222,7 +220,7 @@ public class BatchInserter {
         if (inserter.keySet().contains(type)) {
             inserter.get(type).batchInsert(svo, tripId);
         } else {
-            Log.warn("Sensortype " + type + " not supported, yet. Found in " + svo.toSerializedForm() );
+            Log.warn("Sensortype " + type + " not supported, yet. Found in " + svo.toSerializedForm());
         }
 
     }
@@ -230,7 +228,7 @@ public class BatchInserter {
     public void executeBatch() throws SQLException {
         Log.info("## Execute Batch");
 
-        for (AbstractInserter i : inserter.values()){
+        for (AbstractInserter i : inserter.values()) {
             i.executeBatch();
         }
     }
@@ -238,13 +236,13 @@ public class BatchInserter {
     public void close() throws SQLException {
         Log.info("## Close Statement");
 
-        for (AbstractInserter i : inserter.values()){
+        for (AbstractInserter i : inserter.values()) {
             i.close();
         }
     }
 
     public void dropTables() throws SQLException {
-        for (AbstractInserter i : inserter.values()){
+        for (AbstractInserter i : inserter.values()) {
             i.dropTable();
         }
     }
