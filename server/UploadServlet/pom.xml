@@ -3,10 +3,43 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.liveandgov.wp1</groupId>
     <artifactId>UploadServlet</artifactId>
-    <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
+
+    <packaging>war</packaging>
     <name>UploadServlet Maven Webapp</name>
-    <url>http://maven.apache.org</url>
+    <description>The upload servlet ingesting SSF data</description>
+
+    <url>https://github.com/Institute-Web-Science-and-Technologies/LiveGovWP1</url>
+
+    <licenses>
+        <license>
+            <name>The MIT License (MIT)</name>
+            <url>https://raw.githubusercontent.com/Institute-Web-Science-and-Technologies/LiveGovWP1/master/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://raw.github.com/Institute-Web-Science-and-Technologies/LiveGovWP1</url>
+        <connection>scm:git:git://github.com/Institute-Web-Science-and-Technologies/LiveGovWP1.git</connection>
+        <developerConnection>scm:git:git@github.com:Institute-Web-Science-and-Technologies/LiveGovWP1.git
+        </developerConnection>
+    </scm>
+
+    <properties>
+        <github.global.server>github</github.global.server>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>LiveGovWp1-mvn-repo</id>
+            <url>https://raw.github.com/Institute-Web-Science-and-Technologies/LiveGovWP1/mvn-repo</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -66,16 +99,13 @@
         </dependency>
     </dependencies>
 
-    <repositories>
+    <distributionManagement>
         <repository>
-            <id>LiveGovWp1-mvn-repo</id>
-            <url>https://raw.github.com/Institute-Web-Science-and-Technologies/LiveGovWP1/mvn-repo</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
+            <id>internal.repo</id>
+            <name>Temporary Staging Repository</name>
+            <url>file://${project.build.directory}/mvn-repo</url>
         </repository>
-    </repositories>
+    </distributionManagement>
 
     <build>
         <finalName>UploadServlet</finalName>
@@ -104,6 +134,15 @@
                     <url>http://LG:8080/manager/text</url>
                     <update>true</update>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>tomcat-deploy</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
