@@ -12,12 +12,12 @@
     <name>Live and Gov - Commons</name>
     <description>Common functions and structures for the Live and Gov project</description>
 
-    <url>https://github.com/HeinrichHartmann/LiveGovWP1</url>
+    <url>https://github.com/Institute-Web-Science-and-Technologies/LiveGovWP1</url>
 
     <licenses>
         <license>
             <name>The MIT License (MIT)</name>
-            <url>https://raw.github.com/HeinrichHartmann/LiveGovWP1/feature/platformProximity/LICENSE</url>
+            <url>https://raw.githubusercontent.com/Institute-Web-Science-and-Technologies/LiveGovWP1/master/LICENSE</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
