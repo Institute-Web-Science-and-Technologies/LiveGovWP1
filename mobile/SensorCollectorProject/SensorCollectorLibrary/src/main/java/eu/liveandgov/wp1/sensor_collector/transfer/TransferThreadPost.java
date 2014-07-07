@@ -9,6 +9,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -165,7 +166,8 @@ public class TransferThreadPost implements Runnable, TransferManager {
             HttpResponse response = httpclient.execute(httppost);
             int status = response.getStatusLine().getStatusCode();
             if (status != HttpStatus.SC_ACCEPTED) {
-                Log.i(LOG_TAG, "Upload failed w/ Status Code:" + status);
+                Log.d(LOG_TAG, "Upload failed w/ Status Code:" + status);
+                Log.v(LOG_TAG, "Upload failure response: " + EntityUtils.toString(response.getEntity()));
                 return false;
             }
 
