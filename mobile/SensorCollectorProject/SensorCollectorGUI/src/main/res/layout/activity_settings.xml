@@ -1,23 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:orientation="vertical">
 
     <TextView
+        android:id="@+id/upload_address_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/streaming_address"
-        android:id="@+id/streaming_address_title"
-        android:layout_margin="6dp" />
+        android:layout_margin="6dp"
+        android:text="@string/upload_address"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
+        android:id="@+id/upload_address"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/streaming_address"
         android:layout_margin="6dp"
-        android:hint="@string/default_streaming_address" />
+        android:hint="@string/default_upload_address"
+        android:inputType="textUri" />
+
+    <TextView
+        android:id="@+id/upload_port_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:text="@string/upload_port"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/upload_port"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:hint="@string/default_upload_port"
+        android:inputType="numberDecimal" />
+
+    <TextView
+        android:id="@+id/upload_servlet_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:text="@string/upload_servlet"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/upload_servlet"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:hint="@string/default_upload_servlet"
+        android:inputType="textUri" />
+
+    <TextView
+        android:id="@+id/streaming_address_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:text="@string/streaming_address"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/streaming_address"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:hint="@string/default_streaming_address"
+        android:inputType="textUri" />
+
+    <TextView
+        android:id="@+id/streaming_port_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:text="@string/streaming_port"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/streaming_port"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:hint="@string/default_streaming_port"
+        android:inputType="numberDecimal" />
 </LinearLayout>

@@ -1,5 +1,6 @@
 package eu.liveandgov.wp1.sensor_collector.transfer;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.apache.http.HttpResponse;
@@ -16,7 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
-import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
+import eu.liveandgov.wp1.sensor_collector.R;
 import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
@@ -33,8 +34,6 @@ public class TransferThreadPost implements Runnable, TransferManager {
     public static String LOG_TAG = "TransferThreadPost";
 
     private Thread thread;
-
-    private static final String uploadUrl = SensorCollectionOptions.UPLOAD_URL;
 
     private Persistor persistor;
 
@@ -151,8 +150,11 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
     public boolean transferFile(File file, boolean compressed) {
         try {
+            String dst = getAddress();
+            Log.d(LOG_TAG, "Destination of upload is: " + dst);
+
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(uploadUrl);
+            HttpPost httppost = new HttpPost(dst);
 
             MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
             multipartEntityBuilder.addBinaryBody("upfile", file);
@@ -164,10 +166,11 @@ public class TransferThreadPost implements Runnable, TransferManager {
             httppost.addHeader("ID", GlobalContext.getUserId());
 
             HttpResponse response = httpclient.execute(httppost);
+            Log.v(LOG_TAG, "Response of upload: " + EntityUtils.toString(response.getEntity()));
+
             int status = response.getStatusLine().getStatusCode();
             if (status != HttpStatus.SC_ACCEPTED) {
                 Log.d(LOG_TAG, "Upload failed w/ Status Code:" + status);
-                Log.v(LOG_TAG, "Upload failure response: " + EntityUtils.toString(response.getEntity()));
                 return false;
             }
 
@@ -180,6 +183,21 @@ public class TransferThreadPost implements Runnable, TransferManager {
             return false;
         }
         return true;
+    }
+
+    private String getAddress() {
+        SharedPreferences settings = GlobalContext.context.getSharedPreferences(GlobalContext.context.getString(R.string.spn), 0);
+
+        String uploadAddressValue = settings.getString(GlobalContext.context.getString(R.string.prf_upload_address), null);
+        String theUploadAddress = uploadAddressValue == null ? GlobalContext.context.getString(R.string.default_upload_address) : uploadAddressValue;
+
+        int uploadPortValue = settings.getInt(GlobalContext.context.getString(R.string.prf_upload_port), Integer.MIN_VALUE);
+        int theUploadPort = uploadPortValue == Integer.MIN_VALUE ? Integer.valueOf(GlobalContext.context.getString(R.string.default_upload_port)) : uploadPortValue;
+
+        String uploadServletValue = settings.getString(GlobalContext.context.getString(R.string.prf_upload_servlet), null);
+        String theUploadServlet = uploadServletValue == null ? GlobalContext.context.getString(R.string.default_upload_servlet) : uploadServletValue;
+
+        return "http://" + theUploadAddress + ":" + theUploadPort + "/" + theUploadServlet + "/";
     }
 
     public boolean transferFile(File file) {
