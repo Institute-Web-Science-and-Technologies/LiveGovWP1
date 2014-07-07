@@ -61,18 +61,16 @@ public class ZMQStreamer extends ZMQClient implements Monitorable {
 
     @Override
     protected String getAddress() {
-        final SharedPreferences settings = GlobalContext.context.getSharedPreferences(GlobalContext.context.getString(R.string.spn), 0);
+        SharedPreferences settings = GlobalContext.context.getSharedPreferences(GlobalContext.context.getString(R.string.spn), 0);
 
-        final String streamingAddressValue = settings.getString(GlobalContext.context.getString(R.string.prf_streaming_address), null);
+        String streamingAddressValue = settings.getString(GlobalContext.context.getString(R.string.prf_streaming_address), null);
+        String theStreamingAddress = streamingAddressValue == null ? GlobalContext.context.getString(R.string.default_streaming_address) : streamingAddressValue;
 
-        if (streamingAddressValue == null)
-            return SensorCollectionOptions.STREAMING_ZMQ_SOCKET;
-        else {
-            if (streamingAddressValue.matches("[^:]+:\\d+"))
-                return "tcp://" + streamingAddressValue;
-            else
-                return "tcp://" + streamingAddressValue + ":5555";
-        }
+        int streaminPortValue = settings.getInt(GlobalContext.context.getString(R.string.prf_streaming_port), Integer.MIN_VALUE);
+        int theStreamingPort = streaminPortValue == Integer.MIN_VALUE ? Integer.valueOf(GlobalContext.context.getString(R.string.default_streaming_port)) : streaminPortValue;
+
+
+        return "tcp://" + theStreamingAddress + ":" + theStreamingPort;
     }
 
     @Override

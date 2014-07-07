@@ -43,6 +43,7 @@ public class BatchInserter {
         inserter.put(DataCommons.TYPE_TAG, new TagInserter(db));
         inserter.put(DataCommons.TYPE_GPS, new GpsInserter(db));
         inserter.put(DataCommons.TYPE_ACTIVITY, new HarInserter(db));
+        inserter.put(DataCommons.TYPE_GOOGLE_ACTIVITY, new GActInserter(db));
 
         inserter.put(DataCommons.TYPE_GYROSCOPE, new GyrInserter(db));
         inserter.put(DataCommons.TYPE_ROTATION, new RotInserter(db));

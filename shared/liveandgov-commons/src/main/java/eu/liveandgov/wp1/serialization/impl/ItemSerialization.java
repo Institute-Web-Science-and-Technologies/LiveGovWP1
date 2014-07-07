@@ -124,6 +124,6 @@ public final class ItemSerialization implements Serialization<Item> {
             return WaitingSerialization.WAITING_SERIALIZATION.deSerialize(string);
         }
 
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("Illegal format on: " + string);
     }
 }
