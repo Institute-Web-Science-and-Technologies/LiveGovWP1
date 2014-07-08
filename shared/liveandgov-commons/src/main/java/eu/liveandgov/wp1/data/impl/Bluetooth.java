@@ -39,11 +39,6 @@ public class Bluetooth extends AbstractItem {
      */
     public static final class Item {
         /**
-         * Empty array of items
-         */
-        public static final Item[] EMPTY_ARRAY = new Item[0];
-
-        /**
          * Address of the device
          */
         public final String address;

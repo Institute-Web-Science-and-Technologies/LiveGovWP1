@@ -147,7 +147,16 @@ public class ServiceSensorControl extends Service {
 
         // Init sensor consumers
         final ZMQStreamer zmqStreamer = new ZMQStreamer();
-        streamer = zmqStreamer.itemNode;
+        streamer = new Consumer<Item>() {
+            @Override
+            public void push(Item item) {
+                zmqStreamer.itemNode.push(item);
+
+                // I am ashamed, kill me now
+                if (userId != null && userId.startsWith("dev"))
+                    Log.v("SMP", item.toString());
+            }
+        };
 
         harPipeline = new HARAdapter();
         ppsPipeline = new PPSAdapter("platform", staticIPS);

@@ -77,6 +77,6 @@ public class BluetoothSerialization extends AbstractSerialization<Bluetooth> {
             itemList.add(new Bluetooth.Item(address, deviceMajorClass, deviceMinorClass, bondState, name, rssi));
         }
 
-        return new Bluetooth(timestamp, device, itemList.toArray(Bluetooth.Item.EMPTY_ARRAY));
+        return new Bluetooth(timestamp, device, itemList.toArray(new Bluetooth.Item[itemList.size()]));
     }
 }
