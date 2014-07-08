@@ -105,7 +105,6 @@ public class ServiceLineDetectionTestAPI extends HttpServlet {
   
   for (int i = 0; i < coordinates.size(); i++) {
 	  
-	  String p = coordinates.get(i).getLonLatPoint();
 	  String betweenTimeClause = coordinates.get(i).getBetweenTimeClause("arrival_time",2);
 	  String d = coordinates.get(i).getISO8601Date();
 	  String day = coordinates.get(i).getWeekdayName();
