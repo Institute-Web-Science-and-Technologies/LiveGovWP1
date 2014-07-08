@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metadata>
+<metadata modelVersion="1.1.0">
   <groupId>eu.liveandgov</groupId>
   <artifactId>liveandgov-har-tools</artifactId>
   <version>1.0-SNAPSHOT</version>
   <versioning>
     <snapshot>
-      <timestamp>20140424.111959</timestamp>
-      <buildNumber>4</buildNumber>
+      <timestamp>20140708.121507</timestamp>
+      <buildNumber>2</buildNumber>
     </snapshot>
-    <lastUpdated>20140424111959</lastUpdated>
+    <lastUpdated>20140708121507</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>1.0-20140708.121507-2</value>
+        <updated>20140708121507</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>1.0-20140708.121507-2</value>
+        <updated>20140708121507</updated>
+      </snapshotVersion>
+    </snapshotVersions>
   </versioning>
 </metadata>
