@@ -11,6 +11,22 @@
     <packaging>jar</packaging>
     <name>Live and Gov - HAR Tools</name>
     <description>Library for Human Activity Recognition</description>
+    <url>https://github.com/Institute-Web-Science-and-Technologies/LiveGovWP1</url>
+
+    <licenses>
+        <license>
+            <name>The MIT License (MIT)</name>
+            <url>https://raw.githubusercontent.com/Institute-Web-Science-and-Technologies/LiveGovWP1/master/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://raw.github.com/Institute-Web-Science-and-Technologies/LiveGovWP1</url>
+        <connection>scm:git:git://github.com/Institute-Web-Science-and-Technologies/LiveGovWP1.git</connection>
+        <developerConnection>scm:git:git@github.com:Institute-Web-Science-and-Technologies/LiveGovWP1.git
+        </developerConnection>
+    </scm>
 
     <properties>
         <github.global.server>github</github.global.server>
@@ -19,31 +35,13 @@
     <repositories>
         <repository>
             <id>LiveGovWp1-mvn-repo</id>
-            <url>https://raw.github.com/HeinrichHartmann/LiveGovWP1/mvn-repo</url>
+            <url>https://raw.github.com/Institute-Web-Science-and-Technologies/LiveGovWP1/mvn-repo</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
     </repositories>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.liveandgov</groupId>
-            <artifactId>liveandgov-commons</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
 
     <distributionManagement>
         <repository>
@@ -53,8 +51,35 @@
         </repository>
     </distributionManagement>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>17.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>eu.liveandgov</groupId>
+            <artifactId>liveandgov-commons</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>com.github.github</groupId>
                 <artifactId>site-maven-plugin</artifactId>
@@ -69,7 +94,7 @@
                     </includes>
                     <merge>true</merge>
                     <repositoryName>LiveGovWp1</repositoryName>
-                    <repositoryOwner>HeinrichHartmann</repositoryOwner>
+                    <repositoryOwner>Institute-Web-Science-and-Technologies</repositoryOwner>
                 </configuration>
                 <executions>
                     <execution>
@@ -79,15 +104,6 @@
                         <phase>deploy</phase>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -6,6 +6,8 @@ import android.hardware.SensorEventListener;
 import android.os.Build;
 import android.os.Handler;
 
+import com.google.common.primitives.Floats;
+
 import eu.liveandgov.wp1.data.impl.Acceleration;
 import eu.liveandgov.wp1.data.impl.Gravity;
 import eu.liveandgov.wp1.data.impl.Gyroscope;
@@ -78,22 +80,22 @@ public class MotionSensorHolder implements SensorHolder, SensorEventListener {
         final Motion motion;
         switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER:
-                motion = new Acceleration(timestamp, GlobalContext.getUserId(), sensorEvent.values);
+                motion = new Acceleration(timestamp, GlobalContext.getUserId(), Floats.concat(sensorEvent.values));
                 break;
             case Sensor.TYPE_GRAVITY:
-                motion = new Gravity(timestamp, GlobalContext.getUserId(), sensorEvent.values);
+                motion = new Gravity(timestamp, GlobalContext.getUserId(), Floats.concat(sensorEvent.values));
                 break;
             case Sensor.TYPE_GYROSCOPE:
-                motion = new Gyroscope(timestamp, GlobalContext.getUserId(), sensorEvent.values);
+                motion = new Gyroscope(timestamp, GlobalContext.getUserId(), Floats.concat(sensorEvent.values));
                 break;
             case Sensor.TYPE_LINEAR_ACCELERATION:
-                motion = new LinearAcceleration(timestamp, GlobalContext.getUserId(), sensorEvent.values);
+                motion = new LinearAcceleration(timestamp, GlobalContext.getUserId(), Floats.concat(sensorEvent.values));
                 break;
             case Sensor.TYPE_MAGNETIC_FIELD:
-                motion = new MagneticField(timestamp, GlobalContext.getUserId(), sensorEvent.values);
+                motion = new MagneticField(timestamp, GlobalContext.getUserId(), Floats.concat(sensorEvent.values));
                 break;
             case Sensor.TYPE_ROTATION_VECTOR:
-                motion = new Rotation(timestamp, GlobalContext.getUserId(), sensorEvent.values);
+                motion = new Rotation(timestamp, GlobalContext.getUserId(), Floats.concat(sensorEvent.values));
                 break;
 
             default:
