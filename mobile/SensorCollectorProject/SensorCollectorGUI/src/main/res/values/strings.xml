@@ -7,16 +7,12 @@
     <!-- Shared Preferences Store -->
     <string name="spn">SensorCollectorPreferences</string>
     <string name="prf_upload_address">upload_address</string>
-    <string name="prf_upload_port">upload_port</string>
-    <string name="prf_upload_servlet">upload_servlet</string>
     <string name="prf_streaming_address">streaming_address</string>
     <string name="prf_streaming_port">streaming_port</string>
 
     <!-- Values for default configuration, values in the Sensor Collector Library must be
          changed accordingly -->
-    <string name="default_upload_address">liveandgov.uni-koblenz.de</string>
-    <string name="default_upload_port">8080</string>
-    <string name="default_upload_servlet">UploadServlet</string>
+    <string name="default_upload_address">http://liveandgov.uni-koblenz.de:8080/UploadServlet/</string>
 
     <string name="default_streaming_address">liveandgov.uni-koblenz.de</string>
     <string name="default_streaming_port">5555</string>
@@ -26,6 +22,4 @@
     <string name="title_activity_activity_settings">Settings</string>
     <string name="upload_address">Upload address</string>
     <string name="streaming_port">Streaming Port</string>
-    <string name="upload_port">Upload Port</string>
-    <string name="upload_servlet">Upload Servlet</string>
 </resources>
