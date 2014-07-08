@@ -12,6 +12,15 @@
     <name>Live and Gov - Commons</name>
     <description>Common functions and structures for the Live and Gov project</description>
 
+    <developers>
+        <developer>
+            <email>lukashaertel@gmail.com</email>
+            <name>Lukas Härtel</name>
+            <url>https://github.com/lukashaertel</url>
+            <id>lukashaertel</id>
+        </developer>
+    </developers>
+
     <url>https://github.com/Institute-Web-Science-and-Technologies/LiveGovWP1</url>
 
     <licenses>
@@ -28,15 +37,6 @@
         <developerConnection>scm:git:git@github.com:Institute-Web-Science-and-Technologies/LiveGovWP1.git
         </developerConnection>
     </scm>
-
-    <developers>
-        <developer>
-            <email>lukashaertel@gmail.com</email>
-            <name>Lukas Härtel</name>
-            <url>https://github.com/lukashaertel</url>
-            <id>lukashaertel</id>
-        </developer>
-    </developers>
 
     <properties>
         <github.global.server>github</github.global.server>
