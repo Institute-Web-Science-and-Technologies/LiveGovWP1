@@ -128,14 +128,18 @@ public class FilePersistor implements Persistor {
     }
 
     private void openLogFileAppend() throws IOException {
+        Log.i(LOG_TAG, "Opening Log File to Append: " + logFile);
         fileWriter = new BufferedWriter(new FileWriter(logFile, true));
     }
 
     private void openLogFileOverwrite() throws IOException {
+        Log.i(LOG_TAG, "Overwrining Log File: " + logFile);
         fileWriter = new BufferedWriter(new FileWriter(logFile, false));
     }
 
     private void closeLogFile() throws IOException {
+        Log.i(LOG_TAG, "Closing Log File");
+
         if (fileWriter == null) return;
 
         fileWriter.close();

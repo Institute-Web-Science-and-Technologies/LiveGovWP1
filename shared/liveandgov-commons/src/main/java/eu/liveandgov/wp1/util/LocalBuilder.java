@@ -12,7 +12,7 @@ public class LocalBuilder {
     /**
      * Maximum nesting of string builders
      */
-    public static final int MAXIMUM_NESTED = 16;
+    public static final int MAXIMUM_NESTED = 128; //TODO: Is this just a quickfix? Wifi seems to require more builders
 
     /**
      * Initial capacity of the string builders
@@ -71,7 +71,7 @@ public class LocalBuilder {
      */
     public static StringBuilder acquireBuilder() {
         // Resolve wrapping of the integer
-        final long at = (long) taker.incrementAndGet() - (long) Integer.MIN_VALUE;
+        final long at = (long) taker.getAndIncrement() - (long) Integer.MIN_VALUE;
 
         // Wrap into instancearray and acquire
         return instance[(int) (at % instance.length)].get();

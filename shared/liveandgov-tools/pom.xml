@@ -17,9 +17,7 @@
     <licenses>
         <license>
             <name>The MIT License (MIT)</name>
-            <url>
-                https://raw.github.com/Institute-Web-Science-and-Technologies/LiveGovWP1/feature/platformProximity/LICENSE
-            </url>
+            <url>https://raw.githubusercontent.com/Institute-Web-Science-and-Technologies/LiveGovWP1/master/LICENSE</url>
             <distribution>repo</distribution>
         </license>
     </licenses>

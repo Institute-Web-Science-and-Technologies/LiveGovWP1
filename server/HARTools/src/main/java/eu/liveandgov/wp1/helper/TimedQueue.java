@@ -18,6 +18,7 @@ import java.util.Queue;
  *
  * Created by cehlen, hartmann on 10/18/13.
  */
+@Deprecated
 public class TimedQueue<V> {
     private final long duration;
     private final Deque<TimeQueueEntry<V>> queue = new LinkedList<TimeQueueEntry<V>>();
