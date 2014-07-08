@@ -26,17 +26,17 @@ public class GSMSerialization extends AbstractSerialization<GSM> {
 
     @Override
     protected void serializeRest(StringBuilder stringBuilder, GSM gsm) {
-        stringBuilder.append(toText(gsm.serviceState));
+        appendString(stringBuilder, toText(gsm.serviceState));
         stringBuilder.append(SLASH);
-        stringBuilder.append(toText(gsm.roamingState));
+        appendString(stringBuilder, toText(gsm.roamingState));
         stringBuilder.append(SLASH);
-        stringBuilder.append(toText(gsm.carrierSelection));
+        appendString(stringBuilder, toText(gsm.carrierSelection));
         stringBuilder.append(SLASH);
-        stringBuilder.append(escape(gsm.carrierName));
+        appendString(stringBuilder, gsm.carrierName);
         stringBuilder.append(SLASH);
-        stringBuilder.append(escape(gsm.signalStrength));
+        appendString(stringBuilder, gsm.signalStrength);
 
-        stringBuilder.append(COLON);
+        stringBuilder.append(SLASH);
 
         if (gsm.items.length > 0) {
             appendGSMItem(gsm, stringBuilder, 0);
@@ -58,9 +58,9 @@ public class GSMSerialization extends AbstractSerialization<GSM> {
     private static void appendGSMItem(GSM gsm, StringBuilder stringBuilder, int i) {
         final GSM.Item item = gsm.items[i];
 
-        stringBuilder.append(escape(item.cellIdentity));
+        appendString(stringBuilder, item.cellIdentity);
         stringBuilder.append(SLASH);
-        stringBuilder.append(toText(item.cellType));
+        appendString(stringBuilder, toText(item.cellType));
         stringBuilder.append(SLASH);
         stringBuilder.append(item.rssi);
     }
@@ -74,8 +74,6 @@ public class GSMSerialization extends AbstractSerialization<GSM> {
         final GSM.CarrierSelection carrierSelection = fromText(GSM.CarrierSelection.class, nextString(scanner));
         final String carrierName = nextString(scanner);
         final String signalStrength = nextString(scanner);
-
-        scanner.skip(COLON_SEPARATED);
 
         final List<GSM.Item> itemList = new ArrayList<GSM.Item>();
         while (hasNextString(scanner)) {

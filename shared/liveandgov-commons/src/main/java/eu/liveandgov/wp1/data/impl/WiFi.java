@@ -16,10 +16,6 @@ public class WiFi extends AbstractItem {
      * Item forming the WiFi environment
      */
     public static final class Item {
-        /**
-         * Empty array of items
-         */
-        public static final Item[] EMPTY_ARRAY = new Item[0];
 
         /**
          * SSID of the access point

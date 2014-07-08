@@ -188,7 +188,7 @@ public class BluetoothHolder implements SensorHolder {
                 sensorQueue.push(new Bluetooth(
                         System.currentTimeMillis(),
                         GlobalContext.getUserId(),
-                        items.toArray(Bluetooth.Item.EMPTY_ARRAY)
+                        items.toArray(new Bluetooth.Item[items.size()])
                 ));
 
                 // If results are on time, schedule the next scan at the handler with the given delay

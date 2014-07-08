@@ -39,7 +39,7 @@ public class WiFiSerialization extends AbstractSerialization<WiFi> {
     /**
      * Writes one WiFi sub-item to the string builder
      *
-     * @param wiFi           The WiFi item
+     * @param wiFi          The WiFi item
      * @param stringBuilder The target string builder
      * @param i             The index of the item to write
      */
@@ -70,6 +70,6 @@ public class WiFiSerialization extends AbstractSerialization<WiFi> {
             itemList.add(new WiFi.Item(ssid, bssid, frequency, level));
         }
 
-        return new WiFi(timestamp, device, itemList.toArray(WiFi.Item.EMPTY_ARRAY));
+        return new WiFi(timestamp, device, itemList.toArray(new WiFi.Item[itemList.size()]));
     }
 }
