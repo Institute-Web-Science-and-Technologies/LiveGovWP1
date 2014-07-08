@@ -191,13 +191,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
         String uploadAddressValue = settings.getString(GlobalContext.context.getString(R.string.prf_upload_address), null);
         String theUploadAddress = uploadAddressValue == null ? GlobalContext.context.getString(R.string.default_upload_address) : uploadAddressValue;
 
-        int uploadPortValue = settings.getInt(GlobalContext.context.getString(R.string.prf_upload_port), Integer.MIN_VALUE);
-        int theUploadPort = uploadPortValue == Integer.MIN_VALUE ? Integer.valueOf(GlobalContext.context.getString(R.string.default_upload_port)) : uploadPortValue;
-
-        String uploadServletValue = settings.getString(GlobalContext.context.getString(R.string.prf_upload_servlet), null);
-        String theUploadServlet = uploadServletValue == null ? GlobalContext.context.getString(R.string.default_upload_servlet) : uploadServletValue;
-
-        return "http://" + theUploadAddress + ":" + theUploadPort + "/" + theUploadServlet + "/";
+        return theUploadAddress;
     }
 
     public boolean transferFile(File file) {

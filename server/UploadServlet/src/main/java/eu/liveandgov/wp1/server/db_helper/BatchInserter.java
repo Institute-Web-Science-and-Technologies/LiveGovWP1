@@ -95,9 +95,10 @@ public class BatchInserter {
                     SVO = ItemSerialization.ITEM_SERIALIZATION.deSerialize(line);
                 } catch (NoSuchElementException e) {
                     // This is thrown by the serializer, TODO: parse error type
-                    Log.debug("Parser problem" + line);
+                    Log.error("Parser problem on: " + line + "(" + e.getMessage() + ")", e);
+                    e.printStackTrace();
                 } catch (IllegalArgumentException e) {
-                    Log.debug("Illegal argument exception on: " + line + "(" + e.getMessage() + ")" + e.getStackTrace()[0]);
+                    Log.error("Illegal argument exception on: " + line + "(" + e.getMessage() + ")", e);
                 }
 
                 if (SVO == null) {

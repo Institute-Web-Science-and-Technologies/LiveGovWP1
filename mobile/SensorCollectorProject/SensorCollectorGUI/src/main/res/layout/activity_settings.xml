@@ -22,38 +22,6 @@
         android:inputType="textUri" />
 
     <TextView
-        android:id="@+id/upload_port_title"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:text="@string/upload_port"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <EditText
-        android:id="@+id/upload_port"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:hint="@string/default_upload_port"
-        android:inputType="numberDecimal" />
-
-    <TextView
-        android:id="@+id/upload_servlet_title"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:text="@string/upload_servlet"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <EditText
-        android:id="@+id/upload_servlet"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:hint="@string/default_upload_servlet"
-        android:inputType="textUri" />
-
-    <TextView
         android:id="@+id/streaming_address_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
