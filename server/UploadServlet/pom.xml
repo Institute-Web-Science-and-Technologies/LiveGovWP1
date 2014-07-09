@@ -2,11 +2,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.liveandgov.wp1</groupId>
-    <artifactId>UploadServlet</artifactId>
+    <artifactId>UploadServletFT</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <packaging>war</packaging>
-    <name>UploadServlet Maven Webapp</name>
+    <name>UploadServletFT</name>
     <description>The upload servlet ingesting SSF data</description>
 
     <url>https://github.com/Institute-Web-Science-and-Technologies/LiveGovWP1</url>
@@ -108,7 +108,7 @@
     </distributionManagement>
 
     <build>
-        <finalName>UploadServlet</finalName>
+        <finalName>UploadServletFT</finalName>
         <plugins>
             <plugin>
                 <!-- useage: mvn clean tomcat7:deploy -->
