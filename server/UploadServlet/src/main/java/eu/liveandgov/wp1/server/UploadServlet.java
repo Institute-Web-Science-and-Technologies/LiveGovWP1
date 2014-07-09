@@ -43,7 +43,7 @@ public class UploadServlet extends HttpServlet {
         try {
             SimpleLayout layout = new SimpleLayout();
             FileAppender appender = null;
-            appender = new FileAppender(layout,"/var/log/UploadServlet.log",true);
+            appender = new FileAppender(layout,"/var/log/UploadServletFT.log",true);
             Logger.getRootLogger().addAppender(appender);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -61,7 +61,7 @@ public class UploadServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
         writer.write(
                 "<html>" +
-                        "<h1>Upload Servlet</h1>" +
+                        "<h1>Upload Servlet FT</h1>" +
                         "<form action=\"\" enctype=\"multipart/form-data\" method=\"post\">" +
                         "Upload File: <input type=\"file\" name=\"upfile\" size=\"40\"/><br/>" +
                         "<input type=\"submit\" value=\"Submit\">" +
