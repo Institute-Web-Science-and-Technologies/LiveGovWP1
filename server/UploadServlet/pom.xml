@@ -108,7 +108,7 @@
     </distributionManagement>
 
     <build>
-        <finalName>UploadServlet</finalName>
+        <finalName>UploadServletFT</finalName>
         <plugins>
             <plugin>
                 <!-- useage: mvn clean tomcat7:deploy -->
