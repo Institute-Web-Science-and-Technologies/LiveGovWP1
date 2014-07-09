@@ -20,6 +20,6 @@
     <!-- Values for the Settings activity -->
     <string name="streaming_address">Streaming address</string>
     <string name="title_activity_activity_settings">Settings</string>
-    <string name="upload_address">Upload address</string>
+    <string name="upload_address">Upload address (FT)</string>
     <string name="streaming_port">Streaming Port</string>
 </resources>
