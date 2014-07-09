@@ -131,7 +131,7 @@
                 <version>2.0</version>
                 <configuration>
                     <server>LGTomcatServer</server>
-                    <url>http://LG:8080/manager/text</url>
+                    <url>http://liveandgov.uni-koblenz.de:8080/manager/text</url>
                     <update>true</update>
                 </configuration>
                 <executions>
