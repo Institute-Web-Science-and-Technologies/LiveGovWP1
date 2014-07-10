@@ -1,7 +1,6 @@
 package eu.liveandgov.wp1.server.db_helper.inserter;
 
 import eu.liveandgov.wp1.data.impl.Activity;
-import eu.liveandgov.wp1.data.impl.GoogleActivity;
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
 
 import java.sql.PreparedStatement;
@@ -22,7 +21,7 @@ public class HarInserter extends AbstractInserter<Activity> {
 
     @Override
     protected String getTableName() {
-        return "har_annotation";
+        return "sensor_har";
     }
 
     @Override
