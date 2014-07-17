@@ -22,7 +22,7 @@ public class HARPipeline extends Pipeline<Acceleration, Triple<Long, Long, Strin
 
     public HARPipeline (int delay) {
 
-        int WINDOW_LENGTH_MS = 5 * 1000;
+        int WINDOW_LENGTH_MS = 1000;
         int WINDOW_OVERLAP   = WINDOW_LENGTH_MS - delay;
 
         int SAMPLING_FREQUENCY_HZ = 50;
