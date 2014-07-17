@@ -23,6 +23,7 @@ public class ActivitySettings extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_settings);
 
         // Get target textview for streaming address settings
         final TextView uploadAddress = (TextView) findViewById(R.id.upload_address);
@@ -52,12 +53,26 @@ public class ActivitySettings extends Activity {
         final TextView streamingAddress = (TextView) findViewById(R.id.streaming_address);
 
         // Calculate new configuration value
-        final String uploadAddressValue = uploadAddress.getText().length() == 0 ? null : uploadAddress.getText().toString();
-        final String streamingAddressValue = streamingAddress.getText().length() == 0 ? null : streamingAddress.getText().toString();
+        final String uploadAddressValue =
+                uploadAddress.getText().length() == 0 || uploadAddress.getText().equals(SensorCollectionOptions.DEFAULT_UPLOAD)
+                        ? null
+                        : uploadAddress.getText().toString();
+        final String streamingAddressValue =
+                streamingAddress.getText().length() == 0 || uploadAddress.getText().equals(SensorCollectionOptions.DEFAULT_STREAMING)
+                        ? null
+                        : streamingAddress.getText().toString();
 
         // Store in settings and commit
-        edit.putString(getString(R.string.prf_upload_address), uploadAddressValue);
-        edit.putString(getString(R.string.prf_streaming_address), streamingAddressValue);
+        if (uploadAddressValue == null)
+            edit.remove(getString(R.string.prf_upload_address));
+        else
+            edit.putString(getString(R.string.prf_upload_address), uploadAddressValue);
+
+        if (streamingAddressValue == null)
+            edit.remove(getString(R.string.prf_streaming_address));
+        else
+            edit.putString(getString(R.string.prf_streaming_address), streamingAddressValue);
+
         edit.apply();
 
         super.onPause();

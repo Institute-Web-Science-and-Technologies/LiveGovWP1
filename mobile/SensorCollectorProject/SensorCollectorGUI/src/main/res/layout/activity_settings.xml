@@ -10,6 +10,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
+        android:text="@string/upload_address"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
@@ -17,7 +18,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
-        android:inputType="textUri" />
+        android:inputType="textUri"
+        android:hint="@string/resets_to_default" />
 
     <TextView
         android:id="@+id/streaming_address_title"
@@ -32,20 +34,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
-        android:inputType="textUri" />
+        android:inputType="textUri"
+        android:hint="@string/resets_to_default" />
 
-    <TextView
-        android:id="@+id/streaming_port_title"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:text="@string/streaming_port"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <EditText
-        android:id="@+id/streaming_port"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:inputType="numberDecimal" />
 </LinearLayout>
