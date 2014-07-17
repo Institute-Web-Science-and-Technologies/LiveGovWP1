@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.server.db_helper.inserter;
 
-import eu.liveandgov.wp1.data.impl.Activity;
+import eu.liveandgov.wp1.data.impl.Proximity;
+import eu.liveandgov.wp1.data.impl.Velocity;
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
 
 import java.sql.PreparedStatement;
@@ -13,26 +14,26 @@ import java.sql.SQLException;
  * Time: 2:45 PM
  * To change this template use File | Settings | File Templates.
  */
-public class HarInserter extends AbstractInserter<Activity> {
+public class VelInserter extends AbstractInserter<Velocity> {
 
-    public HarInserter(PostgresqlDatabase db) throws SQLException {
+    public VelInserter(PostgresqlDatabase db) throws SQLException {
         super(db);
     }
 
     @Override
     protected String getTableName() {
-        return "sensor_har";
+        return "sensor_velocity";
     }
 
     @Override
     protected String getSchema() {
-        return "(trip_id INT, ts BIGINT, tag TEXT)";
+        return "(trip_id INT, ts BIGINT, velocity FLOAT)";
     }
 
     @Override
-    public void insertValues(PreparedStatement insertStatement, Activity asv, int tripId) throws SQLException {
+    public void insertValues(PreparedStatement insertStatement, Velocity tsv, int tripId) throws SQLException {
         insertStatement.setInt(1, tripId);
-        insertStatement.setLong(2, asv.getTimestamp());
-        insertStatement.setString(3, asv.activity);
+        insertStatement.setLong(2, tsv.getTimestamp());
+        insertStatement.setFloat(3, tsv.velocity);
     }
 }

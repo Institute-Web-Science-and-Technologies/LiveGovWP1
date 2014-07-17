@@ -68,6 +68,10 @@ public final class ItemSerialization implements Serialization<Item> {
             return WaitingSerialization.WAITING_SERIALIZATION.serialize((Waiting) item);
         }
 
+        if (item instanceof Velocity) {
+            return VelocitySerialization.VELOCITY_SERIALIZATION.serialize((Velocity) item);
+        }
+
         throw new IllegalArgumentException();
     }
 
@@ -123,6 +127,11 @@ public final class ItemSerialization implements Serialization<Item> {
         if (DataCommons.TYPE_WAITING.equals(type)) {
             return WaitingSerialization.WAITING_SERIALIZATION.deSerialize(string);
         }
+
+        if (DataCommons.TYPE_VELOCITY.equals(type)) {
+            return VelocitySerialization.VELOCITY_SERIALIZATION.deSerialize(string);
+        }
+
 
         throw new IllegalArgumentException("Illegal format on: " + string);
     }
