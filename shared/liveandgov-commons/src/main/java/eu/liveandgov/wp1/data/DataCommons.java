@@ -21,6 +21,7 @@ public class DataCommons {
     public static final String TYPE_ERROR = "ERR";
     public static final String TYPE_PROXIMITY = "PRX";
     public static final String TYPE_WAITING = "WTN";
+    public static final String TYPE_VELOCITY = "VEL";
 
     public static final String[] TYPES = {
             TYPE_GPS,
@@ -38,6 +39,7 @@ public class DataCommons {
             TYPE_TAG,
             TYPE_ERROR,
             TYPE_PROXIMITY,
-            TYPE_WAITING
+            TYPE_WAITING,
+            TYPE_VELOCITY
     };
 }
