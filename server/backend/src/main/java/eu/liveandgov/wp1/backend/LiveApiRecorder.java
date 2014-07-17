@@ -29,7 +29,8 @@ public class LiveApiRecorder {
 			ft.setTimeZone(TimeZone.getTimeZone( "Europe/Helsinki" ));
 						
 		    String filename= args[0] + ft.format(new Date()) + "-HSL-Live-API-Record.csv";
-		    FileWriter fw = new FileWriter(filename,true); //the true will append the new data
+		    @SuppressWarnings("resource")
+			FileWriter fw = new FileWriter(filename,true); //the true will append the new data
 		    fw.write("##day,ts,route_id,trip_id,lat,lon,dir,departure\n");
 		    int totalLines = 1;
 		    while(true) {

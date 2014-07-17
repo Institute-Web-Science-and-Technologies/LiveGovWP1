@@ -10,6 +10,8 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
 
+import org.json.JSONTokener;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -166,6 +168,7 @@ public class ServiceSensorControl extends Service {
                 new ZipFilePersistor(sensorFile) :
                 new FilePersistor(sensorFile);
         publisher = new PublicationPipeline(); // for external communication
+
 
         // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
