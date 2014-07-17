@@ -35,7 +35,7 @@ import org.postgresql.Driver;
  */
 public class PostgresqlDatabase {
 
-    public static final String DB_NAME = "fieldtrail";
+    public static final String DB_NAME = "liveandgov_trial";
     public static final String DB_USER = "liveandgov";
     public static final String DB_PASS = "liveandgov";
 
