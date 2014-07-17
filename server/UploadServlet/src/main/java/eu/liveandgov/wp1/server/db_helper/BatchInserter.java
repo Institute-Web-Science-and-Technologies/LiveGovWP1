@@ -50,6 +50,8 @@ public class BatchInserter {
         inserter.put(DataCommons.TYPE_MAGNETOMETER, new MagInserter(db));
         inserter.put(DataCommons.TYPE_PROXIMITY, new PrxInserter(db));
         inserter.put(DataCommons.TYPE_WAITING, new WtnInserter(db));
+
+        inserter.put(DataCommons.TYPE_VELOCITY, new VelInserter(db));
     }
 
     private static enum ParsingState {

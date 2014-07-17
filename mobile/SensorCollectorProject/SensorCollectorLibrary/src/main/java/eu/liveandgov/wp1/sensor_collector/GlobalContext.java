@@ -2,6 +2,8 @@ package eu.liveandgov.wp1.sensor_collector;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
@@ -10,7 +12,11 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
@@ -83,6 +89,6 @@ public class GlobalContext {
 
         Log.d(LOG_TAG, "Extenal storage not available");
         return context.getFilesDir();
-
     }
+
 }
