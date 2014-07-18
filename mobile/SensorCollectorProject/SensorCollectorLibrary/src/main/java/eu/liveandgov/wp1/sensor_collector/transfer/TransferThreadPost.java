@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.R;
+import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
@@ -188,10 +189,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
     private String getAddress() {
         SharedPreferences settings = GlobalContext.context.getSharedPreferences(GlobalContext.context.getString(R.string.spn), 0);
 
-        String uploadAddressValue = settings.getString(GlobalContext.context.getString(R.string.prf_upload_address), null);
-        String theUploadAddress = uploadAddressValue == null ? GlobalContext.context.getString(R.string.default_upload_address) : uploadAddressValue;
-
-        return theUploadAddress;
+        return settings.getString(GlobalContext.context.getString(R.string.prf_upload_address), SensorCollectionOptions.DEFAULT_UPLOAD);
     }
 
     public boolean transferFile(File file) {
