@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.sensor_collector.streaming;
 
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.util.Log;
 
 import eu.liveandgov.wp1.data.Callback;
@@ -63,14 +64,9 @@ public class ZMQStreamer extends ZMQClient implements Monitorable {
     protected String getAddress() {
         SharedPreferences settings = GlobalContext.context.getSharedPreferences(GlobalContext.context.getString(R.string.spn), 0);
 
-        String streamingAddressValue = settings.getString(GlobalContext.context.getString(R.string.prf_streaming_address), null);
-        String theStreamingAddress = streamingAddressValue == null ? GlobalContext.context.getString(R.string.default_streaming_address) : streamingAddressValue;
+        String streamingAddressValue = settings.getString(GlobalContext.context.getString(R.string.prf_streaming_address), SensorCollectionOptions.DEFAULT_STREAMING);
 
-        int streaminPortValue = settings.getInt(GlobalContext.context.getString(R.string.prf_streaming_port), Integer.MIN_VALUE);
-        int theStreamingPort = streaminPortValue == Integer.MIN_VALUE ? Integer.valueOf(GlobalContext.context.getString(R.string.default_streaming_port)) : streaminPortValue;
-
-
-        return "tcp://" + theStreamingAddress + ":" + theStreamingPort;
+        return "tcp://" + streamingAddressValue;
     }
 
     @Override
