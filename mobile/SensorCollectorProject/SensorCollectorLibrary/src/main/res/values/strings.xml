@@ -5,12 +5,4 @@
     <string name="spn">SensorCollectorPreferences</string>
     <string name="prf_upload_address">upload_address</string>
     <string name="prf_streaming_address">streaming_address</string>
-    <string name="prf_streaming_port">streaming_port</string>
-
-    <!-- Values for default configuration, values in the Sensor Collector GUI must be
-         changed accordingly -->
-    <string name="default_upload_address">http://liveandgov.uni-koblenz.de:8080/UploadServlet/</string>
-
-    <string name="default_streaming_address">liveandgov.uni-koblenz.de</string>
-    <string name="default_streaming_port">5555</string>
 </resources>
