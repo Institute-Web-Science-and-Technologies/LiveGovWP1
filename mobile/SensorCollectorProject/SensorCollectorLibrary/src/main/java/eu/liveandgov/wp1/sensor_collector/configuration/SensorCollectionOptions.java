@@ -7,7 +7,7 @@ import android.os.Build;
  * Created by hartmann on 9/26/13.
  */
 public class SensorCollectionOptions {
-    public static final String DEFAULT_UPLOAD = "http://liveandgov.uni-koblenz.de:8080/UploadServlet/";
+    public static final String DEFAULT_UPLOAD = "http://liveandgov.uni-koblenz.de:8080/UploadServletFT/";
     public static final String DEFAULT_STREAMING ="liveandgov.uni-koblenz.de:5555";
 
     // SERVICE
