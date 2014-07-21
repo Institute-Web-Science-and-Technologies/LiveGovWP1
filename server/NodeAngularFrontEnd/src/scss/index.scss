@@ -1,0 +1,355 @@
+$color-x            : #2074c7;
+$color-y            : #24c02e;
+$color-z            : #b92819;
+$color-driving      : #fece09;
+$color-running      : #e41a1c;
+$color-walking      : #a65628;
+$color-standing     : #984ea3;
+$color-sitting      : #4daf4a;
+$color-on-table     : #ff4f7a;
+$color-unknown      : #777777;
+
+$axis-stroke-color  : black;
+$axis-stroke-width  : 1;
+$brush-transparency : 0.5;
+$domain-stroke-width: 1;
+$domain-stroke-color: black;
+$chart-stroke-width : 1.6;
+$data-table-height  : 500px;
+$svg-font           : 0.75em sans-serif;
+$axis-label-font    : 0.7em sans-serif;
+$minimap-height     : 42px;
+
+// HAR ACTIVITY COLORS
+
+// .driving  { background-color: $color-driving;  }
+// .running  { background-color: $color-running;  }
+// .walking  { background-color: $color-walking;  }
+// .standing { background-color: $color-standing; }
+// .sitting  { background-color: $color-sitting;  }
+// .on_table { background-color: $color-on-table; }
+// .unknown  { background-color: $color-unknown;  }
+.x        { color: $color-x;        }
+.y        { color: $color-y;        }
+.z        { color: $color-z;        }
+
+.driving {
+  background-color: $color-driving;
+  fill: $color-driving;
+}
+.on_table {
+  background-color: $color-on-table;
+  fill: $color-on-table;
+}
+.running {
+  background-color: $color-running;
+  fill: $color-running;
+}
+.sitting {
+  background-color: $color-sitting;
+  fill: $color-sitting;
+}
+.standing {
+  background-color: $color-standing;
+  fill: $color-standing;
+}
+.unknown {
+  background-color: $color-unknown;
+  fill: $color-unknown;
+}
+.walking {
+  background-color: $color-walking;
+  fill: $color-walking;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  margin: 16px 32px;
+  height: 100%;
+}
+
+th {
+  text-align: left;
+}
+
+td,
+th {
+  padding: 4px;
+}
+
+table {
+  width: 100%;
+}
+
+#main {
+  margin-bottom: 150px;
+}
+
+#raw,
+.raw {
+  display: inline-block;
+  width: 100%;
+  height: 100px;
+  min-height: 100px;
+  margin-bottom: 150px;
+}
+
+.pure-menu {
+  border-bottom: 2px solid $color-x !important;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+}
+
+menu {
+  margin: 0;
+  padding: 0;
+}
+
+input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+}
+
+input:focus {
+  outline: 0;
+}
+
+.sensorInfo {
+  list-style-type: none;
+  top: 0;
+  position: absolute;
+  li {
+    float: left;
+    padding: 4px 8px;
+    &.okay {
+      background-color: #afd957;
+    }
+    &.empty {
+      background-color: #dd6a92;
+    }
+  }
+}
+
+.warning {
+  padding: 12px;
+  margin: 12px;
+  border: 2px solid #ce6b45;
+  background-color: #febdbf;
+  float: right;
+}
+
+#map {
+  height: 400px;
+  border: 1px solid #999;
+  width: 100%;
+}
+
+#harBrush {
+  // background-color: #fff;
+  position: fixed;
+  height: $minimap-height;
+  display: block;
+  width: 100%;
+  clear: both;
+  left: 0;
+  right: 0;
+  padding: 0;
+  // bottom: 16px;
+  bottom: 0;
+  // z-index: 99;
+}
+
+.leaflet-control-attribution {
+  z-index: none !important;
+  display: none;
+}
+
+.extent {
+  fill-opacity: $brush-transparency;
+}
+
+ul {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+.chartHeader {
+  text-transform: capitalize;
+  margin-bottom: 8px;
+}
+
+.count,
+.legend,
+.export {
+  li {
+    padding: 0 4px 0 0;
+    float: left;
+    font-size: 85%;
+  }
+}
+
+.extentInfo {
+  // padding: 4px;
+  // margin: 4px;
+  text-align: center;
+}
+
+.cell.chart {
+  margin-top: 24px;
+  padding: 12px 12px 12px 0;
+}
+
+.cell.info {
+  padding: 12px 0 12px 12px;
+}
+
+.cell.map {
+  padding: 12px 12px 12px 0;
+}
+
+.chart {
+  margin: 24px 0;
+  height: 220px;
+}
+
+.info {
+  h1 {
+    margin: 0;
+    font-size: 1.4rem;
+  }
+}
+
+text.y.label {
+  alignment-baseline: hanging;
+}
+
+// --------------------------------------------------
+
+
+// GENERAL SVG SETUP
+
+svg {
+  font: $svg-font;
+}
+
+path {
+  fill: none;
+}
+
+line {
+  stroke: $axis-stroke-color;
+  stroke-width: $axis-stroke-width;
+  shape-rendering: crispEdges;
+}
+
+// D3 SPECIFIC SETUP
+
+.extent {
+  fill-opacity: $brush-transparency;
+}
+
+.domain {
+  stroke: $domain-stroke-color;
+  stroke-width: $domain-stroke-width;
+  shape-rendering: crispEdges;
+}
+
+.label {
+  font: $axis-label-font;
+}
+
+// COLOR APPLICATION
+
+.path { stroke-width: $chart-stroke-width; }
+.pathx { stroke: $color-x }
+.pathy { stroke: $color-y }
+.pathz { stroke: $color-z }
+.circle { fill: #333; }
+
+// REACT COMPONENTS
+
+.sensorTable {
+  font-size: .75em;
+  display: inline-block; // ?
+  width: 33.1%; // ?
+  border: none !important;
+  max-height: $data-table-height;
+  overflow: scroll; // FIXME
+}
+
+#minimap {
+  position: fixed;
+  height: $minimap-height;
+  display: block;
+  width: 100%;
+  clear: both;
+  left: 0;
+  right: 0;
+  padding: 0;
+  bottom: 0;
+}
+
+.tripInfo {
+  font-size: 0.85em;
+  ul {
+    margin: 0;
+    padding-left: 8px;
+    list-style-type: none;
+  }
+}
+
+// .chartLegend {
+//   .sensorName {
+//     color: #333;
+//     padding-left: 0;
+//   }
+//   ul {
+//     margin: 0;
+//     padding-left: 24px;
+//     list-style-type: none;
+//   }
+//   li {
+//     color: #dedede;
+//     float: left;
+//   }
+// }
+
+#map {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.leaflet-top-pane {
+  pointer-events: none;
+}
+
+footer {
+  margin-top: 24px;
+  a {
+    color: #ccc;
+    text-decoration: none;
+  }
+  a:hover {
+    color: #fd962d;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+ul.harTags:after {
+  content:'';
+  display:block;
+  clear: both;}
+
+li.harTag {
+  float: right;
+  padding: 4px;
+  margin: 4px 0 4px 4px;
+}

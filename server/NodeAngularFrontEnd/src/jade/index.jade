@@ -1,0 +1,39 @@
+html(ng-app='app')
+  head
+    meta(charset="utf-8")
+    title Live+Gov Front End
+
+    meta(name="google" content="notranslate")
+    meta(name="description" content="Live+Gov Front End")
+    meta(name="viewport" content="width=device-width")
+
+    link(rel="stylesheet", href="./bower_components/pure/pure-min.css")
+    link(rel="stylesheet", href="./css/index.css")
+
+    script(src='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js')
+    link(href='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.css', rel='stylesheet')
+
+    script(src='./bower_components/angular/angular.js')
+
+  body(ng-controller='appCtrl')
+
+    header
+      menu(trip='trip', loc='routeParams.view')
+
+    #content
+      trips(ng-if='!routeParams.view', trips='trips', select-Trip='selectTrip(id)', delete-Trip='deleteTrip(id)', update-Trip='updateTrip(id, value)')
+      raw(ng-if='routeParams.view == "raw"', trip='trip', load-More-Data='loadMoreData(id, props)')
+      har(ng-if='routeParams.view == "har"', trip='trip', load-More-Data='loadMoreData(id, props)')
+
+    footer
+      a(href='https://github.com/Institute-Web-Science-and-Technologies/LiveGovWP1/wiki/Inspection-Front-End') wiki
+
+    script(src='./bower_components/moment/min/moment.min.js')
+    script(src='./bower_components/lodash/dist/lodash.min.js')
+    script(src='./bower_components/angular-route/angular-route.js')
+    script(src='./bower_components/angular-animate/angular-animate.js')
+    script(src='./bower_components/angular-resource/angular-resource.js')
+    script(src='./bower_components/react/react.js')
+    script(src='./bower_components/d3/d3.min.js')
+    script(src='./js/components.js')
+    script(src='./js/app.js')
