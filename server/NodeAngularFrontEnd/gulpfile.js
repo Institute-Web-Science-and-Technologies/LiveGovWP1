@@ -7,6 +7,7 @@
        concat  = require('gulp-concat'),
        plumber = require('gulp-plumber'),
        nodemon = require('gulp-nodemon'),
+       prefix  = require('gulp-autoprefixer'),
        sass    = require('gulp-ruby-sass');
 
   var onError = function(err) {
@@ -26,6 +27,7 @@
     gulp.src('src/scss/*.scss')
       .pipe(plumber({errorHandler:onError}))
       .pipe(sass({sourcemap:false, style:'compressed'}))
+      .pipe(prefix(["last 1 version", "> 1%", "ie 8", "ie 7"], { cascade: true }))
       .pipe(gulp.dest('public/css'));
   });
 

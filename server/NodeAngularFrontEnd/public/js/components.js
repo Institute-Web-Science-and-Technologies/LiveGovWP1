@@ -17,9 +17,9 @@ var ChartHeader = React.createClass({displayName: 'ChartHeader',
 
   render: function() {
     return (
-      React.DOM.h1( {className:"chartHeader", onClick:this.showHideSensorChart}, 
-        this.props.sensorName,
-        React.DOM.small( {className:"hidden"},  " ...")
+      React.DOM.h1({className: "chartHeader", onClick: this.showHideSensorChart}, 
+        this.props.sensorName, 
+        React.DOM.small({className: "hidden"}, " ...")
       )
     );
   }
@@ -29,11 +29,11 @@ var ChartLegend = React.createClass({displayName: 'ChartLegend',
   render: function() {
     return (
       React.DOM.div(null, 
-        React.DOM.ul( {className:"legend"}, 
-          React.DOM.li(null, React.DOM.a( {className:"pure-button"}, "Legend:")),
-          React.DOM.li(null, React.DOM.a( {className:"pure-button x"}, "x")),
-          React.DOM.li(null, React.DOM.a( {className:"pure-button y"}, "y")),
-          React.DOM.li(null, React.DOM.a( {className:"pure-button z"}, "z"))
+        React.DOM.ul({className: "legend"}, 
+          React.DOM.li(null, React.DOM.a({className: "pure-button"}, "Legend:")), 
+          React.DOM.li(null, React.DOM.a({className: "pure-button x"}, "x")), 
+          React.DOM.li(null, React.DOM.a({className: "pure-button y"}, "y")), 
+          React.DOM.li(null, React.DOM.a({className: "pure-button z"}, "z"))
         )
       )
     );
@@ -44,8 +44,8 @@ var ChartExport = React.createClass({displayName: 'ChartExport',
   render: function() {
     return (
       React.DOM.div(null, 
-        React.DOM.ul( {className:"export"}, 
-          React.DOM.li(null, React.DOM.a( {className:"pure-button", href:'/trips/' + this.props.tripId + '/' + this.props.sensor, download:'livegov-' + this.props.tripId + '-' + this.props.sensor + '.json', title:'approx. ' + (Math.round(this.props.availableData / 10.25 / 1024)) + ' MB'}, "Export"))
+        React.DOM.ul({className: "export"}, 
+          React.DOM.li(null, React.DOM.a({className: "pure-button", href: '/trips/' + this.props.tripId + '/' + this.props.sensor, download: 'livegov-' + this.props.tripId + '-' + this.props.sensor + '.json', title: 'approx. ' + (Math.round(this.props.availableData / 10.25 / 1024)) + ' MB'}, "Export"))
         )
       )
     );
@@ -56,9 +56,9 @@ var ChartDataCount = React.createClass({displayName: 'ChartDataCount',
   render: function() {
     return (
       React.DOM.div(null, 
-        React.DOM.ul( {className:"count"}, 
-          React.DOM.li(null, React.DOM.a( {className:"pure-button"}, "Data Count:")),
-          React.DOM.li(null, React.DOM.a( {className:"pure-button"}, this.props.loadedData,"/",this.props.availableData))
+        React.DOM.ul({className: "count"}, 
+          React.DOM.li(null, React.DOM.a({className: "pure-button"}, "Data Count:")), 
+          React.DOM.li(null, React.DOM.a({className: "pure-button"}, this.props.loadedData, "/", this.props.availableData))
         )
       )
     );
@@ -68,7 +68,7 @@ var ChartDataCount = React.createClass({displayName: 'ChartDataCount',
 var Brush = React.createClass({displayName: 'Brush',
   render: function() {
     return (
-      React.DOM.g( {className:"brush"} )
+      React.DOM.g({className: "brush"})
     );
   },
 
@@ -106,9 +106,9 @@ var Circles = React.createClass({displayName: 'Circles',
 
   render: function() {
     var circles = Object.keys(this.props.data).map(function(key) {
-      return React.DOM.g( {key:key, className:key}, 
+      return React.DOM.g({key: key, className: key}, 
         this.props.data[key].map(function(d,i) {
-          return React.DOM.circle( {key:i, cx:d[0], cy:d[1], r:this.props.radius, className:'circle circle' + key} );
+          return React.DOM.circle({key: i, cx: d[0], cy: d[1], r: this.props.radius, className: 'circle circle' + key});
         }.bind(this))
       )
     }.bind(this));
@@ -122,7 +122,7 @@ var Paths = React.createClass({displayName: 'Paths',
   },
   render: function() {
     var paths = Object.keys(this.props.data).map(function(key) {
-      return React.DOM.path( {key:key, width:this.props.width, d:this.props.data[key], className:'path path' + key} );
+      return React.DOM.path({key: key, width: this.props.width, d: this.props.data[key], className: 'path path' + key});
     }.bind(this))
     return React.DOM.g(null, paths);
   }
@@ -235,19 +235,19 @@ var Chart = React.createClass({displayName: 'Chart',
     }.bind(this);
 
     return (
-      React.DOM.div( {className:"chart"}, 
+      React.DOM.div({className: "chart"}, 
         React.DOM.svg(null, 
-          React.DOM.defs(null ),
-          React.DOM.g( {transform:translate(this.props.margin.left, this.props.margin.top)}, 
-            React.DOM.text( {className:"x label", textAnchor:"end", x:this.state.width, y:this.state.height - 2}, "time"),
-            React.DOM.text( {className:"y label", textAnchor:"end", y:"2", transform:"rotate(-90)"} , "value"),
-            React.DOM.g( {className:"x axis", transform:translate(0, this.state.height)} ),
-            React.DOM.g( {className:"y axis"} )
-          ),
-          React.DOM.g( {className:"chart", width:this.state.width, height:this.state.height, transform:translate(this.props.margin.left, this.props.margin.top)}, 
-            Brush( {width:this.state.width, height:this.state.height, extent:this.props.extent, xDomain:this.props.xDomain, yDomain:this.props.yDomain, onBrush:this.props.onBrush} ),
-            Paths( {data:pathData(['x', 'y', 'z'])} ),
-            Circles( {data:circleData(['x', 'y', 'z'])} )
+          React.DOM.defs(null), 
+          React.DOM.g({transform: translate(this.props.margin.left, this.props.margin.top)}, 
+            React.DOM.text({className: "x label", textAnchor: "end", x: this.state.width, y: this.state.height - 2}, "time"), 
+            React.DOM.text({className: "y label", textAnchor: "end", y: "2", transform: "rotate(-90)"}, "value"), 
+            React.DOM.g({className: "x axis", transform: translate(0, this.state.height)}), 
+            React.DOM.g({className: "y axis"})
+          ), 
+          React.DOM.g({className: "chart", width: this.state.width, height: this.state.height, transform: translate(this.props.margin.left, this.props.margin.top)}, 
+            Brush({width: this.state.width, height: this.state.height, extent: this.props.extent, xDomain: this.props.xDomain, yDomain: this.props.yDomain, onBrush: this.props.onBrush}), 
+            Paths({data: pathData(['x', 'y', 'z'])}), 
+            Circles({data: circleData(['x', 'y', 'z'])})
           )
         )
       )
@@ -261,9 +261,9 @@ var HarTable = React.createClass({displayName: 'HarTable',
   render: function() {
     var rows = this.props.data.map(function(d, i) {
       return(
-        React.DOM.tr( {key:i, className:d.tag}, 
-          React.DOM.td(null, moment(d.start).format('HH:mm:ss')),
-          React.DOM.td(null, moment(d.stop).format('HH:mm:ss')),
+        React.DOM.tr({key: i, className: d.tag}, 
+          React.DOM.td(null, moment(d.start).format('HH:mm:ss')), 
+          React.DOM.td(null, moment(d.stop).format('HH:mm:ss')), 
           React.DOM.td(null, d.tag)
         )
       );
@@ -271,7 +271,7 @@ var HarTable = React.createClass({displayName: 'HarTable',
 
     return (
       React.DOM.table(null, 
-        React.DOM.thead(null, React.DOM.th(null, "start"),React.DOM.th(null, "stop"),React.DOM.th(null, "tag")),
+        React.DOM.thead(null, React.DOM.th(null, "start"), React.DOM.th(null, "stop"), React.DOM.th(null, "tag")), 
         React.DOM.tbody(null, rows)
       )
     );
@@ -282,14 +282,14 @@ var HarTags = React.createClass({displayName: 'HarTags',
   render: function() {
     var tags = this.props.tags.map(function(tag, i) {
       return(
-        React.DOM.li( {key:i, className:'harTag ' + tag}, 
+        React.DOM.li({key: i, className: 'harTag ' + tag}, 
           tag
         )
       );
     });
 
     return (
-      React.DOM.ul( {className:"harTags"}, tags)
+      React.DOM.ul({className: "harTags"}, tags)
     );
   }
 });
@@ -303,7 +303,7 @@ var HarBar = React.createClass({displayName: 'HarBar',
     var rects = this.props.data.map(function(c, i, a) {
       var width = xScale(c.stop) - xScale(c.start);
       var tag = c.tag;
-      var rect = React.DOM.g( {key:i}, React.DOM.rect( {className:tag, x:x, width:width, y:"0", height:"100%"} ),React.DOM.title(null, tag));
+      var rect = React.DOM.g({key: i}, React.DOM.rect({className: tag, x: x, width: width, y: "0", height: "100%"}), React.DOM.title(null, tag));
       x = x + width;
       return rect;
     });
@@ -339,7 +339,7 @@ var HarBrush = React.createClass({displayName: 'HarBrush',
   },
 
   render: function() {
-    return React.DOM.g( {className:"harBrush"} );
+    return React.DOM.g({className: "harBrush"});
   }
 });
 
@@ -347,14 +347,14 @@ var HarLegend = React.createClass({displayName: 'HarLegend',
   render: function() {
 
     return (
-      React.DOM.ul( {className:"legend"}, 
-        React.DOM.li( {className:"walking"}, "walking"),
-        React.DOM.li( {className:"running"}, "running"),
-        React.DOM.li( {className:"sitting"}, "sitting"),
-        React.DOM.li( {className:"standing"}, "standing"),
-        React.DOM.li( {className:"driving"}, "driving"),
-        React.DOM.li( {className:"on_table"}, "on table"),
-        React.DOM.li( {className:"unknown"}, "unknown")
+      React.DOM.ul({className: "legend"}, 
+        React.DOM.li({className: "walking"}, "walking"), 
+        React.DOM.li({className: "running"}, "running"), 
+        React.DOM.li({className: "sitting"}, "sitting"), 
+        React.DOM.li({className: "standing"}, "standing"), 
+        React.DOM.li({className: "driving"}, "driving"), 
+        React.DOM.li({className: "on_table"}, "on table"), 
+        React.DOM.li({className: "unknown"}, "unknown")
       )
     );
   }
@@ -446,10 +446,10 @@ var Har = React.createClass({displayName: 'Har',
     var width = window.innerWidth;
     var height = window.innerHeight;
 
-    var harTable = HarTable( {className:"harTable", data:har} );
-    var harMap   = Map( {gps:gps, har:har})
-    var harBar   = HarBar(   {className:"harBar",   xDomain:harDomain, extent:this.state.extent, width:width, data:har} );
-    var harBrush = HarBrush( {className:"harBrush", xDomain:harDomain, extent:this.state.extent, width:width, onBrush:this.onBrush});
+    var harTable = HarTable({className: "harTable", data: har});
+    var harMap   = Map({gps: gps, har: har})
+    var harBar   = HarBar({className: "harBar", xDomain: harDomain, extent: this.state.extent, width: width, data: har});
+    var harBrush = HarBrush({className: "harBrush", xDomain: harDomain, extent: this.state.extent, width: width, onBrush: this.onBrush});
 
     var harTags = _.uniq(_.map(this.props.trip.data.sensor_har, function(d) { return d.tag; }));
 
@@ -466,18 +466,18 @@ var Har = React.createClass({displayName: 'Har',
       })
       .map(function(sensor) {
         return (
-          React.DOM.div( {key:sensor.name, className:"pure-g"}, 
-            React.DOM.div( {className:"pure-u-24-24"}, 
-              ChartHeader( {sensorName:sensor.name.replace(/sensor/, '').replace(/_/g, ' ')} ),
-              ChartLegend(null ),
-              ChartDataCount( {loadedData:sensor.data.length, availableData:this.props.trip.count[sensor.name]} ),
-              ChartExport( {tripId:this.props.trip.id, sensor:sensor.name, availableData:this.props.trip.count[sensor.name]}),
-              Chart(
-                {data:sensor.data,
-                extent:this.state.extent,
-                xDomain:this.state.xDomain,
-                yDomain:this.state.yDomain,
-                onBrush:this.onBrush}
+          React.DOM.div({key: sensor.name, className: "pure-g"}, 
+            React.DOM.div({className: "pure-u-24-24"}, 
+              ChartHeader({sensorName: sensor.name.replace(/sensor/, '').replace(/_/g, ' ')}), 
+              ChartLegend(null), 
+              ChartDataCount({loadedData: sensor.data.length, availableData: this.props.trip.count[sensor.name]}), 
+              ChartExport({tripId: this.props.trip.id, sensor: sensor.name, availableData: this.props.trip.count[sensor.name]}), 
+              Chart({
+                data: sensor.data, 
+                extent: this.state.extent, 
+                xDomain: this.state.xDomain, 
+                yDomain: this.state.yDomain, 
+                onBrush: this.onBrush}
               )
             )
           )
@@ -485,11 +485,11 @@ var Har = React.createClass({displayName: 'Har',
       }.bind(this))
 
     var map = (
-      React.DOM.div( {className:"pure-g"}, 
-        React.DOM.div( {className:"pure-u-24-24"}, 
-          ChartHeader( {sensorName:"GPS"} ),
-          React.DOM.div( {className:"cell map"}, 
-            Map( {featureCollection:featureCollection} )
+      React.DOM.div({className: "pure-g"}, 
+        React.DOM.div({className: "pure-u-24-24"}, 
+          ChartHeader({sensorName: "GPS"}), 
+          React.DOM.div({className: "cell map"}, 
+            Map({featureCollection: featureCollection})
           )
         )
       )
@@ -498,17 +498,17 @@ var Har = React.createClass({displayName: 'Har',
     if (!featureCollection.features.length) map = '';
 
     return (
-      React.DOM.div( {id:"har"}, 
-        React.DOM.div( {id:"main"}, 
-          React.DOM.svg( {height:"50px"}, 
-            HarBar( {className:"harBar", xDomain:this.state.xDomain, extent:this.state.extent, width:width, data:har} ),
-            HarBrush( {className:"harBrush", xDomain:this.state.xDomain, extent:this.state.extent, width:width, onBrush:this.onBrush} )
-          ),
-          HarTags( {tags:harTags} ),
-          map,
+      React.DOM.div({id: "har"}, 
+        React.DOM.div({id: "main"}, 
+          React.DOM.svg({height: "50px"}, 
+            HarBar({className: "harBar", xDomain: this.state.xDomain, extent: this.state.extent, width: width, data: har}), 
+            HarBrush({className: "harBrush", xDomain: this.state.xDomain, extent: this.state.extent, width: width, onBrush: this.onBrush})
+          ), 
+          HarTags({tags: harTags}), 
+          map, 
           charts
-        ),
-        React.DOM.div( {id:"minimap"}
+        ), 
+        React.DOM.div({id: "minimap"}
         )
       )
     );
@@ -520,7 +520,7 @@ var Har = React.createClass({displayName: 'Har',
 var ExtentInfo = React.createClass({displayName: 'ExtentInfo',
   render: function() {
     var extent = this.props.extent.map(function(d) { return moment(d).format('HH:mm:ss'); }).join(' - ');
-    return React.DOM.ul( {className:"extentInfo"}, React.DOM.li(null, extent));
+    return React.DOM.ul({className: "extentInfo"}, React.DOM.li(null, extent));
   }
 });
 
@@ -529,7 +529,7 @@ var DataInfo = React.createClass({displayName: 'DataInfo',
     var a = this.props.trip.count;
     var b = _.mapValues(this.props.trip.data, function(d) { return d.length; }.bind(this));
     var c = _.zip(_.keys(a),_.zip(_.values(b), _.values(a)));
-    return React.DOM.div(null );
+    return React.DOM.div(null);
   }
 });
 
@@ -646,7 +646,7 @@ var Map = React.createClass({displayName: 'Map',
   },
 
   render: function() {
-    return React.DOM.div( {id:"map"} );
+    return React.DOM.div({id: "map"});
   }
 });
 
@@ -672,18 +672,18 @@ var Menu = React.createClass({displayName: 'Menu',
     }.bind(this);
 
     return (
-      React.DOM.ul( {className:"pure-menu pure-menu-open pure-menu-horizontal"}, 
+      React.DOM.ul({className: "pure-menu pure-menu-open pure-menu-horizontal"}, 
         React.DOM.li(null, 
-          React.DOM.a( {href:"/"}, "Records")
-        ),
-        React.DOM.li( {className:className('raw')}, 
-          React.DOM.a( {href:href('raw')}, "Raw Data")
-        ),
-        React.DOM.li( {className:className('har')}, 
-          React.DOM.a( {href:href('har')}, "Activity Recognition")
-        ),
-        React.DOM.li(  {className:className('sld')}, 
-          React.DOM.a( {href:href('sld')}, "Service Line Detection")
+          React.DOM.a({href: "/"}, "Records")
+        ), 
+        React.DOM.li({className: className('raw')}, 
+          React.DOM.a({href: href('raw')}, "Raw Data")
+        ), 
+        React.DOM.li({className: className('har')}, 
+          React.DOM.a({href: href('har')}, "Activity Recognition")
+        ), 
+        React.DOM.li({className: className('sld')}, 
+          React.DOM.a({href: href('sld')}, "Service Line Detection")
         )
       )
     );
@@ -783,8 +783,8 @@ var Raw = React.createClass({displayName: 'Raw',
     var width = window.innerWidth;
     var height = window.innerHeight;
 
-    var harTable = HarTable( {className:"harTable", data:har} );
-    var harMap   = Map( {gps:gps, har:har})
+    var harTable = HarTable({className: "harTable", data: har});
+    var harMap   = Map({gps: gps, har: har})
 
     var harTags = _.uniq(_.map(this.props.trip.data.sensor_har, function(d) { return d.tag; }));
 
@@ -801,18 +801,18 @@ var Raw = React.createClass({displayName: 'Raw',
       })
       .map(function(sensor) {
         return (
-          React.DOM.div( {key:sensor.name, className:"pure-g"}, 
-            React.DOM.div( {className:"pure-u-24-24"}, 
-              ChartHeader( {sensorName:sensor.name.replace(/sensor/, '').replace(/_/g, ' ')} ),
-              ChartLegend(null ),
-              ChartDataCount( {loadedData:sensor.data.length, availableData:this.props.trip.count[sensor.name]} ),
-              ChartExport( {tripId:this.props.trip.id, sensor:sensor.name, availableData:this.props.trip.count[sensor.name]}),
-              Chart(
-                {data:sensor.data,
-                extent:this.state.extent,
-                xDomain:this.state.xDomain,
-                yDomain:this.state.yDomain,
-                onBrush:this.onBrush}
+          React.DOM.div({key: sensor.name, className: "pure-g"}, 
+            React.DOM.div({className: "pure-u-24-24"}, 
+              ChartHeader({sensorName: sensor.name.replace(/sensor/, '').replace(/_/g, ' ')}), 
+              ChartLegend(null), 
+              ChartDataCount({loadedData: sensor.data.length, availableData: this.props.trip.count[sensor.name]}), 
+              ChartExport({tripId: this.props.trip.id, sensor: sensor.name, availableData: this.props.trip.count[sensor.name]}), 
+              Chart({
+                data: sensor.data, 
+                extent: this.state.extent, 
+                xDomain: this.state.xDomain, 
+                yDomain: this.state.yDomain, 
+                onBrush: this.onBrush}
               )
             )
           )
@@ -820,11 +820,11 @@ var Raw = React.createClass({displayName: 'Raw',
       }.bind(this))
 
     var map = (
-      React.DOM.div( {className:"pure-g"}, 
-        React.DOM.div( {className:"pure-u-24-24"}, 
-          ChartHeader( {sensorName:"GPS"} ),
-          React.DOM.div( {className:"cell map"}, 
-            Map( {featureCollection:featureCollection, colorized:false} )
+      React.DOM.div({className: "pure-g"}, 
+        React.DOM.div({className: "pure-u-24-24"}, 
+          ChartHeader({sensorName: "GPS"}), 
+          React.DOM.div({className: "cell map"}, 
+            Map({featureCollection: featureCollection, colorized: false})
           )
         )
       )
@@ -834,9 +834,9 @@ var Raw = React.createClass({displayName: 'Raw',
 
 
 		return (
-      React.DOM.div( {id:"raw"}, 
-        React.DOM.div( {id:"main"}, 
-          map,
+      React.DOM.div({id: "raw"}, 
+        React.DOM.div({id: "main"}, 
+          map, 
           charts
         )
       )
@@ -948,7 +948,7 @@ var TripsFilter = React.createClass({displayName: 'TripsFilter',
   render: function() {
     return (
       React.DOM.span(null, 
-        React.DOM.input( {type:"slider", min:"0", max:"100"} )
+        React.DOM.input({type: "slider", min: "0", max: "100"})
       )
     );
   }
@@ -989,16 +989,16 @@ var Trips = React.createClass({displayName: 'Trips',
       // });
 
       return(
-        React.DOM.tr( {key:trip.id}, 
-          React.DOM.td( {onClick:this.selectTrip.bind(this, trip.id)}, trip.id),
-          React.DOM.td( {onClick:this.selectTrip.bind(this, trip.id)}, trip.user),
-          React.DOM.td( {onClick:this.selectTrip.bind(this, trip.id)}, moment(trip.start).format('HH:mm:ss')),
-          React.DOM.td( {onClick:this.selectTrip.bind(this, trip.id)}, moment(trip.stop).format('HH:mm:ss')),
-          React.DOM.td( {onClick:this.selectTrip.bind(this, trip.id)}, moment(trip.duration).utc().format('HH:mm:ss')),
+        React.DOM.tr({key: trip.id}, 
+          React.DOM.td({onClick: this.selectTrip.bind(this, trip.id)}, trip.id), 
+          React.DOM.td({onClick: this.selectTrip.bind(this, trip.id)}, trip.user), 
+          React.DOM.td({onClick: this.selectTrip.bind(this, trip.id)}, moment(trip.start).format('HH:mm:ss')), 
+          React.DOM.td({onClick: this.selectTrip.bind(this, trip.id)}, moment(trip.stop).format('HH:mm:ss')), 
+          React.DOM.td({onClick: this.selectTrip.bind(this, trip.id)}, moment(trip.duration).utc().format('HH:mm:ss')), 
           React.DOM.td(null, 
-            React.DOM.input( {type:"text", defaultValue:trip.comment, onChange:this.updateTrip.bind(this, trip.id)} )
-          ),
-          React.DOM.td( {onClick:this.deleteTrip.bind(this, trip.id)}, "✗")
+            React.DOM.input({type: "text", defaultValue: trip.comment, onChange: this.updateTrip.bind(this, trip.id)})
+          ), 
+          React.DOM.td({onClick: this.deleteTrip.bind(this, trip.id)}, "✗")
         )
       )
     }.bind(this));
@@ -1007,15 +1007,15 @@ var Trips = React.createClass({displayName: 'Trips',
       React.DOM.table(null, 
         React.DOM.thead(null, 
           React.DOM.tr(null, 
-            React.DOM.th(null, "id"),
-            React.DOM.th(null, "user"),
-            React.DOM.th(null, "start"),
-            React.DOM.th(null, "stop"),
-            React.DOM.th(null, "duration"),
-            React.DOM.th(null, "comment"),
+            React.DOM.th(null, "id"), 
+            React.DOM.th(null, "user"), 
+            React.DOM.th(null, "start"), 
+            React.DOM.th(null, "stop"), 
+            React.DOM.th(null, "duration"), 
+            React.DOM.th(null, "comment"), 
             React.DOM.th(null)
           )
-        ),
+        ), 
         React.DOM.tbody(null, 
           trips
         )

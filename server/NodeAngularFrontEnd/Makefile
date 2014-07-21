@@ -10,7 +10,7 @@ endif
 IGNOREFILE = $(BASEDIR)/.gitignore
 REMOVEFILES = `cat $(IGNOREFILE)` *bz2
 
-NAME = frontend2
+NAME = NodeAngularFrontEnd
 TARBALL = $(NAME)-`date '+%Y%m%d'`.tar.bz2
 
 REMOTE_HOST = rene@141.26.69.238
@@ -43,5 +43,9 @@ forever:
 deploy:
 	@echo deploying to $(REMOTE_HOST)
 	@rsync -av $(BASEDIR) $(REMOTE_HOST):$(REMOTE_PATH) --exclude-from=$(IGNOREFILE)
-  # @ssh $(REMOTE_HOST) $(DEPLOY_CMD)
+	# @ssh $(REMOTE_HOST) $(DEPLOY_CMD)
 	@ssh $(REMOTE_HOST) $(PGURL_CMD)
+
+chport:
+	@echo removing db tunnel port
+	@$(PGURL_CMD)

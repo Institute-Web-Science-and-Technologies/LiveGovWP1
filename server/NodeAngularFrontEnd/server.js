@@ -40,15 +40,15 @@
   ];
 
   var moreSensors = [
-    'har_annotation',
-    'sensor_gact',
+    // 'har_annotation',
+    // 'sensor_gact',
     'sensor_gps',
     'sensor_har',
-    'sensor_proximity',
-    'sensor_tags',
-    'sensor_velocity',
-    'sensor_waiting',
-    'service_sld_trips'
+    // 'sensor_proximity',
+    // 'sensor_tags',
+    // 'sensor_velocity',
+    // 'sensor_waiting',
+    // 'service_sld_trips'
   ];
 
   // list all tables
