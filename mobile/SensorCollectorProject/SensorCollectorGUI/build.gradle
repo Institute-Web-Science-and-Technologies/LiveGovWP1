@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
         mavenLocal()
         maven {
-            url 'https://raw.github.com/HeinrichHartmann/LiveGovWp1/mvn-repo/'
+            url 'https://raw.github.com/Institute-Web-Science-and-Technologies/LiveGovWp1/mvn-repo/'
         }
     }
     dependencies {
@@ -18,7 +18,7 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven {
-        url 'https://raw.github.com/HeinrichHartmann/LiveGovWp1/mvn-repo/'
+        url 'https://raw.github.com/Institute-Web-Science-and-Technologies/LiveGovWp1/mvn-repo/'
     }
 }
 
