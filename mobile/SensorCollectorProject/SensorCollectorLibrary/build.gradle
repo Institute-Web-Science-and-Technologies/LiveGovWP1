@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
         mavenLocal()
         maven {
-            url 'https://raw.github.com/HeinrichHartmann/LiveGovWP1/mvn-repo'
+            url 'https://raw.github.com/Institute-Web-Science-and-Technologies/LiveGovWP1/mvn-repo'
         }
     }
     dependencies {
@@ -18,7 +18,7 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven {
-        url 'https://raw.github.com/HeinrichHartmann/LiveGovWP1/mvn-repo'
+        url 'https://raw.github.com/Institute-Web-Science-and-Technologies/LiveGovWP1/mvn-repo'
     }
 }
 
@@ -47,7 +47,7 @@ android {
 dependencies {
     compile 'eu.liveandgov:liveandgov-commons:1.0-SNAPSHOT'
     compile 'eu.liveandgov:liveandgov-proximity:1.0-SNAPSHOT'
-    compile 'eu.liveandgov:liveandgov-har-tools:1.0-SNAPSHOT'
+    compile 'eu.liveandgov:liveandgov-har-tools:1.1'
     compile 'com.android.support:appcompat-v7:19.1.0'
     compile 'com.google.android.gms:play-services:4.3.23'
     compile 'org.apache.httpcomponents:httpmime:4.3-beta2'
