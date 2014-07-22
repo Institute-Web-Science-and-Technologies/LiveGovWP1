@@ -40,6 +40,10 @@ public class PostgresqlDatabase extends Database {
 	Connection connection = null;
 	
 	public PostgresqlDatabase(String user, String password) throws UnavailableException {
+		 this(user, password, "localhost", "gtfsdb");
+	}
+	
+	public PostgresqlDatabase(String user, String password, String host, String db) throws UnavailableException {
 		try {
 			// problem:
 			// exception when run it in eclipse+m2+tomcat7: path!java.lang.ClassNotFoundException: org.postgresql.Driver...
@@ -59,7 +63,7 @@ public class PostgresqlDatabase extends Database {
 			Util.SLDLogger.log().error(e);
 		}
 
-		String dbAddress = "jdbc:postgresql://localhost/gtfsdb?autoReconnect=true";
+		String dbAddress = "jdbc:postgresql://"+host+"/"+db+"?autoReconnect=true";
 		try {
 
 			connection = DriverManager.getConnection(
@@ -71,8 +75,10 @@ public class PostgresqlDatabase extends Database {
 			Util.SLDLogger.log().error("dbAdress: " + dbAddress + " user: " + user + " password: " + password);
 			Util.SLDLogger.log().error(e);
 			throw new UnavailableException(e.getMessage());
-		} 
+		}
 	}
+
+	
 	/* (non-Javadoc)
 	 * @see eu.liveandgov.wp1.backe29,nd.AbstractDatabase#distanceInMeter(double, double, double, double)
 	 */
@@ -118,5 +124,4 @@ public class PostgresqlDatabase extends Database {
 		}
 		return stmtLink;
 	}
-
 }
