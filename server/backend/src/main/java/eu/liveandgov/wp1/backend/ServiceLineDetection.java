@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.backend;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -32,6 +33,8 @@ import org.json.JSONObject;
 public class ServiceLineDetection extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	PostgresqlDatabase db;
+	PostgresqlDatabase logDb;
+	final String logDBInsert = "INSERT INTO service_sld VALUES (?, ?, ?, ?, ?, ?)";
 	
 	// route_id -> transportation mean
 	final HashMap<String, String> transportationMeans;
@@ -53,6 +56,7 @@ public class ServiceLineDetection extends HttpServlet {
 		super();
 		transportationMeans = initTransportationMeans();
 		db = new PostgresqlDatabase("liveandgov", "liveandgov");
+		logDb = new PostgresqlDatabase("liveandgov", "liveandgov", "liveandgov.uni-koblenz.de", "liveandgov_dev");
 		liveApiExecutor = Executors.newCachedThreadPool();
 		mLogger = Util.SLDLogger.log();
 	}
@@ -137,6 +141,7 @@ public class ServiceLineDetection extends HttpServlet {
 			}
 			logJSON.put("responseTime", System.currentTimeMillis()-startTs);
 			mLogger.info(logJSON.toString());
+			logResult(allTrips.get(0), username, latestLatLonTsDayTuple.getTime());
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -144,6 +149,24 @@ public class ServiceLineDetection extends HttpServlet {
 		}
 	}
 
+	private void logResult (JSONObject data, String username, long ts) {
+		PreparedStatement stmt = null;
+			try {
+				stmt = logDb.connection.prepareStatement(logDBInsert);
+				stmt.setString(1, username);
+				stmt.setLong(2, ts);
+				stmt.setString(3, data.getString("route_id"));
+				stmt.setString(4, data.getString("shape_id"));
+				stmt.setString(5, data.getString("transportation_mean"));
+				stmt.setInt(6, data.getInt("score"));
+				stmt.execute();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				Util.SLDLogger.log().error(e);
+			}
+	}
+	
 	private List<JSONObject> latLonArrayToJsonList(ArrayList<LatLonTsDayTuple> coordinates) {
 		List<JSONObject> allTrips = new ArrayList<JSONObject>();
 		for(LatLonTsDayTuple t:coordinates){
