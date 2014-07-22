@@ -26,7 +26,7 @@ public class HARPipeline extends Pipeline<Acceleration, Triple<Long, Long, Strin
         int WINDOW_OVERLAP   = WINDOW_LENGTH_MS - delay;
 
         int SAMPLING_FREQUENCY_HZ = 50;
-        int MIN_RECORDING_FREQUENCY = 40;
+        int MIN_RECORDING_FREQUENCY = 10;
 
         double SAMPLE_LENGTH_MS = 1000D / SAMPLING_FREQUENCY_HZ;
         int NO_SAMPLES_PER_WINDOW = (int) (WINDOW_LENGTH_MS / SAMPLE_LENGTH_MS);
