@@ -77,21 +77,29 @@ public class WindowPipeline extends Pipeline<Tuple<Long, Acceleration>, Tuple<Lo
         w.z = new float[values.size()];
         w.time = new long[values.size()];
 
-        int i = 0;
-        for (Acceleration a : values) {
-            w.startTime = Math.min(a.getTimestamp(), w.startTime);
-            w.endTime = Math.max(a.getTimestamp(), w.endTime);
+        try {
+            int i = 0;
+            for (Acceleration a : values) {
+                w.startTime = Math.min(a.getTimestamp(), w.startTime);
+                w.endTime = Math.max(a.getTimestamp(), w.endTime);
 
-            w.x[i] = a.values[0];
-            w.y[i] = a.values[1];
-            w.z[i] = a.values[2];
-            w.time[i] = a.getTimestamp();
+                w.x[i] = a.values[0];
+                w.y[i] = a.values[1];
+                w.z[i] = a.values[2];
+                w.time[i] = a.getTimestamp();
 
-            i++;
+                i++;
+            }
+
+        } catch (Throwable h) {
+            // TODO: remove this, just have the feeling that array might be too short
+            h.printStackTrace();
         }
 
         Tuple<Long, Window> value = new Tuple<Long, Window>(current_trip_id, w);
 
         produce(value);
     }
+
+    long windownumber = 0;
 }

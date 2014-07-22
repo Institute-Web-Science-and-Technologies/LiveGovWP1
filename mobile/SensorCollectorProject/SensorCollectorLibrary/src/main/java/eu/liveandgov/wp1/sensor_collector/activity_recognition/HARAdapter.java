@@ -28,6 +28,7 @@ public class HARAdapter implements Consumer<Item> {
         filter = new ClassFilter<Acceleration>(Acceleration.class);
 
         harPipeline = new HARPipeline(1000);
+
         filter.setConsumer(harPipeline);
 
         // Emission

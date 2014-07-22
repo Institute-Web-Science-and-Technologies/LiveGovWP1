@@ -57,14 +57,35 @@ public class FeatureHelper {
         return sum;
     }
 
+    /**
+     * Should be pitch in YPR system
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
     // Tilting measure to ground:
     // 1 if Mobile is pointing to sky or ground
     // 0 if lying flat
     // arccos of return value gives tilting angle
     public static float tilt(float x, float y, float z) {
-        double abs = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
-        return (float) (Math.abs(y) / abs);
+        double absxyz = Math.sqrt(x * x + y * y + z * z);
+        return (float) (Math.abs(y) / absxyz);
     }
+
+    /**
+     * Same as tilt but for roll in YPR system
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public static float roll(float x, float y, float z) {
+        double absxyz = Math.sqrt(x * x + y * y + z * z);
+        return (float) (Math.abs(x) / absxyz);
+    }
+
+
 
     public static float[] padZero(float[] input) {
         if (input == null) {
