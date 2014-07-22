@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>eu.liveandgov</groupId>
+  <artifactId>liveandgov-commons</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20140722.133248</timestamp>
+      <buildNumber>18</buildNumber>
+    </snapshot>
+    <lastUpdated>20140722133248</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>1.0-20140722.133248-18</value>
+        <updated>20140722133248</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>1.0-20140722.133248-18</value>
+        <updated>20140722133248</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <classifier>sources</classifier>
+        <extension>jar</extension>
+        <value>1.0-20140722.132625-15</value>
+        <updated>20140722132635</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <classifier>javadoc</classifier>
+        <extension>jar</extension>
+        <value>1.0-20140722.132625-15</value>
+        <updated>20140722132635</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>
