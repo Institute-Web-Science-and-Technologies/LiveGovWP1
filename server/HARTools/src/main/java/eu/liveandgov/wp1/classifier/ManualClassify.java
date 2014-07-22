@@ -17,7 +17,7 @@ public class ManualClassify {
         if (v.s2Var < 1.5) {
             // sitting, standing, on_table
             if (v.tilt < 0.7) {
-                if (v.tilt < 0.05) {
+                if (v.tilt < 0.07 && v.roll < 0.07) {
                     return ON_TABLE;
                 } else {
                     return SITTING;

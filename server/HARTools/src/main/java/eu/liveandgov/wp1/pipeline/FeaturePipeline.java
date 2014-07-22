@@ -24,6 +24,7 @@ public class FeaturePipeline extends Pipeline<Tuple<Long, Window>, Tuple<Long, F
             vec.tag = csvReader.currentTag;
         }
         Tuple<Long, FeatureVector> t = new Tuple<Long, FeatureVector>(longWindowTuple.left, vec);
+
         produce(t);
     }
 }

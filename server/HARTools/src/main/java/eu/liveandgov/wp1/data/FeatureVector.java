@@ -29,10 +29,11 @@ public class FeatureVector {
 
     // Tilting Angle
     public float tilt = 0F;
+    public float roll = 0F;
     // public float energy = 0F;
     public float kurtosis = 0F;
 
-    public Integer [] S2FTBins = new Integer[0];
+    public Integer[] S2FTBins = new Integer[0];
 
     public long startTime = 0;
 
@@ -40,7 +41,8 @@ public class FeatureVector {
 
     // TODO: Historgram Features
 
-    public FeatureVector(){}
+    public FeatureVector() {
+    }
 
 
     public FeatureVector(Window m) {
@@ -56,14 +58,16 @@ public class FeatureVector {
         s2Mean = FeatureHelper.mean(S2);
         s2Var = FeatureHelper.var(S2);
 
+        //System.out.println("FV: " + xMean + ", " + yMean + ", " + zMean);
         tilt = FeatureHelper.tilt(xMean, yMean, zMean);
+        roll = FeatureHelper.roll(xMean, yMean, zMean);
         // energy = FeatureHelper.sum(S2); this is the same as s2Mean
         kurtosis = FeatureHelper.kurtosis(S2);
 
         // BinDistributor BD = new BinDistributor(0,20,10);
         // S2Bins = BD.getBinsForAxis(S2);
 
-        BinDistributor FBD = new BinDistributor(0,100,5);
+        BinDistributor FBD = new BinDistributor(0, 100, 5);
         S2FTBins = FBD.getBinsForAxis(FeatureHelper.FTAbsolute(S2));
 
         startTime = m.startTime;
@@ -93,17 +97,17 @@ public class FeatureVector {
 
         Deque<Object> R = new ArrayDeque<Object>();
 
-        R.addLast((double)xMean);
-        R.addLast((double)yMean);
-        R.addLast((double)zMean);
-        R.addLast((double)xVar);
-        R.addLast((double)yVar);
-        R.addLast((double)zVar);
-        R.addLast((double)s2Mean);
-        R.addLast((double)s2Var);
-        R.addLast((double)tilt);
-        R.addLast((double)kurtosis);
-        for (float f : S2FTBins){
+        R.addLast((double) xMean);
+        R.addLast((double) yMean);
+        R.addLast((double) zMean);
+        R.addLast((double) xVar);
+        R.addLast((double) yVar);
+        R.addLast((double) zVar);
+        R.addLast((double) s2Mean);
+        R.addLast((double) s2Var);
+        R.addLast((double) tilt);
+        R.addLast((double) kurtosis);
+        for (float f : S2FTBins) {
             R.addLast((double) f);
         }
 
