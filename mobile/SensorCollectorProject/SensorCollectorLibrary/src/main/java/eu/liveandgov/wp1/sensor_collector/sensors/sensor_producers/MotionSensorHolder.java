@@ -77,25 +77,27 @@ public class MotionSensorHolder implements SensorHolder, SensorEventListener {
     public void onSensorChanged(SensorEvent sensorEvent) {
         final long timestamp = (long) (sensorEvent.timestamp / 1E6) + timestampCorrectionMs;
 
+        float[] values = Floats.concat(sensorEvent.values);
+
         final Motion motion;
         switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER:
-                motion = new Acceleration(timestamp, GlobalContext.getUserId(), Floats.concat(sensorEvent.values));
+                motion = new Acceleration(timestamp, GlobalContext.getUserId(), values);
                 break;
             case Sensor.TYPE_GRAVITY:
-                motion = new Gravity(timestamp, GlobalContext.getUserId(), Floats.concat(sensorEvent.values));
+                motion = new Gravity(timestamp, GlobalContext.getUserId(), values);
                 break;
             case Sensor.TYPE_GYROSCOPE:
-                motion = new Gyroscope(timestamp, GlobalContext.getUserId(), Floats.concat(sensorEvent.values));
+                motion = new Gyroscope(timestamp, GlobalContext.getUserId(), values);
                 break;
             case Sensor.TYPE_LINEAR_ACCELERATION:
-                motion = new LinearAcceleration(timestamp, GlobalContext.getUserId(), Floats.concat(sensorEvent.values));
+                motion = new LinearAcceleration(timestamp, GlobalContext.getUserId(), values);
                 break;
             case Sensor.TYPE_MAGNETIC_FIELD:
-                motion = new MagneticField(timestamp, GlobalContext.getUserId(), Floats.concat(sensorEvent.values));
+                motion = new MagneticField(timestamp, GlobalContext.getUserId(), values);
                 break;
             case Sensor.TYPE_ROTATION_VECTOR:
-                motion = new Rotation(timestamp, GlobalContext.getUserId(), Floats.concat(sensorEvent.values));
+                motion = new Rotation(timestamp, GlobalContext.getUserId(), values);
                 break;
 
             default:
