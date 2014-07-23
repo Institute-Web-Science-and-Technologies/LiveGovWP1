@@ -46,7 +46,7 @@ android {
 
 dependencies {
     compile 'eu.liveandgov:liveandgov-commons:1.1'
-    compile 'eu.liveandgov:liveandgov-proximity:1.01'
+    compile 'eu.liveandgov:liveandgov-proximity:1.1'
     compile 'eu.liveandgov:liveandgov-har-tools:1.1'
     compile 'com.android.support:appcompat-v7:19.1.0'
     compile 'com.google.android.gms:play-services:4.3.23'
