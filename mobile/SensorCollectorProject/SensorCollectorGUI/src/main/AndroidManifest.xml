@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="eu.liveandgov.wp1.sensor_miner"
+    android:versionCode="1"
+    android:versionName="2.0">
+
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name="eu.liveandgov.wp1.sensor_miner.ActivitySensorCollector"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name="eu.liveandgov.wp1.sensor_collector.ServiceSensorControl"
+            android:process="">
+            <intent-filter>
+                <action android:name="eu.liveandgov.sensorcollectorapi.intent.action.GET_STATUS" />
+                <action android:name="eu.liveandgov.sensorcollectorapi.intent.action.RECORDING_ENABLE" />
+                <action android:name="eu.liveandgov.sensorcollectorapi.intent.action.RECORDING_DISABLE" />
+                <action android:name="eu.liveandgov.sensorcollectorapi.intent.action.TRANSFER_SAMPLES" />
+                <action android:name="eu.liveandgov.sensorcollectorapi.intent.action.ANNOTATE" />
+                <action android:name="eu.liveandgov.sensorcollectorapi.intent.action.SET_USER_ID" />
+                <action android:name="eu.liveandgov.sensorminingapi.intent.action.START_STREAMING" />
+                <action android:name="eu.liveandgov.sensorminingapi.intent.action.STOP_STREAMING" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="eu.liveandgov.wp1.sensor_collector.sensors.sensor_producers.ActivityIntentService"
+            android:exported="false"
+            android:label="@string/app_name"></service>
+
+        <activity
+            android:name="eu.liveandgov.wp1.sensor_miner.ActivitySettings"
+            android:label="@string/title_activity_activity_settings"
+            android:parentActivityName="eu.liveandgov.wp1.sensor_miner.ActivitySensorCollector">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="eu.liveandgov.wp1.sensor_miner.ActivitySensorCollector" />
+        </activity>
+    </application>
+
+</manifest>
