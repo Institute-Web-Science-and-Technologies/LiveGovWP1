@@ -13,6 +13,4 @@ public interface Consumer<T> {
      * @param message to be handled.
      */
     void push(T message);
-
-    void clear();
 }

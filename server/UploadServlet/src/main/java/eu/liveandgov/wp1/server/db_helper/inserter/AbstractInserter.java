@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.server.db_helper.inserter;
 
+import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
-import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.AbstractSensorValue;
 import org.apache.commons.lang.StringUtils;
 
 import java.sql.PreparedStatement;
@@ -14,7 +14,7 @@ import java.sql.SQLException;
  * Time: 7:32 PM
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractInserter<T extends AbstractSensorValue> {
+public abstract class AbstractInserter<T extends Item> {
 
     protected final PostgresqlDatabase db;
     private final PreparedStatement insertStatement;

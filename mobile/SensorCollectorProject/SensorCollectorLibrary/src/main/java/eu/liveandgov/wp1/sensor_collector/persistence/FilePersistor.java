@@ -7,9 +7,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.util.LocalBuilder;
+
 /**
  * Persistor class that writes samples into a log file.
- *
+ * <p/>
  * Created by hartmann on 9/20/13.
  */
 public class FilePersistor implements Persistor {
@@ -20,6 +23,8 @@ public class FilePersistor implements Persistor {
     private long sampleCount = 0L;
 
     protected boolean disabled = false;
+
+    // TODO: Protect from filling up all memory: Max Sampels? Set fixed file size?
 
     public FilePersistor(File logFile) {
         this.logFile = logFile;
@@ -32,7 +37,7 @@ public class FilePersistor implements Persistor {
     }
 
     @Override
-    public synchronized void push(String s) {
+    public synchronized void push(Item item) {
         if (disabled) return;
         try {
             if (fileWriter == null) {
@@ -40,11 +45,11 @@ public class FilePersistor implements Persistor {
                 return;
             }
 
-            fileWriter.write(s + "\n");
-            sampleCount ++;
+            fileWriter.write(item.toSerializedForm() + "\n");
+            sampleCount++;
 
         } catch (IOException e) {
-            Log.e(LOG_TAG,"Cannot write file.");
+            Log.e(LOG_TAG, "Cannot write file.");
             e.printStackTrace();
         }
     }
@@ -56,12 +61,18 @@ public class FilePersistor implements Persistor {
         try {
             Log.i(LOG_TAG, "Exporting samples.");
 
-            if (stageFile.exists()) { Log.e(LOG_TAG, "Stage file exists."); return false; }
+            if (stageFile.exists()) {
+                Log.e(LOG_TAG, "Stage file exists.");
+                return false;
+            }
 
             closeLogFile();
 
             boolean suc = logFile.renameTo(stageFile);
-            if (!suc) { Log.e(LOG_TAG, "Staging Failed"); return false; }
+            if (!suc) {
+                Log.e(LOG_TAG, "Staging Failed");
+                return false;
+            }
 
             openLogFileOverwrite();
 
@@ -78,7 +89,12 @@ public class FilePersistor implements Persistor {
         if (disabled) return;
         try {
             closeLogFile();
-            if (logFile.exists()) logFile.delete();
+
+            if (logFile.exists()) {
+                boolean suc = logFile.delete();
+                if (!suc) throw new IOException("logFile.delete failed");
+            }
+
             openLogFileOverwrite();
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error deleting samples", e);
@@ -102,22 +118,36 @@ public class FilePersistor implements Persistor {
 
     @Override
     public String getStatus() {
-        return "File size: " + logFile.length()/1024 + "kb. Samples written: " + sampleCount;
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+        stringBuilder.append("File size: ");
+        stringBuilder.append(Math.round(logFile.length() / 1024.0));
+        stringBuilder.append("kb. Samples written: ");
+        stringBuilder.append(sampleCount);
+
+        return stringBuilder.toString();
     }
 
     private void openLogFileAppend() throws IOException {
-        fileWriter = new BufferedWriter(new FileWriter(logFile,true));
+        Log.i(LOG_TAG, "Opening Log File to Append: " + logFile);
+        fileWriter = new BufferedWriter(new FileWriter(logFile, true));
     }
 
     private void openLogFileOverwrite() throws IOException {
-        fileWriter = new BufferedWriter(new FileWriter(logFile,false));
+        Log.i(LOG_TAG, "Overwrining Log File: " + logFile);
+        fileWriter = new BufferedWriter(new FileWriter(logFile, false));
     }
 
     private void closeLogFile() throws IOException {
+        Log.i(LOG_TAG, "Closing Log File");
+
         if (fileWriter == null) return;
 
         fileWriter.close();
         fileWriter = null;
     }
 
+    @Override
+    public String toString() {
+        return "File persistor";
+    }
 }

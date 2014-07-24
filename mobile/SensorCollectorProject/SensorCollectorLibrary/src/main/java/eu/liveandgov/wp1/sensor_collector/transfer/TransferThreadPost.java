@@ -1,5 +1,6 @@
 package eu.liveandgov.wp1.sensor_collector.transfer;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.apache.http.HttpResponse;
@@ -9,6 +10,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,6 +20,7 @@ import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
  * Transfer sensor.log file to server using HTTP/POST request
@@ -33,13 +36,11 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
     private Thread thread;
 
-    private static final String uploadUrl = SensorCollectionOptions.UPLOAD_URL;
-
     private Persistor persistor;
 
     private File stageFile;
     //Used to get callback if transfer completed successfully or not
-    public ServiceSensorControl.TransferListener listener = ServiceSensorControl.TransferListener.NULL_LISTENER;
+    public ServiceSensorControl.TransferListener listener;
 
     public TransferThreadPost(Persistor persistor, File stageFile) {
         this.stageFile = stageFile;
@@ -76,8 +77,17 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
     @Override
     public String getStatus() {
-        return "StageFile: " + stageFile.length() / 1024 + "kb. " +
-                (isTransferring() ? "transferring" : "waiting");
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+        stringBuilder.append("StageFile: ");
+        stringBuilder.append(Math.round(stageFile.length() / 1024.0));
+        stringBuilder.append("kb. ");
+
+        if (isTransferring())
+            stringBuilder.append("transferring");
+        else
+            stringBuilder.append("waiting");
+
+        return stringBuilder.toString();
     }
 
     public void run() {
@@ -96,7 +106,6 @@ public class TransferThreadPost implements Runnable, TransferManager {
                 success = persistor.exportSamples(stageFile);
                 if (!success) {
                     Log.i(LOG_TAG, "Staging failed");
-
                     listener.onTransferCompleted(false);
                     return;
                 }
@@ -125,8 +134,8 @@ public class TransferThreadPost implements Runnable, TransferManager {
             Log.i(LOG_TAG, "Transfer finished successfully");
 
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Error opening stage file", e);
             listener.onTransferCompleted(false);
+            Log.e(LOG_TAG, "Error opening stage file", e);
         }
     }
 
@@ -149,8 +158,11 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
     public boolean transferFile(File file, boolean compressed) {
         try {
+            String dst = getAddress();
+            Log.d(LOG_TAG, "Destination of upload is: " + dst);
+
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(uploadUrl);
+            HttpPost httppost = new HttpPost(dst);
 
             MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
             multipartEntityBuilder.addBinaryBody("upfile", file);
@@ -162,9 +174,11 @@ public class TransferThreadPost implements Runnable, TransferManager {
             httppost.addHeader("ID", GlobalContext.getUserId());
 
             HttpResponse response = httpclient.execute(httppost);
+            Log.v(LOG_TAG, "Response of upload: " + EntityUtils.toString(response.getEntity()));
+
             int status = response.getStatusLine().getStatusCode();
             if (status != HttpStatus.SC_ACCEPTED) {
-                Log.i(LOG_TAG, "Upload failed w/ Status Code:" + status);
+                Log.d(LOG_TAG, "Upload failed w/ Status Code:" + status);
                 return false;
             }
 
@@ -177,6 +191,12 @@ public class TransferThreadPost implements Runnable, TransferManager {
             return false;
         }
         return true;
+    }
+
+    private String getAddress() {
+        SharedPreferences settings = GlobalContext.context.getSharedPreferences(GlobalContext.context.getString(R.string.spn), 0);
+
+        return settings.getString(GlobalContext.context.getString(R.string.prf_upload_address), SensorCollectionOptions.DEFAULT_UPLOAD);
     }
 
     public boolean transferFile(File file) {

@@ -2,6 +2,8 @@ package eu.liveandgov.wp1.sensor_collector.persistence;
 
 import java.io.File;
 
+import eu.liveandgov.wp1.data.Item;
+
 /**
  * Dummy class that returns non-null values to all methods.
  *
@@ -28,7 +30,7 @@ public class DummyPersistor implements Persistor {
     public void close() {}
 
     @Override
-    public void push(String message) {}
+    public void push(Item item) {}
 
     @Override
     public String getStatus() {

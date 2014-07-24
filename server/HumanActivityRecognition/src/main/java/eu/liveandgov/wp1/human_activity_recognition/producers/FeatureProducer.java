@@ -14,8 +14,4 @@ public class FeatureProducer extends Producer<FeatureVector> implements Consumer
         FeatureVector vec = new FeatureVector(m);
         consumer.push(vec);
     }
-
-    public void clear() {
-        consumer.clear();
-    }
 }

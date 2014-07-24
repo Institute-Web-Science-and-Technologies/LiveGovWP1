@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.sensor_collector;
 
+import android.annotation.TargetApi;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Binder;
+import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
@@ -16,15 +18,33 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.io.File;
-import java.util.ArrayList;
+import org.json.JSONTokener;
 
-import eu.liveandgov.wp1.human_activity_recognition.connectors.Consumer;
-import eu.liveandgov.wp1.sensor_collector.activity_recognition.HarAdapter;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import eu.liveandgov.wp1.data.Callback;
+import eu.liveandgov.wp1.data.Callbacks;
+import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.data.impl.Tag;
+import eu.liveandgov.wp1.pipeline.Consumer;
+import eu.liveandgov.wp1.pps.api.AggregatingPS;
+import eu.liveandgov.wp1.pps.api.csv.StaticIPS;
+import eu.liveandgov.wp1.pps.api.ooapi.OSMIPPS;
+import eu.liveandgov.wp1.sensor_collector.activity_recognition.HARAdapter;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
-import eu.liveandgov.wp1.sensor_collector.connectors.implementations.ConnectorThread;
-import eu.liveandgov.wp1.sensor_collector.connectors.implementations.GpsCache;
+import eu.liveandgov.wp1.sensor_collector.configuration.PPSOptions;
+import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
+import eu.liveandgov.wp1.sensor_collector.configuration.WaitingOptions;
+import eu.liveandgov.wp1.sensor_collector.connectors.impl.ConnectorThread;
+import eu.liveandgov.wp1.sensor_collector.connectors.impl.GpsCache;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.LinkedSensorQueue;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
 import eu.liveandgov.wp1.sensor_collector.monitor.MonitorThread;
@@ -32,22 +52,31 @@ import eu.liveandgov.wp1.sensor_collector.persistence.FilePersistor;
 import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
 import eu.liveandgov.wp1.sensor_collector.persistence.PublicationPipeline;
 import eu.liveandgov.wp1.sensor_collector.persistence.ZipFilePersistor;
-import eu.liveandgov.wp1.sensor_collector.sensors.SensorSerializer;
+import eu.liveandgov.wp1.sensor_collector.pps.PPSAdapter;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorThread;
+import eu.liveandgov.wp1.sensor_collector.streaming.ZMQStreamer;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferManager;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferThreadPost;
+import eu.liveandgov.wp1.sensor_collector.waiting.WaitingAdapter;
+import eu.liveandgov.wp1.serialization.impl.TagSerialization;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.API_EXTENSIONS;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.MAIN_EXECUTOR_CORE_TIMEOUT;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.REC_VEL;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
 
 public class ServiceSensorControl extends Service {
+    private static final String LOG_TAG = "SCS";
+
     // CONSTANTS
-    static final String LOG_TAG = "SCS";
     public static final String SENSOR_FILENAME = "sensor.ssf";
     public static final String STAGE_FILENAME = "sensor.stage.ssf";
 
     private static final String SHARED_PREFS_NAME = "SensorCollectorPrefs";
     private static final String PREF_ID = "userid";
+
+    // MAIN EXECUTION SERVICE
+    public final ScheduledThreadPoolExecutor executorService;
 
     // STATUS FLAGS
     public boolean isRecording = false;
@@ -58,14 +87,21 @@ public class ServiceSensorControl extends Service {
     // COMMUNICATION CHANNEL
     public SensorQueue sensorQueue = new LinkedSensorQueue();
 
+
     // REMARK:
     // Need to put initialization to onCreate, since FilesDir, etc. is not available
     // from a static context.
 
+    // INDICES
+    public StaticIPS staticIPS;
+
     // SENSOR CONSUMERS
     public Persistor persistor;
     public PublicationPipeline publisher;
-    public Consumer<String> harPipeline;
+    public Consumer<Item> streamer;
+    public Consumer<Item> harPipeline;
+    public Consumer<Item> ppsPipeline;
+    public Consumer<Item> waitingPipeline;
     public GpsCache gpsCache;
 
     // THREADS
@@ -78,7 +114,17 @@ public class ServiceSensorControl extends Service {
     public ServiceSensorControl() {
         // Register this object globally
         GlobalContext.set(this);
+
+        // Create the executor service, keep two threads in the pool
+        executorService = new ScheduledThreadPoolExecutor(SensorCollectionOptions.MAIN_EXECUTOR_CORE_POOL);
+
+        // If feature is available, enable core thread timeout with five seconds
+        if (Build.VERSION.SDK_INT >= 9) {
+            executorService.setKeepAliveTime(MAIN_EXECUTOR_CORE_TIMEOUT, TimeUnit.MILLISECONDS);
+            executorService.allowCoreThreadTimeOut(true);
+        }
     }
+
 
     /* ANDROID LIFECYCLE */
     @Override
@@ -89,16 +135,50 @@ public class ServiceSensorControl extends Service {
 
         // INITIALIZATIONS
         // Warning: getFilesDir is only available after onCreate was called.
-        File sensorFile = new File(getFilesDir(), SENSOR_FILENAME);
-        File stageFile = new File(getFilesDir(), STAGE_FILENAME);
+        File sensorFile = new File(GlobalContext.getFileRoot(), SENSOR_FILENAME);
+        File stageFile = new File(GlobalContext.getFileRoot(), STAGE_FILENAME);
+
+        // Init index
+        staticIPS = new StaticIPS(
+                PPSOptions.INDEX_HORIZONTAL_RESOLUTION,
+                PPSOptions.INDEX_VERTICAL_RESOLUTION,
+                PPSOptions.INDEX_BY_CENTROID,
+                PPSOptions.INDEX_STORE_DEGREE,
+                new Callable<InputStream>() {
+                    @Override
+                    public InputStream call() throws IOException {
+                        return getAssets().open(PPSOptions.HELSINKIIPPS_ASSET);
+                    }
+                },
+                false,
+                PPSOptions.HELSINKI_ID_FIELD,
+                PPSOptions.HELSINKI_LAT_FIELD,
+                PPSOptions.HELSINKI_LON_FIELD,
+                PPSOptions.PROXIMITY
+        );
 
         // Init sensor consumers
-        harPipeline = new HarAdapter();
+        final ZMQStreamer zmqStreamer = new ZMQStreamer();
+        streamer = new Consumer<Item>() {
+            @Override
+            public void push(Item item) {
+                zmqStreamer.itemNode.push(item);
+
+                // I am ashamed, kill me now
+                if (userId != null && userId.startsWith("dev"))
+                    Log.v("SMP", item.toString());
+            }
+        };
+
+        harPipeline = new HARAdapter();
+        ppsPipeline = new PPSAdapter("platform", staticIPS);
+        waitingPipeline = new WaitingAdapter("platform", WaitingOptions.WAITING_TRESHOLD);
         gpsCache = new GpsCache();
         persistor = ZIPPED_PERSISTOR ?
                 new ZipFilePersistor(sensorFile) :
                 new FilePersistor(sensorFile);
         publisher = new PublicationPipeline(); // for external communication
+
 
         // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
@@ -113,13 +193,17 @@ public class ServiceSensorControl extends Service {
 
         // Start Recording once the first consumers connects to connector thread.
         // This should be done once the SensorThread is already running.
-        connectorThread.registerNonEmptyCallback(new ConnectorThread.Callback() {
-            public void call() {
+        connectorThread.nonEmpty.register(new Callback<Consumer<? super Item>>() {
+            @Override
+            public void call(Consumer<? super Item> consumer) {
+                Log.d(LOG_TAG, "Start recording sensors");
                 SensorThread.startAllRecording();
             }
         });
-        connectorThread.registerEmptyCallback(new ConnectorThread.Callback() {
-            public void call() {
+        connectorThread.empty.register(new Callback<Consumer<? super Item>>() {
+            @Override
+            public void call(Consumer<? super Item> consumer) {
+                Log.d(LOG_TAG, "Stop recording sensors");
                 SensorThread.stopAllRecording();
             }
         });
@@ -146,15 +230,18 @@ public class ServiceSensorControl extends Service {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-
         persistor.close();
+
+        executorService.shutdown();
+
+        super.onDestroy();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
+
 
     /* INTENT API */
 
@@ -192,6 +279,10 @@ public class ServiceSensorControl extends Service {
             doStartHAR();
         } else if (action.equals(IntentAPI.ACTION_STOP_HAR)) {
             doStopHAR();
+        } else if (action.equals(ExtendedIntentAPI.START_STREAMING)) {
+            doStartStreaming();
+        } else if (action.equals(ExtendedIntentAPI.STOP_STREAMING)) {
+            doStopStreaming();
         } else if (action.equals(IntentAPI.ACTION_SET_ID)) {
             doSetId(intent.getStringExtra(IntentAPI.FIELD_USER_ID));
         } else if (action.equals(ExtendedIntentAPI.ACTION_GET_GPS)) {
@@ -210,17 +301,40 @@ public class ServiceSensorControl extends Service {
         publisher.deleteSamples();
         transferManager.deleteStagedSamples();
 
+        //Call back when the deletion of samples has been completed.
         listener.onDeletionCompleted();
     }
 
     private void doStopHAR() {
-        isHAR = false;
         connectorThread.removeConsumer(harPipeline);
+        connectorThread.removeConsumer(ppsPipeline);
+        connectorThread.removeConsumer(waitingPipeline);
+
+        isHAR = false;
+
+        // On har-stop, save indices
+        staticIPS.trySave(new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE));
+
     }
 
     private void doStartHAR() {
+        // On har-start, load indices
+        staticIPS.tryLoad(new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE));
+
         isHAR = true;
+        connectorThread.addConsumer(waitingPipeline);
+        connectorThread.addConsumer(ppsPipeline);
         connectorThread.addConsumer(harPipeline);
+    }
+
+    private void doStopStreaming() {
+        isStreaming = false;
+        connectorThread.removeConsumer(streamer);
+    }
+
+    private void doStartStreaming() {
+        isStreaming = true;
+        connectorThread.addConsumer(streamer);
     }
 
     private void doSetId(String id) {
@@ -241,15 +355,15 @@ public class ServiceSensorControl extends Service {
     private void doAnnotate(String tag) {
         Log.d("AN", "Adding annotation:" + tag);
 
-        sensorQueue.push(SensorSerializer.tag.toSSFDefault(tag));
+        sensorQueue.push(new Tag(
+                System.currentTimeMillis(),
+                GlobalContext.getUserId(),
+                tag));
     }
 
     private void doTransferSamples() {
-        transferManager.doTransfer();
-
         //Show notification when the transfering is in progress.
         onStartTransfering();
-        //CHANGED END
         transferManager.doTransfer();
     }
 
@@ -261,12 +375,17 @@ public class ServiceSensorControl extends Service {
         currentRoute.clear();
         counter = 0l;
 
-        persistor.push(SensorSerializer.tag.toSSFDefault(IntentAPI.VALUE_STOP_RECORDING));
+        final Tag stopRecordingTag = new Tag(
+                System.currentTimeMillis(),
+                GlobalContext.getUserId(),
+                IntentAPI.VALUE_STOP_RECORDING);
+
+        persistor.push(stopRecordingTag);
 
         // API EXTENSIONS are triggered on together with recording
         if (API_EXTENSIONS) {
             // Add "STOP RECORDING TAG" to publisher
-            publisher.push(SensorSerializer.tag.toSSFDefault(IntentAPI.VALUE_STOP_RECORDING));
+            publisher.push(stopRecordingTag);
             connectorThread.removeConsumer(publisher);
             connectorThread.removeConsumer(gpsCache);
         }
@@ -280,11 +399,16 @@ public class ServiceSensorControl extends Service {
         currentRoute.clear();
         counter = 0l;
 
-        persistor.push(SensorSerializer.tag.toSSFDefault(IntentAPI.VALUE_START_RECORDING));
+        final Tag tagStartRecording = new Tag(
+                System.currentTimeMillis(),
+                GlobalContext.getUserId(),
+                IntentAPI.VALUE_START_RECORDING);
+
+        persistor.push(tagStartRecording);
 
         // API EXTENSIONS are triggered on together with recording
         if (API_EXTENSIONS) {
-            publisher.push(SensorSerializer.tag.toSSFDefault(IntentAPI.VALUE_START_RECORDING));
+            publisher.push(tagStartRecording);
             connectorThread.addConsumer(publisher);
             connectorThread.addConsumer(gpsCache);
         }
@@ -330,6 +454,7 @@ public class ServiceSensorControl extends Service {
         userId = settings.getString(PREF_ID, androidId); // use androidId as default;
     }
 
+
     //Id for the "in-progress" transfering notification
     private static final int transferringNotificationID = 3;
     //Coordinates list of the current route of the user
@@ -338,7 +463,7 @@ public class ServiceSensorControl extends Service {
     //Access to the service by an activity
     private final IBinder mBinder = new LocalBinder();
     //Callbacks for transfering status (success/failure)
-    private SensorServiceListener listener = SensorServiceListener.NULL_LISTENER;
+    private SensorServiceListener listener;
     //Used to receive the gps entries for the current route of the user
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
 
@@ -349,7 +474,6 @@ public class ServiceSensorControl extends Service {
         }
 
     };
-
     //Access to the Service.
     public class LocalBinder extends Binder {
         public ServiceSensorControl getService() {
@@ -357,59 +481,41 @@ public class ServiceSensorControl extends Service {
             return ServiceSensorControl.this;
         }
     }
-
     //Callback for deleting samples
-    public interface SensorServiceListener {
-        public static final SensorServiceListener NULL_LISTENER = new SensorServiceListener() {
-            @Override
-            public void onDeletionCompleted() {
-
-            }
-        };
-
+    public interface SensorServiceListener
+    {
         public void onDeletionCompleted();
     }
-
     //Callback for transfer
-    public interface TransferListener {
-        public static final TransferListener NULL_LISTENER = new TransferListener() {
-            @Override
-            public void onTransferCompleted(boolean success) {
-
-            }
-        };
-
+    public interface TransferListener
+    {
         public void onTransferCompleted(boolean success);
     }
-
     //When gpsData is received (for current route of the user)
-    private void onGpsSampleReceived(String gpsSample) {
+    private void onGpsSampleReceived (String gpsSample)
+    {
         //Dont visualize all gpsSamples on the map (memory issues). Skip 4 out of 5
-        if (counter % 5 == 0) {
+        if(counter%5 == 0)
+        {
             String[] gpsData = gpsSample.split(",")[3].split("\\s+");
             currentRoute.add(new LatLng(Double.parseDouble(gpsData[0]), Double.parseDouble(gpsData[1])));
         }
         counter++;
     }
-
     //Get the user's current route
-    public ArrayList<LatLng> getCurrentRoute() {
+    public ArrayList<LatLng> getCurrentRoute()
+    {
         return currentRoute;
     }
 
     //Called when the transfering has started - Show notification to the user
-    private void onStartTransfering() {
+    private void onStartTransfering()
+    {
         final NotificationManager mNotifyManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        PendingIntent contentIntent = PendingIntent.getActivity(
-                getApplicationContext(),
-                0,
-                new Intent(),
-                PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentTitle("Recordings")
                 .setContentText("Uploading samples")
-                .setContentIntent(contentIntent)
                 .setSmallIcon(R.drawable.ic_stat_logo)
                 .setProgress(0, 0, true);
         mNotifyManager.notify(transferringNotificationID, mBuilder.build());
@@ -417,28 +523,33 @@ public class ServiceSensorControl extends Service {
 
             @Override
             public void onTransferCompleted(boolean success) {
-                if (success) {
+                if(success)
+                {
                     mBuilder.setContentText("Upload completed successfully").setProgress(0, 0, false);
                     mNotifyManager.notify(transferringNotificationID, mBuilder.build());
                     transferManager.deleteStagedSamples();
                     persistor.deleteSamples();
                     publisher.deleteSamples();
-                    if (listener != null)
+                    if(listener != null)
                         listener.onDeletionCompleted();
-                } else {
+                }
+                else
+                {
                     mBuilder.setContentText("Upload failed").setProgress(0, 0, false);
-                    mNotifyManager.notify(transferringNotificationID, mBuilder.build());//     if(listener!= null)//      listener.onDeletionCompleted();
+                    mNotifyManager.notify(transferringNotificationID, mBuilder.build());
+//					if(listener!= null)
+//						listener.onDeletionCompleted();
                 }
             }
         };
     }
-
     //Register the listener by an activity
-    public void setOnSamplesDeletedListener(SensorServiceListener l) {
+    public void setOnSamplesDeletedListener(SensorServiceListener l)
+    {
         listener = l;
     }
-
-    public boolean samplesStored() {
+    public boolean samplesStored()
+    {
         //Possible bug : persistor.hasSamples() returns true always
         return persistor.hasSamples() || transferManager.hasStagedSamples();
     }

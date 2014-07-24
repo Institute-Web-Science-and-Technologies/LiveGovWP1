@@ -40,6 +40,10 @@ public class PostgresqlDatabase extends Database {
 	Connection connection = null;
 	
 	public PostgresqlDatabase(String user, String password) throws UnavailableException {
+		 this(user, password, "localhost", "gtfsdb");
+	}
+	
+	public PostgresqlDatabase(String user, String password, String host, String db) throws UnavailableException {
 		try {
 			// problem:
 			// exception when run it in eclipse+m2+tomcat7: path!java.lang.ClassNotFoundException: org.postgresql.Driver...
@@ -52,69 +56,29 @@ public class PostgresqlDatabase extends Database {
 			//  -> Maven Dependencies
 			Class.forName("org.postgresql.Driver");
  
-		} catch (ClassNotFoundException e) {
- 
+		} catch (ClassNotFoundException e) { 
 			System.out.println("Where is your PostgreSQL JDBC Driver? "
 					+ "Include in your library path!");
 			e.printStackTrace();
+			Util.SLDLogger.log().error(e);
 		}
-		Statement stmtLink = null;
-		String dbAddress = "jdbc:postgresql://localhost/gtfsdb?autoReconnect=true";
+
+		String dbAddress = "jdbc:postgresql://"+host+"/"+db+"?autoReconnect=true";
 		try {
 
 			connection = DriverManager.getConnection(
 					dbAddress, user,
 					password);
 
-			stmtLink = connection.createStatement();
-
-//			String createDevInfoTable = "create table if not exists devinfo ( "
-//					+ "uuid integer not null, " + "textuuid text not null, "
-//					+ "device text, " + "fingerprint text, " + "id text, "
-//					+ "manufacturer text, " + "model text, " + "product text, "
-//					+ "androidVersion text, " + "PRIMARY KEY (uuid) )";
-//
-//			stmtLink.execute(createDevInfoTable);
-//
-//			String createSampleTable = "create table if not exists samples ( "
-//					+ "uuid integer not null, " + "sensorid text not null, "
-//					+ "ts bigint not null, " + "prio integer not null, "
-//					+ "synced integer default null, "
-//					+ "loc text, " // location can be null!
-//					+ "data text not null, " + "dataclass text not null, "
-//					+ "FOREIGN KEY (uuid) REFERENCES devinfo(uuid) )";
-//
-//			stmtLink.execute(createSampleTable);
-
-			String createAccelerometerTable = "CREATE TABLE IF NOT EXISTS accelerometer (id VARCHAR(36), ts TIMESTAMP, x FLOAT, y FLOAT, z FLOAT);";
-			String createGPSTable = "CREATE TABLE IF NOT EXISTS gps (id VARCHAR(36), ts TIMESTAMP, lonlat GEOGRAPHY(Point));";
-			String createTagsTable = "CREATE TABLE IF NOT EXISTS tags (id VARCHAR(36), ts TIMESTAMP, tag TEXT);";
-			String createGActivityTable = "CREATE TABLE IF NOT EXISTS google_activity (id VARCHAR(36), ts TIMESTAMP, activity TEXT);";
-			String createLACTable = "CREATE TABLE IF NOT EXISTS linear_acceleration (id VARCHAR(36), ts TIMESTAMP, x FLOAT, y FLOAT, z FLOAT);";
-			String createGravityTable = "CREATE TABLE IF NOT EXISTS gravity (id VARCHAR(36), ts TIMESTAMP, x FLOAT, y FLOAT, z FLOAT);";
-
-			stmtLink.execute(createAccelerometerTable);
-			stmtLink.execute(createGPSTable);
-			stmtLink.execute(createTagsTable);
-			stmtLink.execute(createGActivityTable);
-			stmtLink.execute(createLACTable);
-			stmtLink.execute(createGravityTable);
 
 		} catch (SQLException e) {
-			System.out.println("dbAdress: " + dbAddress);
-			System.out.println("user: " + user);
-			System.out.println("password: " + password);
+			Util.SLDLogger.log().error("dbAdress: " + dbAddress + " user: " + user + " password: " + password);
+			Util.SLDLogger.log().error(e);
 			throw new UnavailableException(e.getMessage());
-		} finally {
-			
-			try {
-				if (stmtLink != null)
-					stmtLink.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 	}
+
+	
 	/* (non-Javadoc)
 	 * @see eu.liveandgov.wp1.backe29,nd.AbstractDatabase#distanceInMeter(double, double, double, double)
 	 */
@@ -133,6 +97,7 @@ public class PostgresqlDatabase extends Database {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			Util.SLDLogger.log().error(e);
 		}
 		return 0;
 	}
@@ -144,6 +109,7 @@ public class PostgresqlDatabase extends Database {
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				Util.SLDLogger.log().error(e);
 			}
 	}
 	
@@ -154,8 +120,8 @@ public class PostgresqlDatabase extends Database {
 			return connection.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			Util.SLDLogger.log().error(e);
 		}
 		return stmtLink;
 	}
-
 }

@@ -1,7 +1,0 @@
-# Maven
-log/
-target/
-# Mac OS
-.DS_Store
-# IntelliJ
-.idea

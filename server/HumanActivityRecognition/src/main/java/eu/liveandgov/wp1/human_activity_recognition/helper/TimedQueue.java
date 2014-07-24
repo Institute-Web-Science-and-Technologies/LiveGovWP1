@@ -8,7 +8,7 @@ import java.util.Queue;
 /**
  * Class that holds samples in a time frame of a given duration d.
  * The time frame ends with the time stamp t of the last sample that was pushed to the queue
- * and starts after the time t - d (inclusively).
+ * and starts after the time t - d (exclusively).
  *
  *  Time                    ---(t-d)--------t-->
  *  Samples:                + + | + + + + + + |
@@ -38,8 +38,6 @@ public class TimedQueue<V> {
      * @param value The sensor value
      */
     public void push(long time, V value) {
-        // If the time value of the new value is less than the value of the last element, we reset the window, because
-        // we assume something went wrong.
         if (time < maxTime) {
             clear();
             System.out.println("Reseting Window");
@@ -80,7 +78,7 @@ public class TimedQueue<V> {
 
         TimeQueueEntry<V> e;
         while( (e = queue.peekLast()) != null ) {
-            if (e.time >= minTime) { break; }
+            if (e.time > minTime) { break; }
             else { queue.removeLast(); }
         }
     }

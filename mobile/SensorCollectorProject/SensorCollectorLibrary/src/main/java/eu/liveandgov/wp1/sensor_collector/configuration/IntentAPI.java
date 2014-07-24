@@ -23,7 +23,7 @@ public class IntentAPI {
 
     /**
      * Enable/Disable the collection of sensor samples.
-     * Sensors can be configured in the class {@link SensorCollectionOptions}
+     * Sensors can be configured in the class {@link eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions}
      */
     public static final String ACTION_RECORDING_ENABLE =  "eu.liveandgov.sensorcollectorapi.intent.action.RECORDING_ENABLE";
     public static final String RECORDING_DISABLE = "eu.liveandgov.sensorcollectorapi.intent.action.RECORDING_DISABLE";

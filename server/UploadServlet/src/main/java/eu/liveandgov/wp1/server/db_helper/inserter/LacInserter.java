@@ -1,7 +1,7 @@
 package eu.liveandgov.wp1.server.db_helper.inserter;
 
+import eu.liveandgov.wp1.data.impl.LinearAcceleration;
 import eu.liveandgov.wp1.server.db_helper.PostgresqlDatabase;
-import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.LacSensorValue;
 
 import java.sql.SQLException;
 
@@ -13,7 +13,7 @@ import java.sql.SQLException;
  * To change this template use File | Settings | File Templates.
  *
  */
-public class LacInserter extends AbstractMotionValueInserter<LacSensorValue> {
+public class LacInserter extends AbstractMotionValueInserter<LinearAcceleration> {
 
     public LacInserter(PostgresqlDatabase db) throws SQLException {
         super(db);

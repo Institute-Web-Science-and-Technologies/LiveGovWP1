@@ -1,58 +1,58 @@
 package eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue;
 
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
  * Simple queue class of a fixed maximal capacity.
  * If the capacity is reached further messages are dropped.
  * The class provides a blockinPull() method, that blocks until new messages are available.
- *
+ * <p/>
  * Created by hartmann on 9/29/13.
  */
 public class LinkedSensorQueue implements SensorQueue {
-    public  static final int capacity = 1000;
+    public static final int CAPACITY = 1024;
 
-    private int size = 0;
-    public  final Queue<String> Q = new ConcurrentLinkedQueue<String>();
+    private final BlockingQueue<Item>queue = new LinkedBlockingQueue<Item>();
 
     /**
      * Push message to the queue.
      * Drop message if queue is full.
-     * @param m
+     *
+     * @param item
      */
     @Override
-    public void push(String m){
-        if (size++ < capacity) {
-            Q.add(m);
+    public void push(Item item) {
+        if (queue.size() < CAPACITY) {
+            try {
+                queue.put(item);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
-    }
-
-    private String pull(){
-        size = Math.max(size - 1, 0);
-        return Q.poll();
     }
 
     @Override
-    public String blockingPull(){
-        String m;
-
-        while (true) {
-            m = pull();
-
-            if (m != null) break;
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+    public Item blockingPull() {
+        try {
+            return queue.take();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
         }
-        return m;
     }
 
     @Override
     public String getStatus() {
-        return "Queue Size: " + Q.size();
+        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+        stringBuilder.append("Queue Size: ");
+        stringBuilder.append(queue.size());
+
+        return stringBuilder.toString();
     }
 }

@@ -1,10 +1,10 @@
 package eu.liveandgov.wp1.server.db_helper;
 
+import eu.liveandgov.wp1.data.DataCommons;
+import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.data.impl.Tag;
+import eu.liveandgov.wp1.serialization.impl.ItemSerialization;
 import eu.liveandgov.wp1.server.db_helper.inserter.*;
-import eu.liveandgov.wp1.shared.sensors.SampleType;
-import eu.liveandgov.wp1.shared.sensors.SensorValueFactory;
-import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.SensorValueInterface;
-import eu.liveandgov.wp1.shared.sensors.sensor_value_objects.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -13,6 +13,7 @@ import java.sql.*;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * User: hartmann
@@ -24,7 +25,7 @@ public class BatchInserter {
 
     private static PostgresqlDatabase db;
 
-    private Map<SampleType,AbstractInserter> inserter = new HashMap<SampleType, AbstractInserter>();
+    private Map<String, AbstractInserter> inserter = new HashMap<String, AbstractInserter>();
 
     public static final String VALUE_STOP_RECORDING = "STOP_RECORDING";
     public static final String VALUE_START_RECORDING = "START_RECORDING";
@@ -36,12 +37,21 @@ public class BatchInserter {
     public BatchInserter(PostgresqlDatabase db) throws SQLException {
         this.db = db;
 
-        inserter.put(SampleType.ACC, new AccInserter(db));
-        inserter.put(SampleType.LAC, new LacInserter(db));
-        inserter.put(SampleType.GRA, new GraInserter(db));
-        inserter.put(SampleType.TAG, new TagInserter(db));
-        inserter.put(SampleType.GPS, new GpsInserter(db));
-        inserter.put(SampleType.ACT, new HarInserter(db));
+        inserter.put(DataCommons.TYPE_ACCELEROMETER, new AccInserter(db));
+        inserter.put(DataCommons.TYPE_LINEAR_ACCELERATION, new LacInserter(db));
+        inserter.put(DataCommons.TYPE_GRAVITY, new GraInserter(db));
+        inserter.put(DataCommons.TYPE_TAG, new TagInserter(db));
+        inserter.put(DataCommons.TYPE_GPS, new GpsInserter(db));
+        inserter.put(DataCommons.TYPE_ACTIVITY, new HarInserter(db));
+        inserter.put(DataCommons.TYPE_GOOGLE_ACTIVITY, new GActInserter(db));
+
+        inserter.put(DataCommons.TYPE_GYROSCOPE, new GyrInserter(db));
+        inserter.put(DataCommons.TYPE_ROTATION, new RotInserter(db));
+        inserter.put(DataCommons.TYPE_MAGNETOMETER, new MagInserter(db));
+        inserter.put(DataCommons.TYPE_PROXIMITY, new PrxInserter(db));
+        inserter.put(DataCommons.TYPE_WAITING, new WtnInserter(db));
+
+        inserter.put(DataCommons.TYPE_VELOCITY, new VelInserter(db));
     }
 
     private static enum ParsingState {
@@ -54,8 +64,7 @@ public class BatchInserter {
     /**
      * Insert samples form ssf file into database
      *
-     *
-     * @param db            database to insert samples
+     * @param db database to insert samples
      * @return count        number of rows inserted
      * @throws IOException  thrown when error reading the file
      * @throws SQLException thrown on error writing the database
@@ -83,7 +92,16 @@ public class BatchInserter {
             try {
                 if (errorCount > MAX_ERRORS_PER_FILE) throw new IllegalStateException("Too many errors in file.");
 
-                SensorValueInterface SVO = SensorValueFactory.parse(line);
+                Item SVO = null;
+                try {
+                    SVO = ItemSerialization.ITEM_SERIALIZATION.deSerialize(line);
+                } catch (NoSuchElementException e) {
+                    // This is thrown by the serializer, TODO: parse error type
+                    Log.error("Parser problem on: " + line + "(" + e.getMessage() + ")", e);
+                    e.printStackTrace();
+                } catch (IllegalArgumentException e) {
+                    Log.error("Illegal argument exception on: " + line + "(" + e.getMessage() + ")", e);
+                }
 
                 if (SVO == null) {
                     // sensor type not implemented, yet
@@ -103,20 +121,21 @@ public class BatchInserter {
                 }
 
                 // EXCEPTIONAL BEHAVIOR: long delay
-                if (! timeDeltaValid(lastTimestamp, SVO.getTimestamp())) {
+                if (!timeDeltaValid(lastTimestamp, SVO.getTimestamp())) {
                     Log.debug("Delay between timestamps too large.");
                     generateNewTripId = true;
                 }
                 lastTimestamp = SVO.getTimestamp();
 
                 // EXCEPTIONAL BEHAVIOR: new user ID
-                if (! lastUserId.equals(SVO.getUserId())) {
-                    lastUserId = SVO.getUserId();
+                if (!lastUserId.equals(SVO.getDevice())) {
+                    lastUserId = SVO.getDevice();
                     generateNewTripId = true;
                 }
 
                 if (generateNewTripId) {
-                    if (userIdChangeCount++ > MAX_TRIPS_PER_FILE) throw new IllegalStateException("Too many userIdChanges");
+                    if (userIdChangeCount++ > MAX_TRIPS_PER_FILE)
+                        throw new IllegalStateException("Too many userIdChanges");
 
                     tripId = generateNewTripId(SVO);
                     Log.info("Generated new trip_id: " + tripId);
@@ -129,11 +148,13 @@ public class BatchInserter {
 
                 if (++rowCount % 10000 == 0) batchInsert.executeBatch();
 
-            } catch (ParseException e) {
-                Log.error("Error parsing line: " + line); // e not attached not to show stack trace.
-                errorCount++;
-            } catch (SQLException e) {
-                Log.error("Error writing to db: " + line,e);
+            }
+//            catch (ParseException e) {
+//                Log.error("Error parsing line: " + line); // e not attached not to show stack trace.
+//                errorCount++;
+//            }
+            catch (SQLException e) {
+                Log.error("Error writing to db: " + line, e);
                 errorCount++;
             } catch (NullPointerException e) {
                 Log.error("Something odd went wrong:" + line, e);
@@ -172,9 +193,9 @@ public class BatchInserter {
         ps.execute();
     }
 
-    private static int generateNewTripId(SensorValueInterface svo) throws SQLException {
+    private static int generateNewTripId(Item svo) throws SQLException {
         PreparedStatement ps = db.connection.prepareStatement("INSERT into trip (user_id, start_ts, stop_ts) VALUES (?,?,?) RETURNING trip_id");
-        ps.setString(1, svo.getUserId());
+        ps.setString(1, svo.getDevice());
         ps.setLong(2, svo.getTimestamp());
         ps.setLong(3, svo.getTimestamp());
         ps.execute();
@@ -183,25 +204,27 @@ public class BatchInserter {
         return results.getInt(1);
     }
 
-    private static boolean isStartRecording(SensorValueInterface svo) {
-        if (svo.getType() != SampleType.TAG) return false;
-        TagSensorValue tsv = (TagSensorValue) svo;
-        return VALUE_START_RECORDING.equals(tsv.getTag().replace("\"", ""));
+    private static boolean isStartRecording(Item svo) {
+        if (svo.getType() != DataCommons.TYPE_TAG) return false;
+        Log.debug("Checking for start recording on: " + svo);
+        Tag tsv = (Tag) svo;
+        return VALUE_START_RECORDING.equals(tsv.tag);
     }
 
-    private static boolean isStopRecording(SensorValueInterface svo) {
-        if (svo.getType() != SampleType.TAG) return false;
-        TagSensorValue tsv = (TagSensorValue) svo;
-        return VALUE_STOP_RECORDING.equals(tsv.getTag().replace("\"",""));
+    private static boolean isStopRecording(Item svo) {
+        if (svo.getType() != DataCommons.TYPE_TAG) return false;
+        Log.debug("Checking for stop recording on: " + svo);
+        Tag tsv = (Tag) svo;
+        return VALUE_STOP_RECORDING.equals(tsv.tag);
     }
 
-    public void add(SensorValueInterface svo, int tripId) throws SQLException {
-        SampleType type = svo.getType();
+    public void add(Item svo, int tripId) throws SQLException {
+        String type = svo.getType();
 
         if (inserter.keySet().contains(type)) {
-            inserter.get(type).batchInsert((AbstractSensorValue) svo, tripId);
+            inserter.get(type).batchInsert(svo, tripId);
         } else {
-            Log.warn("Sensortype " + type + "not supported, yet. Found in " + svo.toSSF() );
+            Log.warn("Sensortype " + type + " not supported, yet. Found in " + svo.toSerializedForm());
         }
 
     }
@@ -209,7 +232,7 @@ public class BatchInserter {
     public void executeBatch() throws SQLException {
         Log.info("## Execute Batch");
 
-        for (AbstractInserter i : inserter.values()){
+        for (AbstractInserter i : inserter.values()) {
             i.executeBatch();
         }
     }
@@ -217,13 +240,13 @@ public class BatchInserter {
     public void close() throws SQLException {
         Log.info("## Close Statement");
 
-        for (AbstractInserter i : inserter.values()){
+        for (AbstractInserter i : inserter.values()) {
             i.close();
         }
     }
 
     public void dropTables() throws SQLException {
-        for (AbstractInserter i : inserter.values()){
+        for (AbstractInserter i : inserter.values()) {
             i.dropTable();
         }
     }

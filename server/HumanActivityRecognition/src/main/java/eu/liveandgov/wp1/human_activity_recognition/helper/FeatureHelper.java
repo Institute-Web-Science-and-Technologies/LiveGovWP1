@@ -64,7 +64,7 @@ public class FeatureHelper {
     // 0 if lying flat
     // arccos of return value gives tilting angle
     public static float tilt(float x,float y,float z){
-        double abs = Math.sqrt(Math.pow(x,2) + Math.pow(y,2) + Math.pow(x,2));
+        double abs = Math.sqrt(Math.pow(x,2) + Math.pow(y,2) + Math.pow(z,2));
         return (float) (Math.abs(y) / abs);
     }
 
