@@ -20,9 +20,11 @@ public class PublicationPipeline implements Consumer<Item> {
 
     private Filter<Item> filter;
     private FilePersistor persistor;
+    public static File publishFile;
 
     public PublicationPipeline() {
-        File publishFile = new File(Environment.getExternalStorageDirectory(), PUBLISH_FILENAME);
+        if(publishFile == null)
+            publishFile = new File(Environment.getExternalStorageDirectory(), PUBLISH_FILENAME);
 
         Log.d("WRITING TO", publishFile.getAbsolutePath());
         persistor = new FilePublisher(publishFile);

@@ -17,7 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
-import eu.liveandgov.wp1.sensor_collector.R;
+import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
 import eu.liveandgov.wp1.util.LocalBuilder;
@@ -39,6 +39,8 @@ public class TransferThreadPost implements Runnable, TransferManager {
     private Persistor persistor;
 
     private File stageFile;
+    //Used to get callback if transfer completed successfully or not
+    public ServiceSensorControl.TransferListener listener;
 
     public TransferThreadPost(Persistor persistor, File stageFile) {
         this.stageFile = stageFile;
@@ -104,6 +106,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
                 success = persistor.exportSamples(stageFile);
                 if (!success) {
                     Log.i(LOG_TAG, "Staging failed");
+                    listener.onTransferCompleted(false);
                     return;
                 }
             }
@@ -114,6 +117,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
             success = transferFile(stageFile, isCompressed);
             if (!success) {
                 Log.i(LOG_TAG, "Transfer failed");
+                listener.onTransferCompleted(false);
                 return;
             }
 
@@ -121,13 +125,16 @@ public class TransferThreadPost implements Runnable, TransferManager {
             success = stageFile.delete();
             if (!success) {
                 Log.i(LOG_TAG, "Deletion failed");
+                listener.onTransferCompleted(false);
                 return;
             }
 
+            listener.onTransferCompleted(true);
             // terminate
             Log.i(LOG_TAG, "Transfer finished successfully");
 
         } catch (IOException e) {
+            listener.onTransferCompleted(false);
             Log.e(LOG_TAG, "Error opening stage file", e);
         }
     }

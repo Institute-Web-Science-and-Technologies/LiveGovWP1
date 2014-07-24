@@ -1,20 +1,29 @@
 package eu.liveandgov.wp1.sensor_collector;
 
 import android.annotation.TargetApi;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONTokener;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -53,6 +62,7 @@ import eu.liveandgov.wp1.serialization.impl.TagSerialization;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.API_EXTENSIONS;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.MAIN_EXECUTOR_CORE_TIMEOUT;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.REC_VEL;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
 
 public class ServiceSensorControl extends Service {
@@ -208,6 +218,14 @@ public class ServiceSensorControl extends Service {
         connectorThread.start();
         monitorThread.start();
         SensorThread.start();
+
+
+        /* The ServiceSensorControl stores temporarily the current route of the users to be visualized on the map.*/
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ExtendedIntentAPI.RETURN_GPS_SAMPLE);
+        registerReceiver(receiver, filter);
+        counter = 0l;
+        currentRoute = new ArrayList<LatLng>();
     }
 
     @Override
@@ -221,7 +239,7 @@ public class ServiceSensorControl extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
     }
 
 
@@ -282,6 +300,9 @@ public class ServiceSensorControl extends Service {
         persistor.deleteSamples();
         publisher.deleteSamples();
         transferManager.deleteStagedSamples();
+
+        //Call back when the deletion of samples has been completed.
+        listener.onDeletionCompleted();
     }
 
     private void doStopHAR() {
@@ -341,12 +362,18 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doTransferSamples() {
+        //Show notification when the transfering is in progress.
+        onStartTransfering();
         transferManager.doTransfer();
     }
 
     private void doDisableRecording() {
         connectorThread.removeConsumer(persistor);
         isRecording = false;
+
+        //Reset the current route of the user.
+        currentRoute.clear();
+        counter = 0l;
 
         final Tag stopRecordingTag = new Tag(
                 System.currentTimeMillis(),
@@ -367,6 +394,10 @@ public class ServiceSensorControl extends Service {
     private void doEnableRecording() {
         connectorThread.addConsumer(persistor);
         isRecording = true;
+
+        //Reset the current route of the user if it has not already been reset.
+        currentRoute.clear();
+        counter = 0l;
 
         final Tag tagStartRecording = new Tag(
                 System.currentTimeMillis(),
@@ -421,5 +452,105 @@ public class ServiceSensorControl extends Service {
         SharedPreferences settings = getSharedPreferences(SHARED_PREFS_NAME, 0);
         if (settings == null) throw new IllegalStateException("Failed to load SharedPreferences");
         userId = settings.getString(PREF_ID, androidId); // use androidId as default;
+    }
+
+
+    //Id for the "in-progress" transfering notification
+    private static final int transferringNotificationID = 3;
+    //Coordinates list of the current route of the user
+    private ArrayList<LatLng> currentRoute;
+    private long counter;
+    //Access to the service by an activity
+    private final IBinder mBinder = new LocalBinder();
+    //Callbacks for transfering status (success/failure)
+    private SensorServiceListener listener;
+    //Used to receive the gps entries for the current route of the user
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            onGpsSampleReceived(intent.getStringExtra(ExtendedIntentAPI.FIELD_GPS_ENTRY));
+        }
+
+    };
+    //Access to the Service.
+    public class LocalBinder extends Binder {
+        public ServiceSensorControl getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return ServiceSensorControl.this;
+        }
+    }
+    //Callback for deleting samples
+    public interface SensorServiceListener
+    {
+        public void onDeletionCompleted();
+    }
+    //Callback for transfer
+    public interface TransferListener
+    {
+        public void onTransferCompleted(boolean success);
+    }
+    //When gpsData is received (for current route of the user)
+    private void onGpsSampleReceived (String gpsSample)
+    {
+        //Dont visualize all gpsSamples on the map (memory issues). Skip 4 out of 5
+        if(counter%5 == 0)
+        {
+            String[] gpsData = gpsSample.split(",")[3].split("\\s+");
+            currentRoute.add(new LatLng(Double.parseDouble(gpsData[0]), Double.parseDouble(gpsData[1])));
+        }
+        counter++;
+    }
+    //Get the user's current route
+    public ArrayList<LatLng> getCurrentRoute()
+    {
+        return currentRoute;
+    }
+
+    //Called when the transfering has started - Show notification to the user
+    private void onStartTransfering()
+    {
+        final NotificationManager mNotifyManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setContentTitle("Recordings")
+                .setContentText("Uploading samples")
+                .setSmallIcon(R.drawable.ic_stat_logo)
+                .setProgress(0, 0, true);
+        mNotifyManager.notify(transferringNotificationID, mBuilder.build());
+        ((TransferThreadPost) transferManager).listener = new TransferListener() {
+
+            @Override
+            public void onTransferCompleted(boolean success) {
+                if(success)
+                {
+                    mBuilder.setContentText("Upload completed successfully").setProgress(0, 0, false);
+                    mNotifyManager.notify(transferringNotificationID, mBuilder.build());
+                    transferManager.deleteStagedSamples();
+                    persistor.deleteSamples();
+                    publisher.deleteSamples();
+                    if(listener != null)
+                        listener.onDeletionCompleted();
+                }
+                else
+                {
+                    mBuilder.setContentText("Upload failed").setProgress(0, 0, false);
+                    mNotifyManager.notify(transferringNotificationID, mBuilder.build());
+//					if(listener!= null)
+//						listener.onDeletionCompleted();
+                }
+            }
+        };
+    }
+    //Register the listener by an activity
+    public void setOnSamplesDeletedListener(SensorServiceListener l)
+    {
+        listener = l;
+    }
+    public boolean samplesStored()
+    {
+        //Possible bug : persistor.hasSamples() returns true always
+        return persistor.hasSamples() || transferManager.hasStagedSamples();
     }
 }
