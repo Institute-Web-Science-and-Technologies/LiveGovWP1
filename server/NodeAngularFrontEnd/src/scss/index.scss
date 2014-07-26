@@ -1,12 +1,15 @@
 $color-x            : #2074c7;
 $color-y            : #24c02e;
 $color-z            : #b92819;
-$color-driving      : #fece09;
-$color-running      : #e41a1c;
-$color-walking      : #a65628;
-$color-standing     : #984ea3;
-$color-sitting      : #4daf4a;
-$color-on-table     : #ff4f7a;
+
+$color-driving      : #53db5d;
+
+$color-running      : #6079df;
+$color-walking      : #4f91d7;
+$color-standing     : #52c3d7;
+
+$color-sitting      : #53db89;
+$color-on-table     : #d88b3d;
 $color-unknown      : #777777;
 
 $axis-stroke-color  : black;
@@ -18,7 +21,7 @@ $chart-stroke-width : 1.6;
 $data-table-height  : 500px;
 $svg-font           : 0.75em sans-serif;
 $axis-label-font    : 0.7em sans-serif;
-$minimap-height     : 42px;
+$minimap-height     : 64px;
 
 // HAR ACTIVITY COLORS
 
@@ -232,13 +235,15 @@ text.y.label {
 
 // GENERAL SVG SETUP
 
-svg {
+
+.chart > svg {
   font: $svg-font;
   width: 100%;
   height: 100%;
 }
 
-path {
+path.path,
+path.domain {
   fill: none;
 }
 
@@ -293,6 +298,13 @@ line {
   right: 0;
   padding: 0;
   bottom: 0;
+}
+
+.minimap {
+  height: $minimap-height;
+  display: block;
+  width: 100%;
+  clear: both;
 }
 
 .tripInfo {

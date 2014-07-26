@@ -48,7 +48,7 @@ var Trips = React.createClass({
         <tr key={trip.id}>
           <td onClick={this.selectTrip.bind(this, trip.id)}>{trip.id}</td>
           <td onClick={this.selectTrip.bind(this, trip.id)}>{trip.user}</td>
-          <td onClick={this.selectTrip.bind(this, trip.id)}>{moment(trip.start).format('HH:mm:ss')}</td>
+          <td onClick={this.selectTrip.bind(this, trip.id)}>{moment(trip.start).format('YY-MM-DD HH:mm:ss')}</td>
           <td onClick={this.selectTrip.bind(this, trip.id)}>{moment(trip.stop).format('HH:mm:ss')}</td>
           <td onClick={this.selectTrip.bind(this, trip.id)}>{moment(trip.duration).utc().format('HH:mm:ss')}</td>
           <td>

@@ -45,7 +45,7 @@
     'sensor_gps',
     'sensor_har',
     // 'sensor_proximity',
-    // 'sensor_tags',
+    'sensor_tags',
     // 'sensor_velocity',
     // 'sensor_waiting',
     // 'service_sld_trips'
@@ -80,8 +80,8 @@
         q = 'SELECT ts, tag FROM sensor_har WHERE trip_id = ' + id + 'ORDER BY ts ASC';
       } else if (sensor === 'sensor_gps') {
         q = 'SELECT ts, ST_AsGeoJSON(lonlat)::json AS lonlat FROM sensor_gps WHERE trip_id = ' + id + 'ORDER BY ts ASC';
-      } else if (sensor === 'test') {
-        q = '\\dt';
+      } else if (sensor === 'sensor_tags') {
+        q = 'SELECT * FROM sensor_tags WHERE trip_id = ' + id + 'ORDER BY ts ASC';
       } else if (windowSize) {
         q = 'SELECT avg(x) AS x, avg(y) AS y, avg(z) AS z, min(ts) AS start, max(ts) AS stop FROM (SELECT x, y, z, ts, NTILE(' + windowSize + ') OVER (ORDER BY ts) AS w FROM ' + sensor + ' WHERE trip_id = ' + id + extent + ') A GROUP BY w ORDER BY w';
       } else {

@@ -1,116 +1,261 @@
 /*** @jsx React.DOM */
 
+// http://geojsonlint.com <3
+// https://github.com/mapbox/simplestyle-spec/tree/master/1.1.0
+// https://www.mapbox.com/maki/
+// https://www.ietf.org/rfc/rfc2119.txt
+// https://www.mapbox.com/mapbox.js/example/v1.0.0/custom-marker/
+// https://www.mapbox.com/mapbox.js/example/v1.0.0/scaled-markers/
+
 var Map = React.createClass({
+
   getDefaultProps: function() {
     return {
-      colorized: true
+      har: false,
+      harColors: {
+          'driving'  : '#53db5d',
+          'running'  : '#6079df',
+          'walking'  : '#4f91d7',
+          'standing' : '#52c3d7',
+          'sitting'  : '#53db89',
+          'on table' : '#d88b3d',
+          'unknown'  : '#777777'
+      },
+      layerStyles: {
+        extentLayer : {weight : 4, opacity : 1, color : '#fc4807'},
+        gpsLayer    : {weight : 3, opacity : 1, color : '#333'},
+        harLayer    : {weight : 3, opacity : 1 },
+        none        : {weight : 0, }
+      },
+      markerStyle: {
+        radius: 12,
+        fillColor: "#ff7800",
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+      }
     };
   },
 
+  getInitialState: function() {
+    return {}; // initialize empty state to prevent undefined error
+  },
+
+  componentDidUpdate: function(prevProps, prevState) {
+    console.log('componentDidUpdate', this.props.extent);
+
+    /////////////////////////
+    // HANDLE EXTENT LAYER //
+    /////////////////////////
+
+    if (this.props.extent.length) {
+      this.state.extentLayer.setGeoJSON(this.generateExtentGeoJSON());
+      this.state.extentLayer.setStyle(this.props.layerStyles.extentLayer);
+      this.state.map.fitBounds(this.state.extentLayer.getBounds(), {padding: [10,10]});
+    } else {
+      this.state.extentLayer.setStyle(this.props.layerStyles.none);
+      this.state.map.fitBounds(this.state.gpsLayer.getBounds());
+    }
+  },
+
   componentDidMount: function() {
-    var map = L.mapbox.map('map', 'rene.i6mdi15p'); // mapbox id [username].[project]
+    console.log('componentDidMount');
+    // when the component did mount and the dom node '#map' is available,
+    // create the map and all layers and keep them in the components state
 
-    var harLayer = L.mapbox.featureLayer().addTo(map);
-    harLayer.setGeoJSON(this.props.featureCollection);
+    var map         = L.mapbox.map('map', 'rene.i6mdi15p'),
+        gpsLayer    = L.mapbox.featureLayer().addTo(map),
+        harLayer    = L.mapbox.featureLayer().addTo(map),
+        extentLayer = L.mapbox.featureLayer().addTo(map);
 
-    harLayer.on('mouseover', function(e) {
-      console.log(e.layer.feature.properties.tag);
-      e.layer.openPopup();
-    });
+    ////////////////////////////////////
+    // RENDER LAYERS AND APPLY STYLES //
+    ////////////////////////////////////
 
-    harLayer.on('mouseout', function(e) {
-      e.layer.openPopup();
-    });
+    // gps layer: one single geojson linestring
+    gpsLayer.setGeoJSON(this.generateGPSGeoJSON());
+    gpsLayer.setStyle(this.props.layerStyles.gpsLayer);
 
-    map.fitBounds(harLayer.getBounds());
+    // har layer: feature collection containing line strings
+    if (this.props.har) {
+      harLayer.setGeoJSON(this.generateHARGeoJSON());
+      harLayer.setStyle(this.props.layerStyles.harLayer);
+    }
 
-      // var highlightFeature = function(e) {
-      //   var layer = e.target;
+    // render tags as circles with a popup
+    this.renderTags(map);
 
-      //   layer.setStyle({
-      //     weight: 3,
-      //     opacity: 1,
-      //     color: this.props.colorized ? getColor(feature.properties.tag) : getColor('running')
-      //   });
+    // zoom to fit gps layer
+    map.fitBounds(gpsLayer.getBounds());
 
-      // }.bind(this);
-
-      // function onEachFeature(feature, layer) {
-      //   layer.on({
-      //     mouseover: function(e) {
-      //       e.layer.openPopup();
-      //       highlightFeature
-      //     },
-      //     mouseout: function(e) {
-      //       e.layer.closePopup();
-      //       resetHighlight
-      //     }
-      //   });
-      // }
-
-      // function resetHighlight(e) {
-      //   geojson.resetStyle(e.target);
-      // }
-
-      function getColor(d) {
-        switch (d) {
-          case 'driving'  : return '#377eb8';
-          case 'running'  : return '#e41a1c';
-          case 'walking'  : return '#ff7f00';
-          case 'standing' : return '#4daf4a';
-          case 'sitting'  : return '#984ea3';
-          case 'on table' : return '#a65628';
-          case 'unknown'  : return '#777777';
-          case void 0     : return '#333333';
-        }
-      }
-
-      var style = function(feature) {
-        return {
-          weight: 3,
-          opacity: 1,
-          color: this.props.colorized ? getColor(feature.properties.tag) : getColor()
-        };
-      }.bind(this);
-
-      var geojson = L.geoJson(this.props.featureCollection, {
-        style: style,
-        onEachFeature: onEachFeature
-      }).addTo(map);
-
-      // map.fitBounds(geojson.getBounds());
-
-      // map.scrollWheelZoom.disable();
-
-      // new L.Control.Zoom({ position: 'topright' }).addTo(map);
-      function onEachFeature(feature, layer) {
-
-        // create a popup for each feature
-        if (feature.properties) {
-          var popupString = '<div class="popup">';
-          for (var k in feature.properties) {
-            var v = feature.properties[k];
-            if (k == 't0' || k == 't1') v = moment.unix(parseInt(v)).utc().format('HH:mm:ss');
-            if (k == 'distance')        v = Math.round(v * 100, 12) / 100 + ' m';
-            if (k == 'duration')        v = moment.duration(v).humanize();
-            if (k == 'speed')           v = v + ' km/h';
-            popupString += k + ': ' + v + '<br />';
-          }
-          popupString += '</div>';
-          layer.bindPopup(popupString, {
-            maxHeight: 200
-          });
-        }
-
-        // highlight feature on mouseover
-        // layer.on({
-        //   mouseover: highlightFeature,
-        //   mouseout: resetHighlight,
-        // });
-      }
+    // make map and layers available through state
+    this.setState({
+      map: map,
+      gpsLayer    : gpsLayer,
+      harLayer    : harLayer,
+      extentLayer : extentLayer,
+    })
   },
 
   render: function() {
-    return <div id='map' />;
-  }
+    return (
+      <div className='pure-g'>
+        <div className='pure-u-24-24'>
+          <ChartHeader sensorName='GPS' />
+          <pre>{this.props.extent.toString()}</pre>
+          <div className='cell map'>
+            <div id='map' />
+          </div>
+        </div>
+      </div>
+    );
+  },
+
+  ////////////////////////
+  // RENDER TAGS TO MAP //
+  ////////////////////////
+
+  renderTags: function(map) {
+    function onEachFeature(feature, layer) {
+      layer.bindPopup(feature.properties.popupContent);
+    }
+
+    L.geoJson(this.generateTagsGeoJSON(), {
+      style: function (feature) {
+        return feature.properties && feature.properties.style;
+      },
+
+      onEachFeature: onEachFeature,
+
+      pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, this.props.markerStyle);
+      }.bind(this)
+    }).addTo(map);
+  },
+
+  /////////////////////////////////////////
+  // METHODS TO GENERATE GEOJSON OBJECTS //
+  /////////////////////////////////////////
+
+  // (1) unify gps coordinates
+  // (2) split coordinates by activity
+  // (3) join activities to prevent gaps in rendering
+
+  generateGPSGeoJSON: function() {
+    var gps = this.props.data.sensor_gps;
+
+    return {
+      type: 'LineString',
+      coordinates: _(gps)
+        .map(function(coord) { return coord.lonlat.coordinates; })
+        .unique(function(coord) { return coord.toString(); })
+        .value()
+    }
+  },
+
+  generateHARGeoJSON: function() {
+    var har = this.sum(this.props.data.sensor_har);
+    var gps = this.props.data.sensor_gps;
+
+    var features = har.map(function(activity) {
+      return {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: this.props.data.sensor_gps
+            .filter(function(d) { return d.ts >= activity.start && d.ts <= activity.stop; })
+            .map(function(d) { return d.lonlat.coordinates; })
+        },
+        properties: {
+          start: activity.start,
+          stop: activity.stop,
+          duration: activity.stop - activity.start,
+          activity: activity.tag,
+          stroke: this.props.harColors[activity.tag],
+        }
+      }
+    }.bind(this));
+
+    // connect each line string with the next one: push the first coordinate
+    // of the next linestring to it's predecessors coordinate array
+    _.forEach(features, function(c,i,a) {
+      if (a[i + 1]) a[i].geometry.coordinates.push(a[i + 1].geometry.coordinates[0]);
+    })
+
+    // remove any falsy elements in each linestrings coordinates array
+    _.forEach(features, function(feature) {
+      return feature.geometry.coordinates = _.compact(feature.geometry.coordinates);
+    })
+
+    // return the features wrapped in a feature collection
+    return {
+      type: 'FeatureCollection',
+      features: features
+    };
+  },
+
+  generateTagsGeoJSON: function() {
+    var tags = this.props.data.sensor_tags;
+    var gps = this.props.data.sensor_gps;
+
+    return {
+      type: 'FeatureCollection',
+      features: tags.map(function(tag) {
+        return {
+          type: 'Feature',
+          geometry: gps.
+            filter(function(coord) { return coord.ts >= tag.ts; })[0].lonlat,
+          properties: {
+            tag: tag.tag,
+            ts: tag.ts,
+            style: {
+                weight: 2,
+                color: "#999",
+                opacity: 1,
+                fillColor: "#B0DE5C",
+                fillOpacity: 0.8,
+            },
+            popupContent: "<strong>Tag</strong>: " + tag.tag
+          }
+        };
+      })
+    };
+  },
+
+  generateExtentGeoJSON: function() {
+    var extent = this.props.extent;
+    var gps = this.props.data.sensor_gps;
+
+    return {
+      type: 'LineString',
+      coordinates: gps
+        .filter(function(d) { return d.ts >= extent[0] && d.ts <= extent[1]; })
+        .map(function(d) { return d.lonlat.coordinates; })
+    }
+  },
+
+  ///////////////////////////////
+  // XXX CHECK FOR CORRECTNESS //
+  ///////////////////////////////
+
+  // summarize har tags
+  sum: function(har) {
+    return har.slice().filter(function(c, i, a) {
+      return a[i - 1] ? a[i].tag !== a[i - 1].tag : true;
+    }).map(function(c, i, a) {
+      return a[i + 1] ? {
+        start: a[i].ts,
+        stop: a[i + 1].ts,
+        tag: a[i].tag
+      } : {
+        start: a[i].ts,
+        stop: har[har.length - 1].ts,
+        tag: a[i].tag
+      };
+    }).filter(function(d) {
+      return d.start !== d.stop;
+    });
+  },
+
 });

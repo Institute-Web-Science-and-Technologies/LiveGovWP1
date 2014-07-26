@@ -181,9 +181,17 @@ var Har = React.createClass({
 
   render: function() {
     var data = this.props.trip.data;
+
     var gps = data.sensor_gps;
     var har = data.sensor_har ? this.sum(data.sensor_har) : [];
-    var featureCollection = this.featureCollection(gps, har);
+    var tags = data.sensor_tags ? data.sensor_tags : [];
+
+    var geojson = {
+      activities: this.featureCollection(gps, har),
+      tags: this.featureCollection(gps, tags),
+      extent: this.featureCollection(gps, this.state.extent)
+    }
+
     var harDomain = this.calculateDomain([har], ['ts']); // NOTE: harDomain != xDomain
 
     var width = window.innerWidth;
@@ -227,28 +235,15 @@ var Har = React.createClass({
         );
       }.bind(this))
 
-    var map = (
-      <div className='pure-g'>
-        <div className='pure-u-24-24'>
-          <ChartHeader sensorName='GPS' />
-          <div className='cell map'>
-            <Map featureCollection={featureCollection} />
-          </div>
-        </div>
-      </div>
-    );
-
-    if (!featureCollection.features.length) map = '';
-
     return (
       <div id='har'>
         <div id='main'>
-          <svg height='50px'>
+          <svg height='50px' className='minimap'>
             <HarBar className='harBar' xDomain={this.state.xDomain} extent={this.state.extent} width={width} data={har} />
             <HarBrush className='harBrush' xDomain={this.state.xDomain} extent={this.state.extent} width={width} onBrush={this.onBrush} />
           </svg>
           <HarTags tags={harTags} />
-          {map}
+          <Map data={this.props.trip.data} extent={this.state.extent} har='true' />
           {charts}
         </div>
         <div id='minimap'>

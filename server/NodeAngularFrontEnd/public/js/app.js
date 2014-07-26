@@ -187,6 +187,7 @@
           if (more) {
             sensors.splice(sensors.indexOf('sensor_gps'), 1);
             sensors.splice(sensors.indexOf('sensor_har'), 1);
+            sensors.splice(sensors.indexOf('sensor_tags'), 1);
           }
 
           var queries = sensors.map(function(sensor) {
@@ -243,14 +244,14 @@
         },
 
         deleteTrip: function(id) {
-          $http({ method: 'DELETE', url: '/trips/' + id })
+          $http({ method: 'DELETE', url: 'trips/' + id })
           .success(function() {
             console.info('DELETED TRIP', id);
           });
         },
 
         updateTrip: function (id, value) {
-          $http({ method: 'POST', url: '/trips/' + id, data:{name:value} })
+          $http({ method: 'POST', url: 'trips/' + id, data:{name:value} })
           .success(function() {
             console.info('UPDATED TRIP', id);
           });
