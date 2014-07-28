@@ -68,7 +68,8 @@ public class FeatureVector {
         // S2Bins = BD.getBinsForAxis(S2);
 
         BinDistributor FBD = new BinDistributor(0, 100, 5);
-        S2FTBins = FBD.getBinsForAxis(FeatureHelper.FTAbsolute(S2));
+        // S2FTBins = FBD.getBinsForAxis(FeatureHelper.FTAbsolute(S2));
+        S2FTBins = FBD.getBinsForAxis(new float[] {});
 
         startTime = m.startTime;
     }

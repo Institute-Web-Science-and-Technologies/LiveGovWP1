@@ -12,7 +12,7 @@ public class HARPipeline extends Pipeline<Acceleration, Triple<Long, Long, Strin
 
     private WindowPipeline wp;
     private QualityPipeline qp;
-    private InterpolationPipeline ip;
+    // private InterpolationPipeline ip;
     private FeaturePipeline fp;
     private ActivityPipeline ap;
 
@@ -36,11 +36,11 @@ public class HARPipeline extends Pipeline<Acceleration, Triple<Long, Long, Strin
         qp = new QualityPipeline(MIN_RECORDING_FREQUENCY);
         wp.setConsumer(qp);
 
-        ip = new InterpolationPipeline(NO_SAMPLES_PER_WINDOW);
-        qp.setConsumer(ip);
+        // ip = new InterpolationPipeline(NO_SAMPLES_PER_WINDOW);
+        // qp.setConsumer(ip);
 
         fp = new FeaturePipeline();
-        ip.setConsumer(fp);
+        qp.setConsumer(fp);
 
         ap = new ActivityPipeline(0);
         fp.setConsumer(ap);
