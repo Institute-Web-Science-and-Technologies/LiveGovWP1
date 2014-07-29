@@ -3,22 +3,23 @@ package eu.liveandgov.wp1.sensor_collector.sensors.sensor_producers;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.ActivityRecognitionClient;
-import com.google.android.gms.location.DetectedActivity;
+
+import org.apache.log4j.Logger;
 
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
+import eu.liveandgov.wp1.sensor_collector.logging.LP;
 
 /**
  * Created by cehlen on 9/26/13.
  */
 public class ActivityHolder implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener, SensorHolder {
-    public static final String LOG_TAG = "ACTH";
 
+    private final Logger log = LP.get();
     public static final int DETECTION_INTERVAL_SECONDS = 20;
 
     public static final int MILLISECONDS_PER_SECOND = 1000;
@@ -40,12 +41,12 @@ public class ActivityHolder implements GooglePlayServicesClient.ConnectionCallba
         // If Google Play services is available
         if (ConnectionResult.SUCCESS == resultCode) {
             // In debug mode, log the status
-            Log.d(LOG_TAG, "Google Play services is available.");
+            log.debug("Google Play services is available.");
             // Continue
             return true;
             // Google Play services was not available for some reason
         } else {
-            Log.d(LOG_TAG, "Google Play services is not available.");
+            log.debug("Google Play services is not available.");
             return false;
         }
     }

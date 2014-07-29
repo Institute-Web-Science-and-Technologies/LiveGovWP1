@@ -7,9 +7,6 @@ import eu.liveandgov.wp1.data.impl.Velocity;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.serialization.impl.GPSSerialization;
-
-import static junit.framework.Assert.assertNotNull;
 
 /**
  * Created by lukashaertel on 04.12.13.

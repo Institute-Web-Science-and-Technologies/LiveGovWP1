@@ -8,22 +8,20 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.location.LocationRequest;
+import org.apache.log4j.Logger;
 
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-
-import static junit.framework.Assert.assertNotNull;
+import eu.liveandgov.wp1.sensor_collector.logging.LP;
 
 /**
  * Created by lukashaertel on 04.12.13.
  */
 public class LocationHolderAndroid extends LocationHolder {
-    private static final String LOG_TAG = "LOC_A";
+    private final Logger log = LP.get();
 
     private final Looper looper;
 
@@ -63,18 +61,18 @@ public class LocationHolderAndroid extends LocationHolder {
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.d(LOG_TAG, "Status changed: " + status);
+           log.debug("Status changed: " + status);
         }
 
         @Override
         public void onProviderEnabled(String provider) {
-            Log.d(LOG_TAG, "Provider enabled: " + provider);
+            log.debug("Provider enabled: " + provider);
 
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-            Log.d(LOG_TAG, "Provider disabled: " + provider);
+            log.debug("Provider disabled: " + provider);
         }
     };
 

@@ -9,8 +9,9 @@ import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.Settings;
-import android.util.Log;
 import android.widget.Toast;
+
+import org.apache.log4j.Logger;
 
 import java.util.List;
 
@@ -18,13 +19,13 @@ import eu.liveandgov.wp1.data.impl.WiFi;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.serialization.impl.WiFiSerialization;
+import eu.liveandgov.wp1.sensor_collector.logging.LP;
 
 /**
  * Created by lukashaertel on 27.11.13.
  */
 public class WifiHolder implements SensorHolder {
-    public static String LOG_TAG = "WIFIH";
+    private final Logger log = LP.get();
 
     private final SensorQueue sensorQueue;
     private final int delay;
@@ -46,7 +47,7 @@ public class WifiHolder implements SensorHolder {
     @Override
     public void startRecording() {
         checkEnableWiFi();
-        Log.d(LOG_TAG, "Start Recording");
+        log.debug("Start Recording");
         GlobalContext.context.registerReceiver(scanResultsAvailableEndpoint, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION), null, handler);
 
         startNextScan();
@@ -54,11 +55,11 @@ public class WifiHolder implements SensorHolder {
 
     @Override
     public void stopRecording() {
-        Log.d(LOG_TAG, "Stop Recording");
+        log.debug("Stop Recording");
         try {
             GlobalContext.context.unregisterReceiver(scanResultsAvailableEndpoint);
         } catch (IllegalArgumentException e) {
-            Log.w(LOG_TAG, "Receiver already unregistered");
+            log.warn("Receiver already unregistered");
         }
     }
 
@@ -66,7 +67,7 @@ public class WifiHolder implements SensorHolder {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction())) {
-                Log.d(LOG_TAG, "Scan results available");
+                log.debug("Scan results available");
 
                 // Get receive-time of the intent in system uptime
                 long scanEndtime = SystemClock.uptimeMillis();

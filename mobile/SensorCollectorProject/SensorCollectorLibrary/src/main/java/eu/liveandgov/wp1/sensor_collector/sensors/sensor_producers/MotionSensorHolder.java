@@ -17,7 +17,6 @@ import eu.liveandgov.wp1.data.impl.Motion;
 import eu.liveandgov.wp1.data.impl.Rotation;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.serialization.impl.MotionSerialization;
 
 /**
  * Created by hartmann on 9/15/13.

@@ -1,20 +1,24 @@
 package eu.liveandgov.wp1.sensor_collector.persistence;
 
 import android.os.Environment;
-import android.util.Log;
+
+import org.apache.log4j.Logger;
 
 import java.io.File;
-;
+
 import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.impl.Filter;
-import eu.liveandgov.wp1.pipeline.impl.StartsWith;
+import eu.liveandgov.wp1.sensor_collector.logging.LP;
+
+;
 
 /**
  * Created by hartmann on 11/12/13.
  */
 public class PublicationPipeline implements Consumer<Item> {
+    private final Logger log = LP.get();
 
     public static final String PUBLISH_FILENAME = "published.ssf";
 
@@ -24,7 +28,7 @@ public class PublicationPipeline implements Consumer<Item> {
     public PublicationPipeline() {
         File publishFile = new File(Environment.getExternalStorageDirectory(), PUBLISH_FILENAME);
 
-        Log.d("WRITING TO", publishFile.getAbsolutePath());
+        log.debug("Writing to " + publishFile.getAbsolutePath());
         persistor = new FilePublisher(publishFile);
 
         filter = new Filter<Item>() {

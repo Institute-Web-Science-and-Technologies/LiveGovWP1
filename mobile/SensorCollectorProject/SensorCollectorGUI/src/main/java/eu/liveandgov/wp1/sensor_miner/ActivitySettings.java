@@ -2,21 +2,12 @@ package eu.liveandgov.wp1.sensor_miner;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
-
-import static junit.framework.Assert.assertNotNull;
 
 public class ActivitySettings extends Activity {
 

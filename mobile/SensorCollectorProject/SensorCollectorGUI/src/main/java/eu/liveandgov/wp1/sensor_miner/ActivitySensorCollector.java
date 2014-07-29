@@ -20,12 +20,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.apache.log4j.Logger;
+
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
+import eu.liveandgov.wp1.sensor_collector.logging.LP;
 import eu.liveandgov.wp1.sensor_miner.configuration.SensorMinerOptions;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.FIELD_MESSAGE;
@@ -60,7 +63,6 @@ import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.RETURN_
  * Created by hartmann on 9/26/13.
  */
 public class ActivitySensorCollector extends Activity {
-    private static final String LOG_TAG = "ASC";
     private BroadcastReceiver universalBroadcastReceiver;
 
     // MIRRORED FLAGS
@@ -212,7 +214,7 @@ public class ActivitySensorCollector extends Activity {
         intent.setAction(ACTION_ANNOTATE);
         intent.putExtra(FIELD_ANNOTATION, annotation);
         startService(intent);
-        Toast.makeText(this, "Adding annotation: " + annotation, 3).show();
+        Toast.makeText(this, "Adding annotation: " + annotation, Toast.LENGTH_SHORT).show();
     }
 
     public void onIdButtonClick(View view) {
@@ -360,14 +362,6 @@ public class ActivitySensorCollector extends Activity {
         }
 
         // logStatus(intent);
-    }
-
-    private void logStatus(Intent intent) {
-        Log.d("STATUS", "SAMPLING:       " + intent.getBooleanExtra(FIELD_SAMPLING, false));
-        Log.d("STATUS", "TRANSFERRING:   " + intent.getBooleanExtra(FIELD_TRANSFERRING, false));
-        Log.d("STATUS", "SAMPLES_STORED: " + intent.getBooleanExtra(FIELD_SAMPLES_STORED, false));
-        Log.d("STATUS", "HAR:            " + intent.getBooleanExtra(FIELD_HAR, false));
-        Log.d("STATUS", "ID:             " + intent.getStringExtra(FIELD_ID));
     }
 
     @Override

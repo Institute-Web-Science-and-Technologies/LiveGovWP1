@@ -3,7 +3,8 @@ package eu.liveandgov.wp1.sensor_collector.persistence;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
-import android.util.Log;
+
+import org.apache.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.util.zip.GZIPOutputStream;
 
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
+import eu.liveandgov.wp1.sensor_collector.logging.LP;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
@@ -23,7 +25,8 @@ import eu.liveandgov.wp1.util.LocalBuilder;
  * Created by hartmann on 9/20/13.
  */
 public class ZipFilePersistor implements Persistor {
-    public static final String LOG_TAG = "ZFP";
+    private final Logger log = LP.get();
+
     public static final String FILENAME = "sensor.log.gz";
 
     private static final String SHARED_PREFS_NAME = "ZipFilePersistorPrefs";
@@ -44,7 +47,7 @@ public class ZipFilePersistor implements Persistor {
     @Override
     public synchronized void push(Item item) {
         if (fileWriter == null) {
-            Log.v(LOG_TAG, "Blocked write event");
+            log.info("Blocked write event");
             return;
         }
 
@@ -52,8 +55,7 @@ public class ZipFilePersistor implements Persistor {
             fileWriter.write(item.toSerializedForm() + "\n");
             sampleCount++;
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Cannot write file.");
-            e.printStackTrace();
+            log.error("Cannot write file.", e);
         }
     }
 
@@ -61,15 +63,15 @@ public class ZipFilePersistor implements Persistor {
     public boolean exportSamples(File stageFile) {
         boolean suc = true;
 
-        Log.i(LOG_TAG, "Exporting samples.");
+        log.info("Exporting samples.");
         if (stageFile.exists()) {
-            Log.e(LOG_TAG, "Stage file exists.");
+            log.error("Stage file exists.");
             return false;
         }
 
         suc = closeLogFile();
         if (!suc) {
-            Log.e(LOG_TAG, "Cosing LogFile failed.");
+            log.error("Cosing LogFile failed.");
             return false;
         }
 
@@ -78,13 +80,13 @@ public class ZipFilePersistor implements Persistor {
         putValidLength(0);
 
         if (!suc) {
-            Log.e(LOG_TAG, "Renaming failed.");
+            log.error("Renaming failed.");
             return false;
         }
 
         suc = openLogFileOverwrite();
         if (!suc) {
-            Log.e(LOG_TAG, "Opening new Log File failed.");
+            log.error("Opening new Log File failed.");
             return false;
         }
 
@@ -147,10 +149,10 @@ public class ZipFilePersistor implements Persistor {
         final long validLength = getValidLength();
         final long actualLength = logFile.length();
 
-        Log.d(LOG_TAG, "Valid zipfile length: " + validLength + ", actual length " + actualLength);
+        log.debug("Valid zipfile length: " + validLength + ", actual length " + actualLength);
 
         if (actualLength > validLength) {
-            Log.w(LOG_TAG, "Erronous file size, truncating");
+            log.warn("Erronous file size, truncating");
 
             // Truncate if mismatching
             final FileChannel channel = new FileOutputStream(logFile, true).getChannel();
@@ -178,7 +180,7 @@ public class ZipFilePersistor implements Persistor {
 
         lastPutValidLength = value;
 
-        Log.d(LOG_TAG, "New valid length: " + value);
+        log.debug("New valid length: " + value);
 
         SharedPreferences prefs = GlobalContext.context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();

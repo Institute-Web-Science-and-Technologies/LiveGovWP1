@@ -1,8 +1,9 @@
 package eu.liveandgov.wp1.sensor_collector.streaming;
 
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteCantOpenDatabaseException;
-import android.util.Log;
+
+import org.apache.log4j.Logger;
+import org.zeromq.ZMQ;
 
 import eu.liveandgov.wp1.data.Callback;
 import eu.liveandgov.wp1.data.Item;
@@ -11,10 +12,9 @@ import eu.liveandgov.wp1.pipeline.impl.ZMQClient;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.R;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
+import eu.liveandgov.wp1.sensor_collector.logging.LP;
 import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
 import eu.liveandgov.wp1.util.LocalBuilder;
-
-import org.zeromq.ZMQ;
 
 /**
  * String-Consumer that sends samples to a remote server as lines using ZMQ message queue system.
@@ -22,8 +22,7 @@ import org.zeromq.ZMQ;
  * Created by hartmann on 10/2/13.
  */
 public class ZMQStreamer extends ZMQClient implements Monitorable {
-
-    public static final String LOG_TAG = "ZST";
+    private final Logger log = LP.get();
 
     /**
      * Pull interval can be slow because we don't expect responses
@@ -36,7 +35,7 @@ public class ZMQStreamer extends ZMQClient implements Monitorable {
         addressUpdated.register(new Callback<String>() {
             @Override
             public void call(String s) {
-                Log.d(LOG_TAG, "ZMQ Streamer destination now " + s);
+                log.debug( "ZMQ Streamer destination now " + s);
             }
         });
     }

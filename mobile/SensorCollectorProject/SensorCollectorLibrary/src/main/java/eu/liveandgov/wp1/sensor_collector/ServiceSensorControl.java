@@ -1,33 +1,26 @@
 package eu.liveandgov.wp1.sensor_collector;
 
-import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
-import android.util.Log;
 
-import org.json.JSONTokener;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import eu.liveandgov.wp1.data.Callback;
-import eu.liveandgov.wp1.data.Callbacks;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.impl.Tag;
 import eu.liveandgov.wp1.pipeline.Consumer;
-import eu.liveandgov.wp1.pps.api.AggregatingPS;
 import eu.liveandgov.wp1.pps.api.csv.StaticIPS;
-import eu.liveandgov.wp1.pps.api.ooapi.OSMIPPS;
 import eu.liveandgov.wp1.sensor_collector.activity_recognition.HARAdapter;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
@@ -38,6 +31,7 @@ import eu.liveandgov.wp1.sensor_collector.connectors.impl.ConnectorThread;
 import eu.liveandgov.wp1.sensor_collector.connectors.impl.GpsCache;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.LinkedSensorQueue;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
+import eu.liveandgov.wp1.sensor_collector.logging.LP;
 import eu.liveandgov.wp1.sensor_collector.monitor.MonitorThread;
 import eu.liveandgov.wp1.sensor_collector.persistence.FilePersistor;
 import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
@@ -49,14 +43,13 @@ import eu.liveandgov.wp1.sensor_collector.streaming.ZMQStreamer;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferManager;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferThreadPost;
 import eu.liveandgov.wp1.sensor_collector.waiting.WaitingAdapter;
-import eu.liveandgov.wp1.serialization.impl.TagSerialization;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.API_EXTENSIONS;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.MAIN_EXECUTOR_CORE_TIMEOUT;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
 
 public class ServiceSensorControl extends Service {
-    private static final String LOG_TAG = "SCS";
+    private final Logger log = LP.get();
 
     // CONSTANTS
     public static final String SENSOR_FILENAME = "sensor.ssf";
@@ -120,8 +113,9 @@ public class ServiceSensorControl extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        LP.configure();
 
-        Log.i(LOG_TAG, "Creating ServiceSensorControl");
+        log.info("Creating ServiceSensorControl");
 
         // INITIALIZATIONS
         // Warning: getFilesDir is only available after onCreate was called.
@@ -149,16 +143,7 @@ public class ServiceSensorControl extends Service {
 
         // Init sensor consumers
         final ZMQStreamer zmqStreamer = new ZMQStreamer();
-        streamer = new Consumer<Item>() {
-            @Override
-            public void push(Item item) {
-                zmqStreamer.itemNode.push(item);
-
-                // I am ashamed, kill me now
-                if (userId != null && userId.startsWith("dev"))
-                    Log.v("SMP", item.toString());
-            }
-        };
+        streamer = zmqStreamer.itemNode;
 
         harPipeline = new HARAdapter();
         ppsPipeline = new PPSAdapter("platform", staticIPS);
@@ -186,14 +171,14 @@ public class ServiceSensorControl extends Service {
         connectorThread.nonEmpty.register(new Callback<Consumer<? super Item>>() {
             @Override
             public void call(Consumer<? super Item> consumer) {
-                Log.d(LOG_TAG, "Start recording sensors");
+                log.debug("Start recording sensors");
                 SensorThread.startAllRecording();
             }
         });
         connectorThread.empty.register(new Callback<Consumer<? super Item>>() {
             @Override
             public void call(Consumer<? super Item> consumer) {
-                Log.d(LOG_TAG, "Stop recording sensors");
+                log.debug("Stop recording sensors");
                 SensorThread.stopAllRecording();
             }
         });
@@ -234,12 +219,12 @@ public class ServiceSensorControl extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) {
-            Log.i(LOG_TAG, "No intent received.");
+            log.debug("No intent received.");
             return START_STICKY;
         }
 
         String action = intent.getAction();
-        Log.v(LOG_TAG, "Received intent with action " + action);
+        log.debug("Received intent with action " + action);
 
         if (action == null) return START_STICKY;
 
@@ -272,7 +257,7 @@ public class ServiceSensorControl extends Service {
         } else if (action.equals(ExtendedIntentAPI.ACTION_DELETE_SAMPLES)) {
             doDeleteSamples();
         } else {
-            Log.i(LOG_TAG, "Received unknown action " + action);
+            log.debug("Received unknown action " + action);
         }
 
         return START_STICKY;
@@ -317,7 +302,7 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doSetId(String id) {
-        Log.i(LOG_TAG, "Set id to:" + id);
+        log.debug("Set id to:" + id);
 
         // Update Shared Preferences
         SharedPreferences settings = getSharedPreferences(SHARED_PREFS_NAME, 0);
@@ -332,7 +317,7 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doAnnotate(String tag) {
-        Log.d("AN", "Adding annotation:" + tag);
+        log.debug("Adding annotation:" + tag);
 
         sensorQueue.push(new Tag(
                 System.currentTimeMillis(),
@@ -398,14 +383,14 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doSendGps() {
-        if (gpsCache == null) Log.w(LOG_TAG, "gpsCache not initialized!");
+        if (gpsCache == null) log.warn("gpsCache not initialized!");
 
         Intent intent = new Intent(ExtendedIntentAPI.RETURN_GPS_SAMPLES);
         intent.putExtra(ExtendedIntentAPI.FIELD_GPS_ENTRIES, gpsCache.getEntryString());
 
         sendBroadcast(intent);
 
-        Log.i(LOG_TAG, "Sent gps message " + gpsCache.getEntryString());
+        log.debug("Sent gps message " + gpsCache.getEntryString());
     }
 
     // HELPER METHODS

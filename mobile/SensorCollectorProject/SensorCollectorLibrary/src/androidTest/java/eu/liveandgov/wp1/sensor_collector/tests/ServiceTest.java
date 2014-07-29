@@ -8,8 +8,6 @@ import android.test.ServiceTestCase;
 
 import junit.framework.Assert;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.Exchanger;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -17,14 +15,20 @@ import java.util.concurrent.TimeoutException;
 import eu.liveandgov.wp1.data.impl.Tag;
 import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
-import eu.liveandgov.wp1.sensor_collector.persistence.FilePersistor;
-import eu.liveandgov.wp1.sensor_collector.persistence.ZipFilePersistor;
 import eu.liveandgov.wp1.sensor_collector.tests.utils.ItemPipeHelper;
 import eu.liveandgov.wp1.sensor_collector.tests.utils.Matcher;
-import eu.liveandgov.wp1.sensor_collector.tests.utils.PipeHelper;
 
-import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.*;
-import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.*;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_ANNOTATE;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_GET_STATUS;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_RECORDING_ENABLE;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_SET_ID;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_START_HAR;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_STOP_HAR;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_ANNOTATION;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_SAMPLING;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_USER_ID;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.RECORDING_DISABLE;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.RETURN_STATUS;
 
 /**
  * Created by lukashaertel on 12.01.14.

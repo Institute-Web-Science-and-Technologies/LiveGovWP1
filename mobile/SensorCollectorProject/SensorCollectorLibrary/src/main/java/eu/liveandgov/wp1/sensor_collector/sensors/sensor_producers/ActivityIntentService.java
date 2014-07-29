@@ -2,22 +2,22 @@ package eu.liveandgov.wp1.sensor_collector.sensors.sensor_producers;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.util.Log;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 
-import eu.liveandgov.wp1.data.impl.Activity;
+import org.apache.log4j.Logger;
+
 import eu.liveandgov.wp1.data.impl.GoogleActivity;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.serialization.impl.ActivitySerialization;
-import eu.liveandgov.wp1.serialization.impl.GoogleActivitySerialization;
+import eu.liveandgov.wp1.sensor_collector.logging.LP;
 
 /**
  * Created by cehlen on 9/26/13.
  */
 public class ActivityIntentService extends IntentService {
+    private final Logger log = LP.get();
 
     /**
      * Utility method for converting the activity type into a readable string
@@ -51,13 +51,13 @@ public class ActivityIntentService extends IntentService {
 
     public ActivityIntentService(String name) {
         super(name);
-        Log.d("AIS", "Constructor");
+       log.debug( "Constructor");
         this.sensorQueue = GlobalContext.getSensorQueue();
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.d("AIS", "HandleIntent");
+        log.debug("HandleIntent");
         if (ActivityRecognitionResult.hasResult(intent)) {
 
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);

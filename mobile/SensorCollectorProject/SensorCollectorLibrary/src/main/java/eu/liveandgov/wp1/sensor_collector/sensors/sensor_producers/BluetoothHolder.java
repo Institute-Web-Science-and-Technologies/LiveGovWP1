@@ -10,8 +10,9 @@ import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.Settings;
-import android.util.Log;
 import android.widget.Toast;
+
+import org.apache.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -24,14 +25,13 @@ import eu.liveandgov.wp1.data.impl.Bluetooth;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.serialization.impl.BluetoothSerialization;
+import eu.liveandgov.wp1.sensor_collector.logging.LP;
 
 /**
  * Created by lukashaertel on 30.11.13.
  */
 public class BluetoothHolder implements SensorHolder {
-    public static String LOG_TAG = "BLTH";
-
+    private final Logger log = LP.get();
     /**
      * This TreeMap maps the integer representing the device major class to its name.
      */
@@ -112,9 +112,9 @@ public class BluetoothHolder implements SensorHolder {
         if (bluetoothAdapter != null && bluetoothAdapter.startDiscovery()) {
             lastScanRequest = SystemClock.uptimeMillis();
 
-            Log.d(LOG_TAG, "Scan successfully started");
+            log.debug("Scan successfully started");
         } else {
-            Log.w(LOG_TAG, "Bluetooth scan could not be started (Is bluetooth activated?)");
+            log.warn("Bluetooth scan could not be started (Is bluetooth activated?)");
         }
     }
 
@@ -136,7 +136,7 @@ public class BluetoothHolder implements SensorHolder {
         try {
             GlobalContext.context.unregisterReceiver(bluetoothEndpoint);
         } catch (IllegalArgumentException e) {
-            Log.w(LOG_TAG, "Receiver already unregistered");
+            log.warn("Receiver already unregistered");
         }
     }
 
