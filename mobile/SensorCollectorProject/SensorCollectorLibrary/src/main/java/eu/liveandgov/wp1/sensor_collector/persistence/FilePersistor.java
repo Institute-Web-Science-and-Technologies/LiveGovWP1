@@ -1,6 +1,6 @@
 package eu.liveandgov.wp1.sensor_collector.persistence;
 
-import android.util.Log;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.sensor_collector.logging.LP;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
@@ -16,7 +17,7 @@ import eu.liveandgov.wp1.util.LocalBuilder;
  * Created by hartmann on 9/20/13.
  */
 public class FilePersistor implements Persistor {
-    public static final String LOG_TAG = "FP";
+    private final Logger log = LP.get();
 
     private File logFile;
     protected BufferedWriter fileWriter;
@@ -31,7 +32,7 @@ public class FilePersistor implements Persistor {
         try {
             openLogFileAppend();
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Could not open file. Disabling Persistor.");
+            log.error("Could not open file. Disabling Persistor.");
             disabled = true;
         }
     }
@@ -41,7 +42,7 @@ public class FilePersistor implements Persistor {
         if (disabled) return;
         try {
             if (fileWriter == null) {
-                Log.v(LOG_TAG, "Blocked write event");
+                log.info("Blocked write event");
                 return;
             }
 
@@ -49,8 +50,7 @@ public class FilePersistor implements Persistor {
             sampleCount++;
 
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Cannot write file.");
-            e.printStackTrace();
+            log.error("Cannot write file.", e);
         }
     }
 
@@ -59,10 +59,10 @@ public class FilePersistor implements Persistor {
         if (disabled) return false;
 
         try {
-            Log.i(LOG_TAG, "Exporting samples.");
+            log.info("Exporting samples.");
 
             if (stageFile.exists()) {
-                Log.e(LOG_TAG, "Stage file exists.");
+                log.error("Stage file exists.");
                 return false;
             }
 
@@ -70,7 +70,7 @@ public class FilePersistor implements Persistor {
 
             boolean suc = logFile.renameTo(stageFile);
             if (!suc) {
-                Log.e(LOG_TAG, "Staging Failed");
+                log.error("Staging Failed");
                 return false;
             }
 
@@ -78,7 +78,7 @@ public class FilePersistor implements Persistor {
 
             sampleCount = 0;
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Error exporting samples", e);
+            log.error("Error exporting samples", e);
             return false;
         }
         return true;
@@ -97,7 +97,7 @@ public class FilePersistor implements Persistor {
 
             openLogFileOverwrite();
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Error deleting samples", e);
+            log.error("Error deleting samples", e);
         }
     }
 
@@ -106,7 +106,7 @@ public class FilePersistor implements Persistor {
         try {
             closeLogFile();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error closing file persistor", e);
         }
     }
 
@@ -128,17 +128,17 @@ public class FilePersistor implements Persistor {
     }
 
     private void openLogFileAppend() throws IOException {
-        Log.i(LOG_TAG, "Opening Log File to Append: " + logFile);
+        log.info("Opening Log File to Append: " + logFile);
         fileWriter = new BufferedWriter(new FileWriter(logFile, true));
     }
 
     private void openLogFileOverwrite() throws IOException {
-        Log.i(LOG_TAG, "Overwrining Log File: " + logFile);
+        log.info("Overwrining Log File: " + logFile);
         fileWriter = new BufferedWriter(new FileWriter(logFile, false));
     }
 
     private void closeLogFile() throws IOException {
-        Log.i(LOG_TAG, "Closing Log File");
+        log.info("Closing Log File");
 
         if (fileWriter == null) return;
 

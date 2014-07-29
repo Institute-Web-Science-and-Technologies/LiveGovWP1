@@ -2,14 +2,13 @@ package eu.liveandgov.wp1.sensor_collector.tests.utils;
 
 import junit.framework.Assert;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import eu.liveandgov.wp1.pipeline.Consumer;
 
-import static eu.liveandgov.wp1.sensor_collector.tests.utils.StringHelper.*;
+import static eu.liveandgov.wp1.sensor_collector.tests.utils.StringHelper.pl;
 
 /**
  * Created by lukashaertel on 13.01.14.

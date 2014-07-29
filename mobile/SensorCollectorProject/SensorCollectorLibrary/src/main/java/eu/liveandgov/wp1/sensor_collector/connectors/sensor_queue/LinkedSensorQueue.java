@@ -1,8 +1,6 @@
 package eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue;
 
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import eu.liveandgov.wp1.data.Item;

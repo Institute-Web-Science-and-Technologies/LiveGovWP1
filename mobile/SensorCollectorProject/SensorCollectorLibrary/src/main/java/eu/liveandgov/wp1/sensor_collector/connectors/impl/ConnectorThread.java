@@ -1,18 +1,13 @@
 package eu.liveandgov.wp1.sensor_collector.connectors.impl;
 
-import android.os.Build;
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.apache.log4j.Logger;
 
 import eu.liveandgov.wp1.data.Diagnostics;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.MultiProducer;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
+import eu.liveandgov.wp1.sensor_collector.logging.LP;
 import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
@@ -22,13 +17,13 @@ import eu.liveandgov.wp1.util.LocalBuilder;
  * Created by hartmann on 9/15/13.
  */
 public class ConnectorThread extends MultiProducer<Item> implements Runnable, Monitorable {
+    private final Logger log = LP.get();
+
     /**
      * This constant specifies how many items are produced without diagnosing the pipe times,
      * specify -1 to disable diagnosis
      */
     private static final int DIAG_EVERY_NTH = 256;
-
-    private static final String LOG_TAG = "CT";
 
     private final SensorQueue sensorQueue;
     private final Thread thread;
@@ -58,7 +53,7 @@ public class ConnectorThread extends MultiProducer<Item> implements Runnable, Mo
                 messageCount++;
 
                 // Print it to the diagnostics
-                Log.d(LOG_TAG, this + " diagnostics: " + diag);
+                log.debug(this + " diagnostics: " + diag);
             }
         } else {
             // Else, just loop

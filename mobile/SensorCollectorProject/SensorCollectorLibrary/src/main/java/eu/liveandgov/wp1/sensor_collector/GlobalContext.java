@@ -2,24 +2,20 @@ package eu.liveandgov.wp1.sensor_collector;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
-import android.util.Log;
+
+import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Date;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
+import eu.liveandgov.wp1.sensor_collector.logging.LP;
 
 import static junit.framework.Assert.assertNotNull;
 
@@ -29,7 +25,10 @@ import static junit.framework.Assert.assertNotNull;
  * Created by hartmann on 9/29/13.
  */
 public class GlobalContext {
-    private static final String LOG_TAG = "GCX";
+    /**
+     * Acquire a logger for domain service and for item global context
+     */
+    private static final Logger log = LP.get();
 
     public static ServiceSensorControl context;
 
@@ -81,13 +80,13 @@ public class GlobalContext {
 
     public static File getFileRoot() {
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            Log.d(LOG_TAG, "Extenal storage available");
+            log.debug("Extenal storage available");
             return Environment.getExternalStorageDirectory();
         }
 
         assertNotNull(context);
 
-        Log.d(LOG_TAG, "Extenal storage not available");
+        log.debug("Extenal storage not available");
         return context.getFilesDir();
     }
 

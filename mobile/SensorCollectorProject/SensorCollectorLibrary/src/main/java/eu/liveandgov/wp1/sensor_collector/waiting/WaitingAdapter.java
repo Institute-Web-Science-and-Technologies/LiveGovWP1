@@ -1,17 +1,10 @@
 package eu.liveandgov.wp1.sensor_collector.waiting;
 
-import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.impl.Proximity;
-import eu.liveandgov.wp1.data.impl.Waiting;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.impl.ClassFilter;
-import eu.liveandgov.wp1.pipeline.impl.DeSerializer;
-import eu.liveandgov.wp1.pipeline.impl.Serializer;
-import eu.liveandgov.wp1.pipeline.impl.StartsWith;
 import eu.liveandgov.wp1.sensor_collector.connectors.impl.SensorEmitter;
-import eu.liveandgov.wp1.serialization.impl.ProximitySerialization;
-import eu.liveandgov.wp1.serialization.impl.WaitingSerialization;
 import eu.liveandgov.wp1.waiting.WaitingPipeline;
 
 /**
