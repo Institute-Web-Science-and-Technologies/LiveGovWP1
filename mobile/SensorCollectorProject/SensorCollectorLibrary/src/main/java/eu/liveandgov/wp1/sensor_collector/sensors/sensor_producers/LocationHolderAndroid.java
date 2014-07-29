@@ -41,8 +41,10 @@ public class LocationHolderAndroid extends LocationHolder {
         c.setSpeedAccuracy(Criteria.ACCURACY_HIGH);
         c.setVerticalAccuracy(Criteria.ACCURACY_HIGH);
 
-        GlobalContext.getLocationManager().requestSingleUpdate(c, locationEndpoint, looper);
-        GlobalContext.getLocationManager().requestLocationUpdates(SensorCollectionOptions.GPS_DELAY_MS, 0, c, locationEndpoint, looper);
+        String p = GlobalContext.getLocationManager().getBestProvider(c, false);
+
+        GlobalContext.getLocationManager().requestSingleUpdate(p, locationEndpoint, looper);
+        GlobalContext.getLocationManager().requestLocationUpdates(p, SensorCollectionOptions.GPS_DELAY_MS, 0, locationEndpoint, looper);
     }
 
     @Override
@@ -61,7 +63,7 @@ public class LocationHolderAndroid extends LocationHolder {
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-           log.debug("Status changed: " + status);
+            log.debug("Status changed: " + status);
         }
 
         @Override
