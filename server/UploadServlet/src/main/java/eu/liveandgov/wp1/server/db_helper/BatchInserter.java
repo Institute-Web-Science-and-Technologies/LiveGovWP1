@@ -25,7 +25,7 @@ public class BatchInserter {
 
     private static PostgresqlDatabase db;
 
-    private Map<String, AbstractInserter> inserter = new HashMap<String, AbstractInserter>();
+    private Map<String, AbstractInserter<?>> inserter = new HashMap<String, AbstractInserter<?>>();
 
     public static final String VALUE_STOP_RECORDING = "STOP_RECORDING";
     public static final String VALUE_START_RECORDING = "START_RECORDING";
@@ -74,9 +74,9 @@ public class BatchInserter {
 
         BatchInserter batchInsert = new BatchInserter(db);
 
-        Log.debug("BatchInserterStarted.");
+        Log.debug("============= Batch inserter started =============");
 
-        ParsingState state = ParsingState.INIT;
+        //ParsingState state = ParsingState.INIT;
         int rowCount = 0;
 
         String line = "";
@@ -110,13 +110,13 @@ public class BatchInserter {
 
                 if (isStartRecording(SVO)) {
                     generateNewTripId = true;
-                    state = ParsingState.RUNNING;
+                    //state = ParsingState.RUNNING;
                     continue; // do not insert "STOP_RECORDING" tag
                 }
 
                 if (isStopRecording(SVO)) {
                     setStopTime(tripId, SVO.getTimestamp());
-                    state = ParsingState.STOPPED;
+                    //state = ParsingState.STOPPED;
                     continue; // do not insert "STOP_RECORDING" tag
                 }
 
@@ -146,23 +146,20 @@ public class BatchInserter {
                 // DO INSERT
                 batchInsert.add(SVO, tripId);
 
-                if (++rowCount % 10000 == 0) batchInsert.executeBatch();
-
-            }
-//            catch (ParseException e) {
-//                Log.error("Error parsing line: " + line); // e not attached not to show stack trace.
-//                errorCount++;
-//            }
-            catch (SQLException e) {
+                if (++rowCount % 10000 == 0) {
+                    Log.debug("Executing batch after 10k rows");
+                    batchInsert.executeBatch();
+                }
+            } catch (SQLException e) {
                 Log.error("Error writing to db: " + line, e);
                 errorCount++;
             } catch (NullPointerException e) {
                 Log.error("Something odd went wrong:" + line, e);
-                errorCount++;
                 break;
             }
         }
 
+        Log.debug("Executing batch after loop");
         batchInsert.executeBatch();
         batchInsert.close();
 
@@ -205,27 +202,38 @@ public class BatchInserter {
     }
 
     private static boolean isStartRecording(Item svo) {
-        if (svo.getType() != DataCommons.TYPE_TAG) return false;
-        Log.debug("Checking for start recording on: " + svo);
-        Tag tsv = (Tag) svo;
-        return VALUE_START_RECORDING.equals(tsv.tag);
+        try {
+            if (!DataCommons.TYPE_TAG.equals(svo.getType())) return false;
+            Log.debug("Checking for start recording on: " + svo);
+            Tag tsv = (Tag) svo;
+            return VALUE_START_RECORDING.equals(tsv.tag);
+        } catch (Throwable t) {
+            Log.debug("Odd exception", t);
+            return false;
+        }
     }
 
     private static boolean isStopRecording(Item svo) {
-        if (svo.getType() != DataCommons.TYPE_TAG) return false;
-        Log.debug("Checking for stop recording on: " + svo);
-        Tag tsv = (Tag) svo;
-        return VALUE_STOP_RECORDING.equals(tsv.tag);
+        try {
+            if (!DataCommons.TYPE_TAG.equals(svo.getType())) return false;
+            Log.debug("Checking for stop recording on: " + svo);
+            Tag tsv = (Tag) svo;
+            return VALUE_STOP_RECORDING.equals(tsv.tag);
+        } catch (Throwable t) {
+            Log.debug("Odd exception", t);
+            return false;
+        }
     }
 
     public void add(Item svo, int tripId) throws SQLException {
         String type = svo.getType();
 
-        if (inserter.keySet().contains(type)) {
-            inserter.get(type).batchInsert(svo, tripId);
-        } else {
+        AbstractInserter x = inserter.get(type);
+
+        if (x != null)
+            x.batchInsert(svo, tripId);
+        else
             Log.warn("Sensortype " + type + " not supported, yet. Found in " + svo.toSerializedForm());
-        }
 
     }
 

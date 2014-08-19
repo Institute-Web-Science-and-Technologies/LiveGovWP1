@@ -30,7 +30,7 @@ import static java.lang.System.currentTimeMillis;
  * or
  * <pre>{@code cat test-upload-data.txt | curl localhost:8080/server/upload -F "upfile=@-"}</pre>
  * also a python test script is provided in the /scripts/ folder.
- *
+ * <p/>
  * User: hartmann
  * Date: 10/19/13
  */
@@ -43,7 +43,7 @@ public class UploadServlet extends HttpServlet {
         try {
             SimpleLayout layout = new SimpleLayout();
             FileAppender appender = null;
-            appender = new FileAppender(layout,"/var/log/UploadServlet.log",true);
+            appender = new FileAppender(layout, "/var/log/UploadServlet.log", true);
             Logger.getRootLogger().addAppender(appender);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -96,7 +96,7 @@ public class UploadServlet extends HttpServlet {
         try {
             bytesWritten = writeStreamToFile(fileStream, outFile);
         } catch (IOException e) {
-            Log.error("Error writing output file:",e);
+            Log.error("Error writing output file:", e);
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
@@ -106,47 +106,51 @@ public class UploadServlet extends HttpServlet {
         resp.getWriter().write(
                 // Output will be parsed by test script.
                 "Status:Success.\n" +
-                "Destination:"+ outFile.getAbsolutePath() + "\n" +
-                "Bytes written:" + bytesWritten
+                        "Destination:" + outFile.getAbsolutePath() + "\n" +
+                        "Bytes written:" + bytesWritten
         );
         resp.setStatus(HttpServletResponse.SC_ACCEPTED);
 
 
         // Insert directly to database
         BufferedReader reader;
-        if (! isCompressed(req)) {
+        if (!isCompressed(req)) {
             Log.info("Opening Text Reader");
             reader = new BufferedReader(new FileReader(outFile));
         } else {
             Log.info("Opening GZIP Reader");
-            reader = new BufferedReader(new InputStreamReader(new GZIPInputStream( new FileInputStream(outFile)), "UTF8"));
+            reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(outFile)), "UTF8"));
         }
 
         Log.info("Writing file into database.");
         try {
             BatchInserter.batchInsertFile(new PostgresqlDatabase(), reader);
         } catch (SQLException e) {
-            Log.info("Error writing db.",e);
+            Log.info("Error writing db.", e);
             e.printStackTrace();
         } catch (IOException e) {
             Log.info("Error reading file" + outFile.getAbsolutePath());
             e.printStackTrace();
         }
+        finally
+        {
+            reader.close();
+        }
     }
 
     /**
-     *  Writes contents of inputStream to a file.
-     *  Uses Apache IOUtils for copy.
-     *  @see <a href="http://stackoverflow.com/questions/43157/easy-way-to-write-contents-of-a-java-inputstream-to-an-outputstream/43168#43168">StackOverflow</a>
-     *  for a discussion.
+     * Writes contents of inputStream to a file.
+     * Uses Apache IOUtils for copy.
      *
-     * @param inputStream   stream to read
-     * @param file          file to write
-     * @throws IOException  if writing of file fails
+     * @param inputStream stream to read
+     * @param file        file to write
      * @return the number of bytes copied, or -1 if > Integer.MAX_VALUE
+     * @throws IOException if writing of file fails
+     * @see <a href="http://stackoverflow.com/questions/43157/easy-way-to-write-contents-of-a-java-inputstream-to-an-outputstream/43168#43168">StackOverflow</a>
+     * for a discussion.
      */
     private int writeStreamToFile(InputStream inputStream, File file) throws IOException {
-        assert(inputStream != null): "inputStream must be non-null";
+        assert (inputStream != null) : "inputStream must be non-null";
 
         OutputStream outputStream = new FileOutputStream(file);
         return IOUtils.copy(inputStream, outputStream);
@@ -155,7 +159,7 @@ public class UploadServlet extends HttpServlet {
     /**
      * Generate a "unique" file name for the given request.
      *
-     * @param req       HttpRequest
+     * @param req HttpRequest
      * @return fileName
      */
     private String generateFileName(HttpServletRequest req) {
@@ -170,11 +174,10 @@ public class UploadServlet extends HttpServlet {
     /**
      * Get contents of fieldName as InputStream from POST request
      *
-     * @see <a href="http://commons.apache.org/proper/commons-fileupload/streaming.html">the docs.</a>
-     *
-     * @param req               HttpRequest Containing a Form Request
-     * @param fieldName         name of field to isolate
+     * @param req       HttpRequest Containing a Form Request
+     * @param fieldName name of field to isolate
      * @return formFieldStream
+     * @see <a href="http://commons.apache.org/proper/commons-fileupload/streaming.html">the docs.</a>
      */
     private InputStream getStreamFromField(HttpServletRequest req, String fieldName) {
         try {
