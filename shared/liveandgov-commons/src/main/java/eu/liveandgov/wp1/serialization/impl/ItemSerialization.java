@@ -72,7 +72,6 @@ public final class ItemSerialization implements Serialization<Item> {
             return VelocitySerialization.VELOCITY_SERIALIZATION.serialize((Velocity) item);
         }
 
-        throw new IllegalArgumentException();
     }
 
     @Override
