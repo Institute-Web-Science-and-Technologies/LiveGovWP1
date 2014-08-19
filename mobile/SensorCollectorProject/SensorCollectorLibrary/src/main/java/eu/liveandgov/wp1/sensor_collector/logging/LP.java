@@ -21,10 +21,6 @@ public class LP {
     public static final int TAG_LENGTH = 3;
 
     public static final int NAME_LENGTH = 4;
-    /**
-     * <p>True if the logger has been configured</p>
-     */
-    private static boolean configured = false;
 
     /**
      * Uses the class loader to resolve topmost stack trace class below the caller
