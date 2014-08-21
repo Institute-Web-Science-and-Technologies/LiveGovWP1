@@ -15,13 +15,13 @@ import org.apache.log4j.Logger;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 
 /**
  * Created by lukashaertel on 04.12.13.
  */
 public class LocationHolderAndroid extends LocationHolder {
-    private final Logger log = LP.get();
+    private final Logger log = LogPrincipal.get();
 
     private final Looper looper;
 

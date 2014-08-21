@@ -25,13 +25,13 @@ import eu.liveandgov.wp1.data.impl.Bluetooth;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 
 /**
  * Created by lukashaertel on 30.11.13.
  */
 public class BluetoothHolder implements SensorHolder {
-    private final Logger log = LP.get();
+    private final Logger log = LogPrincipal.get();
     /**
      * This TreeMap maps the integer representing the device major class to its name.
      */

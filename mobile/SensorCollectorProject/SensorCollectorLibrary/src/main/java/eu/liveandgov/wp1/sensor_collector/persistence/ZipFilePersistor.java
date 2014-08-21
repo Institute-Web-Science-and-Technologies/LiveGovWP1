@@ -16,7 +16,7 @@ import java.util.zip.GZIPOutputStream;
 
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
@@ -25,7 +25,7 @@ import eu.liveandgov.wp1.util.LocalBuilder;
  * Created by hartmann on 9/20/13.
  */
 public class ZipFilePersistor implements Persistor {
-    private final Logger log = LP.get();
+    private final Logger log = LogPrincipal.get();
 
     public static final String FILENAME = "sensor.log.gz";
 

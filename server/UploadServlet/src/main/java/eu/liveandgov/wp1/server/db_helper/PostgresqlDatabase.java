@@ -3,9 +3,11 @@
  */
 package eu.liveandgov.wp1.server.db_helper;
 
+import org.postgresql.Driver;
+
 import java.sql.*;
 
-import org.postgresql.Driver;
+import static junit.framework.Assert.assertNotNull;
 
 /**
  * @author chrisschaefer
@@ -63,12 +65,10 @@ public class PostgresqlDatabase {
 		try {
 			connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/"+ DB_NAME +"?autoReconnect=true", DB_USER, DB_PASS);
 
-			stmtLink = connection.createStatement();
+            stmtLink = connection.createStatement();
 
             String createTripTable = "CREATE TABLE IF NOT EXISTS trip (trip_id SERIAL, user_id VARCHAR(36), start_ts BIGINT, stop_ts BIGINT, name VARCHAR(255));";
             stmtLink.execute(createTripTable);
-
-            // TODO: Create Sensor Tables
 
 		} catch (SQLException e) {
 			throw new IllegalArgumentException(e.getMessage());
@@ -82,6 +82,28 @@ public class PostgresqlDatabase {
 			}
 		}
 	}
+
+    public void setSecret(String user, String secret){
+        assertNotNull(connection);
+
+        try {
+            connection.createStatement().execute("CREATE TABLE IF NOT EXISTS auth (user_id VARCHAR(36) PRIMARY KEY, secret VARCHAR(255));");
+
+            PreparedStatement q = connection.prepareStatement("DELETE FROM auth WHERE user_id = ?;");
+            q.setString(1,user);
+            q.execute();
+
+            PreparedStatement p = connection.prepareStatement("INSERT INTO auth VALUES (? , ?);");
+            p.setString(1, user);
+            p.setString(2, secret);
+            p.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
 	protected void finalize() {
 		if (connection != null)

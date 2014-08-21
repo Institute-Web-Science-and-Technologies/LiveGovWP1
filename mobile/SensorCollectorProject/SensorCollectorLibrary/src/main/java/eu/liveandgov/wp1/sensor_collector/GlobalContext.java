@@ -15,7 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 
 import static junit.framework.Assert.assertNotNull;
 
@@ -28,7 +28,7 @@ public class GlobalContext {
     /**
      * Acquire a logger for domain service and for item global context
      */
-    private static final Logger log = LP.get();
+    private static final Logger log = LogPrincipal.get();
 
     public static ServiceSensorControl context;
 
@@ -64,6 +64,11 @@ public class GlobalContext {
     public static String getUserId() {
         assertNotNull(context);
         return context.userId;
+    }
+
+    public static String getUserSecret() {
+        assertNotNull(context);
+        return context.userSecret;
     }
 
     public static SensorQueue getSensorQueue() {

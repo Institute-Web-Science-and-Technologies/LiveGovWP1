@@ -6,13 +6,13 @@ import java.io.File;
 import java.io.IOException;
 
 import eu.liveandgov.wp1.data.Item;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 
 /**
  * Created by hartmann on 11/12/13.
  */
 public class FilePublisher extends FilePersistor {
-    private final Logger log = LP.get();
+    private final Logger log = LogPrincipal.get();
 
     public FilePublisher(File logFile) {
         super(logFile);

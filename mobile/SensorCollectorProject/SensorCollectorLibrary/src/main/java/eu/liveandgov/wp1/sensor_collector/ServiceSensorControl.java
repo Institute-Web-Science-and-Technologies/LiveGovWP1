@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -31,7 +32,7 @@ import eu.liveandgov.wp1.sensor_collector.connectors.impl.ConnectorThread;
 import eu.liveandgov.wp1.sensor_collector.connectors.impl.GpsCache;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.LinkedSensorQueue;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.monitor.MonitorThread;
 import eu.liveandgov.wp1.sensor_collector.persistence.FilePersistor;
 import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
@@ -49,14 +50,16 @@ import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionO
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
 
 public class ServiceSensorControl extends Service {
-    private final Logger log = LP.get();
+    private final Logger log = LogPrincipal.get();
 
     // CONSTANTS
     public static final String SENSOR_FILENAME = "sensor.ssf";
     public static final String STAGE_FILENAME = "sensor.stage.ssf";
 
-    private static final String SHARED_PREFS_NAME = "SensorCollectorPrefs";
+    private static final String SHARED_PREFS_NAME = "SensorCollectorPreferences";
     private static final String PREF_ID = "userid";
+    private static final String PREF_SECRET = "secret";
+
 
     // MAIN EXECUTION SERVICE
     public final ScheduledThreadPoolExecutor executorService;
@@ -66,6 +69,7 @@ public class ServiceSensorControl extends Service {
     public boolean isStreaming = false;
     public boolean isHAR = false;
     public String userId = ""; // will be set onCreate
+
 
     // COMMUNICATION CHANNEL
     public SensorQueue sensorQueue = new LinkedSensorQueue();
@@ -113,7 +117,7 @@ public class ServiceSensorControl extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        LP.configure();
+        LogPrincipal.configure();
 
         log.info("Creating ServiceSensorControl");
 
@@ -302,16 +306,21 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doSetId(String id) {
-        log.debug("Set id to:" + id);
+        log.debug("Setting userId to:" + id);
+
+        userId = id;
+
+        String userSecret = RandomStringUtils.randomAlphanumeric(5);
+        log.debug("Created new user Secret: " + userSecret);
 
         // Update Shared Preferences
         SharedPreferences settings = getSharedPreferences(SHARED_PREFS_NAME, 0);
         if (settings == null) throw new IllegalStateException("Failed to load SharedPreferences");
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(PREF_ID, id);
-        editor.commit();
+        editor.putString(PREF_SECRET, userSecret);
 
-        userId = id;
+        editor.commit();
 
         doAnnotate("USER_ID SET TO: " + id);
     }
@@ -405,6 +414,7 @@ public class ServiceSensorControl extends Service {
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(SHARED_PREFS_NAME, 0);
         if (settings == null) throw new IllegalStateException("Failed to load SharedPreferences");
+
         userId = settings.getString(PREF_ID, androidId); // use androidId as default;
     }
 }

@@ -10,7 +10,7 @@ import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.impl.Filter;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 
 ;
 
@@ -18,7 +18,7 @@ import eu.liveandgov.wp1.sensor_collector.logging.LP;
  * Created by hartmann on 11/12/13.
  */
 public class PublicationPipeline implements Consumer<Item> {
-    private final Logger log = LP.get();
+    private final Logger log = LogPrincipal.get();
 
     public static final String PUBLISH_FILENAME = "published.ssf";
 

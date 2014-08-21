@@ -15,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.sensors.sensor_producers.ActivityHolder;
 import eu.liveandgov.wp1.sensor_collector.sensors.sensor_producers.BluetoothHolder;
 import eu.liveandgov.wp1.sensor_collector.sensors.sensor_producers.LocationHolderAndroid;
@@ -39,7 +39,7 @@ import static junit.framework.Assert.assertNotNull;
  * Created by hartmann on 9/22/13.
  */
 public class SensorThread implements Runnable {
-    private final Logger log = LP.get();
+    private final Logger log = LogPrincipal.get();
 
     private Set<SensorHolder> activeSensors = new CopyOnWriteArraySet<SensorHolder>();
     private Handler sensorHandler;

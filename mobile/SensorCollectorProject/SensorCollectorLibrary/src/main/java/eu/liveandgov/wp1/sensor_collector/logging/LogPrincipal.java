@@ -3,7 +3,6 @@ package eu.liveandgov.wp1.sensor_collector.logging;
 import android.os.Environment;
 
 import com.google.common.base.CharMatcher;
-import com.google.common.base.Strings;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -17,7 +16,7 @@ import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
  * <p>Log principal; helper for log configuration and acquisition</p>
  * Created by lukashaertel on 29.07.2014.
  */
-public class LP {
+public class LogPrincipal {
     public static final int TAG_LENGTH = 3;
 
     public static final int NAME_LENGTH = 4;
@@ -33,7 +32,7 @@ public class LP {
 
             for (int i = 2; i < st.length; i++) {
                 Class<?> p = Class.forName(Thread.currentThread().getStackTrace()[i].getClassName());
-                if (p != LP.class)
+                if (p != LogPrincipal.class)
                     return get(p);
             }
             throw new ClassNotFoundException("No containing class could be found to associate");

@@ -37,4 +37,20 @@
         android:inputType="textUri"
         android:hint="@string/resets_to_default" />
 
+    <TextView
+        android:id="@+id/user_secret_label"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:text="@string/user_secret"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/userSecret"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:inputType="textUri"
+        android:editable="false" />
+
 </LinearLayout>

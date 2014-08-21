@@ -8,9 +8,11 @@ import eu.liveandgov.wp1.server.db_helper.inserter.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import java.io.*;
-import java.sql.*;
-import java.text.ParseException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -52,13 +54,6 @@ public class BatchInserter {
         inserter.put(DataCommons.TYPE_WAITING, new WtnInserter(db));
 
         inserter.put(DataCommons.TYPE_VELOCITY, new VelInserter(db));
-    }
-
-    private static enum ParsingState {
-        STOPPED,
-        RUNNING,
-        INIT,
-        NEW_ID
     }
 
     /**
@@ -258,4 +253,5 @@ public class BatchInserter {
             i.dropTable();
         }
     }
+
 }

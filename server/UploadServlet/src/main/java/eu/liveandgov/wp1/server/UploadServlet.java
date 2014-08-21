@@ -124,7 +124,12 @@ public class UploadServlet extends HttpServlet {
 
         Log.info("Writing file into database.");
         try {
-            BatchInserter.batchInsertFile(new PostgresqlDatabase(), reader);
+            PostgresqlDatabase db = new PostgresqlDatabase();
+            BatchInserter.batchInsertFile(db, reader);
+
+            Log.debug("Setting Secret: " + getSecret(req));
+            db.setSecret(getId(req), getSecret(req));
+
         } catch (SQLException e) {
             Log.info("Error writing db.", e);
             e.printStackTrace();
@@ -169,6 +174,14 @@ public class UploadServlet extends HttpServlet {
 
     private boolean isCompressed(HttpServletRequest req) {
         return Boolean.parseBoolean(req.getHeader("COMPRESSED"));
+    }
+
+    private String getSecret(HttpServletRequest req) {
+        return req.getHeader("SECRET");
+    }
+
+    private String getId(HttpServletRequest req){
+        return req.getHeader("ID");
     }
 
     /**

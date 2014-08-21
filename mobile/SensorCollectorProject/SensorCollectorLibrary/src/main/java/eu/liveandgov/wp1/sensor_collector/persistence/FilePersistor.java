@@ -8,7 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import eu.liveandgov.wp1.data.Item;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
@@ -17,7 +17,7 @@ import eu.liveandgov.wp1.util.LocalBuilder;
  * Created by hartmann on 9/20/13.
  */
 public class FilePersistor implements Persistor {
-    private final Logger log = LP.get();
+    private final Logger log = LogPrincipal.get();
 
     private File logFile;
     protected BufferedWriter fileWriter;

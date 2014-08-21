@@ -33,6 +33,19 @@ public class ActivitySettings extends Activity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        final TextView userSecret = (TextView) findViewById(R.id.userSecret);
+
+        SharedPreferences settings = getSharedPreferences(getString(R.string.spn), 0);
+
+        final String userSecretValue = settings.getString("secret", "n.a.");
+
+        userSecret.setText(userSecretValue);
+    }
+
+    @Override
     protected void onPause() {
 
         // Open settings for editing

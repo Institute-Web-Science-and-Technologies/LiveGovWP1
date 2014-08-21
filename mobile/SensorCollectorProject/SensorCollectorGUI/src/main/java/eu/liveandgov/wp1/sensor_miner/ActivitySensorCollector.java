@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,15 +19,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import org.apache.log4j.Logger;
-
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
 import eu.liveandgov.wp1.sensor_miner.configuration.SensorMinerOptions;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.FIELD_MESSAGE;
@@ -46,8 +42,7 @@ import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_ACTIVITY;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_ANNOTATION;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_HAR;
-import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_ID;
-import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_SAMPLES_STORED;
+import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_STATUS_ID;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_SAMPLING;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_TRANSFERRING;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.RECORDING_DISABLE;
@@ -220,7 +215,7 @@ public class ActivitySensorCollector extends Activity {
     public void onIdButtonClick(View view) {
         Intent intent = new Intent(this, ServiceSensorControl.class);
         intent.setAction(ACTION_SET_ID);
-        intent.putExtra(FIELD_ID, idText.getText().toString());
+        intent.putExtra(FIELD_STATUS_ID, idText.getText().toString());
         startService(intent);
     }
 

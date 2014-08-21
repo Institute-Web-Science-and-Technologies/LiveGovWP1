@@ -1,0 +1,3 @@
+[submodule "server/NodeInserter"]
+	path = server/NodeInserter
+	url = git@github.com:rwilhelm/lg-insert.git

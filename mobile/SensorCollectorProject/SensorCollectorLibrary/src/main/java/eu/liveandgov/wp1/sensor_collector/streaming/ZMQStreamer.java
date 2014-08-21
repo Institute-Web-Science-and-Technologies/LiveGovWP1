@@ -12,7 +12,7 @@ import eu.liveandgov.wp1.pipeline.impl.ZMQClient;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.R;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
@@ -22,7 +22,7 @@ import eu.liveandgov.wp1.util.LocalBuilder;
  * Created by hartmann on 10/2/13.
  */
 public class ZMQStreamer extends ZMQClient implements Monitorable {
-    private final Logger log = LP.get();
+    private final Logger log = LogPrincipal.get();
 
     /**
      * Pull interval can be slow because we don't expect responses

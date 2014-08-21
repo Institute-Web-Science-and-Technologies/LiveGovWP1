@@ -15,4 +15,6 @@
     <string name="upload_address">Upload address</string>
     <string name="streaming_port">Streaming Port</string>
     <string name="resets_to_default">Resets to default</string>
+    <string name="user_secret">User Secret</string>
+
 </resources>

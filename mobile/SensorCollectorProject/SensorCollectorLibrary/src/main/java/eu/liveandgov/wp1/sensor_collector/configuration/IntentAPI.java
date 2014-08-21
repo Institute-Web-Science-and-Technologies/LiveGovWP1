@@ -19,7 +19,7 @@ public class IntentAPI {
     public static final String FIELD_TRANSFERRING   = "transferring";   // true if transfering samples
     public static final String FIELD_SAMPLES_STORED = "samples_stored"; // true if samples are left for transfer
     public static final String FIELD_HAR            = "har";            // true if HAR is active
-    public static final String FIELD_ID             = "id";             // user ID set via Intent
+    public static final String FIELD_STATUS_ID      = "id";             // user ID set via Intent
 
     /**
      * Enable/Disable the collection of sensor samples.

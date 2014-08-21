@@ -19,7 +19,7 @@ import java.io.IOException;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.R;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
@@ -33,7 +33,7 @@ import eu.liveandgov.wp1.util.LocalBuilder;
  * Created by hartmann on 8/30/13.
  */
 public class TransferThreadPost implements Runnable, TransferManager {
-    private final Logger log = LP.get();
+    private final Logger log = LogPrincipal.get();
 
     private Thread thread;
 
@@ -95,7 +95,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
         try {
 
             // TODO: Check methods if with success return should rather throw an exception in
-            // order to make calleing more uniform.
+            // order to make calling more uniform.
 
 
             // get stage file
@@ -166,6 +166,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
             httppost.addHeader("COMPRESSED", String.valueOf(compressed));
             httppost.addHeader("CHECKSUM", String.valueOf(file.length()));
             httppost.addHeader("ID", GlobalContext.getUserId());
+            httppost.addHeader("SECRET", GlobalContext.getUserSecret());
 
             HttpResponse response = httpclient.execute(httppost);
             log.info("Response of upload: " + EntityUtils.toString(response.getEntity()));

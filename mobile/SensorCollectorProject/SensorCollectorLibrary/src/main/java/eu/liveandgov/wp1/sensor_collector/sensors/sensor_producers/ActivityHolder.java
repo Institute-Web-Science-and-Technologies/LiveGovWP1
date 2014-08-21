@@ -12,14 +12,14 @@ import com.google.android.gms.location.ActivityRecognitionClient;
 import org.apache.log4j.Logger;
 
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 
 /**
  * Created by cehlen on 9/26/13.
  */
 public class ActivityHolder implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener, SensorHolder {
 
-    private final Logger log = LP.get();
+    private final Logger log = LogPrincipal.get();
     public static final int DETECTION_INTERVAL_SECONDS = 20;
 
     public static final int MILLISECONDS_PER_SECOND = 1000;

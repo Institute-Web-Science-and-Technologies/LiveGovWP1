@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 
 import static junit.framework.Assert.assertNotNull;
 
@@ -35,7 +35,7 @@ import static junit.framework.Assert.assertNotNull;
 public class LocationHolderPlayServices extends LocationHolder implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
-    private final Logger log = LP.get();
+    private final Logger log = LogPrincipal.get();
     private LocationClient locationClient;
     private LocationRequest locationRequest;
     private Looper myLooper;

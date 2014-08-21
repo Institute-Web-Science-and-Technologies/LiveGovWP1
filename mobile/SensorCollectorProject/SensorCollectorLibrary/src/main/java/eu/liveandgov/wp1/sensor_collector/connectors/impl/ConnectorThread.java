@@ -7,7 +7,7 @@ import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.MultiProducer;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
@@ -17,7 +17,7 @@ import eu.liveandgov.wp1.util.LocalBuilder;
  * Created by hartmann on 9/15/13.
  */
 public class ConnectorThread extends MultiProducer<Item> implements Runnable, Monitorable {
-    private final Logger log = LP.get();
+    private final Logger log = LogPrincipal.get();
 
     /**
      * This constant specifies how many items are produced without diagnosing the pipe times,
