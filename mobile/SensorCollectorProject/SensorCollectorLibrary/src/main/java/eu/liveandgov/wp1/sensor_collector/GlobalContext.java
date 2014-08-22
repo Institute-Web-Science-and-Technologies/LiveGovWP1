@@ -66,11 +66,6 @@ public class GlobalContext {
         return context.userId;
     }
 
-    public static String getUserSecret() {
-        assertNotNull(context);
-        return context.userSecret;
-    }
-
     public static SensorQueue getSensorQueue() {
         assertNotNull(context);
         return context.sensorQueue;

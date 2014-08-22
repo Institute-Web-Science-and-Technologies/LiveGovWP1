@@ -5,4 +5,5 @@
     <string name="spn">SensorCollectorPreferences</string>
     <string name="prf_upload_address">upload_address</string>
     <string name="prf_streaming_address">streaming_address</string>
+    <string name="prf_secret">user_secret</string>
 </resources>

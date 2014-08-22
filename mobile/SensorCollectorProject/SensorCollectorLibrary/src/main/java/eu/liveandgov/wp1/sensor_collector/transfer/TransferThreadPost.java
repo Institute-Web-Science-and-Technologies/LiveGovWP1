@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.R;
+import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
@@ -166,7 +167,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
             httppost.addHeader("COMPRESSED", String.valueOf(compressed));
             httppost.addHeader("CHECKSUM", String.valueOf(file.length()));
             httppost.addHeader("ID", GlobalContext.getUserId());
-            httppost.addHeader("SECRET", GlobalContext.getUserSecret());
+            httppost.addHeader("SECRET", getSecret());
 
             HttpResponse response = httpclient.execute(httppost);
             log.info("Response of upload: " + EntityUtils.toString(response.getEntity()));
@@ -191,6 +192,12 @@ public class TransferThreadPost implements Runnable, TransferManager {
         SharedPreferences settings = GlobalContext.context.getSharedPreferences(GlobalContext.context.getString(R.string.spn), 0);
 
         return settings.getString(GlobalContext.context.getString(R.string.prf_upload_address), SensorCollectionOptions.DEFAULT_UPLOAD);
+    }
+
+    private String getSecret() {
+        SharedPreferences settings = GlobalContext.context.getSharedPreferences(GlobalContext.context.getString(R.string.spn), 0);
+
+        return settings.getString(GlobalContext.context.getString(R.string.prf_secret),"");
     }
 
     public boolean transferFile(File file) {
