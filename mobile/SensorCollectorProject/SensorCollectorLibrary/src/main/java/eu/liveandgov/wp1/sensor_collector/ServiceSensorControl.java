@@ -1,11 +1,16 @@
 package eu.liveandgov.wp1.sensor_collector;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.log4j.Logger;
@@ -170,12 +175,29 @@ public class ServiceSensorControl extends Service {
         // Setup sensor thread
         SensorThread.setup(sensorQueue);
 
+        final int recordingNotificationId = 1;
+
         // Start Recording once the first consumers connects to connector thread.
         // This should be done once the SensorThread is already running.
         connectorThread.nonEmpty.register(new Callback<Consumer<? super Item>>() {
             @Override
             public void call(Consumer<? super Item> consumer) {
                 log.debug("Start recording sensors");
+
+                // Notification
+                NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+
+                Notification notification = new NotificationCompat.Builder(ServiceSensorControl.this)
+                        .setContentTitle("Sensor miner")
+                        .setContentText("Recording sensor data")
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setLights(0xff0000ff, 900, 900)
+                        .setOngoing(true)
+                        .setProgress(0, 0, true)
+                        .build();
+
+                notificationManager.notify(recordingNotificationId, notification);
+
                 SensorThread.startAllRecording();
             }
         });
@@ -183,6 +205,10 @@ public class ServiceSensorControl extends Service {
             @Override
             public void call(Consumer<? super Item> consumer) {
                 log.debug("Stop recording sensors");
+
+                NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(recordingNotificationId);
+
                 SensorThread.stopAllRecording();
             }
         });
