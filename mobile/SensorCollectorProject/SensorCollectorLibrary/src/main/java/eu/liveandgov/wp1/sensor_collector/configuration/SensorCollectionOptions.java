@@ -3,6 +3,12 @@ package eu.liveandgov.wp1.sensor_collector.configuration;
 import android.hardware.SensorManager;
 import android.os.Build;
 
+import com.google.common.collect.ImmutableMap;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Map;
+
 /**
  * Created by hartmann on 9/26/13.
  */
@@ -10,7 +16,7 @@ public class SensorCollectionOptions {
     public static final String LOGFILE_NAME = "sensorminer";
 
     public static final String DEFAULT_UPLOAD = "http://liveandgov.uni-koblenz.de:8080/UploadServlet/";
-    public static final String DEFAULT_STREAMING ="liveandgov.uni-koblenz.de:5555";
+    public static final String DEFAULT_STREAMING = "liveandgov.uni-koblenz.de:5555";
 
     // SERVICE
     public static final int MAIN_EXECUTOR_CORE_POOL = 3;
@@ -22,13 +28,14 @@ public class SensorCollectionOptions {
 
     // CONNECTIVITY //
     public static final boolean ZIPPED_PERSISTOR = true;
+    public static final boolean INTENT_TRANSFER = true;
     public static final boolean API_EXTENSIONS = true;
 
     // SENSOR RECORDING OPTIONS //
 
     // GPS
     public static final boolean REC_GPS = true;
-    public static final boolean REC_VEL =true;
+    public static final boolean REC_VEL = true;
     public static final int GPS_DELAY_MS = 5000; // delay of gps rescan in milli seconds
 
     // Motion sensors
@@ -63,5 +70,37 @@ public class SensorCollectionOptions {
         public static int ON_GAME = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_GAME : (25 * 1000); // 40Hz
         public static int ON_UI = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_UI : (50 * 1000); // 20Hz
         public static int ON_NORMAL = Build.VERSION.SDK_INT <= 9 ? SensorManager.SENSOR_DELAY_NORMAL : (100 * 1000); // 10Hz
+    }
+
+    /**
+     * Value for the result of {@link #con()}
+     */
+    private static ImmutableMap<String, Object> con = null;
+
+    /**
+     * Gets the static configuration as a map from names to values
+     *
+     * @return Returns an immutable map
+     */
+    public static ImmutableMap<String, Object> con() {
+        // Lazy exit
+        if (con != null)
+            return con;
+
+        try {
+            // Make builder, we don't have double mappings so this is most efficient
+            ImmutableMap.Builder<String, Object> b = ImmutableMap.builder();
+
+            // Iterate all fields, if static, append
+            for (Field f : SensorCollectionOptions.class.getFields())
+                if ((f.getModifiers() & Modifier.STATIC) != 0)
+                    b.put(f.getName(), f.get(null));
+
+            // Store value for con
+            return con = b.build();
+        } catch (IllegalAccessException e) {
+            // Single time stateless exception, should be fixed and therefore not be logged
+            throw new RuntimeException(e);
+        }
     }
 }
