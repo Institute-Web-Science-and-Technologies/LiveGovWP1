@@ -80,7 +80,7 @@ public class ZipFilePersistor implements Persistor {
         putValidLength(0);
 
         if (!suc) {
-            log.error("Renaming failed.");
+            log.error("Renaming failed, tried to rename " + logFile + " to " + stageFile);
             return false;
         }
 
