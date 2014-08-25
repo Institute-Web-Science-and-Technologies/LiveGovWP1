@@ -48,8 +48,6 @@ public class TransferThreadPost implements Runnable, TransferManager {
         thread = new Thread(this);
     }
 
-    ;
-
     @Override
     public void doTransfer() {
         if (thread.isAlive()) {
@@ -197,7 +195,7 @@ public class TransferThreadPost implements Runnable, TransferManager {
     private String getSecret() {
         SharedPreferences settings = GlobalContext.context.getSharedPreferences(GlobalContext.context.getString(R.string.spn), 0);
 
-        return settings.getString(GlobalContext.context.getString(R.string.prf_secret),"");
+        return settings.getString(GlobalContext.context.getString(R.string.prf_secret), "");
     }
 
     public boolean transferFile(File file) {

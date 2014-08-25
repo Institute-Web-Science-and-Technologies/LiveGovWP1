@@ -46,11 +46,13 @@ import eu.liveandgov.wp1.sensor_collector.persistence.ZipFilePersistor;
 import eu.liveandgov.wp1.sensor_collector.pps.PPSAdapter;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorThread;
 import eu.liveandgov.wp1.sensor_collector.streaming.ZMQStreamer;
+import eu.liveandgov.wp1.sensor_collector.transfer.IntentTransfer;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferManager;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferThreadPost;
 import eu.liveandgov.wp1.sensor_collector.waiting.WaitingAdapter;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.API_EXTENSIONS;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.INTENT_TRANSFER;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.MAIN_EXECUTOR_CORE_TIMEOUT;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
 
@@ -63,7 +65,7 @@ public class ServiceSensorControl extends Service {
 
     private static final String SHARED_PREFS_NAME = "SensorCollectorPreferences";
     private static final String PREF_ID = "userid";
-    private static final String PREF_SECRET = "secret";
+    private static final String PREF_SECRET = "user_secret";
 
 
     // MAIN EXECUTION SERVICE
@@ -166,7 +168,9 @@ public class ServiceSensorControl extends Service {
 
         // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
-        transferManager = new TransferThreadPost(persistor, stageFile);
+        transferManager = INTENT_TRANSFER ?
+                new IntentTransfer(persistor, GlobalContext.getFileRoot()) :
+                new TransferThreadPost(persistor, stageFile);
         monitorThread = new MonitorThread();
 
         // Restore user id from shared preferences
@@ -182,10 +186,10 @@ public class ServiceSensorControl extends Service {
         connectorThread.nonEmpty.register(new Callback<Consumer<? super Item>>() {
             @Override
             public void call(Consumer<? super Item> consumer) {
-                log.debug("Start recording sensors");
+                log.debug("Start recording sensors, configuration " + SensorCollectionOptions.con());
 
                 // Notification
-                NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
                 Notification notification = new NotificationCompat.Builder(ServiceSensorControl.this)
                         .setContentTitle("Sensor miner")
@@ -206,7 +210,7 @@ public class ServiceSensorControl extends Service {
             public void call(Consumer<? super Item> consumer) {
                 log.debug("Stop recording sensors");
 
-                NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.cancel(recordingNotificationId);
 
                 SensorThread.stopAllRecording();
