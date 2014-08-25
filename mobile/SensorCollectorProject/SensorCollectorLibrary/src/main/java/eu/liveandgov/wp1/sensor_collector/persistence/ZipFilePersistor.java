@@ -1,21 +1,35 @@
 package eu.liveandgov.wp1.sensor_collector.persistence;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Handler;
+import android.util.Log;
+
+import com.google.common.base.Joiner;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
+import com.google.common.io.LineProcessor;
 
 import org.apache.log4j.Logger;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.nio.channels.FileChannel;
+import java.io.PrintStream;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Scanner;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import eu.liveandgov.wp1.data.Item;
-import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
@@ -61,7 +75,7 @@ public class ZipFilePersistor implements Persistor {
 
     @Override
     public boolean exportSamples(File stageFile) {
-        boolean suc = true;
+        boolean suc;
 
         log.info("Exporting samples.");
         if (stageFile.exists()) {
@@ -77,7 +91,6 @@ public class ZipFilePersistor implements Persistor {
 
         // Renamed, the valid length is now zero
         suc = logFile.renameTo(stageFile);
-        putValidLength(0);
 
         if (!suc) {
             log.error("Renaming failed, tried to rename " + logFile + " to " + stageFile);
@@ -106,8 +119,8 @@ public class ZipFilePersistor implements Persistor {
         closeLogFile();
 
         // Deleted, the valid length is now zero
-        logFile.delete();
-        putValidLength(0);
+        if (!logFile.delete())
+            log.error("Could not delete log file");
 
         if (wasOpen) {
             // We can override here because we do in fact want to delete the samples
@@ -134,67 +147,78 @@ public class ZipFilePersistor implements Persistor {
     private boolean openLogFileAppend() {
         try {
 
-            truncateFileIfCorupted();
+            sanityCheck();
 
             fileWriter = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(logFile, true)), "UTF8"));
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error opening log file for appending", e);
             return false;
         }
         return true;
     }
 
-    private void truncateFileIfCorupted() throws IOException {
-        // Compare actual length to valid length
-        final long validLength = getValidLength();
-        final long actualLength = logFile.length();
+    private void sanityCheck() throws IOException {
+        // Create sanity file
+        File f = File.createTempFile("sanity", "." + Files.getFileExtension(logFile.getName()), logFile.getParentFile());
 
-        log.debug("Valid zipfile length: " + validLength + ", actual length " + actualLength);
+        // Create input stream on file to read and sanity file
+        MultiMemberGZIPInputStream gis = new MultiMemberGZIPInputStream(new FileInputStream(logFile));
+        GZIPOutputStream gos = new GZIPOutputStream(new FileOutputStream(f));
 
-        if (actualLength > validLength) {
-            log.warn("Erronous file size, truncating");
-
-            // Truncate if mismatching
-            final FileChannel channel = new FileOutputStream(logFile, true).getChannel();
-
-            channel.truncate(validLength);
-            channel.close();
-        }
-    }
-
-    // Gets the valid length
-    private long getValidLength() {
-        SharedPreferences prefs = GlobalContext.context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
-
-        return prefs.getLong(PREF_VALID_LENGTH, 0L);
-    }
-
-    // Store last value to keep access to the shared prefs to a minimum
-    private long lastPutValidLength = -1;
-
-    // Puts the next valid length if it differs from the last put value
-    private void putValidLength(long value) {
-        if (lastPutValidLength == value) {
-            return;
+        // Copy as much as possible
+        try {
+            // Do a byte-wise copy, retrieve as much as possible before running into an IO exception
+            int d;
+            while ((d = gis.read()) != -1)
+                gos.write(d);
+        } catch (EOFException e) {
+            // This is due to someone not regarding specifications
+        } catch (IOException e) {
+            log.error("An error occurred during the sanity transfer", e);
+        } finally {
+            gis.close();
+            gos.close();
         }
 
-        lastPutValidLength = value;
+        if (f.length() != logFile.length()) {
+            // Number of lines to output to the user
+            final int n = 5;
 
-        log.debug("New valid length: " + value);
+            // Obtain a reader
+            BufferedReader r = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(f)), "UTF8"));
 
-        SharedPreferences prefs = GlobalContext.context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
+            // Read all lines to a buffer
+            String s;
+            Deque<String> buffer = new LinkedList<String>();
+            while ((s = r.readLine()) != null) {
+                buffer.offer(s);
 
-        editor.putLong(PREF_VALID_LENGTH, value);
+                // Limit the buffer size
+                while (buffer.size() > n)
+                    buffer.poll();
+            }
 
-        editor.commit();
+            // Close the cascade
+            r.close();
+
+            // Output as debug
+            log.debug("Recovered insanity error, " + f.length() + " of " + logFile.length() + " were recovered, last " + buffer.size() + " lines are: " + Joiner.on("\r\n").join(buffer));
+        }
+
+
+        // Replace file with sanity file
+        if (logFile.delete()) {
+            if (!f.renameTo(logFile))
+                log.error("Could not complete sanity transfer");
+        } else
+            log.error("Could not initiate sanity transfer");
     }
 
     private boolean openLogFileOverwrite() {
         try {
             fileWriter = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(logFile, false)), "UTF8"));
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error opening log file for overwriting", e);
             return false;
         }
 
@@ -207,10 +231,8 @@ public class ZipFilePersistor implements Persistor {
         try {
             fileWriter.flush();
             fileWriter.close();
-
-            putValidLength(logFile.length());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error closing log file", e);
             return false;
         }
         fileWriter = null;
