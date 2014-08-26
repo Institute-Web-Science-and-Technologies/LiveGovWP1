@@ -3,6 +3,7 @@ package eu.liveandgov.wp1.sensor_collector.persistence;
 import android.os.Handler;
 import android.util.Log;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
@@ -31,6 +32,7 @@ import java.util.zip.GZIPOutputStream;
 
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
+import eu.liveandgov.wp1.serialization.Serialization;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
@@ -52,8 +54,11 @@ public class ZipFilePersistor implements Persistor {
     private BufferedWriter fileWriter;
     private long sampleCount = 0L;
 
-    public ZipFilePersistor(File logFile) {
+    public final Function<Item, String> serialization;
+
+    public ZipFilePersistor(File logFile,Function<Item, String> serialization) {
         this.logFile = logFile;
+        this.serialization=serialization;
 
         openLogFileAppend();
     }
@@ -66,7 +71,7 @@ public class ZipFilePersistor implements Persistor {
         }
 
         try {
-            fileWriter.write(item.toSerializedForm() + "\n");
+            fileWriter.write(serialization.apply(item) + "\n");
             sampleCount++;
         } catch (IOException e) {
             log.error("Cannot write file.", e);
