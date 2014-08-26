@@ -23,13 +23,13 @@ public class PublicationPipeline implements Consumer<Item> {
     public static final String PUBLISH_FILENAME = "published.ssf";
 
     private Filter<Item> filter;
-    private JSONPersistor persistor;
+    private FilePersistor persistor;
 
     public PublicationPipeline() {
         File publishFile = new File(Environment.getExternalStorageDirectory(), PUBLISH_FILENAME);
 
         log.debug("Writing to " + publishFile.getAbsolutePath());
-        persistor = new JSONPersistor(publishFile);
+        persistor = new FilePersistor(publishFile);
 
         filter = new Filter<Item>() {
             @Override
