@@ -205,7 +205,6 @@ public class ZipFilePersistor implements Persistor {
             log.debug("Recovered insanity error, " + f.length() + " of " + logFile.length() + " were recovered, last " + buffer.size() + " lines are: " + Joiner.on("\r\n").join(buffer));
         }
 
-
         // Replace file with sanity file
         if (logFile.delete()) {
             if (!f.renameTo(logFile))

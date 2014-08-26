@@ -5,6 +5,13 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.util.zip.GZIPInputStream;
 
+/*
+ * Copied from:https://gist.github.com/yangls06/3930476
+ * under license?
+ *
+ * Workaround bug in GZIP Java Library for concatenating gzip files.
+ *
+ */
 public class MultiMemberGZIPInputStream extends GZIPInputStream {
 
     public MultiMemberGZIPInputStream(InputStream in, int size) throws IOException {

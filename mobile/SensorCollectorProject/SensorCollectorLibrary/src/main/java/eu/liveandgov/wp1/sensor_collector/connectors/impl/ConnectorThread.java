@@ -23,7 +23,7 @@ public class ConnectorThread extends MultiProducer<Item> implements Runnable, Mo
      * This constant specifies how many items are produced without diagnosing the pipe times,
      * specify -1 to disable diagnosis
      */
-    private static final int DIAG_EVERY_NTH = 256;
+    private static final int DIAG_EVERY_NTH = -1;
 
     private final SensorQueue sensorQueue;
     private final Thread thread;

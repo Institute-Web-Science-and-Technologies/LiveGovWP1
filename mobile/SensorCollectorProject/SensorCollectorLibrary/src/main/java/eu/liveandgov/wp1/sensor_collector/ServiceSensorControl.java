@@ -125,7 +125,6 @@ public class ServiceSensorControl extends Service {
     public void onCreate() {
         super.onCreate();
         LogPrincipal.configure();
-
         log.info("Creating ServiceSensorControl");
 
         // INITIALIZATIONS
@@ -231,6 +230,8 @@ public class ServiceSensorControl extends Service {
 
     @Override
     public void onDestroy() {
+        log.debug("Called onDestroy()");
+
         persistor.close();
 
         executorService.shutdown();
