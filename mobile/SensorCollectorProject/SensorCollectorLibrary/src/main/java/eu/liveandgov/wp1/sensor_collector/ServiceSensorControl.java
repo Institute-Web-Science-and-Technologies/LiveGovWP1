@@ -12,6 +12,8 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
+import com.google.common.base.Function;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.log4j.Logger;
 
@@ -53,6 +55,7 @@ import eu.liveandgov.wp1.sensor_collector.waiting.WaitingAdapter;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.API_EXTENSIONS;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.INTENT_TRANSFER;
+import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.JSON_PERSISTOR;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.MAIN_EXECUTOR_CORE_TIMEOUT;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
 
@@ -160,11 +163,17 @@ public class ServiceSensorControl extends Service {
         ppsPipeline = new PPSAdapter("platform", staticIPS);
         waitingPipeline = new WaitingAdapter("platform", WaitingOptions.WAITING_TRESHOLD);
         gpsCache = new GpsCache();
-        persistor = ZIPPED_PERSISTOR ?
-                new ZipFilePersistor(sensorFile) :
-                new FilePersistor(sensorFile);
         publisher = new PublicationPipeline(); // for external communication
 
+        // Serialization used for persisting items
+        Function<Item, String> persistorSerialization = JSON_PERSISTOR ?
+                Persistor.JSON_SERIALIZATION :
+                Persistor.REGULAR_SERIALIZATION;
+
+        // Persistor taking and storing the items
+        persistor = ZIPPED_PERSISTOR ?
+                new ZipFilePersistor(sensorFile, persistorSerialization) :
+                new FilePersistor(sensorFile, persistorSerialization);
 
         // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);

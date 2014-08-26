@@ -29,7 +29,7 @@ public class PublicationPipeline implements Consumer<Item> {
         File publishFile = new File(Environment.getExternalStorageDirectory(), PUBLISH_FILENAME);
 
         log.debug("Writing to " + publishFile.getAbsolutePath());
-        persistor = new FilePersistor(publishFile);
+        persistor = new FilePersistor(publishFile, Persistor.REGULAR_SERIALIZATION);
 
         filter = new Filter<Item>() {
             @Override

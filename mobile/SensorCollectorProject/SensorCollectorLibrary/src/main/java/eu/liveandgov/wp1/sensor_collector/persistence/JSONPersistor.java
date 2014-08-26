@@ -17,6 +17,7 @@ import java.io.IOError;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
 
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.impl.Activity;
@@ -30,7 +31,7 @@ import eu.liveandgov.wp1.data.impl.Tag;
 import eu.liveandgov.wp1.data.impl.Velocity;
 import eu.liveandgov.wp1.data.impl.Waiting;
 import eu.liveandgov.wp1.data.impl.WiFi;
-import eu.liveandgov.wp1.sensor_collector.logging.LP;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
 
@@ -38,7 +39,7 @@ import eu.liveandgov.wp1.util.LocalBuilder;
  * Created by cehlen on 18/08/14.
  */
 public class JSONPersistor implements Persistor {
-    private final Logger log = LP.get();
+    private static final Logger log = LogPrincipal.get();
 
     private File logFile;
     private JsonWriter jsonWriter;
@@ -186,7 +187,7 @@ public class JSONPersistor implements Persistor {
         raf = null;
     }
 
-    private String serialize(Item item) throws IllegalArgumentException {
+    public static String serialize(Item item) throws IllegalArgumentException {
         try {
             JSONObject json = new JSONObject();
 
@@ -195,7 +196,11 @@ public class JSONPersistor implements Persistor {
             json.put("user", item.getDevice());
             if (item instanceof Motion) {
                 Motion m = (Motion) item;
-                json.put("value", m.values);
+                JSONArray motion = new JSONArray();
+                for (float v : m.values)
+                    motion.put(v);
+
+                json.put("value", motion);
             } else if (item instanceof Activity) {
                 Activity a = (Activity) item;
                 json.put("value", a.activity);
@@ -276,8 +281,8 @@ public class JSONPersistor implements Persistor {
             }
             return json.toString();
         } catch (JSONException e) {
-            e.printStackTrace();
-            return "";
+            // Non-recoverable exception, serialization must convert, delegate item filtering before that
+            throw new RuntimeException(e);
         }
     }
 
