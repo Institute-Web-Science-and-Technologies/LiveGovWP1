@@ -1,5 +1,7 @@
 package eu.liveandgov.wp1.sensor_collector.persistence;
 
+import com.google.common.base.Function;
+
 import org.apache.log4j.Logger;
 
 import java.io.BufferedWriter;
@@ -9,6 +11,7 @@ import java.io.IOException;
 
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
+import eu.liveandgov.wp1.serialization.Serialization;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
@@ -27,8 +30,12 @@ public class FilePersistor implements Persistor {
 
     // TODO: Protect from filling up all memory: Max Sampels? Set fixed file size?
 
-    public FilePersistor(File logFile) {
+
+    public final Function<Item, String> serialization;
+
+    public FilePersistor(File logFile, Function<Item, String> serialization) {
         this.logFile = logFile;
+        this.serialization = serialization;
         try {
             openLogFileAppend();
         } catch (IOException e) {
@@ -46,7 +53,7 @@ public class FilePersistor implements Persistor {
                 return;
             }
 
-            fileWriter.write(item.toSerializedForm() + "\n");
+            fileWriter.write(serialization.apply(item) + "\n");
             sampleCount++;
 
         } catch (IOException e) {

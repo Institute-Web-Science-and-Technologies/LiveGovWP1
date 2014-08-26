@@ -28,6 +28,7 @@ public class SensorCollectionOptions {
 
     // CONNECTIVITY //
     public static final boolean ZIPPED_PERSISTOR = true;
+    public static final boolean JSON_PERSISTOR = true;
     public static final boolean INTENT_TRANSFER = true;
     public static final boolean API_EXTENSIONS = true;
 

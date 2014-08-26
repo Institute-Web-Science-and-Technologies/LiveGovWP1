@@ -1,5 +1,7 @@
 package eu.liveandgov.wp1.sensor_collector.persistence;
 
+import com.google.common.base.Function;
+
 import java.io.File;
 
 import eu.liveandgov.wp1.data.Item;
@@ -8,7 +10,7 @@ import eu.liveandgov.wp1.sensor_collector.monitor.Monitorable;
 
 /**
  * Interface for persistence providers.
- *
+ * <p/>
  * Created by hartmann on 9/20/13.
  */
 public interface Persistor extends Consumer<Item>, Monitorable {
@@ -33,4 +35,24 @@ public interface Persistor extends Consumer<Item>, Monitorable {
      * Free all resources used by the persistor.
      */
     void close();
+
+    /**
+     * Serialization method relying on the items {@link eu.liveandgov.wp1.data.Item#toSerializedForm()} method
+     */
+    public static final Function<Item, String> REGULAR_SERIALIZATION = new Function<Item, String>() {
+        @Override
+        public String apply(Item item) {
+            return item.toSerializedForm();
+        }
+    };
+
+    /**
+     * Serialization method delegating to {@link eu.liveandgov.wp1.sensor_collector.persistence.JSONPersistor#serialize(eu.liveandgov.wp1.data.Item)}
+     */
+    public static final Function<Item, String> JSON_SERIALIZATION = new Function<Item, String>() {
+        @Override
+        public String apply(Item item) {
+            return JSONPersistor.serialize(item);
+        }
+    };
 }
