@@ -18,6 +18,14 @@ Testing Tools:
 * [Data Inspection Front End](http://liveandgov.uni-koblenz.de/storage/inspection)
 * [Service Line Detection Test](http://liveandgov.uni-koblenz.de/SLD/test)
 
+### Screenshots
+
+* Inspection Front End  
+  ![png](https://github.com/Institute-Web-Science-and-Technologies/LiveGovWP1/raw/master/images/InspectionTool_HAR.png)
+
+* Mobile GUI
+  ![png](https://github.com/Institute-Web-Science-and-Technologies/LiveGovWP1/raw/master/images/sc_gui.png)
+
 ### Contributors:
 * [Heinrich Hartmann](https://github.com/HeinrichHartmann)
 * Christoph Schaefer
