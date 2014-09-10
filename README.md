@@ -20,7 +20,7 @@ Testing Tools:
 
 ### Screenshots
 
-* Inspection Front End
+* Inspection Front End  
   ![png](images/InspectionTool_RAW_300.png?raw=true)
 
 * Mobile GUI  
