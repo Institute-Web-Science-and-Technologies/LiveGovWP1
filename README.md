@@ -21,10 +21,11 @@ Testing Tools:
 ### Screenshots
 
 * Inspection Front End  
-  ![png](images/InspectionTool_HAR.png?raw=true)
+  ![png](images/InspectionTool_HAR_300.png?raw=true)
+  ![png](images/InspectionTool_RAW_300.png?raw=true)
 
-* Mobile GUI
-  ![png](images/sc_gui.png?raw=true)
+* Mobile GUI  
+  ![png](images/sc_gui_200.png?raw=true)
 
 ### Contributors:
 * [Heinrich Hartmann](https://github.com/HeinrichHartmann)
