@@ -21,10 +21,10 @@ Testing Tools:
 ### Screenshots
 
 * Inspection Front End  
-  ![png](https://github.com/Institute-Web-Science-and-Technologies/LiveGovWP1/raw/master/images/InspectionTool_HAR.png)
+  ![png](images/InspectionTool_HAR.png?raw=true)
 
 * Mobile GUI
-  ![png](https://github.com/Institute-Web-Science-and-Technologies/LiveGovWP1/raw/master/images/sc_gui.png)
+  ![png](images/sc_gui.png?raw=true)
 
 ### Contributors:
 * [Heinrich Hartmann](https://github.com/HeinrichHartmann)
