@@ -4,6 +4,8 @@
 package eu.liveandgov.wp1.server.db_helper;
 
 import eu.liveandgov.wp1.server.CONFIG;
+import eu.liveandgov.wp1.server.SQL;
+import org.apache.log4j.Logger;
 import org.postgresql.Driver;
 
 import java.sql.*;
@@ -36,7 +38,7 @@ import static junit.framework.Assert.assertNotNull;
  *       exit;
  */
 public class PostgresqlDatabase {
-
+    private static final Logger Log = Logger.getLogger(PostgresqlDatabase.class);
 
     public Connection connection = null;
 	
@@ -53,25 +55,21 @@ public class PostgresqlDatabase {
             //  -> Maven Dependencies
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
-            System.out.println("Where is your PostgreSQL JDBC Driver? Include in your library path!");
-            e.printStackTrace();
+            Log.error("Where is your PostgreSQL JDBC Driver? Include in your library path!");
         }
 
-        System.out.println("Postgres driver version:" + Driver.getVersion());
+        Log.debug("Postgres driver version:" + Driver.getVersion());
 
 		Statement stmtLink = null;
 		try {
-			connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/"+ CONFIG.DB_NAME +"?autoReconnect=true", CONFIG.DB_USER, CONFIG.DB_PASS);
+            Log.debug("Connecting to DB");
+			connection = DriverManager.getConnection(CONFIG.JDBC_CONNECTION, CONFIG.DB_USER, CONFIG.DB_PASS);
 
             stmtLink = connection.createStatement();
-
-            String createTripTable = "CREATE TABLE IF NOT EXISTS trip (trip_id SERIAL, user_id VARCHAR(36), start_ts BIGINT, stop_ts BIGINT, name VARCHAR(255));";
-            stmtLink.execute(createTripTable);
-
+            stmtLink.execute(SQL.CREATE_TRIP_TABLE);
 		} catch (SQLException e) {
-			throw new IllegalArgumentException(e.getMessage());
+			throw new IllegalArgumentException(e);
 		} finally {
-			
 			try {
 				if (stmtLink != null)
 					stmtLink.close();
@@ -83,9 +81,10 @@ public class PostgresqlDatabase {
 
     public void setSecret(String user, String secret){
         assertNotNull(connection);
+        if (secret == null) { return; }
 
         try {
-            connection.createStatement().execute("CREATE TABLE IF NOT EXISTS auth (user_id VARCHAR(36) PRIMARY KEY, secret VARCHAR(255));");
+            connection.createStatement().execute(SQL.CREATE_AUTH_TABLE);
 
             PreparedStatement q = connection.prepareStatement("DELETE FROM auth WHERE user_id = ?;");
             q.setString(1,user);
@@ -95,7 +94,6 @@ public class PostgresqlDatabase {
             p.setString(1, user);
             p.setString(2, secret);
             p.execute();
-
         } catch (SQLException e) {
             e.printStackTrace();
         }

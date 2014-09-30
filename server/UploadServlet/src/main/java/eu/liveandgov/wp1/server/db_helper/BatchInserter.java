@@ -69,18 +69,13 @@ public class BatchInserter {
 
         BatchInserter batchInsert = new BatchInserter(db);
 
-        Log.debug("============= Batch inserter started =============");
+        Log.debug("Starting batch insert");
 
         //ParsingState state = ParsingState.INIT;
         int rowCount = 0;
 
         String line = "";
-        String lastUserId = "";
-        long lastTimestamp = -1;
         int tripId = -1;
-
-        boolean generateNewTripId = true;
-        int userIdChangeCount = 0;
         int errorCount = 0;
 
         while ((line = reader.readLine()) != null) {
@@ -91,11 +86,11 @@ public class BatchInserter {
                 try {
                     SVO = ItemSerialization.ITEM_SERIALIZATION.deSerialize(line);
                 } catch (NoSuchElementException e) {
-                    // This is thrown by the serializer, TODO: parse error type
                     Log.error("Parser problem on: " + line + "(" + e.getMessage() + ")", e);
-                    e.printStackTrace();
+                    errorCount++;
                 } catch (IllegalArgumentException e) {
                     Log.error("Illegal argument exception on: " + line + "(" + e.getMessage() + ")", e);
+                    errorCount++;
                 }
 
                 if (SVO == null) {
@@ -104,29 +99,15 @@ public class BatchInserter {
                 }
 
                 if (isStartRecording(SVO)) {
-                    generateNewTripId = true;
+                    tripId = generateNewTripId(SVO);
+                    Log.debug("START RECORDING: trip_id: " + tripId);
                     continue; // do not insert "STOP_RECORDING" tag
                 }
 
                 if (isStopRecording(SVO)) {
                     setStopTime(tripId, SVO.getTimestamp());
+                    Log.debug("STOP RECORDING: trip_id: " + tripId);
                     continue; // do not insert "STOP_RECORDING" tag
-                }
-
-                // EXCEPTIONAL BEHAVIOR: new user ID
-                if (!lastUserId.equals(SVO.getDevice())) {
-                    lastUserId = SVO.getDevice();
-                    generateNewTripId = true;
-                }
-
-                if (generateNewTripId) {
-                    if (userIdChangeCount++ > MAX_TRIPS_PER_FILE)
-                        throw new IllegalStateException("Too many userIdChanges");
-
-                    tripId = generateNewTripId(SVO);
-                    Log.info("Generated new trip_id: " + tripId);
-                    Log.debug(" at line " + line);
-                    generateNewTripId = false;
                 }
 
                 // DO INSERT
@@ -170,6 +151,7 @@ public class BatchInserter {
     }
 
     private static void setStopTime(int tripId, long timestamp) throws SQLException {
+        Log.debug(String.format("Setting stop time for trip %d to %d.",tripId, timestamp));
         PreparedStatement ps = db.connection.prepareStatement("UPDATE trip SET stop_ts = ? WHERE trip_id = ?");
         ps.setLong(1, timestamp);
         ps.setInt(2, tripId);
@@ -190,7 +172,6 @@ public class BatchInserter {
     private static boolean isStartRecording(Item svo) {
         try {
             if (!DataCommons.TYPE_TAG.equals(svo.getType())) return false;
-            Log.debug("Checking for start recording on: " + svo);
             Tag tsv = (Tag) svo;
             return VALUE_START_RECORDING.equals(tsv.tag);
         } catch (Throwable t) {
@@ -202,7 +183,6 @@ public class BatchInserter {
     private static boolean isStopRecording(Item svo) {
         try {
             if (!DataCommons.TYPE_TAG.equals(svo.getType())) return false;
-            Log.debug("Checking for stop recording on: " + svo);
             Tag tsv = (Tag) svo;
             return VALUE_STOP_RECORDING.equals(tsv.tag);
         } catch (Throwable t) {
@@ -224,7 +204,7 @@ public class BatchInserter {
     }
 
     public void executeBatch() throws SQLException {
-        Log.info("## Execute Batch");
+        Log.trace("## Execute Batch");
 
         for (AbstractInserter i : inserter.values()) {
             i.executeBatch();
@@ -232,7 +212,7 @@ public class BatchInserter {
     }
 
     public void close() throws SQLException {
-        Log.info("## Close Statement");
+        Log.trace("## Close Statement");
 
         for (AbstractInserter i : inserter.values()) {
             i.close();
