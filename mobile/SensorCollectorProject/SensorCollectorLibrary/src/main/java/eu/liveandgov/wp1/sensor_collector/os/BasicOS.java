@@ -8,7 +8,6 @@ import com.google.inject.Singleton;
 
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -84,6 +83,7 @@ public class BasicOS implements OS {
     public synchronized void add(Reporter reporter) {
         logger.info("Adding reporter to OS: " + reporter);
 
+        reporters.add(reporter);
     }
 
     /**
@@ -124,10 +124,16 @@ public class BasicOS implements OS {
     public synchronized void remove(Reporter reporter) {
         logger.info("Removing reporter from OS: " + reporter);
 
+        reporters.remove(reporter);
     }
 
     @Override
-    public Set<Bundle> getReports() {
-        return null;
+    public List<Bundle> getReports() {
+        List<Bundle> res = Lists.newArrayList();
+
+        for (Reporter r : reporters)
+            res.add(r.getReport());
+
+        return res;
     }
 }

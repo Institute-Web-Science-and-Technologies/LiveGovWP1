@@ -1,7 +1,37 @@
 package eu.liveandgov.wp1.sensor_collector.fs;
 
+import com.google.common.io.CharSink;
+import com.google.common.io.CharSource;
+
+import java.util.List;
+
+import eu.liveandgov.wp1.sensor_collector.api.Trip;
+
 /**
+ * <p>File System</p>
  * Created by lukashaertel on 30.09.2014.
  */
 public interface FS {
+    /**
+     * <p>Lists all the currently stored trips</p>
+     *
+     * @return Returns a list of trips
+     */
+    List<Trip> listTrips();
+
+    /**
+     * <p>Opens an existing trip for reading</p>
+     *
+     * @param trip The trip to read
+     * @return Returns an input stream
+     */
+    CharSource readTrip(Trip trip);
+
+    /**
+     * @param trip
+     * @return
+     */
+    CharSink writeTrip(Trip trip);
+
+    void deleteTrip(Trip trip);
 }

@@ -45,7 +45,6 @@ import eu.liveandgov.wp1.sensor_collector.persistence.FilePersistor;
 import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
 import eu.liveandgov.wp1.sensor_collector.persistence.PublicationPipeline;
 import eu.liveandgov.wp1.sensor_collector.persistence.ZipFilePersistor;
-import eu.liveandgov.wp1.sensor_collector.pps.PPSAdapter;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorThread;
 import eu.liveandgov.wp1.sensor_collector.streaming.ZMQStreamer;
 import eu.liveandgov.wp1.sensor_collector.transfer.IntentTransfer;
@@ -89,15 +88,11 @@ public class ServiceSensorControl extends Service {
     // Need to put initialization to onCreate, since FilesDir, etc. is not available
     // from a static context.
 
-    // INDICES
-    public StaticIPS staticIPS;
-
     // SENSOR CONSUMERS
     public Persistor persistor;
     public PublicationPipeline publisher;
     public Consumer<Item> streamer;
     public Consumer<Item> harPipeline;
-    public Consumer<Item> ppsPipeline;
     public Consumer<Item> waitingPipeline;
     public GpsCache gpsCache;
 
@@ -135,31 +130,11 @@ public class ServiceSensorControl extends Service {
         File sensorFile = new File(GlobalContext.getFileRoot(), SENSOR_FILENAME);
         File stageFile = new File(GlobalContext.getFileRoot(), STAGE_FILENAME);
 
-        // Init index
-        staticIPS = new StaticIPS(
-                PPSOptions.INDEX_HORIZONTAL_RESOLUTION,
-                PPSOptions.INDEX_VERTICAL_RESOLUTION,
-                PPSOptions.INDEX_BY_CENTROID,
-                PPSOptions.INDEX_STORE_DEGREE,
-                new Callable<InputStream>() {
-                    @Override
-                    public InputStream call() throws IOException {
-                        return getAssets().open(PPSOptions.HELSINKIIPPS_ASSET);
-                    }
-                },
-                false,
-                PPSOptions.HELSINKI_ID_FIELD,
-                PPSOptions.HELSINKI_LAT_FIELD,
-                PPSOptions.HELSINKI_LON_FIELD,
-                PPSOptions.PROXIMITY
-        );
-
         // Init sensor consumers
         final ZMQStreamer zmqStreamer = new ZMQStreamer();
         streamer = zmqStreamer.itemNode;
 
         harPipeline = new HARAdapter();
-        ppsPipeline = new PPSAdapter("platform", staticIPS);
         waitingPipeline = new WaitingAdapter("platform", WaitingOptions.WAITING_TRESHOLD);
         gpsCache = new GpsCache();
         publisher = new PublicationPipeline(); // for external communication
@@ -315,23 +290,16 @@ public class ServiceSensorControl extends Service {
 
     private void doStopHAR() {
         connectorThread.removeConsumer(harPipeline);
-        connectorThread.removeConsumer(ppsPipeline);
         connectorThread.removeConsumer(waitingPipeline);
 
         isHAR = false;
 
-        // On har-stop, save indices
-        staticIPS.trySave(new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE));
-
     }
 
     private void doStartHAR() {
-        // On har-start, load indices
-        staticIPS.tryLoad(new File(getFilesDir(), PPSOptions.HELSINKIIPPS_INDEX_FILE));
 
         isHAR = true;
         connectorThread.addConsumer(waitingPipeline);
-        connectorThread.addConsumer(ppsPipeline);
         connectorThread.addConsumer(harPipeline);
     }
 

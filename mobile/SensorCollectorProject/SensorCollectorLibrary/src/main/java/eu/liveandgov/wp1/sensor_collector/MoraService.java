@@ -24,7 +24,6 @@ public abstract class MoraService extends RoboService {
     private final IBinder api = new MoraAPI.Stub() {
         @Override
         public void startRecording() throws RemoteException {
-
         }
 
         @Override
@@ -64,12 +63,11 @@ public abstract class MoraService extends RoboService {
 
         @Override
         public void deleteTrip(Trip trip) throws RemoteException {
-
         }
 
         @Override
-        public Bundle getReport() throws RemoteException {
-            return os.getReport();
+        public List<Bundle> getReports() throws RemoteException {
+            return os.getReports();
         }
     };
 
