@@ -1,3 +1,4 @@
+// IMoraAPI.aidl
 package eu.liveandgov.wp1.sensor_collector.api;
 
 import android.os.Bundle;
@@ -55,5 +56,5 @@ interface MoraAPI {
     /**
      * Returns a container for status information
      */
-    Bundle[] getReports();
+    List<Bundle> getReports();
 }
