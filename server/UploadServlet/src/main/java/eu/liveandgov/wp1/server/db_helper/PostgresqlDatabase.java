@@ -3,6 +3,7 @@
  */
 package eu.liveandgov.wp1.server.db_helper;
 
+import eu.liveandgov.wp1.server.CONFIG;
 import org.postgresql.Driver;
 
 import java.sql.*;
@@ -36,9 +37,6 @@ import static junit.framework.Assert.assertNotNull;
  */
 public class PostgresqlDatabase {
 
-    public static final String DB_NAME = "liveandgov_dev";
-    public static final String DB_USER = "liveandgov";
-    public static final String DB_PASS = "liveandgov";
 
     public Connection connection = null;
 	
@@ -63,7 +61,7 @@ public class PostgresqlDatabase {
 
 		Statement stmtLink = null;
 		try {
-			connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/"+ DB_NAME +"?autoReconnect=true", DB_USER, DB_PASS);
+			connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/"+ CONFIG.DB_NAME +"?autoReconnect=true", CONFIG.DB_USER, CONFIG.DB_PASS);
 
             stmtLink = connection.createStatement();
 

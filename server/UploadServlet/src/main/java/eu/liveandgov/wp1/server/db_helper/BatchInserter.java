@@ -105,22 +105,13 @@ public class BatchInserter {
 
                 if (isStartRecording(SVO)) {
                     generateNewTripId = true;
-                    //state = ParsingState.RUNNING;
                     continue; // do not insert "STOP_RECORDING" tag
                 }
 
                 if (isStopRecording(SVO)) {
                     setStopTime(tripId, SVO.getTimestamp());
-                    //state = ParsingState.STOPPED;
                     continue; // do not insert "STOP_RECORDING" tag
                 }
-
-                // EXCEPTIONAL BEHAVIOR: long delay
-                if (!timeDeltaValid(lastTimestamp, SVO.getTimestamp())) {
-                    Log.debug("Delay between timestamps too large.");
-                    generateNewTripId = true;
-                }
-                lastTimestamp = SVO.getTimestamp();
 
                 // EXCEPTIONAL BEHAVIOR: new user ID
                 if (!lastUserId.equals(SVO.getDevice())) {

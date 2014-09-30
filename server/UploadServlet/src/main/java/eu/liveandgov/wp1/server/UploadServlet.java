@@ -35,7 +35,6 @@ import static java.lang.System.currentTimeMillis;
  * Date: 10/19/13
  */
 public class UploadServlet extends HttpServlet {
-    static final String OUT_DIR = "/srv/liveandgov/UploadServletRawFiles/";
     private static final String FIELD_NAME_UPFILE = "upfile";
     private static final Logger Log = Logger.getLogger(UploadServlet.class);
 
@@ -43,7 +42,7 @@ public class UploadServlet extends HttpServlet {
         try {
             SimpleLayout layout = new SimpleLayout();
             FileAppender appender = null;
-            appender = new FileAppender(layout, "/var/log/UploadServlet.log", true);
+            appender = new FileAppender(layout, CONFIG.LOG_FILE, true);
             Logger.getRootLogger().addAppender(appender);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -92,7 +91,7 @@ public class UploadServlet extends HttpServlet {
         String fileName = generateFileName(req);
         int bytesWritten = 0;
 
-        File outFile = new File(OUT_DIR, fileName);
+        File outFile = new File(CONFIG.OUT_DIR, fileName);
         try {
             bytesWritten = writeStreamToFile(fileStream, outFile);
         } catch (IOException e) {
