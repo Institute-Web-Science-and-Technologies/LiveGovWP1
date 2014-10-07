@@ -3,12 +3,13 @@ __author__ = 'Christoph Ehlen'
 import sys
 import getopt
 from database import Database
-from operations import do_anonymization, do_cleanup
+from operations import do_anonymization, do_cleanup, do_user_cut
 
 validOps = ["cleanup", "anonymization"]
 callOps = {
     "cleanup": lambda db, args: do_cleanup(db),
-    "anonymization": lambda db, args: do_anonymization(db, args[0])
+    "anonymization": lambda db, args: do_anonymization(db, args[0]),
+    "usercut": lambda db, args: do_user_cut(db, args[0], args[1])
 }
 
 
@@ -25,6 +26,11 @@ Valid Operations:
         Option:
             SQL Select Query: Every row found by this query will be set
             to user_id = 0.
+
+    usercut: Cuts trips where they split and could be traceable
+        Options:
+            First - the radius in which we look
+            Second - the number of users that needs to be in the radius
     """
 
 
