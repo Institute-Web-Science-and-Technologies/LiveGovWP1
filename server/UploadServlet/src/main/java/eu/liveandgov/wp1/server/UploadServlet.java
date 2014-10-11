@@ -7,9 +7,7 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -37,17 +35,6 @@ import static java.lang.System.currentTimeMillis;
 public class UploadServlet extends HttpServlet {
     private static final String FIELD_NAME_UPFILE = "upfile";
     private static final Logger Log = Logger.getLogger(UploadServlet.class);
-
-    static {
-        try {
-            SimpleLayout layout = new SimpleLayout();
-            FileAppender appender = null;
-            appender = new FileAppender(layout, CONFIG.LOG_FILE, true);
-            Logger.getRootLogger().addAppender(appender);
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-    }
 
     /**
      * Handle GET REQUEST
@@ -99,6 +86,7 @@ public class UploadServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
+        Log.info(String.format("Wrote %d bytes to file %s.", bytesWritten, fileName));
 
         // Success
         Log.info("Received file " + fileName + " of length " + bytesWritten);
@@ -109,7 +97,6 @@ public class UploadServlet extends HttpServlet {
                         "Bytes written:" + bytesWritten
         );
         resp.setStatus(HttpServletResponse.SC_ACCEPTED);
-
 
         // Insert directly to database
         BufferedReader reader;
@@ -128,18 +115,14 @@ public class UploadServlet extends HttpServlet {
 
             Log.debug("Setting Secret: " + getSecret(req));
             db.setSecret(getId(req), getSecret(req));
-
         } catch (SQLException e) {
             Log.info("Error writing db.", e);
-            e.printStackTrace();
         } catch (IOException e) {
             Log.info("Error reading file" + outFile.getAbsolutePath());
-            e.printStackTrace();
-        }
-        finally
-        {
+        } finally {
             reader.close();
         }
+        Log.info("Wrote data into DB.");
     }
 
     /**
@@ -223,5 +206,4 @@ public class UploadServlet extends HttpServlet {
         }
         return null;
     }
-
 }
