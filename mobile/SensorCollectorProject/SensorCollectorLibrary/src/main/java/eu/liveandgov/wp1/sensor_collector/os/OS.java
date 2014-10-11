@@ -23,7 +23,6 @@ public interface OS {
     void remove(Reporter reporter);
 
     /**
-     * TODO: WHAT HERE
      * @return
      */
     List<Bundle> getReports();

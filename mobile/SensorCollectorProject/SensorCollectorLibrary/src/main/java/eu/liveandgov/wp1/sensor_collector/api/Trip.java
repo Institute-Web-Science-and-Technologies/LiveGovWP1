@@ -23,6 +23,8 @@ public class Trip implements Parcelable, Comparable<Trip> {
         }
     };
 
+    public static final long SPECIAL_TIME_UNSET = Long.MIN_VALUE;
+
     public final
     @NonNull
     String userId;

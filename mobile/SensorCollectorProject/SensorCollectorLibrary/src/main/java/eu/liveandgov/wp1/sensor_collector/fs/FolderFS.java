@@ -180,6 +180,11 @@ public class FolderFS implements FS {
     }
 
     @Override
+    public void renameTrip(Trip tripFrom, Trip tripTo) {
+        throw new RuntimeException("TODO:IMPLEMENT");
+    }
+
+    @Override
     public void deleteTrip(Trip trip) {
         // Delete the first matching meta file and the corresponding data file
         for (File f : listMetafiles()) {

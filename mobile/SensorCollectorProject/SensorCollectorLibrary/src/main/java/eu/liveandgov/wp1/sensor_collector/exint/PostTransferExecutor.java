@@ -2,6 +2,8 @@ package eu.liveandgov.wp1.sensor_collector.exint;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
@@ -26,13 +28,17 @@ public class PostTransferExecutor implements TransferExecutor {
     public void transfer(String target, String id, String secret, boolean compressed, File file) throws IOException {
         try {
             // Make client and setup post
-            HttpClient httpclient = new DefaultHttpClient();
+            DefaultHttpClient httpclient = new DefaultHttpClient();
+
+            // New method uses basic authentication
+            httpclient.getCredentialsProvider().setCredentials(
+                    AuthScope.ANY,
+                    new UsernamePasswordCredentials(id, secret)
+            );
 
             HttpPost httppost = new HttpPost(target);
             httppost.setEntity(MultipartEntityBuilder.create().addBinaryBody("upfile", file).build());
             httppost.addHeader("COMPRESSED", String.valueOf(compressed));
-            httppost.addHeader("ID", id);
-            httppost.addHeader("SECRET", secret);
             httppost.addHeader("CHECKSUM", String.valueOf(calculateChecksum(file)));
 
             // Execute for response
