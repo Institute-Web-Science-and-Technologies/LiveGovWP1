@@ -10,6 +10,8 @@ import java.util.List;
  * Created by lukashaertel on 08.09.2014.
  */
 public interface OS {
+    boolean isActive();
+
     void add(SampleSource sampleSource);
 
     void add(SampleTarget sampleTarget);

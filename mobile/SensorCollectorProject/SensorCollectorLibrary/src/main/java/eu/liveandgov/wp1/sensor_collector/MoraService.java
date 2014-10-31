@@ -7,6 +7,8 @@ import android.os.RemoteException;
 
 import com.google.inject.Inject;
 
+import org.apache.log4j.Logger;
+
 import java.util.List;
 
 import eu.liveandgov.wp1.sensor_collector.api.MoraAPI;
@@ -14,6 +16,7 @@ import eu.liveandgov.wp1.sensor_collector.api.Trip;
 import eu.liveandgov.wp1.sensor_collector.components.Streamer;
 import eu.liveandgov.wp1.sensor_collector.components.Writer;
 import eu.liveandgov.wp1.sensor_collector.fs.FS;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.os.OS;
 import eu.liveandgov.wp1.sensor_collector.strategies.Transfer;
 import roboguice.service.RoboService;
@@ -21,7 +24,13 @@ import roboguice.service.RoboService;
 /**
  * Created by lukashaertel on 08.09.2014.
  */
-public abstract class MoraService extends RoboService {
+public abstract class MoraService extends ProvisioningRoboService {
+    /**
+     * Logger interface
+     */
+    private final Logger logger = LogPrincipal.get();
+
+
     /**
      * This binder holds and delegates all API calls to their respective components
      */
@@ -157,12 +166,27 @@ public abstract class MoraService extends RoboService {
         this.writer = writer;
 
         // ... and then they connect
+        logger.debug("Service is now set up.");
+    }
+
+
+    @Override
+    protected void activateProvision() {
+        logger.debug("Service is now providing for user interface.");
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        // Return the API binder
-        return api;
+    protected void activateStandAlone() {
+        // If no activity at backend, service may terminate
+        if (!os.isActive()) {
+            logger.debug("Entered standalone mode of service without backend activity, stopping.");
+            stopSelf();
+        }
     }
 
+    @Override
+    protected IBinder getBinder() {
+        logger.debug("Binder requested");
+        return api;
+    }
 }

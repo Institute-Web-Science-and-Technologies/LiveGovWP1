@@ -1,6 +1,10 @@
 package eu.liveandgov.wp1.sensor_collector;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import eu.liveandgov.wp1.sensor_collector.fs.FS;
 import eu.liveandgov.wp1.sensor_collector.fs.FolderFS;
@@ -13,6 +17,7 @@ import eu.liveandgov.wp1.sensor_collector.os.OS;
 public class MoraModule extends AbstractModule {
     @Override
     protected void configure() {
+        bind(DateFormat.class).toInstance(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX"));
         bind(OS.class).to(BasicOS.class);
         bind(FS.class).to(FolderFS.class);
     }

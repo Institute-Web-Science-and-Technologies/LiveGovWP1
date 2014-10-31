@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -61,6 +63,9 @@ public class FolderFS implements FS {
     @Named("eu.liveandgov.wp1.sensor_collector.fs.root")
     private String root = "mora/fs";
 
+    @Inject
+    private DateFormat dateFormat;
+
     /**
      * <p>Obtains the file under which all MORA file system entries are listed</p>
      *
@@ -75,13 +80,27 @@ public class FolderFS implements FS {
      *
      * @return Returns a list of files
      */
-    private File[] listMetafiles() {
+    private File[] listMetaFiles() {
         return getRootFile().listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String filename) {
                 return filename.toLowerCase().endsWith(metaextension);
             }
         });
+    }
+
+    /**
+     * <p>Generates a new meta file location</p>
+     *
+     * @return Returns a randomly generated new meta file
+     */
+    private File newMetaFile() {
+        try {
+            return File.createTempFile(dateFormat.format(new Date()), metaextension, getRootFile());
+        } catch (IOException e) {
+            logger.error("Could not create meta file in directory", e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -103,13 +122,28 @@ public class FolderFS implements FS {
     }
 
     /**
+     * <p>Writes a meta file</p>
+     *
+     * @param f The file to write
+     * @param o The metadata to put
+     */
+    private void putMetaFile(File f, JSONObject o) {
+        try {
+            Files.write(o.toString(), f, metacharset);
+        } catch (IOException e) {
+            logger.error("Error writing trip meta file to file system", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * <p>Finds the data file corresponding to a meta file</p>
      *
-     * @param metafile The meta file
+     * @param metaFile The meta file
      * @return Returns the corresponding file
      */
-    private File findDatafile(File metafile) {
-        return new File(metafile.getParentFile(), metafile.getName() + dataextension);
+    private File findDatafile(File metaFile) {
+        return new File(metaFile.getParentFile(), metaFile.getName() + dataextension);
     }
 
     @Override
@@ -117,7 +151,7 @@ public class FolderFS implements FS {
         List<Trip> trips = Lists.newArrayList();
 
         // List and process all meta files
-        for (File f : listMetafiles()) {
+        for (File f : listMetaFiles()) {
             JSONObject j = openMetafile(f);
 
             try {
@@ -138,7 +172,7 @@ public class FolderFS implements FS {
     @Override
     public CharSource readTrip(Trip trip) {
         // Return the first matching meta files data file as a char source
-        for (File f : listMetafiles()) {
+        for (File f : listMetaFiles()) {
             JSONObject j = openMetafile(f);
 
             try {
@@ -160,7 +194,7 @@ public class FolderFS implements FS {
     @Override
     public CharSink writeTrip(Trip trip) {
         // Return the first matching meta files data file as a char sink
-        for (File f : listMetafiles()) {
+        for (File f : listMetaFiles()) {
             JSONObject j = openMetafile(f);
 
             try {
@@ -176,18 +210,47 @@ public class FolderFS implements FS {
             }
         }
 
-        throw new NoSuchElementException("No trip data file found for parameter " + trip);
+        try {
+            // No trip found, put it then
+            JSONObject meta = new JSONObject();
+            meta.put("userId", trip.userId);
+            meta.put("userSecret", trip.userSecret);
+            meta.put("startTime", trip.startTime);
+            meta.put("endTime", trip.endTime);
+
+            // Generate a place to put the metadata and write it
+            File f = newMetaFile();
+            putMetaFile(f, meta);
+
+            return Files.asCharSink(findDatafile(f), datacharset);
+        } catch (JSONException e) {
+            logger.error("Error creating meta data object", e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void renameTrip(Trip tripFrom, Trip tripTo) {
-        throw new RuntimeException("TODO:IMPLEMENT");
+        try {
+            // TODO: Right now favoring the pattern of delegating to other methods instead of file modifications, as meta data is written here
+
+            // Copy all data
+            CharSource source = readTrip(tripFrom);
+            CharSink sink = writeTrip(tripTo);
+
+            source.copyTo(sink);
+
+            // Delete trip
+            deleteTrip(tripFrom);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void deleteTrip(Trip trip) {
         // Delete the first matching meta file and the corresponding data file
-        for (File f : listMetafiles()) {
+        for (File f : listMetaFiles()) {
             JSONObject j = openMetafile(f);
 
             try {

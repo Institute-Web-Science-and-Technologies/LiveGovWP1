@@ -2,12 +2,16 @@ package eu.liveandgov.wp1.sensor_miner;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,7 +27,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import eu.liveandgov.wp1.sensor_collector.MoraService;
 import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
+import eu.liveandgov.wp1.sensor_collector.api.MoraAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_miner.configuration.SensorMinerOptions;
 
@@ -98,6 +104,22 @@ public class ActivitySensorCollector extends Activity {
         }
     }
 
+    private MoraAPI api;
+
+    private final ServiceConnection apiConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d("MORA", "Service connected");
+            api = MoraAPI.Stub.asInterface(service);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            api = null;
+            Log.d("MORA", "Service disconnected");
+        }
+    };
+
     /* ANDROID LIFECYCLE MANAGEMENT */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,10 +191,18 @@ public class ActivitySensorCollector extends Activity {
         if (statusTask == null) {
             statusTask = executorService.scheduleAtFixedRate(statusMethod, 0L, SensorMinerOptions.REQUEST_STATUS_INTERVAL, TimeUnit.MILLISECONDS);
         }
+
+        Log.d("MORA", "Starting and binding the mora service");
+        Intent mora = new Intent(this, MoraService.class);
+        startService(mora);
+        bindService(mora, apiConnection, 0);
     }
 
     @Override
     public void onPause() {
+        unbindService(apiConnection);
+        Log.d("MORA", "Unbinding the mora service");
+
         if (statusTask != null) {
             statusTask.cancel(true);
             statusTask = null;

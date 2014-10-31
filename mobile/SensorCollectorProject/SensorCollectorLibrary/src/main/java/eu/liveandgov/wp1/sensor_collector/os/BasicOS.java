@@ -41,6 +41,11 @@ public class BasicOS implements OS {
      */
     private Set<Reporter> reporters = Sets.newConcurrentHashSet();
 
+    @Override
+    public boolean isActive() {
+        return !sampleTargets.isEmpty();
+    }
+
     /**
      * <p>Adds a sample source to the OS, activates it if there are potential targets</p>
      *

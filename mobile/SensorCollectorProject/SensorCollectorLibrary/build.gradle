@@ -45,7 +45,8 @@ android {
 }
 
 dependencies {
-    compile 'org.roboguice:roboguice:3.0-alpha-2'
+    compile 'org.roboguice:roboguice:3.0'
+   // provided 'org.roboguice:roboblender:3.0'
     compile 'eu.liveandgov:liveandgov-commons:1.1'
     compile 'eu.liveandgov:liveandgov-proximity:1.1'
     compile 'eu.liveandgov:liveandgov-har-tools:1.1'

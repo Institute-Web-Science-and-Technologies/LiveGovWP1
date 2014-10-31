@@ -27,6 +27,8 @@ public class PostTransferExecutor implements TransferExecutor {
     @Override
     public void transfer(String target, String id, String secret, boolean compressed, File file) throws IOException {
         try {
+            log.info("Transferring to " + target + ", ID " + id + ", Secret " + secret + ", Compressed " + compressed + ", File " + file);
+
             // Make client and setup post
             DefaultHttpClient httpclient = new DefaultHttpClient();
 
