@@ -1,5 +1,9 @@
 package eu.liveandgov.wp1.sensor_collector.exint;
 
+import com.google.common.io.Files;
+
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
@@ -7,13 +11,15 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 
@@ -25,7 +31,7 @@ public class PostTransferExecutor implements TransferExecutor {
     private final Logger log = LogPrincipal.get();
 
     @Override
-    public void transfer(String target, String id, String secret, boolean compressed, File file) throws IOException {
+    public boolean transfer(String target, String id, String secret, boolean compressed, File file) throws IOException {
         try {
             log.info("Transferring to " + target + ", ID " + id + ", Secret " + secret + ", Compressed " + compressed + ", File " + file);
 
@@ -38,8 +44,8 @@ public class PostTransferExecutor implements TransferExecutor {
                     new UsernamePasswordCredentials(id, secret)
             );
 
+
             HttpPost httppost = new HttpPost(target);
-            httppost.setEntity(MultipartEntityBuilder.create().addBinaryBody("upfile", file).build());
             httppost.addHeader("COMPRESSED", String.valueOf(compressed));
             httppost.addHeader("CHECKSUM", String.valueOf(calculateChecksum(file)));
 
@@ -52,11 +58,13 @@ public class PostTransferExecutor implements TransferExecutor {
             // If the status is not accepted, print it
             if (status != HttpStatus.SC_ACCEPTED)
                 log.error("Transfer error, target: " + target + ", status code: " + status + ", response: " + EntityUtils.toString(response.getEntity()));
+            else return true;
         } catch (HttpHostConnectException e) {
             log.error("Connection Refused", e);
         } catch (IOException e) {
             log.error("IO exception occurred", e);
         }
+        return false;
     }
 
     private long calculateChecksum(File file) {

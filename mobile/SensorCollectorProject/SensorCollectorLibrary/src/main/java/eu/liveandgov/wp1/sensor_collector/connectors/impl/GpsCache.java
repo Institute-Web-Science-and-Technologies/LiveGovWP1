@@ -52,7 +52,7 @@ public class GpsCache implements Consumer<Item> {
         StringBuilder out = new StringBuilder(10000);
 
         for (GPS line : getSamples()) {
-            out.append(line.toSerializedForm() + "\n");
+            out.append(line.toSerializedForm()).append("\n");
         }
 
         return out.toString();

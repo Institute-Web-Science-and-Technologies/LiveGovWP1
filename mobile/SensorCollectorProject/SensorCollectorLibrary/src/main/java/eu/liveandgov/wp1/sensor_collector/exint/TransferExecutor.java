@@ -19,5 +19,5 @@ public interface TransferExecutor {
      * @param file       The file to transmit
      * @throws IOException Throws an IO exception if the transfer caused an exception
      */
-    void transfer(String target, String id, String secret, boolean compressed, File file) throws IOException;
+    boolean transfer(String target, String id, String secret, boolean compressed, File file) throws IOException;
 }

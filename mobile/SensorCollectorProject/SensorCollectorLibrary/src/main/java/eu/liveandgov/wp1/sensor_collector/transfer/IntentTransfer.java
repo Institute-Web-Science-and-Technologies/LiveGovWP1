@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 
 import eu.liveandgov.wp1.data.Callback;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
@@ -58,7 +59,7 @@ public class IntentTransfer implements TransferManager {
             public void run() {
 
                 // Get a stage file
-                final File stageFile = new File(stageroot, RandomStringUtils.randomAlphanumeric(10) + "-" + System.nanoTime());
+                final File stageFile = new File(stageroot, UUID.randomUUID().toString() + "-" + System.nanoTime());
 
                 // Save the samples to the stage file
                 if (!persistor.exportSamples(stageFile)) {

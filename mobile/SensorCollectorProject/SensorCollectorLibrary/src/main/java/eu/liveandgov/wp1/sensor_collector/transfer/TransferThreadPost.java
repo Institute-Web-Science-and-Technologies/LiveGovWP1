@@ -2,14 +2,6 @@ package eu.liveandgov.wp1.sensor_collector.transfer;
 
 import android.content.SharedPreferences;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.HttpHostConnectException;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -20,6 +12,7 @@ import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.R;
 import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
+import eu.liveandgov.wp1.sensor_collector.exint.Post2TransferExecutor;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
 import eu.liveandgov.wp1.util.LocalBuilder;
@@ -151,39 +144,11 @@ public class TransferThreadPost implements Runnable, TransferManager {
 
     public boolean transferFile(File file, boolean compressed) {
         try {
-            String dst = getAddress();
-            log.info("Destination of upload is: " + dst);
-
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(dst);
-
-            MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
-            multipartEntityBuilder.addBinaryBody("upfile", file);
-
-            httppost.setEntity(multipartEntityBuilder.build());
-
-            httppost.addHeader("COMPRESSED", String.valueOf(compressed));
-            httppost.addHeader("CHECKSUM", String.valueOf(file.length()));
-            httppost.addHeader("ID", GlobalContext.getUserId());
-            httppost.addHeader("SECRET", getSecret());
-
-            HttpResponse response = httpclient.execute(httppost);
-            log.info("Response of upload: " + EntityUtils.toString(response.getEntity()));
-
-            int status = response.getStatusLine().getStatusCode();
-            if (status != HttpStatus.SC_ACCEPTED) {
-                log.error("Upload failed w/ Status Code:" + status);
-                return false;
-            }
-
-        } catch (HttpHostConnectException e) {
-            log.error("Connection Refused", e);
-            return false;
+            return Post2TransferExecutor.INSTANCE.transfer(getAddress(), GlobalContext.getUserId(), getSecret(), compressed, file);
         } catch (IOException e) {
             log.error("IO exception occured", e);
             return false;
         }
-        return true;
     }
 
     private String getAddress() {

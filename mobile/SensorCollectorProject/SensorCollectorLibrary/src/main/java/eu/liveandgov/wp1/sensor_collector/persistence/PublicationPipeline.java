@@ -12,8 +12,6 @@ import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.pipeline.impl.Filter;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 
-;
-
 /**
  * Created by hartmann on 11/12/13.
  */

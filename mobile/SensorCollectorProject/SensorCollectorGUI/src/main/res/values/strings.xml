@@ -16,5 +16,13 @@
     <string name="streaming_port">Streaming Port</string>
     <string name="resets_to_default">Resets to default</string>
     <string name="user_secret">User Secret</string>
+    <string name="activity">ACTIVITY</string>
+    <string name="set">Set</string>
+    <string name="id">ID</string>
+    <string name="send">Send</string>
+    <string name="annotation">Annotation</string>
+    <string name="deleteAllSamples">Delete All Samples</string>
+    <string name="sendQueuedGPSSamples">Send queued GPS Samples</string>
+    <string name="transferSamples">Transfer samples</string>
 
 </resources>

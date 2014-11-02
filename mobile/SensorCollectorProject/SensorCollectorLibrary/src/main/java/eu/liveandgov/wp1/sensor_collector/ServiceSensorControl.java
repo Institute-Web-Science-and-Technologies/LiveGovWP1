@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +29,6 @@ import eu.liveandgov.wp1.data.Callback;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.impl.Tag;
 import eu.liveandgov.wp1.pipeline.Consumer;
-import eu.liveandgov.wp1.pps.api.csv.StaticIPS;
 import eu.liveandgov.wp1.sensor_collector.activity_recognition.HARAdapter;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
@@ -50,7 +50,6 @@ import eu.liveandgov.wp1.sensor_collector.streaming.ZMQStreamer;
 import eu.liveandgov.wp1.sensor_collector.transfer.IntentTransfer;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferManager;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferThreadPost;
-import eu.liveandgov.wp1.sensor_collector.waiting.WaitingAdapter;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.API_EXTENSIONS;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.INTENT_TRANSFER;
@@ -93,7 +92,6 @@ public class ServiceSensorControl extends Service {
     public PublicationPipeline publisher;
     public Consumer<Item> streamer;
     public Consumer<Item> harPipeline;
-    public Consumer<Item> waitingPipeline;
     public GpsCache gpsCache;
 
     // THREADS
@@ -135,7 +133,6 @@ public class ServiceSensorControl extends Service {
         streamer = zmqStreamer.itemNode;
 
         harPipeline = new HARAdapter();
-        waitingPipeline = new WaitingAdapter("platform", WaitingOptions.WAITING_TRESHOLD);
         gpsCache = new GpsCache();
         publisher = new PublicationPipeline(); // for external communication
 
@@ -290,7 +287,6 @@ public class ServiceSensorControl extends Service {
 
     private void doStopHAR() {
         connectorThread.removeConsumer(harPipeline);
-        connectorThread.removeConsumer(waitingPipeline);
 
         isHAR = false;
 
@@ -299,7 +295,6 @@ public class ServiceSensorControl extends Service {
     private void doStartHAR() {
 
         isHAR = true;
-        connectorThread.addConsumer(waitingPipeline);
         connectorThread.addConsumer(harPipeline);
     }
 
@@ -313,12 +308,23 @@ public class ServiceSensorControl extends Service {
         connectorThread.addConsumer(streamer);
     }
 
+    private static final char[] ALPHANUMERIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
+
+    private static String randomAlphanumeric(int length) {
+        Random r = new Random();
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < length; i++)
+            b.append(ALPHANUMERIC[r.nextInt(ALPHANUMERIC.length)]);
+
+        return b.toString();
+    }
+
     private void doSetId(String id) {
         log.debug("Setting userId to:" + id);
 
         userId = id;
 
-        String userSecret = RandomStringUtils.randomAlphanumeric(5);
+        String userSecret = randomAlphanumeric(5);
         log.debug("Created new user Secret: " + userSecret);
 
         // Update Shared Preferences
