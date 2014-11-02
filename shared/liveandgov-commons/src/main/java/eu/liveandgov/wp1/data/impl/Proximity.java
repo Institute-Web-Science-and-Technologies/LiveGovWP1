@@ -54,9 +54,8 @@ public class Proximity extends AbstractItem {
 
         if (in != proximity.in) return false;
         if (key != null ? !key.equals(proximity.key) : proximity.key != null) return false;
-        if (of != null ? !of.equals(proximity.of) : proximity.of != null) return false;
+        return !(of != null ? !of.equals(proximity.of) : proximity.of != null);
 
-        return true;
     }
 
     @Override

@@ -34,9 +34,8 @@ public abstract class Motion extends AbstractItem {
 
         Motion motion = (Motion) o;
 
-        if (!Arrays.equals(values, motion.values)) return false;
+        return Arrays.equals(values, motion.values);
 
-        return true;
     }
 
     @Override

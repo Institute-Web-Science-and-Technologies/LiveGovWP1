@@ -85,7 +85,7 @@ public class GSMSerialization extends AbstractSerialization<GSM> {
             itemList.add(new GSM.Item(cellIdentity, cellType, rssi));
         }
 
-        return new GSM(timestamp, device, serviceState, roamingState, carrierSelection, carrierName, signalStrength, itemList.toArray(GSM.Item.EMPTY_ARRAY));
+        return new GSM(timestamp, device, serviceState, roamingState, carrierSelection, carrierName, signalStrength, itemList.toArray(new GSM.Item[itemList.size()]));
     }
 
 

@@ -39,11 +39,26 @@ public class Player<Item> extends Pipeline<Item, Item> implements Stoppable {
      * @param executorService The executor service used to run the playback
      * @param limit           The limit of items to store in the queue or -1 for no limit
      */
-    public Player(ExecutorService executorService, int limit) {
+    public Player(final ExecutorService executorService, int limit) {
         this.executorService = executorService;
         this.limit = limit;
 
         queue = new LinkedBlockingQueue<Item>();
+
+        // Method for playback
+        Runnable playerMethod = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    produce(queue.take());
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+
+                // Resubmit
+                executorService.submit(this);
+            }
+        };
         playerTask = executorService.submit(playerMethod);
     }
 
@@ -56,19 +71,6 @@ public class Player<Item> extends Pipeline<Item, Item> implements Stoppable {
                 Thread.currentThread().interrupt();
             }
     }
-
-    private final Runnable playerMethod = new Runnable() {
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    produce(queue.take());
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }
-    };
 
 
     @Override
