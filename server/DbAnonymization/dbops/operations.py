@@ -118,8 +118,8 @@ def do_blur(db, radius):
         distance = random.randint(0, radius) / 1000
         destination = VincentyDistance(kilometers=distance)\
                        .destination(origin, bearing)
-        insertdata.append({"point": "POINT(" + str(destination.longitude) + " "
-                                    + str(destination.latitude) + ")",
+        insertdata.append({"point": "POINT(" + str(destination.latitude) + " "
+                                    + str(destination.longitude) + ")",
                            "trip_id": row[1], "ts": row[2],
                            "altitude": row[3]})
     print("Done Select, starting insert")
