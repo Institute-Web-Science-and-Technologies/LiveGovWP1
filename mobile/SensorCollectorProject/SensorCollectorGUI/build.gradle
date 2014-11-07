@@ -7,7 +7,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.13.0'
+        classpath 'com.android.tools.build:gradle:0.14.0'
     }
 }
 
@@ -25,12 +25,10 @@ repositories {
 android {
     compileSdkVersion 21
     buildToolsVersion '21.1'
-
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 21
     }
-
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES.txt'
         exclude 'META-INF/LICENSE.txt'
@@ -42,7 +40,16 @@ android {
         exclude 'META-INF/license.txt'
         exclude 'META-INF/dependencies.txt'
     }
-
+    buildTypes {
+        debug {
+            runProguard true
+            proguardFile 'proguard.cfg'
+        }
+        release {
+            runProguard true
+            proguardFile 'proguard.cfg'
+        }
+    }
 }
 
 dependencies {

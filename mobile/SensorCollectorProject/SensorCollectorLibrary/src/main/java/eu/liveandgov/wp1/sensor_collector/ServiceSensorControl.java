@@ -14,7 +14,6 @@ import android.support.v4.app.NotificationCompat;
 
 import com.google.common.base.Function;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;

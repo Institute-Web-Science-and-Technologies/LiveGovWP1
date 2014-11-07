@@ -6,14 +6,16 @@ import android.os.IBinder;
 import roboguice.service.RoboService;
 
 /**
- * Created by Pazuzu on 31.10.2014.
+ * Created by Pazuzu on 07.11.2014.
  */
-public abstract class ProvisioningRoboService extends RoboService {
+public abstract class BaseMoraService extends RoboService {
     private int connections = 0;
 
     protected abstract void activateProvision();
 
     protected abstract void activateStandAlone();
+
+    protected abstract IBinder getBinder();
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -23,8 +25,6 @@ public abstract class ProvisioningRoboService extends RoboService {
         // Return the API binder
         return getBinder();
     }
-
-    protected abstract IBinder getBinder();
 
     @Override
     public void onRebind(Intent intent) {

@@ -7,7 +7,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.13.0'
+        classpath 'com.android.tools.build:gradle:0.14.0'
     }
 }
 
@@ -46,15 +46,22 @@ android {
 
 dependencies {
     compile 'org.roboguice:roboguice:3.0'
-    compile 'org.roboguice:roboblender:3.0'
-    compile 'eu.liveandgov:liveandgov-commons:1.1'
-    compile 'eu.liveandgov:liveandgov-har-tools:1.1'
+    provided 'org.roboguice:roboblender:3.0'
+    compile 'com.google.guava:guava:18.0'
+    compile 'eu.liveandgov:liveandgov-commons:1.2'
+    compile 'eu.liveandgov:liveandgov-har-tools:1.2'
     compile 'com.android.support:appcompat-v7:21.0.0'
     compile 'com.android.support:support-v4:21.0.0'
     compile 'com.google.android.gms:play-services:6.1.71'
     compile 'junit:junit:3.8'
-    compile 'org.slf4j:slf4j-api:1.6.4'
-    compile 'org.slf4j:slf4j-log4j12:1.6.4'
     compile 'log4j:log4j:1.2.16'
     compile 'de.mindpipe.android:android-logging-log4j:1.0.3'
+}
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-AguiceAnnotationDatabasePackageName=eu.liveandgov.wp1.sensor_collector"
+        }
+    }
 }

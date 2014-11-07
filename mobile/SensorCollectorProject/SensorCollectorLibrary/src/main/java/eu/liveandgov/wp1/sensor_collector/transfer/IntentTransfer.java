@@ -6,7 +6,6 @@ import android.util.Log;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;

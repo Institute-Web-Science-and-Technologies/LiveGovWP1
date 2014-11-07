@@ -23,6 +23,15 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="roboguice.annotations.packages"
+            android:value="eu.liveandgov.wp1.sensor_collector" />
+
+        <meta-data
+            android:name="roboguice.modules"
+            android:value="eu.liveandgov.wp1.sensor_collector.MoraModule" />
+
         <activity
             android:name="eu.liveandgov.wp1.sensor_miner.ActivitySensorCollector"
             android:label="@string/app_name">

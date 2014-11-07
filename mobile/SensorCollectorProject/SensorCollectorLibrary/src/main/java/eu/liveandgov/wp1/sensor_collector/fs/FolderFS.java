@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import eu.liveandgov.wp1.data.annotations.Optional;
 import eu.liveandgov.wp1.sensor_collector.api.Trip;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 
@@ -44,27 +45,22 @@ public class FolderFS implements FS {
     private Context context;
 
     @Inject
-    @Named("eu.liveandgov.wp1.sensor_collector.fs.metaextension")
-    private String metaextension = ".meta";
-
-    @Inject
-    @Named("eu.liveandgov.wp1.sensor_collector.fs.metacharset")
-    private Charset metacharset = Charsets.UTF_8;
-
-    @Inject
-    @Named("eu.liveandgov.wp1.sensor_collector.fs.dataextension")
-    private String dataextension = ".data";
-
-    @Inject
-    @Named("eu.liveandgov.wp1.sensor_collector.fs.datacharset")
-    private Charset datacharset = Charsets.UTF_8;
-
-    @Inject
-    @Named("eu.liveandgov.wp1.sensor_collector.fs.root")
-    private String root = "mora/fs";
+    private Charset charset;
 
     @Inject
     private DateFormat dateFormat;
+
+    @Inject
+    @Named("eu.liveandgov.wp1.sensor_collector.fs.root")
+    private String root;
+
+    @Inject
+    @Named("eu.liveandgov.wp1.sensor_collector.fs.metaextension")
+    private String metaextension;
+
+    @Inject
+    @Named("eu.liveandgov.wp1.sensor_collector.fs.dataextension")
+    private String dataextension;
 
     /**
      * <p>Obtains the file under which all MORA file system entries are listed</p>
@@ -111,7 +107,7 @@ public class FolderFS implements FS {
      */
     private JSONObject openMetafile(File f) {
         try {
-            return new JSONObject(Files.toString(f, metacharset));
+            return new JSONObject(Files.toString(f, charset));
         } catch (IOException e) {
             logger.error("Error reading trip meta file in file system", e);
             throw new RuntimeException(e);
@@ -129,7 +125,7 @@ public class FolderFS implements FS {
      */
     private void putMetaFile(File f, JSONObject o) {
         try {
-            Files.write(o.toString(), f, metacharset);
+            Files.write(o.toString(), f, charset);
         } catch (IOException e) {
             logger.error("Error writing trip meta file to file system", e);
             throw new RuntimeException(e);
@@ -181,7 +177,7 @@ public class FolderFS implements FS {
                 if (trip.startTime != j.getLong("startTime")) continue;
                 if (trip.endTime != j.getLong("endTime")) continue;
 
-                return Files.asCharSource(findDatafile(f), datacharset);
+                return Files.asCharSource(findDatafile(f), charset);
             } catch (JSONException e) {
                 logger.error("Schema error in meta file", e);
                 throw new RuntimeException(e);
@@ -203,7 +199,7 @@ public class FolderFS implements FS {
                 if (trip.startTime != j.getLong("startTime")) continue;
                 if (trip.endTime != j.getLong("endTime")) continue;
 
-                return Files.asCharSink(findDatafile(f), datacharset);
+                return Files.asCharSink(findDatafile(f), charset);
             } catch (JSONException e) {
                 logger.error("Schema error in meta file", e);
                 throw new RuntimeException(e);
@@ -222,7 +218,7 @@ public class FolderFS implements FS {
             File f = newMetaFile();
             putMetaFile(f, meta);
 
-            return Files.asCharSink(findDatafile(f), datacharset);
+            return Files.asCharSink(findDatafile(f), charset);
         } catch (JSONException e) {
             logger.error("Error creating meta data object", e);
             throw new RuntimeException(e);

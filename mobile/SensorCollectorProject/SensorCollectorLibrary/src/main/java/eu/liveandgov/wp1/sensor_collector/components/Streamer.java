@@ -11,16 +11,16 @@ import eu.liveandgov.wp1.sensor_collector.os.SampleTarget;
  * Created by lukashaertel on 07.10.2014.
  */
 public class Streamer implements SampleTarget {
-    ZMQ.Socket s;
+  //  ZMQ.Socket s;
     public Streamer(){
-        ZMQ.Context x = ZMQ.context(1);
-        s = x.socket(ZMQ.PUB);
-        s.connect("addressherepls");
+      //  ZMQ.Context x = ZMQ.context(1);
+      //  s = x.socket(ZMQ.PUB);
+      //  s.connect("tcp://liveandgov.uni-koblenz.de:5555");
 
     }
 
     @Override
     public void handle(Item item) {
-        s.send(item.toSerializedForm());
+        //s.send(item.toSerializedForm());
     }
 }

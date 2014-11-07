@@ -24,7 +24,7 @@ import roboguice.service.RoboService;
 /**
  * Created by lukashaertel on 08.09.2014.
  */
-public abstract class MoraService extends ProvisioningRoboService {
+public class MoraService extends BaseMoraService {
     /**
      * Logger interface
      */
@@ -141,34 +141,25 @@ public abstract class MoraService extends ProvisioningRoboService {
         }
     };
 
+    @Inject
     private OS os;
-    private FS fs;
-    private Transfer transfer;
-    private Streamer streamer;
-    private Writer writer;
 
     @Inject
-    public void setUp(
-            // Top level components
-            OS os,
-            FS fs,
-            // Strategies
-            Transfer transfer,
-            // Network components
-            Streamer streamer,
-            Writer writer
-    ) {
-        // Copy fields
-        this.os = os;
-        this.fs = fs;
-        this.transfer = transfer;
-        this.streamer = streamer;
-        this.writer = writer;
+    private FS fs;
 
-        // ... and then they connect
-        logger.debug("Service is now set up.");
+    @Inject
+    private Transfer transfer;
+
+    @Inject
+    private Streamer streamer;
+
+    @Inject
+    private Writer writer;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
     }
-
 
     @Override
     protected void activateProvision() {
@@ -186,7 +177,7 @@ public abstract class MoraService extends ProvisioningRoboService {
 
     @Override
     protected IBinder getBinder() {
-        logger.debug("Binder requested");
         return api;
     }
+
 }
