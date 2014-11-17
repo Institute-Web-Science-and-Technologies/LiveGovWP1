@@ -46,6 +46,12 @@ public abstract class SensorSource implements SampleSource, Reporter {
     long motionSensorCorrection;
 
     /**
+     * Central credentials store
+     */
+    @Inject
+    Credentials credentials;
+
+    /**
      * Central item buffer
      */
     @Inject
@@ -89,9 +95,12 @@ public abstract class SensorSource implements SampleSource, Reporter {
 
         configurator.initListener(new ConfigListener() {
             @Override
-            public void updated(MoraConfig config) {
+            public void updated(MoraConfig was, MoraConfig config) {
                 // Default update strategy is reactivation
-                if (isActive()) {
+                if (!isActive())
+                    return;
+
+                if (isEnabled(was) != isEnabled(config) || getDelay(was) != getDelay(config)) {
                     deactivate();
                     activate();
                 }
@@ -172,28 +181,27 @@ public abstract class SensorSource implements SampleSource, Reporter {
         public void onSensorChanged(SensorEvent sensorEvent) {
             final long timestamp = (long) (sensorEvent.timestamp / 1E6) + motionSensorCorrection;
 
-            String userId = GlobalContext.getUserId();
             float[] values = Floats.concat(sensorEvent.values);
 
             final Motion motion;
             switch (sensorEvent.sensor.getType()) {
                 case Sensor.TYPE_ACCELEROMETER:
-                    motion = new Acceleration(timestamp, userId, values);
+                    motion = new Acceleration(timestamp, credentials.user, values);
                     break;
                 case Sensor.TYPE_GRAVITY:
-                    motion = new Gravity(timestamp, userId, values);
+                    motion = new Gravity(timestamp, credentials.user, values);
                     break;
                 case Sensor.TYPE_GYROSCOPE:
-                    motion = new Gyroscope(timestamp, userId, values);
+                    motion = new Gyroscope(timestamp, credentials.user, values);
                     break;
                 case Sensor.TYPE_LINEAR_ACCELERATION:
-                    motion = new LinearAcceleration(timestamp, userId, values);
+                    motion = new LinearAcceleration(timestamp, credentials.user, values);
                     break;
                 case Sensor.TYPE_MAGNETIC_FIELD:
-                    motion = new MagneticField(timestamp, userId, values);
+                    motion = new MagneticField(timestamp, credentials.user, values);
                     break;
                 case Sensor.TYPE_ROTATION_VECTOR:
-                    motion = new Rotation(timestamp, userId, values);
+                    motion = new Rotation(timestamp, credentials.user, values);
                     break;
 
                 default:

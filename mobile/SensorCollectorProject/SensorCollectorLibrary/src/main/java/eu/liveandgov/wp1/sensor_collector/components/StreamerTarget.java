@@ -26,7 +26,7 @@ public class StreamerTarget implements SampleTarget {
         // Listen for configuration changes
         configurator.initListener(new ConfigListener() {
             @Override
-            public void updated(MoraConfig config) {
+            public void updated(MoraConfig was, MoraConfig config) {
                 logger.info("Streamer now pointing to " + config.streaming);
             }
         }, true);
@@ -38,6 +38,6 @@ public class StreamerTarget implements SampleTarget {
 
     @Override
     public void handle(Item item) {
-        //s.send(item.toSerializedForm());
+        System.out.println(item.toSerializedForm());
     }
 }

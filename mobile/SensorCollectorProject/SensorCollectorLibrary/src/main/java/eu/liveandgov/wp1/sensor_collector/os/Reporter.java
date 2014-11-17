@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 /**
  * <p>Reporter</p>
+ * TODO: Make a central report repository instead instead of adding them manually
  * Created by lukashaertel on 08.09.2014.
  */
 public interface Reporter {

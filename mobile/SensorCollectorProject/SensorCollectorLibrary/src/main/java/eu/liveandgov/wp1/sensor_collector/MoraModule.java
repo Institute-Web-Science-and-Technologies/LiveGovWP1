@@ -11,9 +11,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
-import eu.liveandgov.wp1.sensor_collector.components.BlockingQueueItemBuffer;
+import eu.liveandgov.wp1.sensor_collector.components.LinkedItemBuffer;
 import eu.liveandgov.wp1.sensor_collector.components.ItemBuffer;
 import eu.liveandgov.wp1.sensor_collector.config.BasicConfigurator;
 import eu.liveandgov.wp1.sensor_collector.config.Configurator;
@@ -84,8 +85,17 @@ public class MoraModule extends AbstractModule {
                 .to(FolderFS.class);
 
         // Configure the connectors
+        bindConstant()
+                .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.components.itemBufferLimit"))
+                .to(1024);
+        bindConstant()
+                .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.components.itemBufferTimeout"))
+                .to(100L);
+        bindConstant()
+                .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.components.itemBufferTimeoutUnit"))
+                .to(TimeUnit.MILLISECONDS);
         bind(ItemBuffer.class)
-                .to(BlockingQueueItemBuffer.class);
+                .to(LinkedItemBuffer.class);
 
         // Configure the components
         long motionSensorCorrection = Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1

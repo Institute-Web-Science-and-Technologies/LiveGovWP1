@@ -4,13 +4,19 @@ import android.os.Bundle;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.apache.log4j.Logger;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
+import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.sensor_collector.components.ItemBuffer;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 
 /**
@@ -26,6 +32,13 @@ public class BasicOS implements OS {
      */
     private static final Logger logger = LogPrincipal.get();
 
+    @Inject
+    ScheduledExecutorService scheduledExecutorService;
+
+    @Inject
+    ItemBuffer itemBuffer;
+
+
     /**
      * The set of sample sources
      */
@@ -40,6 +53,48 @@ public class BasicOS implements OS {
      * The set of all reportes
      */
     private Set<Reporter> reporters = Sets.newConcurrentHashSet();
+
+    private ScheduledFuture<?> connector = null;
+
+    @Override
+    public void startConnector() {
+        // If already connected, return
+        if (connector != null) {
+            logger.warn("Repetitive call to start connector, maybe inconsistent state transitions");
+            return;
+        }
+
+        // Start runnable and store handle
+        connector = scheduledExecutorService.schedule(new Runnable() {
+            @Override
+            public void run() {
+                // While connector is running
+                while (connector != null && !connector.isCancelled()) {
+                    // Poll an item
+                    Item item = itemBuffer.poll();
+
+                    // If no item could be polled during the timeout, skip this round
+                    if (item == null)
+                        continue;
+
+                    // Offer item to all targets
+                    for (SampleTarget t : sampleTargets)
+                        t.handle(item);
+                }
+            }
+        }, 0L, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void stopConnector() {
+        if (connector == null) {
+            logger.warn("Repetitive call to stop connector, maybe inconsistent state transitions");
+            return;
+        }
+
+        connector.cancel(false);
+        connector = null;
+    }
 
     @Override
     public boolean isActive() {

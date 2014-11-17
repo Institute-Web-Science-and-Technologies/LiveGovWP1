@@ -6,6 +6,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
+import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -233,8 +234,9 @@ public class FolderFS implements FS {
                 if (!d.exists() && !d.createNewFile())
                     throw new IOException("Cannot create data file");
 
+
                 // Return as char sink
-                return Files.asCharSink(d, charset);
+                return Files.asCharSink(d, charset, FileWriteMode.APPEND);
             } catch (JSONException e) {
                 logger.error("Schema error in meta file", e);
                 throw new RuntimeException(e);
@@ -267,7 +269,7 @@ public class FolderFS implements FS {
                 throw new IOException("Cannot create data file");
 
             // Return as char sink
-            return Files.asCharSink(d, charset);
+            return Files.asCharSink(d, charset, FileWriteMode.APPEND);
         } catch (JSONException e) {
             logger.error("Error creating meta data object", e);
             throw new RuntimeException(e);

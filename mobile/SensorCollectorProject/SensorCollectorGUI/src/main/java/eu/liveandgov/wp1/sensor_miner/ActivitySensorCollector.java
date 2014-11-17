@@ -356,7 +356,10 @@ public class ActivitySensorCollector extends Activity {
                 StringBuilder b = new StringBuilder();
                 for (Bundle r : api.getReports()) {
                     // Append reporter
-                    b.append(r.getString(Reporter.SPECIAL_KEY_ORIGINATOR, "Report")).append("\r\n");
+                    if (r.containsKey(Reporter.SPECIAL_KEY_ORIGINATOR))
+                        b.append(r.get(Reporter.SPECIAL_KEY_ORIGINATOR)).append("\r\n");
+                    else
+                        b.append("Unknown reporter\r\n");
 
                     // Append keys
                     for (String k : r.keySet())

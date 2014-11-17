@@ -12,6 +12,9 @@ import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
  * Created by lukashaertel on 08.09.2014.
  */
 public interface OS {
+    void startConnector();
+    void stopConnector();
+
     boolean isActive();
 
     void add(SampleSource sampleSource);

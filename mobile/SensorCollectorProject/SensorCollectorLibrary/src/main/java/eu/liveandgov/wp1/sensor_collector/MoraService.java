@@ -14,6 +14,7 @@ import java.util.List;
 import eu.liveandgov.wp1.sensor_collector.api.MoraAPI;
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
 import eu.liveandgov.wp1.sensor_collector.api.Trip;
+import eu.liveandgov.wp1.sensor_collector.components.Credentials;
 import eu.liveandgov.wp1.sensor_collector.components.ItemBuffer;
 import eu.liveandgov.wp1.sensor_collector.components.SensorSource.*;
 import eu.liveandgov.wp1.sensor_collector.components.StreamerTarget;
@@ -24,6 +25,7 @@ import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.os.OS;
 import eu.liveandgov.wp1.sensor_collector.os.Reporter;
 import eu.liveandgov.wp1.sensor_collector.os.SampleSource;
+import eu.liveandgov.wp1.sensor_collector.os.SampleTarget;
 import eu.liveandgov.wp1.sensor_collector.strategies.Transfer;
 
 /**
@@ -52,13 +54,13 @@ public class MoraService extends BaseMoraService {
                 return;
 
             // Make a temporary trip
-            activeTrip = new Trip("USER", "SECRET", System.currentTimeMillis(), Trip.SPECIAL_TIME_UNSET);
+            activeTrip = new Trip(credentials.user, credentials.secret, System.currentTimeMillis(), Trip.SPECIAL_TIME_UNSET);
 
             // Assign the trips sink to the writer
             writerTarget.setSink(fs.writeTrip(activeTrip));
 
             // Activate the writer dependency
-            os.add(writerTarget);
+            os.add((SampleTarget) writerTarget);
 
             // Set recording flag
             isRecording = true;
@@ -74,7 +76,7 @@ public class MoraService extends BaseMoraService {
             isRecording = false;
 
             // Deactivate writer dependency
-            os.remove(writerTarget);
+            os.remove((SampleTarget) writerTarget);
 
             // Unset sink
             writerTarget.setSink(null);
@@ -161,6 +163,8 @@ public class MoraService extends BaseMoraService {
         }
     };
 
+    @Inject
+    Credentials credentials;
 
     @Inject
     Configurator configurator;
@@ -210,7 +214,6 @@ public class MoraService extends BaseMoraService {
         // Add the connectors
         os.add(itemBuffer);
 
-
         // Add the sensors
         os.add((SampleSource) accelerometerSource);
         os.add((Reporter) accelerometerSource);
@@ -227,13 +230,20 @@ public class MoraService extends BaseMoraService {
         os.add((SampleSource) rotationSource);
         os.add((Reporter) rotationSource);
 
+        // Add the targets
+        os.add((Reporter) writerTarget);
+
         // Sanitize file system
         for (Trip t : fs.listTrips(false))
             fs.deleteTrip(t);
+
+        os.startConnector();
     }
 
     @Override
     protected void shutdown() throws IOException {
+        os.stopConnector();
+
         // Save the config
         configurator.storeConfig();
     }
