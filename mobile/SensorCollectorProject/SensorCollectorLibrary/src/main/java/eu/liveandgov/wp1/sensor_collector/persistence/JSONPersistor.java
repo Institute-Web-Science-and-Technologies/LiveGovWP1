@@ -1,7 +1,5 @@
 package eu.liveandgov.wp1.sensor_collector.persistence;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.util.JsonWriter;
 
 import org.apache.log4j.Logger;
@@ -9,15 +7,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOError;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
-import java.util.Arrays;
 
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.data.impl.Activity;

@@ -24,7 +24,7 @@ public class BasicOS implements OS {
     /**
      * Logger interface
      */
-    private final Logger logger = LogPrincipal.get();
+    private static final Logger logger = LogPrincipal.get();
 
     /**
      * The set of sample sources

@@ -1,25 +1,29 @@
 package eu.liveandgov.wp1.sensor_collector;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 import org.apache.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import eu.liveandgov.wp1.sensor_collector.api.MoraAPI;
+import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
 import eu.liveandgov.wp1.sensor_collector.api.Trip;
 import eu.liveandgov.wp1.sensor_collector.components.Streamer;
 import eu.liveandgov.wp1.sensor_collector.components.Writer;
+import eu.liveandgov.wp1.sensor_collector.config.Configurator;
 import eu.liveandgov.wp1.sensor_collector.fs.FS;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.os.OS;
 import eu.liveandgov.wp1.sensor_collector.strategies.Transfer;
-import roboguice.service.RoboService;
+import eu.liveandgov.wp1.sensor_collector.util.MoraFiles;
 
 /**
  * Created by lukashaertel on 08.09.2014.
@@ -28,7 +32,7 @@ public class MoraService extends BaseMoraService {
     /**
      * Logger interface
      */
-    private final Logger logger = LogPrincipal.get();
+    private static final Logger logger = LogPrincipal.get();
 
 
     /**
@@ -36,6 +40,7 @@ public class MoraService extends BaseMoraService {
      */
     private final IBinder api = new MoraAPI.Stub() {
         private Trip activeTrip;
+
         private boolean isRecording = false;
 
         private boolean isStreaming = false;
@@ -139,7 +144,26 @@ public class MoraService extends BaseMoraService {
             // Get all implemented reports
             return os.getReports();
         }
+
+        @Override
+        public MoraConfig getConfig() {
+            return configurator.getConfig();
+        }
+
+        @Override
+        public void setConfig(MoraConfig config) {
+            configurator.setConfig(config);
+        }
+
+        @Override
+        public void resetConfig() {
+            configurator.resetConfig();
+        }
     };
+
+
+    @Inject
+    private Configurator configurator;
 
     @Inject
     private OS os;
@@ -157,22 +181,21 @@ public class MoraService extends BaseMoraService {
     private Writer writer;
 
     @Override
-    public void onCreate() {
-        super.onCreate();
+    protected void startup() throws IOException {
+        // Load the config
+        configurator.loadConfig();
     }
 
     @Override
-    protected void activateProvision() {
-        logger.debug("Service is now providing for user interface.");
+    protected void shutdown() throws IOException {
+        // Save the config
+        configurator.storeConfig();
     }
 
     @Override
-    protected void activateStandAlone() {
+    protected boolean activateStandAlone() {
         // If no activity at backend, service may terminate
-        if (!os.isActive()) {
-            logger.debug("Entered standalone mode of service without backend activity, stopping.");
-            stopSelf();
-        }
+        return os.isActive();
     }
 
     @Override

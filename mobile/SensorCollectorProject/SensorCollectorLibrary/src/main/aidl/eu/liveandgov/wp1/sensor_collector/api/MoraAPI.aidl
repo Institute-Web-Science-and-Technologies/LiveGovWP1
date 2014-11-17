@@ -4,8 +4,24 @@ package eu.liveandgov.wp1.sensor_collector.api;
 import android.os.Bundle;
 
 import eu.liveandgov.wp1.sensor_collector.api.Trip;
+import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
 
 interface MoraAPI {
+    /**
+     * Reads the config, result is modifiable but changes are not propagated, call setConfig
+     */
+    MoraConfig getConfig();
+
+    /**
+     * Sets the new config
+     */
+    void setConfig(in MoraConfig c);
+
+    /**
+     * Resets the config
+     */
+    void resetConfig();
+
     /**
      * Starts the sample recorder
      */

@@ -35,7 +35,7 @@ import static junit.framework.Assert.assertNotNull;
 public class LocationHolderPlayServices extends LocationHolder implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
     private LocationClient locationClient;
     private LocationRequest locationRequest;
     private Looper myLooper;

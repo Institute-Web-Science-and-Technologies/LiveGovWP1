@@ -39,7 +39,7 @@ import static junit.framework.Assert.assertNotNull;
  * Created by hartmann on 9/22/13.
  */
 public class SensorThread implements Runnable {
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
 
     private Set<SensorHolder> activeSensors = new CopyOnWriteArraySet<SensorHolder>();
     private Handler sensorHandler;

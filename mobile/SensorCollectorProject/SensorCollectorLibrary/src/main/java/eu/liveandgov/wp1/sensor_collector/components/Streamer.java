@@ -2,20 +2,37 @@ package eu.liveandgov.wp1.sensor_collector.components;
 
 import com.google.inject.Inject;
 
-import org.zeromq.ZMQ;
+import org.apache.log4j.Logger;
 
 import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
+import eu.liveandgov.wp1.sensor_collector.config.ConfigListener;
+import eu.liveandgov.wp1.sensor_collector.config.Configurator;
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.os.SampleTarget;
 
 /**
  * Created by lukashaertel on 07.10.2014.
  */
 public class Streamer implements SampleTarget {
-  //  ZMQ.Socket s;
-    public Streamer(){
-      //  ZMQ.Context x = ZMQ.context(1);
-      //  s = x.socket(ZMQ.PUB);
-      //  s.connect("tcp://liveandgov.uni-koblenz.de:5555");
+    /**
+     * Logger interface
+     */
+    private static final Logger logger = LogPrincipal.get();
+
+    //  ZMQ.Socket s;
+    @Inject
+    public Streamer(Configurator configurator) {
+        // Listen for configuration changes
+        configurator.initListener(new ConfigListener() {
+            @Override
+            public void updated(MoraConfig config) {
+                logger.info("Streamer now pointing to " + config.streaming);
+            }
+        }, true);
+        //  ZMQ.Context x = ZMQ.context(1);
+        //  s = x.socket(ZMQ.PUB);
+        //  s.connect("tcp://liveandgov.uni-koblenz.de:5555");
 
     }
 

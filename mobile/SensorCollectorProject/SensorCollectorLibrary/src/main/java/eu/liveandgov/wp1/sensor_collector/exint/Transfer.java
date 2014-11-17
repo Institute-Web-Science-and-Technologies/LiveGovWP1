@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.common.base.Strings;
-import com.google.common.io.Files;
 
 import org.apache.log4j.Logger;
 
@@ -25,7 +24,7 @@ import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
  * </ul>
  */
 public class Transfer extends IntentService {
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
 
     /**
      * Extra field. Handle of a transfer, can be used to maintain record of active and succeeded transfers

@@ -2,7 +2,6 @@ package eu.liveandgov.wp1.sensor_collector;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -17,10 +16,7 @@ import com.google.common.base.Function;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Random;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -31,9 +27,7 @@ import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.sensor_collector.activity_recognition.HARAdapter;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI;
-import eu.liveandgov.wp1.sensor_collector.configuration.PPSOptions;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
-import eu.liveandgov.wp1.sensor_collector.configuration.WaitingOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.impl.ConnectorThread;
 import eu.liveandgov.wp1.sensor_collector.connectors.impl.GpsCache;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.LinkedSensorQueue;
@@ -57,7 +51,7 @@ import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionO
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.ZIPPED_PERSISTOR;
 
 public class ServiceSensorControl extends Service {
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
 
     // CONSTANTS
     public static final String SENSOR_FILENAME = "sensor.ssf";

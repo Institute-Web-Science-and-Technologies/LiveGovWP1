@@ -10,7 +10,6 @@ import java.io.IOException;
 
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.R;
-import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.exint.Post2TransferExecutor;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
@@ -27,7 +26,7 @@ import eu.liveandgov.wp1.util.LocalBuilder;
  * Created by hartmann on 8/30/13.
  */
 public class TransferThreadPost implements Runnable, TransferManager {
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
 
     private Thread thread;
 

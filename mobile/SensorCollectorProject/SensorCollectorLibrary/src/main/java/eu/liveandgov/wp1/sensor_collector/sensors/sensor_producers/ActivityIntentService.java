@@ -17,7 +17,7 @@ import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
  * Created by cehlen on 9/26/13.
  */
 public class ActivityIntentService extends IntentService {
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
 
     /**
      * Utility method for converting the activity type into a readable string

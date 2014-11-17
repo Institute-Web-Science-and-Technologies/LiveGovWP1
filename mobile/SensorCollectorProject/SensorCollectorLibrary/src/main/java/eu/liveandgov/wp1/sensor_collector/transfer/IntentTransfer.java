@@ -1,17 +1,12 @@
 package eu.liveandgov.wp1.sensor_collector.transfer;
 
 import android.content.SharedPreferences;
-import android.util.Log;
-
-import com.google.common.collect.Sets;
-import com.google.common.io.Files;
 
 import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Set;
 import java.util.UUID;
 
 import eu.liveandgov.wp1.data.Callback;
@@ -28,7 +23,7 @@ import eu.liveandgov.wp1.sensor_collector.persistence.Persistor;
  * Created by lukashaertel on 25.08.2014.
  */
 public class IntentTransfer implements TransferManager {
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
 
     private final Persistor persistor;
 

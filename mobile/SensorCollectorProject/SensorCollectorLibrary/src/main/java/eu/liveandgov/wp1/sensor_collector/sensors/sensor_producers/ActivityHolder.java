@@ -19,7 +19,7 @@ import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
  */
 public class ActivityHolder implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener, SensorHolder {
 
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
     public static final int DETECTION_INTERVAL_SECONDS = 20;
 
     public static final int MILLISECONDS_PER_SECOND = 1000;

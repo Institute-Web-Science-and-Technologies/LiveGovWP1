@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import org.apache.log4j.Logger;
 
@@ -20,7 +19,7 @@ public class TransferTracker {
     /**
      * Obtain a logger
      */
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
 
     /**
      * Callback set for state changes

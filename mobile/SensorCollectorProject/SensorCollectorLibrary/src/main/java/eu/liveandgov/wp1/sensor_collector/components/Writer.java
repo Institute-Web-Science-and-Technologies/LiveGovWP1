@@ -2,13 +2,13 @@ package eu.liveandgov.wp1.sensor_collector.components;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharSink;
-import com.google.inject.Inject;
 
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
 import eu.liveandgov.wp1.data.Item;
+import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.os.SampleTarget;
 
@@ -16,7 +16,7 @@ import eu.liveandgov.wp1.sensor_collector.os.SampleTarget;
  * Created by Pazuzu on 07.10.2014.
  */
 public class Writer implements SampleTarget {
-    private Logger logger = LogPrincipal.get();
+    private static final Logger logger = LogPrincipal.get();
 
     private CharSink sink;
 
@@ -26,7 +26,7 @@ public class Writer implements SampleTarget {
 
     @Override
     public void handle(Item item) {
-        if(sink==null)
+        if (sink == null)
             return;
 
         try {

@@ -22,7 +22,7 @@ import eu.liveandgov.wp1.util.LocalBuilder;
  * Created by hartmann on 10/2/13.
  */
 public class ZMQStreamer extends ZMQClient implements Monitorable {
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
 
     /**
      * Pull interval can be slow because we don't expect responses

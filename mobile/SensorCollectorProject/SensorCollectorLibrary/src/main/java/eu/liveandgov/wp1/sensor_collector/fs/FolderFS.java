@@ -2,13 +2,13 @@ package eu.liveandgov.wp1.sensor_collector.fs;
 
 import android.content.Context;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 import org.apache.log4j.Logger;
@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import eu.liveandgov.wp1.data.annotations.Optional;
+import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
 import eu.liveandgov.wp1.sensor_collector.api.Trip;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 
@@ -32,11 +32,12 @@ import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
  * <p>Implements a MORA file system from a folder contianing files named in a specific scheme</p>
  * Created by lukashaertel on 30.09.2014.
  */
+@Singleton
 public class FolderFS implements FS {
     /**
      * Logger interface
      */
-    private final Logger logger = LogPrincipal.get();
+    private static final Logger logger = LogPrincipal.get();
 
     /**
      * <p>Android context, needed for root file resolution</p>

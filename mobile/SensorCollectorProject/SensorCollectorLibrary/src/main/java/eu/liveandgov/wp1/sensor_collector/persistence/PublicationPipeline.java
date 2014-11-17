@@ -16,7 +16,7 @@ import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
  * Created by hartmann on 11/12/13.
  */
 public class PublicationPipeline implements Consumer<Item> {
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
 
     public static final String PUBLISH_FILENAME = "published.ssf";
 

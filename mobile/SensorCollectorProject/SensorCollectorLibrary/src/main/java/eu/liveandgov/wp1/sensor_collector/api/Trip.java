@@ -7,10 +7,12 @@ import android.support.annotation.NonNull;
 import com.google.common.base.Objects;
 import com.google.common.collect.ComparisonChain;
 
+import java.io.Serializable;
+
 /**
  * Created by lukashaertel on 08.09.2014.
  */
-public class Trip implements Parcelable, Comparable<Trip> {
+public class Trip implements Parcelable, Comparable<Trip>, Serializable {
     public static final Creator<Trip> CREATOR = new Creator<Trip>() {
         @Override
         public Trip createFromParcel(Parcel source) {
@@ -70,9 +72,8 @@ public class Trip implements Parcelable, Comparable<Trip> {
         if (endTime != trip.endTime) return false;
         if (startTime != trip.startTime) return false;
         if (!userId.equals(trip.userId)) return false;
-        if (!userSecret.equals(trip.userSecret)) return false;
+        return userSecret.equals(trip.userSecret);
 
-        return true;
     }
 
     @Override

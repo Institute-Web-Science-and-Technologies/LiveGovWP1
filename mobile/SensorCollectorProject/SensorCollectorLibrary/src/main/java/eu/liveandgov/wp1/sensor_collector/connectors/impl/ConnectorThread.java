@@ -17,7 +17,7 @@ import eu.liveandgov.wp1.util.LocalBuilder;
  * Created by hartmann on 9/15/13.
  */
 public class ConnectorThread extends MultiProducer<Item> implements Runnable, Monitorable {
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
 
     /**
      * This constant specifies how many items are produced without diagnosing the pipe times,

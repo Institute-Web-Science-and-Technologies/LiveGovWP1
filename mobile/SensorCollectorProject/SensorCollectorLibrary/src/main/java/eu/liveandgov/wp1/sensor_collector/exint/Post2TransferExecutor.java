@@ -33,7 +33,7 @@ public class Post2TransferExecutor implements TransferExecutor {
     /**
      * Logger for the transfer executor
      */
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
 
     /**
      * Charset for the transfer

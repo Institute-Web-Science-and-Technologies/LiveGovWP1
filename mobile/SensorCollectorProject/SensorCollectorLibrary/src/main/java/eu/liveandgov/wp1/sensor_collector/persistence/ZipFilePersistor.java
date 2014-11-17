@@ -1,13 +1,10 @@
 package eu.liveandgov.wp1.sensor_collector.persistence;
 
 import android.os.Handler;
-import android.util.Log;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
-import com.google.common.io.LineProcessor;
 
 import org.apache.log4j.Logger;
 
@@ -16,23 +13,17 @@ import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
-import java.io.Reader;
-import java.nio.charset.Charset;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Scanner;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
-import eu.liveandgov.wp1.serialization.Serialization;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
@@ -41,7 +32,7 @@ import eu.liveandgov.wp1.util.LocalBuilder;
  * Created by hartmann on 9/20/13.
  */
 public class ZipFilePersistor implements Persistor {
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
 
     public static final String FILENAME = "sensor.log.gz";
 

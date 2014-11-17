@@ -7,7 +7,6 @@ import com.google.common.collect.ImmutableMap;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Map;
 
 /**
  * Created by hartmann on 9/26/13.

@@ -31,7 +31,7 @@ import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
  * Created by lukashaertel on 30.11.13.
  */
 public class BluetoothHolder implements SensorHolder {
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
     /**
      * This TreeMap maps the integer representing the device major class to its name.
      */

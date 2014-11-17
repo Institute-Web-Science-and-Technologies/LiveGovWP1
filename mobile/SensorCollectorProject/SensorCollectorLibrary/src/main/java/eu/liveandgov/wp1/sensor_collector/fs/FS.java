@@ -35,8 +35,9 @@ public interface FS {
 
     /**
      * Renames a trip from the source name to the target name
+     *
      * @param tripFrom The Source trip
-     * @param tripTo The target trip
+     * @param tripTo   The target trip
      */
     void renameTrip(Trip tripFrom, Trip tripTo);
 

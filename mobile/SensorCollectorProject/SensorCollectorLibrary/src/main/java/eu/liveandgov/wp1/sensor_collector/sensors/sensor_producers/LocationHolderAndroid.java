@@ -21,7 +21,7 @@ import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
  * Created by lukashaertel on 04.12.13.
  */
 public class LocationHolderAndroid extends LocationHolder {
-    private final Logger log = LogPrincipal.get();
+    private static final Logger log = LogPrincipal.get();
 
     private final Looper looper;
 
