@@ -15,7 +15,7 @@ import eu.liveandgov.wp1.sensor_collector.os.SampleTarget;
 /**
  * Created by Pazuzu on 07.10.2014.
  */
-public class Writer implements SampleTarget {
+public class WriterTarget implements SampleTarget {
     private static final Logger logger = LogPrincipal.get();
 
     private CharSink sink;

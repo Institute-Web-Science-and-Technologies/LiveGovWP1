@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
@@ -30,28 +31,25 @@ import java.util.concurrent.TimeUnit;
 import eu.liveandgov.wp1.sensor_collector.MoraService;
 import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
 import eu.liveandgov.wp1.sensor_collector.api.MoraAPI;
+import eu.liveandgov.wp1.sensor_collector.api.Trip;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
+import eu.liveandgov.wp1.sensor_collector.os.Reporter;
 import eu.liveandgov.wp1.sensor_miner.configuration.SensorMinerOptions;
 
-import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.FIELD_MESSAGE;
 import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.FIELD_STREAMING;
 import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.RETURN_LOG;
 import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.START_STREAMING;
 import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.STOP_STREAMING;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_ANNOTATE;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_GET_STATUS;
-import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_RECORDING_ENABLE;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_SET_ID;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_START_HAR;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_STOP_HAR;
-import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.ACTION_TRANSFER_SAMPLES;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_ACTIVITY;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_ANNOTATION;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_HAR;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_STATUS_ID;
-import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_SAMPLING;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.FIELD_TRANSFERRING;
-import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.RECORDING_DISABLE;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.RETURN_ACTIVITY;
 import static eu.liveandgov.wp1.sensor_collector.configuration.IntentAPI.RETURN_STATUS;
 
@@ -216,20 +214,38 @@ public class ActivitySensorCollector extends Activity {
     /* BUTTON HANDLER */
     public void onRecordingToggleButtonClick(View view) {
         if (!isRecording) {
-            Intent intent = new Intent(this, ServiceSensorControl.class);
-            intent.setAction(ACTION_RECORDING_ENABLE);
-            startService(intent);
+//            Intent intent = new Intent(this, ServiceSensorControl.class);
+//            intent.setAction(ACTION_RECORDING_ENABLE);
+//            startService(intent);
+
+            try {
+                api.startRecording();
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
         } else { // already recording
-            Intent intent = new Intent(this, ServiceSensorControl.class);
-            intent.setAction(RECORDING_DISABLE);
-            startService(intent);
+//            Intent intent = new Intent(this, ServiceSensorControl.class);
+//            intent.setAction(RECORDING_DISABLE);
+//            startService(intent);
+
+            try {
+                api.stopRecording();
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     public void onTransferButtonClick(View view) {
-        Intent intent = new Intent(this, ServiceSensorControl.class);
-        intent.setAction(ACTION_TRANSFER_SAMPLES);
-        startService(intent);
+        try {
+            for (Trip t : api.getTrips())
+                api.transferTrip(t);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+//        Intent intent = new Intent(this, ServiceSensorControl.class);
+//        intent.setAction(ACTION_TRANSFER_SAMPLES);
+//        startService(intent);
     }
 
     public void onSendButtonClick(View view) {
@@ -280,9 +296,16 @@ public class ActivitySensorCollector extends Activity {
     }
 
     public void onDeleteButtonClick(View view) {
-        Intent intent = new Intent(this, ServiceSensorControl.class);
-        intent.setAction(ExtendedIntentAPI.ACTION_DELETE_SAMPLES);
-        startService(intent);
+        try {
+            for (Trip t : api.getTrips())
+                api.deleteTrip(t);
+
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+//        Intent intent = new Intent(this, ServiceSensorControl.class);
+//        intent.setAction(ExtendedIntentAPI.ACTION_DELETE_SAMPLES);
+//        startService(intent);
     }
 
     /* HANDLE RETURN INTENTS */
@@ -326,7 +349,27 @@ public class ActivitySensorCollector extends Activity {
     }
 
     private void updateLog(Intent intent) {
-        logTextView.setText(intent.getStringExtra(FIELD_MESSAGE) + "\n");
+        // logTextView.setText(intent.getStringExtra(FIELD_MESSAGE) + "\n");
+
+        try {
+            if (api != null) {
+                StringBuilder b = new StringBuilder();
+                for (Bundle r : api.getReports()) {
+                    // Append reporter
+                    b.append(r.getString(Reporter.SPECIAL_KEY_ORIGINATOR, "Report")).append("\r\n");
+
+                    // Append keys
+                    for (String k : r.keySet())
+                        if (!Reporter.SPECIAL_KEY_ORIGINATOR.equals(k))
+                            b.append(k).append(": ").append(r.get(k)).append("\r\n");
+                    b.append("\r\n");
+                }
+
+                logTextView.setText(b);
+            }
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
 
         // scroll to end
 //        logTextView.setSelected(true);
@@ -353,8 +396,14 @@ public class ActivitySensorCollector extends Activity {
     }
 
     private void updateStatus(Intent intent) {
+
         // Update Flags
-        isRecording = intent.getBooleanExtra(FIELD_SAMPLING, false);
+        //isRecording = intent.getBooleanExtra(FIELD_SAMPLING, false);
+        try {
+            isRecording = api != null && api.isRecording();
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
         isTransferring = intent.getBooleanExtra(FIELD_TRANSFERRING, false);
         isStreaming = intent.getBooleanExtra(FIELD_STREAMING, false);
         isHAR = intent.getBooleanExtra(FIELD_HAR, false);

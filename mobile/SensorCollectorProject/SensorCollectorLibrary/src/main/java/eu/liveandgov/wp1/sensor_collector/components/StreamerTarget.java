@@ -14,7 +14,7 @@ import eu.liveandgov.wp1.sensor_collector.os.SampleTarget;
 /**
  * Created by lukashaertel on 07.10.2014.
  */
-public class Streamer implements SampleTarget {
+public class StreamerTarget implements SampleTarget {
     /**
      * Logger interface
      */
@@ -22,7 +22,7 @@ public class Streamer implements SampleTarget {
 
     //  ZMQ.Socket s;
     @Inject
-    public Streamer(Configurator configurator) {
+    public StreamerTarget(Configurator configurator) {
         // Listen for configuration changes
         configurator.initListener(new ConfigListener() {
             @Override

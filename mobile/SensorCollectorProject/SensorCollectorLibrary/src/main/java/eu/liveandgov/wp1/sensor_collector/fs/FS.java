@@ -15,9 +15,11 @@ public interface FS {
     /**
      * <p>Lists all the currently stored trips</p>
      *
+     * @param complete True if only complete trips, false if only incomplete trips
      * @return Returns a list of trips
      */
-    List<Trip> listTrips();
+    List<Trip> listTrips(boolean complete);
+
 
     /**
      * <p>Opens an existing trip for reading</p>

@@ -5,25 +5,26 @@ import android.os.IBinder;
 import android.os.RemoteException;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 import org.apache.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import eu.liveandgov.wp1.sensor_collector.api.MoraAPI;
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
 import eu.liveandgov.wp1.sensor_collector.api.Trip;
-import eu.liveandgov.wp1.sensor_collector.components.Streamer;
-import eu.liveandgov.wp1.sensor_collector.components.Writer;
+import eu.liveandgov.wp1.sensor_collector.components.ItemBuffer;
+import eu.liveandgov.wp1.sensor_collector.components.SensorSource.*;
+import eu.liveandgov.wp1.sensor_collector.components.StreamerTarget;
+import eu.liveandgov.wp1.sensor_collector.components.WriterTarget;
 import eu.liveandgov.wp1.sensor_collector.config.Configurator;
 import eu.liveandgov.wp1.sensor_collector.fs.FS;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.os.OS;
+import eu.liveandgov.wp1.sensor_collector.os.Reporter;
+import eu.liveandgov.wp1.sensor_collector.os.SampleSource;
 import eu.liveandgov.wp1.sensor_collector.strategies.Transfer;
-import eu.liveandgov.wp1.sensor_collector.util.MoraFiles;
 
 /**
  * Created by lukashaertel on 08.09.2014.
@@ -33,7 +34,6 @@ public class MoraService extends BaseMoraService {
      * Logger interface
      */
     private static final Logger logger = LogPrincipal.get();
-
 
     /**
      * This binder holds and delegates all API calls to their respective components
@@ -55,10 +55,10 @@ public class MoraService extends BaseMoraService {
             activeTrip = new Trip("USER", "SECRET", System.currentTimeMillis(), Trip.SPECIAL_TIME_UNSET);
 
             // Assign the trips sink to the writer
-            writer.setSink(fs.writeTrip(activeTrip));
+            writerTarget.setSink(fs.writeTrip(activeTrip));
 
             // Activate the writer dependency
-            os.add(writer);
+            os.add(writerTarget);
 
             // Set recording flag
             isRecording = true;
@@ -74,10 +74,10 @@ public class MoraService extends BaseMoraService {
             isRecording = false;
 
             // Deactivate writer dependency
-            os.remove(writer);
+            os.remove(writerTarget);
 
             // Unset sink
-            writer.setSink(null);
+            writerTarget.setSink(null);
 
             // Move temporary trip
             fs.renameTrip(activeTrip, new Trip(activeTrip.userId, activeTrip.userSecret, activeTrip.startTime, System.currentTimeMillis()));
@@ -98,7 +98,7 @@ public class MoraService extends BaseMoraService {
                 return;
 
             // Add streamer dependency
-            os.add(streamer);
+            os.add(streamerTarget);
 
             // Set streaming flag
             isStreaming = true;
@@ -114,7 +114,7 @@ public class MoraService extends BaseMoraService {
             isStreaming = false;
 
             // Remove streamer dependency
-            os.remove(streamer);
+            os.remove(streamerTarget);
         }
 
         @Override
@@ -124,13 +124,13 @@ public class MoraService extends BaseMoraService {
 
         @Override
         public List<Trip> getTrips() throws RemoteException {
-            return fs.listTrips();
+            return fs.listTrips(true);
         }
 
         @Override
         public void transferTrip(Trip trip) throws RemoteException {
             // Read the trip and transfer it somewhere
-            transfer.transferAllStuffSomewhere(fs.readTrip(trip));
+            transfer.transferAllStuffSomewhere(trip, fs.readTrip(trip));
         }
 
         @Override
@@ -163,27 +163,73 @@ public class MoraService extends BaseMoraService {
 
 
     @Inject
-    private Configurator configurator;
+    Configurator configurator;
 
     @Inject
-    private OS os;
+    OS os;
 
     @Inject
-    private FS fs;
+    FS fs;
+
 
     @Inject
-    private Transfer transfer;
+    Transfer transfer;
 
     @Inject
-    private Streamer streamer;
+    ItemBuffer itemBuffer;
+
 
     @Inject
-    private Writer writer;
+    AccelerometerSource accelerometerSource;
+
+    @Inject
+    LinearAccelerationSource linearAccelerationSource;
+
+    @Inject
+    GravitySource gravitySource;
+
+    @Inject
+    MagnetometerSource magnetometerSource;
+
+    @Inject
+    RotationSource rotationSource;
+
+
+    @Inject
+    StreamerTarget streamerTarget;
+
+    @Inject
+    WriterTarget writerTarget;
 
     @Override
     protected void startup() throws IOException {
         // Load the config
         configurator.loadConfig();
+
+
+        // Add the connectors
+        os.add(itemBuffer);
+
+
+        // Add the sensors
+        os.add((SampleSource) accelerometerSource);
+        os.add((Reporter) accelerometerSource);
+
+        os.add((SampleSource) linearAccelerationSource);
+        os.add((Reporter) linearAccelerationSource);
+
+        os.add((SampleSource) gravitySource);
+        os.add((Reporter) gravitySource);
+
+        os.add((SampleSource) magnetometerSource);
+        os.add((Reporter) magnetometerSource);
+
+        os.add((SampleSource) rotationSource);
+        os.add((Reporter) rotationSource);
+
+        // Sanitize file system
+        for (Trip t : fs.listTrips(false))
+            fs.deleteTrip(t);
     }
 
     @Override

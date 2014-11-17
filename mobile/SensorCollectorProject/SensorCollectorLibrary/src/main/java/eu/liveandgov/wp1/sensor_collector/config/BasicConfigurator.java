@@ -24,15 +24,15 @@ public class BasicConfigurator implements Configurator {
      * <p>Android context, needed for root file resolution</p>
      */
     @Inject
-    private Context context;
+    Context context;
 
     @Inject
     @Named("eu.liveandgov.wp1.sensor_collector.config.configFile")
-    private String configFile;
+    String configFile;
 
     @Inject
     @Named("eu.liveandgov.wp1.sensor_collector.config.configDefault")
-    private MoraConfig configDefault;
+    MoraConfig configDefault;
 
     private Set<ConfigListener> listeners = Sets.newLinkedHashSet();
 

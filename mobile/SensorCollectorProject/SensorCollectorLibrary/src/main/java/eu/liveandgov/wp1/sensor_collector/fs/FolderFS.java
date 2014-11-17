@@ -23,8 +23,8 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Random;
 
-import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
 import eu.liveandgov.wp1.sensor_collector.api.Trip;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 
@@ -43,25 +43,25 @@ public class FolderFS implements FS {
      * <p>Android context, needed for root file resolution</p>
      */
     @Inject
-    private Context context;
+    Context context;
 
     @Inject
-    private Charset charset;
+    Charset charset;
 
     @Inject
-    private DateFormat dateFormat;
+    DateFormat dateFormat;
 
     @Inject
     @Named("eu.liveandgov.wp1.sensor_collector.fs.root")
-    private String root;
+    String root;
 
     @Inject
     @Named("eu.liveandgov.wp1.sensor_collector.fs.metaextension")
-    private String metaextension;
+    String metaextension;
 
     @Inject
     @Named("eu.liveandgov.wp1.sensor_collector.fs.dataextension")
-    private String dataextension;
+    String dataextension;
 
     /**
      * <p>Obtains the file under which all MORA file system entries are listed</p>
@@ -78,12 +78,20 @@ public class FolderFS implements FS {
      * @return Returns a list of files
      */
     private File[] listMetaFiles() {
-        return getRootFile().listFiles(new FilenameFilter() {
+        // Try to list the files
+        File[] r = getRootFile().listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String filename) {
                 return filename.toLowerCase().endsWith(metaextension);
             }
         });
+
+        // Handle null result that the API luckily returns instead of an empty array
+        if (r == null)
+            return new File[0];
+
+        // Return an existing value
+        return r;
     }
 
     /**
@@ -92,12 +100,12 @@ public class FolderFS implements FS {
      * @return Returns a randomly generated new meta file
      */
     private File newMetaFile() {
-        try {
-            return File.createTempFile(dateFormat.format(new Date()), metaextension, getRootFile());
-        } catch (IOException e) {
-            logger.error("Could not create meta file in directory", e);
-            throw new RuntimeException(e);
-        }
+        Random random = new Random();
+        File candidate;
+        do {
+            candidate = new File(getRootFile(), dateFormat.format(new Date()) + "_" + random.nextInt() + metaextension);
+        } while (candidate.exists());
+        return candidate;
     }
 
     /**
@@ -106,6 +114,7 @@ public class FolderFS implements FS {
      * @param f The file to open
      * @return Returns the file as a JSON object
      */
+
     private JSONObject openMetafile(File f) {
         try {
             return new JSONObject(Files.toString(f, charset));
@@ -126,6 +135,7 @@ public class FolderFS implements FS {
      */
     private void putMetaFile(File f, JSONObject o) {
         try {
+            Files.createParentDirs(f);
             Files.write(o.toString(), f, charset);
         } catch (IOException e) {
             logger.error("Error writing trip meta file to file system", e);
@@ -144,7 +154,7 @@ public class FolderFS implements FS {
     }
 
     @Override
-    public List<Trip> listTrips() {
+    public List<Trip> listTrips(boolean complete) {
         List<Trip> trips = Lists.newArrayList();
 
         // List and process all meta files
@@ -152,11 +162,24 @@ public class FolderFS implements FS {
             JSONObject j = openMetafile(f);
 
             try {
-                trips.add(new Trip(
+                Trip can = new Trip(
                         j.getString("userId"),
                         j.getString("userSecret"),
                         j.getLong("startTime"),
-                        j.getLong("endTime")));
+                        j.getLong("endTime"));
+
+                // Check which trips are desired
+                if (complete) {
+                    // Complete, neither start time or end time may be set
+                    if (can.startTime == Trip.SPECIAL_TIME_UNSET || can.endTime == Trip.SPECIAL_TIME_UNSET)
+                        continue;
+                } else {
+                    // Incomplete, start time and stop time may not be set
+                    if (can.startTime != Trip.SPECIAL_TIME_UNSET && can.endTime != Trip.SPECIAL_TIME_UNSET)
+                        continue;
+                }
+
+                trips.add(can);
             } catch (JSONException e) {
                 logger.error("Schema error in meta file", e);
                 throw new RuntimeException(e);
@@ -200,9 +223,23 @@ public class FolderFS implements FS {
                 if (trip.startTime != j.getLong("startTime")) continue;
                 if (trip.endTime != j.getLong("endTime")) continue;
 
-                return Files.asCharSink(findDatafile(f), charset);
+                // Find a corresponding data file
+                File d = findDatafile(f);
+
+                // Create its parent directories
+                Files.createParentDirs(d);
+
+                // Create the file if it does not exist
+                if (!d.exists() && !d.createNewFile())
+                    throw new IOException("Cannot create data file");
+
+                // Return as char sink
+                return Files.asCharSink(d, charset);
             } catch (JSONException e) {
                 logger.error("Schema error in meta file", e);
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                logger.error("Error creating file for writing", e);
                 throw new RuntimeException(e);
             }
         }
@@ -219,9 +256,23 @@ public class FolderFS implements FS {
             File f = newMetaFile();
             putMetaFile(f, meta);
 
-            return Files.asCharSink(findDatafile(f), charset);
+            // Find a corresponding data file
+            File d = findDatafile(f);
+
+            // Create its parent directories
+            Files.createParentDirs(d);
+
+            // Create the file if it does not exist
+            if (!d.exists() && !d.createNewFile())
+                throw new IOException("Cannot create data file");
+
+            // Return as char sink
+            return Files.asCharSink(d, charset);
         } catch (JSONException e) {
             logger.error("Error creating meta data object", e);
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            logger.error("Error creating file for writing", e);
             throw new RuntimeException(e);
         }
     }
@@ -257,9 +308,9 @@ public class FolderFS implements FS {
                 if (trip.endTime != j.getLong("endTime")) continue;
 
                 if (!f.delete())
-                    throw new UnsupportedOperationException("Could not delete meta file for parameter " + trip);
+                    logger.warn("Could not delete meta file for parameter " + trip);
                 if (!findDatafile(f).delete())
-                    throw new UnsupportedOperationException("Could not delete data file for parameter " + trip);
+                    logger.warn("Could not delete data file for parameter " + trip);
             } catch (JSONException e) {
                 logger.error("Schema error in meta file", e);
                 throw new RuntimeException(e);

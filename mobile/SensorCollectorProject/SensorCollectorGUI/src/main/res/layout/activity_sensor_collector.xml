@@ -171,7 +171,7 @@
         <TextView
             android:id="@+id/logTextView"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="1000dp"
             android:focusable="true"
             android:scrollbars="vertical"
             android:singleLine="false"

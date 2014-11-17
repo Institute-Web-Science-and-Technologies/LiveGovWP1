@@ -1,5 +1,7 @@
 package eu.liveandgov.wp1.sensor_collector;
 
+import android.os.Build;
+
 import com.google.common.base.Charsets;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
@@ -11,6 +13,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
+import eu.liveandgov.wp1.sensor_collector.components.BlockingQueueItemBuffer;
+import eu.liveandgov.wp1.sensor_collector.components.ItemBuffer;
 import eu.liveandgov.wp1.sensor_collector.config.BasicConfigurator;
 import eu.liveandgov.wp1.sensor_collector.config.Configurator;
 import eu.liveandgov.wp1.sensor_collector.fs.FS;
@@ -26,16 +30,16 @@ public class MoraModule extends AbstractModule {
     protected void configure() {
         // Basic configuration
         bind(DateFormat.class)
-                .toInstance(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssSSS"));
+                .toInstance(new SimpleDateFormat("yyyy-MM-dd'T'HH_mm_ssSSS"));
         bind(Charset.class)
                 .toInstance(Charsets.UTF_8);
         bind(ScheduledExecutorService.class)
                 .toInstance(new ScheduledThreadPoolExecutor(1));
 
         // Configure config manager
-        bind(String.class)
+        bindConstant()
                 .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.config.configFile"))
-                .toInstance("mora/config.dat");
+                .to("mora/config.dat");
 
         bind(MoraConfig.class)
                 .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.config.configDefault"))
@@ -64,19 +68,32 @@ public class MoraModule extends AbstractModule {
 
 
         // Configure FS and its parameters
-        bind(String.class)
+        bindConstant()
                 .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.fs.root"))
-                .toInstance("mora/fs");
+                .to("mora/fs");
 
-        bind(String.class)
+        bindConstant()
                 .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.fs.metaextension"))
-                .toInstance(".meta");
+                .to(".meta");
 
-        bind(String.class)
+        bindConstant()
                 .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.fs.dataextension"))
-                .toInstance(".data");
+                .to(".data");
 
         bind(FS.class)
                 .to(FolderFS.class);
+
+        // Configure the connectors
+        bind(ItemBuffer.class)
+                .to(BlockingQueueItemBuffer.class);
+
+        // Configure the components
+        long motionSensorCorrection = Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1
+                ? (long) (System.currentTimeMillis() - (System.nanoTime() / 1E6))
+                : 0;
+
+        bindConstant()
+                .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.components.motionSensorCorrection"))
+                .to(motionSensorCorrection);
     }
 }

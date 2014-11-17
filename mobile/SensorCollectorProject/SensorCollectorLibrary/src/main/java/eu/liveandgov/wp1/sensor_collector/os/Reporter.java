@@ -7,6 +7,8 @@ import android.os.Bundle;
  * Created by lukashaertel on 08.09.2014.
  */
 public interface Reporter {
+    public static final String SPECIAL_KEY_ORIGINATOR = "originator";
+
     /**
      * <p>Gets the report of the current status</p>
      */
