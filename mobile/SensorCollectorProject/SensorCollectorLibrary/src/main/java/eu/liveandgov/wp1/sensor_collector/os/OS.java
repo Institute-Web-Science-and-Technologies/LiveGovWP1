@@ -13,21 +13,22 @@ import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
  */
 public interface OS {
     void startConnector();
+    
     void stopConnector();
 
     boolean isActive();
 
-    void add(SampleSource sampleSource);
+    void addSource(SampleSource sampleSource);
 
-    void add(SampleTarget sampleTarget);
+    void addTarget(SampleTarget sampleTarget);
 
-    void add(Reporter reporter);
+    void addReporter(Reporter reporter);
 
-    void remove(SampleSource sampleSource);
+    void removeSource(SampleSource sampleSource);
 
-    void remove(SampleTarget sampleTarget);
+    void removeTarget(SampleTarget sampleTarget);
 
-    void remove(Reporter reporter);
+    void removeReporter(Reporter reporter);
 
     /**
      * @return

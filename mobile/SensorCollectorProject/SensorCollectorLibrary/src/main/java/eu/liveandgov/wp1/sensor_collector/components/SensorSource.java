@@ -162,8 +162,8 @@ public abstract class SensorSource implements SampleSource, Reporter {
         report.putString(SPECIAL_KEY_ORIGINATOR, getClass().getSimpleName());
 
         report.putString("sensor", sensorManager.getDefaultSensor(sensorType).getName());
-        report.putInt("accuracy", accuracy);
-        report.putBoolean("active", active);
+        report.putInt("accuracy", getAccuracy());
+        report.putBoolean("active", isActive());
         if (isEnabled(configurator.getConfig())) {
             report.putBoolean("enabled", true);
             report.putInt("delay", getDelay(configurator.getConfig()));

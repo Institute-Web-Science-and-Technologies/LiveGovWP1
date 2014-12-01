@@ -107,7 +107,7 @@ public class BasicOS implements OS {
      * @param sampleSource The sample source
      */
     @Override
-    public synchronized void add(SampleSource sampleSource) {
+    public synchronized void addSource(SampleSource sampleSource) {
         logger.info("Adding sample source to OS: " + sampleSource);
 
         // Try to add the sample source, if already contained, do nothing more
@@ -123,7 +123,7 @@ public class BasicOS implements OS {
      * @param sampleTarget The sample target
      */
     @Override
-    public synchronized void add(SampleTarget sampleTarget) {
+    public synchronized void addTarget(SampleTarget sampleTarget) {
         logger.info("Adding sample target to OS: " + sampleTarget);
 
         if (sampleTargets.isEmpty()) {
@@ -140,7 +140,7 @@ public class BasicOS implements OS {
      * @param reporter The reporter
      */
     @Override
-    public synchronized void add(Reporter reporter) {
+    public synchronized void addReporter(Reporter reporter) {
         logger.info("Adding reporter to OS: " + reporter);
 
         reporters.add(reporter);
@@ -152,7 +152,7 @@ public class BasicOS implements OS {
      * @param sampleSource The sample source
      */
     @Override
-    public synchronized void remove(SampleSource sampleSource) {
+    public synchronized void removeSource(SampleSource sampleSource) {
         logger.info("Removing sample source from OS: " + sampleSource);
 
         if (sampleSources.remove(sampleSource))
@@ -166,7 +166,7 @@ public class BasicOS implements OS {
      * @param sampleTarget The sample target
      */
     @Override
-    public synchronized void remove(SampleTarget sampleTarget) {
+    public synchronized void removeTarget(SampleTarget sampleTarget) {
         logger.info("Removing sample target from OS: " + sampleTarget);
 
         if (sampleTargets.remove(sampleTarget))
@@ -181,7 +181,7 @@ public class BasicOS implements OS {
      * @param reporter The reporter
      */
     @Override
-    public synchronized void remove(Reporter reporter) {
+    public synchronized void removeReporter(Reporter reporter) {
         logger.info("Removing reporter from OS: " + reporter);
 
         reporters.remove(reporter);

@@ -24,6 +24,9 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
             return new MoraConfig[size];
         }
     };
+    public String user;
+
+    public int secretLength;
 
     public String upload;
 
@@ -76,6 +79,8 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
     }
 
     private MoraConfig(Parcel source) {
+        user = source.readString();
+        secretLength = source.readInt();
         upload = source.readString();
         streaming = source.readString();
         gps = readInteger(source);
@@ -91,7 +96,9 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
         googleActivity = readBoolean(source);
     }
 
-    public MoraConfig(String upload, String streaming, Integer gps, boolean velocity, Integer acceleration, Integer linearAcceleration, Integer gravity, Integer magnetometer, Integer rotation, Integer wifi, Integer bluetooth, Integer gsm, boolean googleActivity) {
+    public MoraConfig(String user, int secretLength, String upload, String streaming, Integer gps, boolean velocity, Integer acceleration, Integer linearAcceleration, Integer gravity, Integer magnetometer, Integer rotation, Integer wifi, Integer bluetooth, Integer gsm, boolean googleActivity) {
+        this.user = user;
+        this.secretLength = secretLength;
         this.upload = upload;
         this.streaming = streaming;
         this.gps = gps;
@@ -114,6 +121,8 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(user);
+        dest.writeInt(secretLength);
         dest.writeString(upload);
         dest.writeString(streaming);
         writeInteger(dest, gps);
@@ -132,11 +141,12 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MoraConfig)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         MoraConfig that = (MoraConfig) o;
 
         if (googleActivity != that.googleActivity) return false;
+        if (secretLength != that.secretLength) return false;
         if (velocity != that.velocity) return false;
         if (acceleration != null ? !acceleration.equals(that.acceleration) : that.acceleration != null)
             return false;
@@ -154,13 +164,17 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
         if (streaming != null ? !streaming.equals(that.streaming) : that.streaming != null)
             return false;
         if (upload != null ? !upload.equals(that.upload) : that.upload != null) return false;
-        return !(wifi != null ? !wifi.equals(that.wifi) : that.wifi != null);
+        if (user != null ? !user.equals(that.user) : that.user != null) return false;
+        if (wifi != null ? !wifi.equals(that.wifi) : that.wifi != null) return false;
 
+        return true;
     }
 
     @Override
     public int hashCode() {
-        int result = upload != null ? upload.hashCode() : 0;
+        int result = user != null ? user.hashCode() : 0;
+        result = 31 * result + secretLength;
+        result = 31 * result + (upload != null ? upload.hashCode() : 0);
         result = 31 * result + (streaming != null ? streaming.hashCode() : 0);
         result = 31 * result + (gps != null ? gps.hashCode() : 0);
         result = 31 * result + (velocity ? 1 : 0);
@@ -179,6 +193,8 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
     @Override
     public int compareTo(@NonNull MoraConfig another) {
         return ComparisonChain.start()
+                .compare(user, another.user)
+                .compare(secretLength, another.secretLength)
                 .compare(upload, another.upload)
                 .compare(streaming, another.streaming)
                 .compare(gps, another.gps)

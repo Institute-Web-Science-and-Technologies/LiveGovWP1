@@ -13,22 +13,23 @@ import java.util.List;
 
 import eu.liveandgov.wp1.sensor_collector.api.MoraAPI;
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
+import eu.liveandgov.wp1.sensor_collector.api.RecorderConfig;
 import eu.liveandgov.wp1.sensor_collector.api.Trip;
 import eu.liveandgov.wp1.sensor_collector.components.Credentials;
 import eu.liveandgov.wp1.sensor_collector.components.ItemBuffer;
 import eu.liveandgov.wp1.sensor_collector.components.SensorSource.*;
 import eu.liveandgov.wp1.sensor_collector.components.StreamerTarget;
+import eu.liveandgov.wp1.sensor_collector.components.TagSource;
 import eu.liveandgov.wp1.sensor_collector.components.WriterTarget;
 import eu.liveandgov.wp1.sensor_collector.config.Configurator;
 import eu.liveandgov.wp1.sensor_collector.fs.FS;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.os.OS;
-import eu.liveandgov.wp1.sensor_collector.os.Reporter;
-import eu.liveandgov.wp1.sensor_collector.os.SampleSource;
-import eu.liveandgov.wp1.sensor_collector.os.SampleTarget;
+import eu.liveandgov.wp1.sensor_collector.rec.Recorder;
 import eu.liveandgov.wp1.sensor_collector.strategies.Transfer;
 
 /**
+ * <p>The service coordinating the connection and control of the recording and transfer components</p>
  * Created by lukashaertel on 08.09.2014.
  */
 public class MoraService extends BaseMoraService {
@@ -47,6 +48,48 @@ public class MoraService extends BaseMoraService {
 
         private boolean isStreaming = false;
 
+
+        @Override
+        public MoraConfig getConfig() {
+            return configurator.getConfig();
+        }
+
+        @Override
+        public void setConfig(MoraConfig config) {
+            configurator.setConfig(config);
+        }
+
+        @Override
+        public void resetConfig() {
+            configurator.resetConfig();
+        }
+
+        @Override
+        public void registerRecorder(RecorderConfig config) {
+            recorder.registerRecorder(config);
+        }
+
+        @Override
+        public void unregisterRecorder(RecorderConfig config) {
+            recorder.unregisterRecorder(config);
+        }
+
+        @Override
+        public List<RecorderConfig> getRecorders() {
+            return recorder.getRecorders();
+        }
+
+        @Override
+        public List<String> getRecorderItems(RecorderConfig config) {
+            return recorder.getRecorderItems(config);
+        }
+
+        @Override
+        public void annotate(String userTag) {
+            tagSource.annotate(userTag);
+        }
+
+
         @Override
         public void startRecording() throws RemoteException {
             // State aware abort
@@ -60,7 +103,7 @@ public class MoraService extends BaseMoraService {
             writerTarget.setSink(fs.writeTrip(activeTrip));
 
             // Activate the writer dependency
-            os.add((SampleTarget) writerTarget);
+            os.addTarget(writerTarget);
 
             // Set recording flag
             isRecording = true;
@@ -76,7 +119,7 @@ public class MoraService extends BaseMoraService {
             isRecording = false;
 
             // Deactivate writer dependency
-            os.remove((SampleTarget) writerTarget);
+            os.removeTarget(writerTarget);
 
             // Unset sink
             writerTarget.setSink(null);
@@ -100,7 +143,7 @@ public class MoraService extends BaseMoraService {
                 return;
 
             // Add streamer dependency
-            os.add(streamerTarget);
+            os.addTarget(streamerTarget);
 
             // Set streaming flag
             isStreaming = true;
@@ -116,7 +159,7 @@ public class MoraService extends BaseMoraService {
             isStreaming = false;
 
             // Remove streamer dependency
-            os.remove(streamerTarget);
+            os.removeTarget(streamerTarget);
         }
 
         @Override
@@ -146,21 +189,6 @@ public class MoraService extends BaseMoraService {
             // Get all implemented reports
             return os.getReports();
         }
-
-        @Override
-        public MoraConfig getConfig() {
-            return configurator.getConfig();
-        }
-
-        @Override
-        public void setConfig(MoraConfig config) {
-            configurator.setConfig(config);
-        }
-
-        @Override
-        public void resetConfig() {
-            configurator.resetConfig();
-        }
     };
 
     @Inject
@@ -171,6 +199,9 @@ public class MoraService extends BaseMoraService {
 
     @Inject
     OS os;
+
+    @Inject
+    Recorder recorder;
 
     @Inject
     FS fs;
@@ -198,6 +229,9 @@ public class MoraService extends BaseMoraService {
     @Inject
     RotationSource rotationSource;
 
+    @Inject
+    TagSource tagSource;
+
 
     @Inject
     StreamerTarget streamerTarget;
@@ -212,26 +246,31 @@ public class MoraService extends BaseMoraService {
 
 
         // Add the connectors
-        os.add(itemBuffer);
+        os.addReporter(itemBuffer);
+
+        os.addReporter(recorder);
 
         // Add the sensors
-        os.add((SampleSource) accelerometerSource);
-        os.add((Reporter) accelerometerSource);
+        os.addSource(accelerometerSource);
+        os.addReporter(accelerometerSource);
 
-        os.add((SampleSource) linearAccelerationSource);
-        os.add((Reporter) linearAccelerationSource);
+        os.addSource(linearAccelerationSource);
+        os.addReporter(linearAccelerationSource);
 
-        os.add((SampleSource) gravitySource);
-        os.add((Reporter) gravitySource);
+        os.addSource(gravitySource);
+        os.addReporter(gravitySource);
 
-        os.add((SampleSource) magnetometerSource);
-        os.add((Reporter) magnetometerSource);
+        os.addSource(magnetometerSource);
+        os.addReporter(magnetometerSource);
 
-        os.add((SampleSource) rotationSource);
-        os.add((Reporter) rotationSource);
+        os.addSource(rotationSource);
+        os.addReporter(rotationSource);
+
+        os.addSource(tagSource);
+        os.addReporter(tagSource);
 
         // Add the targets
-        os.add((Reporter) writerTarget);
+        os.addReporter(writerTarget);
 
         // Sanitize file system
         for (Trip t : fs.listTrips(false))

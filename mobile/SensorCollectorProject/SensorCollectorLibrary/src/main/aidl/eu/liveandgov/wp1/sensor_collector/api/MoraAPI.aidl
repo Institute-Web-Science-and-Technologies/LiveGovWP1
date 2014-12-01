@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import eu.liveandgov.wp1.sensor_collector.api.Trip;
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
+import eu.liveandgov.wp1.sensor_collector.api.RecorderConfig;
 
 interface MoraAPI {
     /**
@@ -21,6 +22,32 @@ interface MoraAPI {
      * Resets the config
      */
     void resetConfig();
+
+
+    /**
+     * Registers a sample recorder
+     */
+    void registerRecorder(in RecorderConfig c);
+
+    /**
+     * Removes the sample recorder registration
+     */
+    void unregisterRecorder(in RecorderConfig c);
+
+    /**
+     * Gets all registered sample recorders
+     */
+    List<RecorderConfig> getRecorders();
+
+    /**
+     * Returns the value of the sample recorder, in serialized form
+     */
+    List<String> getRecorderItems(in RecorderConfig c);
+
+    /**
+     * Annotates the item stream with a user entered tag
+     */
+    void annotate(String userTag);
 
     /**
      * Starts the sample recorder
@@ -68,6 +95,7 @@ interface MoraAPI {
      * Deletes the recording by handle
      */
     void deleteTrip(in Trip trip);
+
 
     /**
      * Returns a container for status information

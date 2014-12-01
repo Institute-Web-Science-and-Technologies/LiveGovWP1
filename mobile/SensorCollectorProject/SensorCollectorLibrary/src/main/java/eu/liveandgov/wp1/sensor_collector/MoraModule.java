@@ -22,6 +22,8 @@ import eu.liveandgov.wp1.sensor_collector.fs.FS;
 import eu.liveandgov.wp1.sensor_collector.fs.FolderFS;
 import eu.liveandgov.wp1.sensor_collector.os.BasicOS;
 import eu.liveandgov.wp1.sensor_collector.os.OS;
+import eu.liveandgov.wp1.sensor_collector.rec.BasicRecorder;
+import eu.liveandgov.wp1.sensor_collector.rec.Recorder;
 
 /**
  * Created by lukashaertel on 08.09.2014.
@@ -45,6 +47,8 @@ public class MoraModule extends AbstractModule {
         bind(MoraConfig.class)
                 .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.config.configDefault"))
                 .toInstance(new MoraConfig(
+                        "user", // User identity
+                        5, // Secret length
                         "http://liveandgov.uni-koblenz.de:8080/UploadServlet/", // Upload
                         "liveandgov.uni-koblenz.de:5555", // Streaming
                         5000, // GPS
@@ -66,6 +70,10 @@ public class MoraModule extends AbstractModule {
         // Configure OS
         bind(OS.class)
                 .to(BasicOS.class);
+
+        // Configure recorder
+        bind(Recorder.class)
+                .to(BasicRecorder.class);
 
 
         // Configure FS and its parameters
