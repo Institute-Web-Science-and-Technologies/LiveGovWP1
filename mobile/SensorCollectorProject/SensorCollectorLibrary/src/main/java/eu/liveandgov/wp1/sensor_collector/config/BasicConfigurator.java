@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
-import eu.liveandgov.wp1.sensor_collector.util.MoraFiles;
+import eu.liveandgov.wp1.sensor_collector.util.MoraIO;
 
 /**
  * Created by lukashaertel on 17.11.2014.
@@ -77,11 +77,11 @@ public class BasicConfigurator implements Configurator {
 
     @Override
     public void loadConfig() throws IOException {
-        setConfig(MoraFiles.getContent(getConfigFile(), configDefault));
+        setConfig(MoraIO.getContent(getConfigFile(), configDefault));
     }
 
     @Override
     public void storeConfig() throws IOException {
-        MoraFiles.setContent(getConfig(), getConfigFile());
+        MoraIO.setContent(getConfig(), getConfigFile());
     }
 }

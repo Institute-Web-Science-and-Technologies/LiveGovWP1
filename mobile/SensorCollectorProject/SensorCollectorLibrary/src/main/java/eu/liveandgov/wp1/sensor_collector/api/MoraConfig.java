@@ -30,6 +30,8 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
 
     public String upload;
 
+    public boolean uploadCompressed;
+
     public String streaming;
 
     public Integer gps;
@@ -82,6 +84,7 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
         user = source.readString();
         secretLength = source.readInt();
         upload = source.readString();
+        uploadCompressed = readBoolean(source);
         streaming = source.readString();
         gps = readInteger(source);
         velocity = readBoolean(source);
@@ -96,10 +99,11 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
         googleActivity = readBoolean(source);
     }
 
-    public MoraConfig(String user, int secretLength, String upload, String streaming, Integer gps, boolean velocity, Integer acceleration, Integer linearAcceleration, Integer gravity, Integer magnetometer, Integer rotation, Integer wifi, Integer bluetooth, Integer gsm, boolean googleActivity) {
+    public MoraConfig(String user, int secretLength, String upload, boolean uploadCompressed, String streaming, Integer gps, boolean velocity, Integer acceleration, Integer linearAcceleration, Integer gravity, Integer magnetometer, Integer rotation, Integer wifi, Integer bluetooth, Integer gsm, boolean googleActivity) {
         this.user = user;
         this.secretLength = secretLength;
         this.upload = upload;
+        this.uploadCompressed = uploadCompressed;
         this.streaming = streaming;
         this.gps = gps;
         this.velocity = velocity;
@@ -124,6 +128,7 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
         dest.writeString(user);
         dest.writeInt(secretLength);
         dest.writeString(upload);
+        writeBoolean(dest, uploadCompressed);
         dest.writeString(streaming);
         writeInteger(dest, gps);
         writeBoolean(dest, velocity);
@@ -147,6 +152,7 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
 
         if (googleActivity != that.googleActivity) return false;
         if (secretLength != that.secretLength) return false;
+        if (uploadCompressed != that.uploadCompressed) return false;
         if (velocity != that.velocity) return false;
         if (acceleration != null ? !acceleration.equals(that.acceleration) : that.acceleration != null)
             return false;
@@ -175,6 +181,7 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
         int result = user != null ? user.hashCode() : 0;
         result = 31 * result + secretLength;
         result = 31 * result + (upload != null ? upload.hashCode() : 0);
+        result = 31 * result + (uploadCompressed ? 1 : 0);
         result = 31 * result + (streaming != null ? streaming.hashCode() : 0);
         result = 31 * result + (gps != null ? gps.hashCode() : 0);
         result = 31 * result + (velocity ? 1 : 0);
@@ -196,6 +203,7 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
                 .compare(user, another.user)
                 .compare(secretLength, another.secretLength)
                 .compare(upload, another.upload)
+                .compareFalseFirst(uploadCompressed, another.uploadCompressed)
                 .compare(streaming, another.streaming)
                 .compare(gps, another.gps)
                 .compareFalseFirst(velocity, another.velocity)

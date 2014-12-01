@@ -40,9 +40,6 @@ import eu.liveandgov.wp1.sensor_collector.persistence.PublicationPipeline;
 import eu.liveandgov.wp1.sensor_collector.persistence.ZipFilePersistor;
 import eu.liveandgov.wp1.sensor_collector.sensors.SensorThread;
 import eu.liveandgov.wp1.sensor_collector.streaming.ZMQStreamer;
-import eu.liveandgov.wp1.sensor_collector.transfer.IntentTransfer;
-import eu.liveandgov.wp1.sensor_collector.transfer.TransferManager;
-import eu.liveandgov.wp1.sensor_collector.transfer.TransferThreadPost;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.API_EXTENSIONS;
 import static eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions.INTENT_TRANSFER;
@@ -89,7 +86,6 @@ public class ServiceSensorControl extends Service {
 
     // THREADS
     public ConnectorThread connectorThread;
-    public TransferManager transferManager;
     public MonitorThread monitorThread;
     // Rem: Also SensorThread would belong here, but it is realized via static methods
 
@@ -141,9 +137,6 @@ public class ServiceSensorControl extends Service {
 
         // INIT THREADS
         connectorThread = new ConnectorThread(sensorQueue);
-        transferManager = INTENT_TRANSFER ?
-                new IntentTransfer(persistor, GlobalContext.getFileRoot()) :
-                new TransferThreadPost(persistor, stageFile);
         monitorThread = new MonitorThread();
 
         // Restore user id from shared preferences
@@ -193,7 +186,6 @@ public class ServiceSensorControl extends Service {
         // Setup monitoring thread
         monitorThread.registerMonitorable(connectorThread, "SampleCount");
         monitorThread.registerMonitorable(persistor, "Persitor");
-        monitorThread.registerMonitorable(transferManager, "Transfer");
         monitorThread.registerMonitorable(sensorQueue, "Queue");
 
         // Start threads
@@ -275,7 +267,6 @@ public class ServiceSensorControl extends Service {
     private void doDeleteSamples() {
         persistor.deleteSamples();
         publisher.deleteSamples();
-        transferManager.deleteStagedSamples();
     }
 
     private void doStopHAR() {
@@ -342,7 +333,7 @@ public class ServiceSensorControl extends Service {
     }
 
     private void doTransferSamples() {
-        transferManager.doTransfer();
+
     }
 
     private void doDisableRecording() {
@@ -387,11 +378,8 @@ public class ServiceSensorControl extends Service {
     public void doSendStatus() {
         Intent intent = new Intent(IntentAPI.RETURN_STATUS);
         intent.putExtra(IntentAPI.FIELD_SAMPLING, isRecording);
-        intent.putExtra(IntentAPI.FIELD_TRANSFERRING,
-                transferManager.isTransferring());
-        intent.putExtra(IntentAPI.FIELD_SAMPLES_STORED,
-                persistor.hasSamples() | transferManager.hasStagedSamples()
-        );
+        intent.putExtra(IntentAPI.FIELD_TRANSFERRING, false);
+        intent.putExtra(IntentAPI.FIELD_SAMPLES_STORED, persistor.hasSamples());
         intent.putExtra(ExtendedIntentAPI.FIELD_STREAMING, isStreaming);
         intent.putExtra(IntentAPI.FIELD_HAR, isHAR);
         intent.putExtra(IntentAPI.FIELD_USER_ID, userId);

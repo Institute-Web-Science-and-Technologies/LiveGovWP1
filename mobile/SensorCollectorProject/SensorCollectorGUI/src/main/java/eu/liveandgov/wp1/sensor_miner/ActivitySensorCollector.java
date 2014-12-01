@@ -24,6 +24,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +36,7 @@ import eu.liveandgov.wp1.sensor_collector.api.MoraAPI;
 import eu.liveandgov.wp1.sensor_collector.api.Trip;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.os.Reporter;
+import eu.liveandgov.wp1.sensor_collector.util.MoraStrings;
 import eu.liveandgov.wp1.sensor_miner.configuration.SensorMinerOptions;
 
 import static eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI.FIELD_STREAMING;
@@ -237,12 +240,19 @@ public class ActivitySensorCollector extends Activity {
     }
 
     public void onTransferButtonClick(View view) {
-        try {
-            for (Trip t : api.getTrips())
-                api.transferTrip(t);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+
+        // Execute on executor service, so we do not get net on main error
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    for (Trip t : api.getTrips())
+                        api.transferTrip(t);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 //        Intent intent = new Intent(this, ServiceSensorControl.class);
 //        intent.setAction(ACTION_TRANSFER_SAMPLES);
 //        startService(intent);
@@ -348,6 +358,7 @@ public class ActivitySensorCollector extends Activity {
         unregisterReceiver(universalBroadcastReceiver);
     }
 
+
     private void updateLog(Intent intent) {
         // logTextView.setText(intent.getStringExtra(FIELD_MESSAGE) + "\n");
 
@@ -363,8 +374,11 @@ public class ActivitySensorCollector extends Activity {
 
                     // Append keys
                     for (String k : r.keySet())
-                        if (!Reporter.SPECIAL_KEY_ORIGINATOR.equals(k))
-                            b.append(k).append(": ").append(r.get(k)).append("\r\n");
+                        if (!Reporter.SPECIAL_KEY_ORIGINATOR.equals(k)) {
+                            b.append(k).append(": ");
+                            MoraStrings.appendDeep(b, r.get(k));
+                            b.append("\r\n");
+                        }
                     b.append("\r\n");
                 }
 

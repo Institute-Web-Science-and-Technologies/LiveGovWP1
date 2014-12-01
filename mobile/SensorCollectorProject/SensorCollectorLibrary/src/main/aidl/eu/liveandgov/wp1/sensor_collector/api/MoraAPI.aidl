@@ -89,7 +89,7 @@ interface MoraAPI {
     /**
      * Transfers a recording by handle
      */
-    void transferTrip(in Trip trip);
+    boolean transferTrip(in Trip trip);
 
     /**
      * Deletes the recording by handle

@@ -1,5 +1,6 @@
 package eu.liveandgov.wp1.sensor_collector.util;
 
+import java.lang.reflect.Array;
 import java.util.Random;
 
 /**
@@ -33,5 +34,35 @@ public class MoraStrings {
      */
     public static String randomAlphanumeric(int length) {
         return randomAlphanumeric(System.nanoTime(), length);
+    }
+
+    /**
+     * <p>Appends an object, deeply appending arrays</p>
+     *
+     * @param b The target
+     * @param o The object
+     */
+    public static void appendDeep(StringBuilder b, Object o) {
+        if (o == null) {
+            b.append((Object) null);
+            return;
+        }
+
+        if (o.getClass().isArray()) {
+            int l = Array.getLength(o);
+            b.append("[");
+            for (int i = 0; i < l; i++) {
+                if (i > 0)
+                    b.append(", ");
+
+                // Recursive invokation
+                appendDeep(b, Array.get(o, i));
+            }
+            b.append("]");
+
+            return;
+        }
+
+        b.append(o);
     }
 }

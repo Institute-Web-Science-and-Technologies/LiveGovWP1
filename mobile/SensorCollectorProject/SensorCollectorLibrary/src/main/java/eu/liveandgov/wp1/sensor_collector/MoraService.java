@@ -26,7 +26,7 @@ import eu.liveandgov.wp1.sensor_collector.fs.FS;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.os.OS;
 import eu.liveandgov.wp1.sensor_collector.rec.Recorder;
-import eu.liveandgov.wp1.sensor_collector.strategies.Transfer;
+import eu.liveandgov.wp1.sensor_collector.strategies.TransferExecutor;
 
 /**
  * <p>The service coordinating the connection and control of the recording and transfer components</p>
@@ -173,9 +173,14 @@ public class MoraService extends BaseMoraService {
         }
 
         @Override
-        public void transferTrip(Trip trip) throws RemoteException {
+        public boolean transferTrip(Trip trip) throws RemoteException {
             // Read the trip and transfer it somewhere
-            transfer.transferAllStuffSomewhere(trip, fs.readTrip(trip));
+            try {
+                return transferExecutor.transfer(trip, fs.readTrip(trip));
+            } catch (IOException e) {
+                logger.error("Error transferring trip " + trip, e);
+                throw new RuntimeException(e);
+            }
         }
 
         @Override
@@ -208,7 +213,7 @@ public class MoraService extends BaseMoraService {
 
 
     @Inject
-    Transfer transfer;
+    TransferExecutor transferExecutor;
 
     @Inject
     ItemBuffer itemBuffer;
@@ -243,6 +248,9 @@ public class MoraService extends BaseMoraService {
     protected void startup() throws IOException {
         // Load the config
         configurator.loadConfig();
+
+        // DEBUG ONLY
+        configurator.resetConfig();
 
 
         // Add the connectors

@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
@@ -28,7 +29,7 @@ public class BasicRecorder implements Recorder {
     @Inject
     OS os;
 
-    private Map<RecorderConfig, TimedQueue2<Item>> recorders;
+    private Map<RecorderConfig, TimedQueue2<Item>> recorders = Maps.newHashMap();
 
     /**
      * Recorder target intercepting all
@@ -134,7 +135,8 @@ public class BasicRecorder implements Recorder {
             maxMaximum = Math.max(maxMaximum, config.maximum);
         }
 
-        String[] typesArray = new String[recorders.size()];
+        String[] typesArray = types.toArray(new String[types.size()]);
+
         report.putStringArray("types", typesArray);
         report.putLong("maxTimeSpanMs", maxTimeSpanMs);
         report.putLong("maxMaximum", maxMaximum);

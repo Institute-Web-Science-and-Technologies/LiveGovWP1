@@ -24,6 +24,7 @@ import java.util.zip.GZIPOutputStream;
 
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
+import eu.liveandgov.wp1.sensor_collector.util.GZIPConcatInputStream;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
 /**
@@ -158,7 +159,7 @@ public class ZipFilePersistor implements Persistor {
         File f = File.createTempFile("sanity", "." + Files.getFileExtension(logFile.getName()), logFile.getParentFile());
 
         // Create input stream on file to read and sanity file
-        MultiMemberGZIPInputStream gis = new MultiMemberGZIPInputStream(new FileInputStream(logFile));
+        GZIPConcatInputStream gis = new GZIPConcatInputStream(new FileInputStream(logFile));
         GZIPOutputStream gos = new GZIPOutputStream(new FileOutputStream(f));
 
         // Copy as much as possible

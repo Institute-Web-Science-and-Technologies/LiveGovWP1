@@ -24,6 +24,8 @@ import eu.liveandgov.wp1.sensor_collector.os.BasicOS;
 import eu.liveandgov.wp1.sensor_collector.os.OS;
 import eu.liveandgov.wp1.sensor_collector.rec.BasicRecorder;
 import eu.liveandgov.wp1.sensor_collector.rec.Recorder;
+import eu.liveandgov.wp1.sensor_collector.strategies.PostTransferExecutor;
+import eu.liveandgov.wp1.sensor_collector.strategies.TransferExecutor;
 
 /**
  * Created by lukashaertel on 08.09.2014.
@@ -49,7 +51,8 @@ public class MoraModule extends AbstractModule {
                 .toInstance(new MoraConfig(
                         "user", // User identity
                         5, // Secret length
-                        "http://liveandgov.uni-koblenz.de:8080/UploadServlet/", // Upload
+                        "http://liveandgov.uni-koblenz.de/storage/upload/", // Upload
+                        false, // Upload compressed
                         "liveandgov.uni-koblenz.de:5555", // Streaming
                         5000, // GPS
                         true, // Velocity of GPS
@@ -67,14 +70,6 @@ public class MoraModule extends AbstractModule {
         bind(Configurator.class)
                 .to(BasicConfigurator.class);
 
-        // Configure OS
-        bind(OS.class)
-                .to(BasicOS.class);
-
-        // Configure recorder
-        bind(Recorder.class)
-                .to(BasicRecorder.class);
-
 
         // Configure FS and its parameters
         bindConstant()
@@ -89,8 +84,25 @@ public class MoraModule extends AbstractModule {
                 .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.fs.dataextension"))
                 .to(".data");
 
+        bindConstant()
+                .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.fs.compressed"))
+                .to(true);
+
         bind(FS.class)
                 .to(FolderFS.class);
+
+        // Configure OS
+        bind(OS.class)
+                .to(BasicOS.class);
+
+        // Configure recorder
+        bind(Recorder.class)
+                .to(BasicRecorder.class);
+
+        // Configure the strategies
+        bind(TransferExecutor.class)
+                .to(PostTransferExecutor.class);
+
 
         // Configure the connectors
         bindConstant()

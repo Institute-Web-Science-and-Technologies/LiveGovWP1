@@ -28,6 +28,7 @@ import java.util.Random;
 
 import eu.liveandgov.wp1.sensor_collector.api.Trip;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
+import eu.liveandgov.wp1.sensor_collector.util.MoraIO;
 
 /**
  * <p>Implements a MORA file system from a folder contianing files named in a specific scheme</p>
@@ -63,6 +64,10 @@ public class FolderFS implements FS {
     @Inject
     @Named("eu.liveandgov.wp1.sensor_collector.fs.dataextension")
     String dataextension;
+
+    @Inject
+    @Named("eu.liveandgov.wp1.sensor_collector.fs.compressed")
+    boolean compressed;
 
     /**
      * <p>Obtains the file under which all MORA file system entries are listed</p>
@@ -191,7 +196,7 @@ public class FolderFS implements FS {
     }
 
     @Override
-    public CharSource readTrip(Trip trip) {
+    public DataSource readTrip(Trip trip) {
         // Return the first matching meta files data file as a char source
         for (File f : listMetaFiles()) {
             JSONObject j = openMetafile(f);
@@ -201,15 +206,33 @@ public class FolderFS implements FS {
                 if (!Objects.equal(trip.userSecret, j.getString("userSecret"))) continue;
                 if (trip.startTime != j.getLong("startTime")) continue;
                 if (trip.endTime != j.getLong("endTime")) continue;
+                return getTripReader(f);
 
-                return Files.asCharSource(findDatafile(f), charset);
+
             } catch (JSONException e) {
                 logger.error("Schema error in meta file", e);
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                logger.error("Error creating the resulting char source", e);
                 throw new RuntimeException(e);
             }
         }
 
         throw new NoSuchElementException("No trip data file found for parameter " + trip);
+    }
+
+    private DataSource getTripReader(File metafile) throws IOException {
+        // Find the datafile
+        File datafile = findDatafile(metafile);
+
+        // Return a data source that may deal with both kind of data, optionally
+        // decompressing a GZIP file, this will not invalidate files that were recorded in
+        // a different setting.
+        return new DataSource(
+                datafile.getName(),
+                Files.asByteSource(datafile),
+                MoraIO.decompressCompressed(Files.asByteSource(datafile)).asCharSource(charset)
+        );
     }
 
     @Override
@@ -224,19 +247,8 @@ public class FolderFS implements FS {
                 if (trip.startTime != j.getLong("startTime")) continue;
                 if (trip.endTime != j.getLong("endTime")) continue;
 
-                // Find a corresponding data file
-                File d = findDatafile(f);
-
-                // Create its parent directories
-                Files.createParentDirs(d);
-
-                // Create the file if it does not exist
-                if (!d.exists() && !d.createNewFile())
-                    throw new IOException("Cannot create data file");
-
-
-                // Return as char sink
-                return Files.asCharSink(d, charset, FileWriteMode.APPEND);
+                // Return trip writer on the data file corresponding to the meta file
+                return getTripWriter(f);
             } catch (JSONException e) {
                 logger.error("Schema error in meta file", e);
                 throw new RuntimeException(e);
@@ -258,18 +270,8 @@ public class FolderFS implements FS {
             File f = newMetaFile();
             putMetaFile(f, meta);
 
-            // Find a corresponding data file
-            File d = findDatafile(f);
-
-            // Create its parent directories
-            Files.createParentDirs(d);
-
-            // Create the file if it does not exist
-            if (!d.exists() && !d.createNewFile())
-                throw new IOException("Cannot create data file");
-
-            // Return as char sink
-            return Files.asCharSink(d, charset, FileWriteMode.APPEND);
+            // Return trip writer on the data file corresponding to the new meta file
+            return getTripWriter(f);
         } catch (JSONException e) {
             logger.error("Error creating meta data object", e);
             throw new RuntimeException(e);
@@ -279,13 +281,42 @@ public class FolderFS implements FS {
         }
     }
 
+    /**
+     * <p>Gets ta trip writer with the current state, makes sure that the file system structure is valid</p>
+     *
+     * @param metafile The meta file
+     * @return Returns a char sink
+     * @throws IOException Throws an io exception if there were problems with file system sanity
+     */
+    private CharSink getTripWriter(File metafile) throws IOException {
+        // Find a corresponding data file
+        File datafile = findDatafile(metafile);
+
+        // Create its parent directories
+        Files.createParentDirs(datafile);
+
+        // Create the file if it does not exist
+        if (!datafile.exists() && !datafile.createNewFile())
+            throw new IOException("Cannot create data file");
+
+        // Log that file is opened
+        logger.info("Opening file " + datafile + " for writing in " + (compressed ? "compressed" : "uncompressed") + " output mode");
+
+        // If compression is desired, return as compressed stream
+        if (compressed)
+            return MoraIO.compress(Files.asByteSink(datafile, FileWriteMode.APPEND)).asCharSink(charset);
+
+        // Return as char sink
+        return Files.asCharSink(datafile, charset, FileWriteMode.APPEND);
+    }
+
     @Override
     public void renameTrip(Trip tripFrom, Trip tripTo) {
         try {
             // TODO: Right now favoring the pattern of delegating to other methods instead of file modifications, as meta data is written here
 
             // Copy all data
-            CharSource source = readTrip(tripFrom);
+            CharSource source = readTrip(tripFrom).charSource;
             CharSink sink = writeTrip(tripTo);
 
             source.copyTo(sink);

@@ -1,7 +1,6 @@
 package eu.liveandgov.wp1.sensor_collector.fs;
 
 import com.google.common.io.CharSink;
-import com.google.common.io.CharSource;
 
 import java.util.List;
 
@@ -27,7 +26,7 @@ public interface FS {
      * @param trip The trip to read
      * @return Returns an input stream
      */
-    CharSource readTrip(Trip trip);
+    DataSource readTrip(Trip trip);
 
     /**
      * @param trip
