@@ -15,18 +15,23 @@ import eu.liveandgov.wp1.sensor_collector.api.MoraAPI;
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
 import eu.liveandgov.wp1.sensor_collector.api.RecorderConfig;
 import eu.liveandgov.wp1.sensor_collector.api.Trip;
+import eu.liveandgov.wp1.sensor_collector.components.BluetoothSource;
 import eu.liveandgov.wp1.sensor_collector.components.Credentials;
+import eu.liveandgov.wp1.sensor_collector.components.GActSource;
 import eu.liveandgov.wp1.sensor_collector.components.ItemBuffer;
+import eu.liveandgov.wp1.sensor_collector.components.LocationSource;
 import eu.liveandgov.wp1.sensor_collector.components.SensorSource.*;
 import eu.liveandgov.wp1.sensor_collector.components.StreamerTarget;
 import eu.liveandgov.wp1.sensor_collector.components.TagSource;
+import eu.liveandgov.wp1.sensor_collector.components.TelephonySource;
+import eu.liveandgov.wp1.sensor_collector.components.WifiSource;
 import eu.liveandgov.wp1.sensor_collector.components.WriterTarget;
 import eu.liveandgov.wp1.sensor_collector.config.Configurator;
 import eu.liveandgov.wp1.sensor_collector.fs.FS;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.os.OS;
 import eu.liveandgov.wp1.sensor_collector.rec.Recorder;
-import eu.liveandgov.wp1.sensor_collector.strategies.TransferExecutor;
+import eu.liveandgov.wp1.sensor_collector.transfer.TransferExecutor;
 
 /**
  * <p>The service coordinating the connection and control of the recording and transfer components</p>
@@ -44,9 +49,9 @@ public class MoraService extends BaseMoraService {
     private final IBinder api = new MoraAPI.Stub() {
         private Trip activeTrip;
 
-        private boolean isRecording = false;
+        private boolean recording = false;
 
-        private boolean isStreaming = false;
+        private boolean streaming = false;
 
 
         @Override
@@ -93,7 +98,7 @@ public class MoraService extends BaseMoraService {
         @Override
         public void startRecording() throws RemoteException {
             // State aware abort
-            if (isRecording)
+            if (recording)
                 return;
 
             // Make a temporary trip
@@ -106,17 +111,17 @@ public class MoraService extends BaseMoraService {
             os.addTarget(writerTarget);
 
             // Set recording flag
-            isRecording = true;
+            recording = true;
         }
 
         @Override
         public void stopRecording() throws RemoteException {
             // State aware abort
-            if (!isRecording)
+            if (!recording)
                 return;
 
             // Clear recording flag
-            isRecording = false;
+            recording = false;
 
             // Deactivate writer dependency
             os.removeTarget(writerTarget);
@@ -133,30 +138,30 @@ public class MoraService extends BaseMoraService {
 
         @Override
         public boolean isRecording() throws RemoteException {
-            return isRecording;
+            return recording;
         }
 
         @Override
         public void startStreaming() throws RemoteException {
             // State aware abort
-            if (isStreaming)
+            if (streaming)
                 return;
 
             // Add streamer dependency
             os.addTarget(streamerTarget);
 
             // Set streaming flag
-            isStreaming = true;
+            streaming = true;
         }
 
         @Override
         public void stopStreaming() throws RemoteException {
             // State aware abort
-            if (!isStreaming)
+            if (!streaming)
                 return;
 
             // Clear streaming flag
-            isStreaming = false;
+            streaming = false;
 
             // Remove streamer dependency
             os.removeTarget(streamerTarget);
@@ -164,7 +169,7 @@ public class MoraService extends BaseMoraService {
 
         @Override
         public boolean isStreaming() throws RemoteException {
-            return isStreaming;
+            return streaming;
         }
 
         @Override
@@ -196,28 +201,59 @@ public class MoraService extends BaseMoraService {
         }
     };
 
+    /**
+     * Credentials field holding user and secret
+     */
     @Inject
     Credentials credentials;
 
+    /**
+     * The configurator managing configuration changes
+     */
     @Inject
     Configurator configurator;
 
+    /**
+     * The system controlling sample source activation and distribution
+     */
     @Inject
     OS os;
 
+    /**
+     * Recorder system for sample snapshots
+     */
     @Inject
     Recorder recorder;
 
+    /**
+     * The system wrapping the storage of trips
+     */
     @Inject
     FS fs;
 
-
+    /**
+     * The delegate for transfer to hosts
+     */
     @Inject
     TransferExecutor transferExecutor;
 
+    /**
+     * The destination for any sample source
+     */
     @Inject
     ItemBuffer itemBuffer;
 
+
+    // Below are all sample source currently available
+
+    @Inject
+    BluetoothSource bluetoothSource;
+
+    @Inject
+    GActSource gActSource;
+
+    @Inject
+    LocationSource locationSource;
 
     @Inject
     AccelerometerSource accelerometerSource;
@@ -237,10 +273,23 @@ public class MoraService extends BaseMoraService {
     @Inject
     TagSource tagSource;
 
+    @Inject
+    TelephonySource telephonySource;
 
+    @Inject
+    WifiSource wifiSource;
+
+    // Targets that may be added and removed satisfying Mora API standards
+
+    /**
+     * The streamer streaming to a network node
+     */
     @Inject
     StreamerTarget streamerTarget;
 
+    /**
+     * The writer serializing the items to the FS
+     */
     @Inject
     WriterTarget writerTarget;
 
@@ -258,7 +307,17 @@ public class MoraService extends BaseMoraService {
 
         os.addReporter(recorder);
 
+
         // Add the sensors
+        os.addSource(bluetoothSource);
+        os.addReporter(bluetoothSource);
+
+        os.addSource(gActSource);
+        os.addReporter(gActSource);
+
+        os.addSource(locationSource);
+        os.addReporter(locationSource);
+
         os.addSource(accelerometerSource);
         os.addReporter(accelerometerSource);
 
@@ -276,6 +335,12 @@ public class MoraService extends BaseMoraService {
 
         os.addSource(tagSource);
         os.addReporter(tagSource);
+
+        os.addSource(telephonySource);
+        os.addReporter(telephonySource);
+
+        os.addSource(wifiSource);
+        os.addReporter(wifiSource);
 
         // Add the targets
         os.addReporter(writerTarget);

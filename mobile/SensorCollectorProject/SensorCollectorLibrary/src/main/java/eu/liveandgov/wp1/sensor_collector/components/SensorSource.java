@@ -19,18 +19,14 @@ import eu.liveandgov.wp1.data.impl.LinearAcceleration;
 import eu.liveandgov.wp1.data.impl.MagneticField;
 import eu.liveandgov.wp1.data.impl.Motion;
 import eu.liveandgov.wp1.data.impl.Rotation;
-import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
-import eu.liveandgov.wp1.sensor_collector.config.ConfigListener;
 import eu.liveandgov.wp1.sensor_collector.config.Configurator;
-import eu.liveandgov.wp1.sensor_collector.os.Reporter;
-import eu.liveandgov.wp1.sensor_collector.os.SampleSource;
 
 /**
  * <p>Source for items based on harware or emulated sensors as specified by Android</p>
  * Created by lukashaertel on 17.11.2014.
  */
-public abstract class SensorSource implements SampleSource, Reporter {
+public abstract class SensorSource extends RegularSampleSource {
     /**
      * Sensor manager responsible for getting the sensors and for registering and unregistering the
      * listeners
@@ -64,19 +60,9 @@ public abstract class SensorSource implements SampleSource, Reporter {
     Handler handler;
 
     /**
-     * Configuration handler
-     */
-    private Configurator configurator;
-
-    /**
      * Type of the sensor
      */
     private int sensorType;
-
-    /**
-     * True if sensor is currently active
-     */
-    private boolean active;
 
     /**
      * Accuracy value of the sensor
@@ -90,63 +76,18 @@ public abstract class SensorSource implements SampleSource, Reporter {
      * @param sensorType   The sensor type
      */
     protected SensorSource(Configurator configurator, int sensorType) {
-        this.configurator = configurator;
+        super(configurator);
         this.sensorType = sensorType;
-
-        configurator.initListener(new ConfigListener() {
-            @Override
-            public void updated(MoraConfig was, MoraConfig config) {
-                // Default update strategy is reactivation
-                if (!isActive())
-                    return;
-
-                if (isEnabled(was) != isEnabled(config) || getDelay(was) != getDelay(config)) {
-                    deactivate();
-                    activate();
-                }
-            }
-        }, true);
     }
 
-    /**
-     * Should return true if the sensor is enabled in the config
-     *
-     * @param config The config to read
-     */
-    protected abstract boolean isEnabled(MoraConfig config);
-
-    /**
-     * Should return the delay in microseconds (?)
-     *
-     * @param config The config to read
-     */
-    protected abstract int getDelay(MoraConfig config);
-
     @Override
-    public void activate() {
-        if (active)
-            return;
-
-        if (!isEnabled(configurator.getConfig()))
-            return;
-
-        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(sensorType), getDelay(configurator.getConfig()), handler);
-        active = true;
+    protected void handleActivation() {
+        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(sensorType), getCurrentDelay(), handler);
     }
 
-
     @Override
-    public void deactivate() {
-        if (!active)
-            return;
-
-        active = false;
+    protected void handleDeactivation() {
         sensorManager.unregisterListener(listener);
-    }
-
-    @Override
-    public boolean isActive() {
-        return active;
     }
 
     /**
@@ -158,18 +99,9 @@ public abstract class SensorSource implements SampleSource, Reporter {
 
     @Override
     public Bundle getReport() {
-        Bundle report = new Bundle();
-        report.putString(SPECIAL_KEY_ORIGINATOR, getClass().getSimpleName());
-
+        Bundle report = super.getReport();
         report.putString("sensor", sensorManager.getDefaultSensor(sensorType).getName());
         report.putInt("accuracy", getAccuracy());
-        report.putBoolean("active", isActive());
-        if (isEnabled(configurator.getConfig())) {
-            report.putBoolean("enabled", true);
-            report.putInt("delay", getDelay(configurator.getConfig()));
-        } else
-            report.putBoolean("enabled", false);
-
         return report;
     }
 
@@ -228,12 +160,7 @@ public abstract class SensorSource implements SampleSource, Reporter {
         }
 
         @Override
-        protected boolean isEnabled(MoraConfig config) {
-            return config.acceleration != null;
-        }
-
-        @Override
-        protected int getDelay(MoraConfig config) {
+        protected Integer getDelay(MoraConfig config) {
             return config.acceleration;
         }
     }
@@ -249,12 +176,7 @@ public abstract class SensorSource implements SampleSource, Reporter {
         }
 
         @Override
-        protected boolean isEnabled(MoraConfig config) {
-            return config.linearAcceleration != null;
-        }
-
-        @Override
-        protected int getDelay(MoraConfig config) {
+        protected Integer getDelay(MoraConfig config) {
             return config.linearAcceleration;
         }
     }
@@ -270,12 +192,7 @@ public abstract class SensorSource implements SampleSource, Reporter {
         }
 
         @Override
-        protected boolean isEnabled(MoraConfig config) {
-            return config.gravity != null;
-        }
-
-        @Override
-        protected int getDelay(MoraConfig config) {
+        protected Integer getDelay(MoraConfig config) {
             return config.gravity;
         }
     }
@@ -291,12 +208,7 @@ public abstract class SensorSource implements SampleSource, Reporter {
         }
 
         @Override
-        protected boolean isEnabled(MoraConfig config) {
-            return config.magnetometer != null;
-        }
-
-        @Override
-        protected int getDelay(MoraConfig config) {
+        protected Integer getDelay(MoraConfig config) {
             return config.magnetometer;
         }
     }
@@ -312,12 +224,7 @@ public abstract class SensorSource implements SampleSource, Reporter {
         }
 
         @Override
-        protected boolean isEnabled(MoraConfig config) {
-            return config.rotation != null;
-        }
-
-        @Override
-        protected int getDelay(MoraConfig config) {
+        protected Integer getDelay(MoraConfig config) {
             return config.rotation;
         }
     }

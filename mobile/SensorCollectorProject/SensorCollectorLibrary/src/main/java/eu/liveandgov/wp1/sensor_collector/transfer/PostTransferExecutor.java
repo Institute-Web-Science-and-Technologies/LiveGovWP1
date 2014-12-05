@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.sensor_collector.strategies;
+package eu.liveandgov.wp1.sensor_collector.transfer;
 
 import android.util.Base64;
 
@@ -19,9 +19,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.Charset;
-import java.util.UUID;
 
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
 import eu.liveandgov.wp1.sensor_collector.api.Trip;

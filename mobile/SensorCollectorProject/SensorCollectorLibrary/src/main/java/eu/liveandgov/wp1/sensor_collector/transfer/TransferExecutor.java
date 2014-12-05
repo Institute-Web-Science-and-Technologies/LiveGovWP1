@@ -1,4 +1,4 @@
-package eu.liveandgov.wp1.sensor_collector.strategies;
+package eu.liveandgov.wp1.sensor_collector.transfer;
 
 import java.io.IOException;
 

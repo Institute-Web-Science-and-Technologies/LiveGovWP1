@@ -10,7 +10,12 @@ import com.google.common.collect.ComparisonChain;
 import java.io.Serializable;
 
 /**
- * Created by lukashaertel on 08.09.2014.
+ * <p>
+ * </p>
+ * <p>
+ * Created on 08.09.2014.
+ * </p>
+ * @author lukashaertel
  */
 public class Trip implements Parcelable, Comparable<Trip>, Serializable {
     public static final Creator<Trip> CREATOR = new Creator<Trip>() {

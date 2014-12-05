@@ -33,11 +33,14 @@
             android:value="eu.liveandgov.wp1.sensor_collector.MoraModule" />
 
         <service
-            android:name=".exint.Transfer"
+            android:name=".MoraService"
             android:exported="false" />
 
         <service
-            android:name=".MoraService"
+            android:name=".components.AndroidLocationSource$AndroidLocationSourceReceiver"
+            android:exported="false" />
+        <service
+            android:name=".components.PlayServicesLocationSource$PlayServicesLocationSourceReceiver"
             android:exported="false" />
     </application>
 

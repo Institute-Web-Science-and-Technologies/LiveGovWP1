@@ -10,7 +10,6 @@ import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
@@ -24,15 +23,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import eu.liveandgov.wp1.data.Callback;
 import eu.liveandgov.wp1.sensor_collector.MoraService;
 import eu.liveandgov.wp1.sensor_collector.ServiceSensorControl;
 import eu.liveandgov.wp1.sensor_collector.api.MoraAPI;
+import eu.liveandgov.wp1.sensor_collector.api.ThreadedMoraAPI;
 import eu.liveandgov.wp1.sensor_collector.api.Trip;
 import eu.liveandgov.wp1.sensor_collector.configuration.ExtendedIntentAPI;
 import eu.liveandgov.wp1.sensor_collector.os.Reporter;
@@ -105,13 +105,13 @@ public class ActivitySensorCollector extends Activity {
         }
     }
 
-    private MoraAPI api;
+    private ThreadedMoraAPI api;
 
     private final ServiceConnection apiConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d("MORA", "Service connected");
-            api = MoraAPI.Stub.asInterface(service);
+            api = new ThreadedMoraAPI(MoraAPI.Stub.asInterface(service), executorService);
         }
 
         @Override
@@ -221,38 +221,25 @@ public class ActivitySensorCollector extends Activity {
 //            intent.setAction(ACTION_RECORDING_ENABLE);
 //            startService(intent);
 
-            try {
-                api.startRecording();
-            } catch (RemoteException e) {
-                throw new RuntimeException(e);
-            }
+            api.startRecording();
         } else { // already recording
 //            Intent intent = new Intent(this, ServiceSensorControl.class);
 //            intent.setAction(RECORDING_DISABLE);
 //            startService(intent);
 
-            try {
-                api.stopRecording();
-            } catch (RemoteException e) {
-                throw new RuntimeException(e);
-            }
+            api.stopRecording();
         }
     }
 
     public void onTransferButtonClick(View view) {
-
-        // Execute on executor service, so we do not get net on main error
-        executorService.execute(new Runnable() {
+        api.getTrips(new Callback<List<Trip>>() {
             @Override
-            public void run() {
-                try {
-                    for (Trip t : api.getTrips())
-                        api.transferTrip(t);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+            public void call(List<Trip> trips) {
+                for (Trip trip : trips)
+                    api.transferTrip(trip);
             }
         });
+
 //        Intent intent = new Intent(this, ServiceSensorControl.class);
 //        intent.setAction(ACTION_TRANSFER_SAMPLES);
 //        startService(intent);
@@ -306,13 +293,14 @@ public class ActivitySensorCollector extends Activity {
     }
 
     public void onDeleteButtonClick(View view) {
-        try {
-            for (Trip t : api.getTrips())
-                api.deleteTrip(t);
+        api.getTrips(new Callback<List<Trip>>() {
+            @Override
+            public void call(List<Trip> trips) {
+                for (Trip trip : trips)
+                    api.deleteTrip(trip);
+            }
+        });
 
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
 //        Intent intent = new Intent(this, ServiceSensorControl.class);
 //        intent.setAction(ExtendedIntentAPI.ACTION_DELETE_SAMPLES);
 //        startService(intent);
@@ -362,31 +350,31 @@ public class ActivitySensorCollector extends Activity {
     private void updateLog(Intent intent) {
         // logTextView.setText(intent.getStringExtra(FIELD_MESSAGE) + "\n");
 
-        try {
-            if (api != null) {
-                StringBuilder b = new StringBuilder();
-                for (Bundle r : api.getReports()) {
-                    // Append reporter
-                    if (r.containsKey(Reporter.SPECIAL_KEY_ORIGINATOR))
-                        b.append(r.get(Reporter.SPECIAL_KEY_ORIGINATOR)).append("\r\n");
-                    else
-                        b.append("Unknown reporter\r\n");
+        if (api != null)
+            api.getReports(new Callback<List<Bundle>>() {
+                @Override
+                public void call(List<Bundle> bundles) {
+                    StringBuilder b = new StringBuilder();
+                    for (Bundle r : bundles) {
+                        // Append reporter
+                        if (r.containsKey(Reporter.SPECIAL_KEY_ORIGINATOR))
+                            b.append(r.get(Reporter.SPECIAL_KEY_ORIGINATOR)).append("\r\n");
+                        else
+                            b.append("Unknown reporter\r\n");
 
-                    // Append keys
-                    for (String k : r.keySet())
-                        if (!Reporter.SPECIAL_KEY_ORIGINATOR.equals(k)) {
-                            b.append(k).append(": ");
-                            MoraStrings.appendDeep(b, r.get(k));
-                            b.append("\r\n");
-                        }
-                    b.append("\r\n");
+                        // Append keys
+                        for (String k : r.keySet())
+                            if (!Reporter.SPECIAL_KEY_ORIGINATOR.equals(k)) {
+                                b.append(k).append(": ");
+                                MoraStrings.appendDeep(b, r.get(k));
+                                b.append("\r\n");
+                            }
+                        b.append("\r\n");
+                    }
+
+                    logTextView.setText(b);
                 }
-
-                logTextView.setText(b);
-            }
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+            });
 
         // scroll to end
 //        logTextView.setSelected(true);
@@ -416,11 +404,7 @@ public class ActivitySensorCollector extends Activity {
 
         // Update Flags
         //isRecording = intent.getBooleanExtra(FIELD_SAMPLING, false);
-        try {
-            isRecording = api != null && api.isRecording();
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        isRecording = api != null && api.isRecording();
         isTransferring = intent.getBooleanExtra(FIELD_TRANSFERRING, false);
         isStreaming = intent.getBooleanExtra(FIELD_STREAMING, false);
         isHAR = intent.getBooleanExtra(FIELD_HAR, false);

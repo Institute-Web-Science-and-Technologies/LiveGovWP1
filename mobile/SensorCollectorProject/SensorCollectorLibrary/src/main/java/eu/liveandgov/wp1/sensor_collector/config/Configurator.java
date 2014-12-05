@@ -10,7 +10,7 @@ import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
  */
 public interface Configurator {
     /**
-     * Adds a listener to the configuration notification chain
+     * <p>Adds a listener to the configuration notification chain</p>
      *
      * @param listener   The listener to add
      * @param initialize True if a stub notification should be pushed
@@ -18,31 +18,31 @@ public interface Configurator {
     void initListener(ConfigListener listener, boolean initialize);
 
     /**
-     * Gets the current config
+     * <p>Gets the current config</p>
      */
     MoraConfig getConfig();
 
     /**
-     * Sets the current config
+     * <p>Sets the current config</p>
      *
      * @param config The new config value
      */
     void setConfig(MoraConfig config);
 
     /**
-     * Resets the config to the default
+     * <p>Resets the config to the default</p>
      */
     void resetConfig();
 
     /**
-     * Loads the config
+     * <p>Loads the config</p>
      *
      * @throws IOException Exception thrown by underlying operations
      */
     void loadConfig() throws IOException;
 
     /**
-     * Stores the config
+     * <p>Stores the config</p>
      *
      * @throws IOException Exception thrown by underlying operations
      */

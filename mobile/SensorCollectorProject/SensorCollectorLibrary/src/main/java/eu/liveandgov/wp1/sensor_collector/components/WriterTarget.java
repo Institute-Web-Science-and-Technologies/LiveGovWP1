@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 
 import eu.liveandgov.wp1.data.Item;
-import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.os.Reporter;
 import eu.liveandgov.wp1.sensor_collector.os.SampleTarget;

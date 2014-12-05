@@ -5,8 +5,6 @@ import android.os.Bundle;
 
 import java.util.List;
 
-import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
-
 /**
  * <p>Operating system</p>
  * Created by lukashaertel on 08.09.2014.

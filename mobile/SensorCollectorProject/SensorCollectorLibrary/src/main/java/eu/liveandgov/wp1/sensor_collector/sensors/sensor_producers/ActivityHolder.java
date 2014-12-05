@@ -37,6 +37,7 @@ public class ActivityHolder implements GooglePlayServicesClient.ConnectionCallba
     }
 
     private boolean playServicesAvailable() {
+
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(GlobalContext.context);
         // If Google Play services is available
         if (ConnectionResult.SUCCESS == resultCode) {

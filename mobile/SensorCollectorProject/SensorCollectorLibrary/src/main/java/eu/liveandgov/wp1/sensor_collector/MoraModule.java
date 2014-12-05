@@ -24,8 +24,8 @@ import eu.liveandgov.wp1.sensor_collector.os.BasicOS;
 import eu.liveandgov.wp1.sensor_collector.os.OS;
 import eu.liveandgov.wp1.sensor_collector.rec.BasicRecorder;
 import eu.liveandgov.wp1.sensor_collector.rec.Recorder;
-import eu.liveandgov.wp1.sensor_collector.strategies.PostTransferExecutor;
-import eu.liveandgov.wp1.sensor_collector.strategies.TransferExecutor;
+import eu.liveandgov.wp1.sensor_collector.transfer.PostTransferExecutor;
+import eu.liveandgov.wp1.sensor_collector.transfer.TransferExecutor;
 
 /**
  * Created by lukashaertel on 08.09.2014.
@@ -57,14 +57,14 @@ public class MoraModule extends AbstractModule {
                         5000, // GPS
                         true, // Velocity of GPS
                         25 * 1000, // Acceleration
-                        100 * 1000, // Linear acceleration
-                        100 * 1000, // Gravity
+                        null, // Linear acceleration
+                        null, // Gravity
                         25 * 1000, // Magnetometer
-                        100 * 1000, // Rotation
-                        5000, // WiFi
-                        5000, // Bluetooth
-                        5000, // GSM
-                        true // Google Activity
+                        null, // Rotation
+                        null, // WiFi
+                        null, // Bluetooth
+                        null, // GSM
+                        20 * 1000 // Google Activity
                 ));
 
         bind(Configurator.class)

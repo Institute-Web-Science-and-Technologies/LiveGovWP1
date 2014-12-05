@@ -24,6 +24,7 @@ import static junit.framework.Assert.assertNotNull;
  * <p/>
  * Created by hartmann on 9/29/13.
  */
+@Deprecated
 public class GlobalContext {
     /**
      * Acquire a logger for domain service and for item global context

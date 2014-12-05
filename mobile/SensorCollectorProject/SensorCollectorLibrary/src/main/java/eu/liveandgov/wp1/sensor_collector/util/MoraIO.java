@@ -6,7 +6,6 @@ import com.google.common.base.Charsets;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
-import com.google.common.io.ByteProcessor;
 import com.google.common.io.ByteSink;
 import com.google.common.io.ByteSource;
 import com.google.common.io.CharSource;
@@ -14,9 +13,6 @@ import com.google.common.io.Closer;
 import com.google.common.io.Files;
 import com.google.common.io.LineProcessor;
 
-import org.apache.commons.math3.geometry.partitioning.BSPTree;
-
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,9 +21,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**

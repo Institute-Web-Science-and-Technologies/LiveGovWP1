@@ -9,7 +9,7 @@ import com.google.common.collect.ComparisonChain;
 import java.io.Serializable;
 
 /**
- * Configuration object for passing via API
+ * <p>Configuration object for passing via API</p>
  * Created by lukashaertel on 17.11.2014.
  */
 public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializable {
@@ -24,37 +24,86 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
             return new MoraConfig[size];
         }
     };
+
+    /**
+     * <p>The name of the user</p>
+     */
     public String user;
 
+    /**
+     * <p>The desired secret length</p>
+     */
     public int secretLength;
 
+    /**
+     * <p>The address of the upload</p>
+     */
     public String upload;
 
+    /**
+     * <p>The compression state of the upload</p>
+     */
     public boolean uploadCompressed;
 
+    /**
+     * <p>The address of the streamer</p>
+     */
     public String streaming;
 
+    /**
+     * <p>The milliseconds between GPS recordings or null if disabled</p>
+     */
     public Integer gps;
 
+    /**
+     * <p>True if velocity should be recorded from the GPS samples</p>
+     */
     public boolean velocity;
 
+    /**
+     * <p>The milliseconds between acceleration samples or null if disabled</p>
+     */
     public Integer acceleration;
 
+    /**
+     * <p>The milliseconds between linear acceleration samples or null if disabled</p>
+     */
     public Integer linearAcceleration;
 
+    /**
+     * <p>The milliseconds between gravity samples or null if disabled</p>
+     */
     public Integer gravity;
 
+    /**
+     * <p>The milliseconds between magnetometer samples or null if disabled</p>
+     */
     public Integer magnetometer;
 
+    /**
+     * <p>The milliseconds between rotation samples or null if disabled</p>
+     */
     public Integer rotation;
 
+    /**
+     * <p>The milliseconds between WiFi samples or null if disabled</p>
+     */
     public Integer wifi;
 
+    /**
+     * <p>The milliseconds between bluetooth samples or null if disabled</p>
+     */
     public Integer bluetooth;
 
+    /**
+     * <p>The milliseconds between GSM samples or null if disabled</p>
+     */
     public Integer gsm;
 
-    private boolean googleActivity;
+    /**
+     * <p>The milliseconds between Google Activity Recognition samples or null if disabled</p>
+     */
+    public Integer googleActivity;
 
     private static boolean readBoolean(Parcel source) {
         return source.readByte() != 0;
@@ -96,10 +145,10 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
         wifi = readInteger(source);
         bluetooth = readInteger(source);
         gsm = readInteger(source);
-        googleActivity = readBoolean(source);
+        googleActivity = readInteger(source);
     }
 
-    public MoraConfig(String user, int secretLength, String upload, boolean uploadCompressed, String streaming, Integer gps, boolean velocity, Integer acceleration, Integer linearAcceleration, Integer gravity, Integer magnetometer, Integer rotation, Integer wifi, Integer bluetooth, Integer gsm, boolean googleActivity) {
+    public MoraConfig(String user, int secretLength, String upload, boolean uploadCompressed, String streaming, Integer gps, boolean velocity, Integer acceleration, Integer linearAcceleration, Integer gravity, Integer magnetometer, Integer rotation, Integer wifi, Integer bluetooth, Integer gsm, Integer googleActivity) {
         this.user = user;
         this.secretLength = secretLength;
         this.upload = upload;
@@ -140,7 +189,7 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
         writeInteger(dest, wifi);
         writeInteger(dest, bluetooth);
         writeInteger(dest, gsm);
-        writeBoolean(dest, googleActivity);
+        writeInteger(dest, googleActivity);
     }
 
     @Override
@@ -150,13 +199,14 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
 
         MoraConfig that = (MoraConfig) o;
 
-        if (googleActivity != that.googleActivity) return false;
         if (secretLength != that.secretLength) return false;
         if (uploadCompressed != that.uploadCompressed) return false;
         if (velocity != that.velocity) return false;
         if (acceleration != null ? !acceleration.equals(that.acceleration) : that.acceleration != null)
             return false;
         if (bluetooth != null ? !bluetooth.equals(that.bluetooth) : that.bluetooth != null)
+            return false;
+        if (googleActivity != null ? !googleActivity.equals(that.googleActivity) : that.googleActivity != null)
             return false;
         if (gps != null ? !gps.equals(that.gps) : that.gps != null) return false;
         if (gravity != null ? !gravity.equals(that.gravity) : that.gravity != null) return false;
@@ -193,7 +243,7 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
         result = 31 * result + (wifi != null ? wifi.hashCode() : 0);
         result = 31 * result + (bluetooth != null ? bluetooth.hashCode() : 0);
         result = 31 * result + (gsm != null ? gsm.hashCode() : 0);
-        result = 31 * result + (googleActivity ? 1 : 0);
+        result = 31 * result + (googleActivity != null ? googleActivity.hashCode() : 0);
         return result;
     }
 
@@ -215,7 +265,7 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
                 .compare(wifi, another.wifi)
                 .compare(bluetooth, another.bluetooth)
                 .compare(gsm, another.gsm)
-                .compareFalseFirst(googleActivity, another.googleActivity)
+                .compare(googleActivity, another.googleActivity)
                 .result();
     }
 

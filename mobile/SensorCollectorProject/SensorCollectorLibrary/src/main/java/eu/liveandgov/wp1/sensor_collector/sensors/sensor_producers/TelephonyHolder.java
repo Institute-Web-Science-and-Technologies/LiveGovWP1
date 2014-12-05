@@ -7,7 +7,6 @@ import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -15,6 +14,7 @@ import eu.liveandgov.wp1.data.impl.GSM;
 import eu.liveandgov.wp1.sensor_collector.GlobalContext;
 import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
+import eu.liveandgov.wp1.sensor_collector.util.MoraConstants;
 
 /**
  * Created by lukashaertel on 02.12.13.
@@ -22,49 +22,6 @@ import eu.liveandgov.wp1.sensor_collector.connectors.sensor_queue.SensorQueue;
 public class TelephonyHolder implements SensorHolder {
 
     public static final String LOG_TAG = "TELH";
-
-    /**
-     * Returns the Signal Strength in dBm
-     */
-    private static Integer convertTS27SignalStrength(int i) {
-        if (i == 99) {
-            return null;
-        } else {
-            return -113 + 2 * i;
-        }
-    }
-
-    private static String getTS27SignalStrengthText(int i) {
-        if (i == 99) {
-            return "unknown";
-        } else {
-            return String.format(Locale.ENGLISH, "%d", convertTS27SignalStrength(i));
-        }
-    }
-
-    private static String getSignalStrengthText(SignalStrength signalStrength) {
-        if (signalStrength.isGsm()) {
-            return String.format(Locale.ENGLISH, "gsm %d", convertTS27SignalStrength(signalStrength.getGsmSignalStrength()));
-        } else {
-            return String.format(Locale.ENGLISH, "other %d %d, %d %d", signalStrength.getCdmaDbm(), signalStrength.getCdmaEcio(), signalStrength.getEvdoDbm(), signalStrength.getEvdoEcio());
-        }
-    }
-
-    public String getIdentityText(int cid, int lac) {
-        if (cid == NeighboringCellInfo.UNKNOWN_CID) {
-            if (lac == NeighboringCellInfo.UNKNOWN_CID) {
-                return "unknown";
-            } else {
-                return String.format(Locale.ENGLISH, "lac: %d", lac);
-            }
-        } else {
-            if (lac == NeighboringCellInfo.UNKNOWN_CID) {
-                return String.format(Locale.ENGLISH, "cid: %d", cid);
-            } else {
-                return String.format(Locale.ENGLISH, "cid: %d lac: %d", cid, lac);
-            }
-        }
-    }
 
     private static final int LISTEN_FLAGS =
             PhoneStateListener.LISTEN_SERVICE_STATE |
@@ -182,9 +139,9 @@ public class TelephonyHolder implements SensorHolder {
             }
 
             items[i] = new GSM.Item(
-                    getIdentityText(nci.getCid(), nci.getLac()),
+                    MoraConstants.getCellIdentityText(nci.getCid(), nci.getLac()),
                     cellType,
-                    convertTS27SignalStrength(nci.getRssi())
+                    MoraConstants.convertTS27SignalStrength(nci.getRssi())
             );
         }
 
@@ -195,7 +152,7 @@ public class TelephonyHolder implements SensorHolder {
                 roamingState,
                 carrierSelection,
                 lastServiceState.getOperatorAlphaLong(),
-                getSignalStrengthText(lastSignalStrength),
+                MoraConstants.getSignalStrengthText(lastSignalStrength),
                 items
         ));
     }
