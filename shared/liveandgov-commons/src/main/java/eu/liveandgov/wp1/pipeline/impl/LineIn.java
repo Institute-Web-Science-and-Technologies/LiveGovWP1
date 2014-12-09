@@ -4,7 +4,6 @@ import eu.liveandgov.wp1.pipeline.Producer;
 import eu.liveandgov.wp1.util.LocalBuilder;
 
 import java.io.*;
-import java.util.Scanner;
 
 /**
  * <p>The line-in producer reads lines with newline from a scanner</p>

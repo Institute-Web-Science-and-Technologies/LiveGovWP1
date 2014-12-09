@@ -104,10 +104,6 @@ public class GSM extends AbstractItem {
      * Item of the GSM environment
      */
     public static final class Item {
-        /**
-         * Empty array of items
-         */
-        public static final Item[] EMPTY_ARRAY = new Item[0];
 
         /**
          * Identity string of the cell
@@ -148,9 +144,8 @@ public class GSM extends AbstractItem {
             if (rssi != item.rssi) return false;
             if (cellIdentity != null ? !cellIdentity.equals(item.cellIdentity) : item.cellIdentity != null)
                 return false;
-            if (cellType != item.cellType) return false;
+            return cellType == item.cellType;
 
-            return true;
         }
 
         @Override
@@ -240,10 +235,8 @@ public class GSM extends AbstractItem {
         if (!Arrays.equals(items, gsm.items)) return false;
         if (roamingState != gsm.roamingState) return false;
         if (serviceState != gsm.serviceState) return false;
-        if (signalStrength != null ? !signalStrength.equals(gsm.signalStrength) : gsm.signalStrength != null)
-            return false;
+        return !(signalStrength != null ? !signalStrength.equals(gsm.signalStrength) : gsm.signalStrength != null);
 
-        return true;
     }
 
     @Override

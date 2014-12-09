@@ -56,9 +56,8 @@ public class Waiting extends AbstractItem {
 
         if (duration != waiting.duration) return false;
         if (at != null ? !at.equals(waiting.at) : waiting.at != null) return false;
-        if (key != null ? !key.equals(waiting.key) : waiting.key != null) return false;
+        return !(key != null ? !key.equals(waiting.key) : waiting.key != null);
 
-        return true;
     }
 
     @Override

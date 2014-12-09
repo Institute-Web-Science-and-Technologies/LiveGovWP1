@@ -25,7 +25,6 @@
                 android:layout_alignParentLeft="true"
                 android:layout_toLeftOf="@+id/recordingProgressBar"
                 android:onClick="onRecordingToggleButtonClick"
-                android:text="ToggleButton"
                 android:textOff="Start Recording"
                 android:textOn="Stop Recording" />
 
@@ -43,7 +42,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="onTransferButtonClick"
-            android:text="Transfer samples" />
+            android:text="@string/transferSamples" />
 
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"
@@ -57,7 +56,6 @@
                 android:id="@+id/streamButton"
                 android:layout_height="fill_parent"
                 android:onClick="onStreamButtonClick"
-                android:text="Streaming"
                 android:checked="false"
                 android:textOff="Start Streaming"
                 android:textOn="Stop Streaming"
@@ -65,36 +63,10 @@
                 android:layout_width="match_parent" />
 
 
-        <ToggleButton
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="New ToggleButton"
-            android:id="@+id/harButton"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/ActivityText"
-            android:checked="false"
-            android:textOff="Start HAR"
-            android:textOn="Stop HAR"
-            android:layout_gravity="center"
-            android:onClick="onHarButtonClick" />
-
-        <Button
-            android:id="@+id/sendSamples"
-            android:layout_height="fill_parent"
-            android:text="Send queued GPS Samples"
-            android:checked="false"
-            android:textOff="Start Streaming"
-            android:textOn="Stop Streaming"
-            android:layout_weight="0.23"
-            android:layout_width="fill_parent"
-            android:layout_gravity="center_horizontal"
-            android:onClick="onGpsButtonClick" />
-
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Delete All Samples"
+            android:text="@string/deleteAllSamples"
             android:id="@+id/button"
             android:layout_gravity="center_horizontal"
             android:onClick="onDeleteButtonClick" />
@@ -103,7 +75,7 @@
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Annotation"
+            android:text="@string/annotation"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <RelativeLayout
@@ -117,7 +89,6 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/sendButton"
                 android:ems="10"
-                android:editable="true"
                 android:clickable="true"
                 android:enabled="true"
                 android:focusable="true">
@@ -130,14 +101,14 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:onClick="onSendButtonClick"
-                android:text="Send" />
+                android:text="@string/send" />
         </RelativeLayout>
 
         <TextView
             android:id="@+id/idTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ID"
+            android:text="@string/id"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <RelativeLayout
@@ -151,7 +122,6 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/idButton"
                 android:ems="10"
-                android:editable="true"
                 android:clickable="true"
                 android:enabled="true"
                 android:focusable="true">
@@ -164,7 +134,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:onClick="onIdButtonClick"
-                android:text="Set" />
+                android:text="@string/set" />
         </RelativeLayout>
 
 
@@ -172,16 +142,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="ACTIVITY"
+            android:text="@string/activity"
             android:id="@+id/ActivityText"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
             android:layout_gravity="center" />
 
         <TextView
             android:id="@+id/logTextView"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="1000dp"
             android:focusable="true"
             android:scrollbars="vertical"
             android:singleLine="false"

@@ -60,9 +60,8 @@ public class GPS extends AbstractItem {
 
         if (Double.compare(gps.lat, lat) != 0) return false;
         if (Double.compare(gps.lon, lon) != 0) return false;
-        if (alt != null ? !alt.equals(gps.alt) : gps.alt != null) return false;
+        return !(alt != null ? !alt.equals(gps.alt) : gps.alt != null);
 
-        return true;
     }
 
     @Override

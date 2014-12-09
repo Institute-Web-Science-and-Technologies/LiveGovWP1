@@ -64,9 +64,8 @@ public class WiFi extends AbstractItem {
             if (frequency != item.frequency) return false;
             if (level != item.level) return false;
             if (bssid != null ? !bssid.equals(item.bssid) : item.bssid != null) return false;
-            if (ssid != null ? !ssid.equals(item.ssid) : item.ssid != null) return false;
+            return !(ssid != null ? !ssid.equals(item.ssid) : item.ssid != null);
 
-            return true;
         }
 
         @Override
@@ -119,9 +118,8 @@ public class WiFi extends AbstractItem {
 
         WiFi wiFi = (WiFi) o;
 
-        if (!Arrays.equals(items, wiFi.items)) return false;
+        return Arrays.equals(items, wiFi.items);
 
-        return true;
     }
 
     @Override
