@@ -14,6 +14,7 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import org.apache.log4j.Logger;
 
@@ -38,6 +39,7 @@ import roboguice.service.RoboIntentService;
  *
  * @author lukashaertel
  */
+@Singleton
 class PlayServicesLocationSource extends RegularSampleSource implements LocationSource {
     private static final Logger log = LogPrincipal.get();
 

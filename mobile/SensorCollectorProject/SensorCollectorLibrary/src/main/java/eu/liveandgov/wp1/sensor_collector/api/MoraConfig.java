@@ -105,6 +105,11 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
      */
     public Integer googleActivity;
 
+    /**
+     * <p>True if custom HAR is activated</p>
+     */
+    public boolean har;
+
     private static boolean readBoolean(Parcel source) {
         return source.readByte() != 0;
     }
@@ -146,9 +151,10 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
         bluetooth = readInteger(source);
         gsm = readInteger(source);
         googleActivity = readInteger(source);
+        har = readBoolean(source);
     }
 
-    public MoraConfig(String user, int secretLength, String upload, boolean uploadCompressed, String streaming, Integer gps, boolean velocity, Integer acceleration, Integer linearAcceleration, Integer gravity, Integer magnetometer, Integer rotation, Integer wifi, Integer bluetooth, Integer gsm, Integer googleActivity) {
+    public MoraConfig(String user, int secretLength, String upload, boolean uploadCompressed, String streaming, Integer gps, boolean velocity, Integer acceleration, Integer linearAcceleration, Integer gravity, Integer magnetometer, Integer rotation, Integer wifi, Integer bluetooth, Integer gsm, Integer googleActivity, boolean har) {
         this.user = user;
         this.secretLength = secretLength;
         this.upload = upload;
@@ -165,6 +171,7 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
         this.bluetooth = bluetooth;
         this.gsm = gsm;
         this.googleActivity = googleActivity;
+        this.har = har;
     }
 
     @Override
@@ -190,6 +197,7 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
         writeInteger(dest, bluetooth);
         writeInteger(dest, gsm);
         writeInteger(dest, googleActivity);
+        writeBoolean(dest, har);
     }
 
     @Override
@@ -199,6 +207,7 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
 
         MoraConfig that = (MoraConfig) o;
 
+        if (har != that.har) return false;
         if (secretLength != that.secretLength) return false;
         if (uploadCompressed != that.uploadCompressed) return false;
         if (velocity != that.velocity) return false;
@@ -244,6 +253,7 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
         result = 31 * result + (bluetooth != null ? bluetooth.hashCode() : 0);
         result = 31 * result + (gsm != null ? gsm.hashCode() : 0);
         result = 31 * result + (googleActivity != null ? googleActivity.hashCode() : 0);
+        result = 31 * result + (har ? 1 : 0);
         return result;
     }
 
@@ -266,6 +276,7 @@ public class MoraConfig implements Parcelable, Comparable<MoraConfig>, Serializa
                 .compare(bluetooth, another.bluetooth)
                 .compare(gsm, another.gsm)
                 .compare(googleActivity, another.googleActivity)
+                .compareFalseFirst(har, another.har)
                 .result();
     }
 

@@ -2,10 +2,12 @@ package eu.liveandgov.wp1.sensor_collector.components;
 
 import android.os.Bundle;
 
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 

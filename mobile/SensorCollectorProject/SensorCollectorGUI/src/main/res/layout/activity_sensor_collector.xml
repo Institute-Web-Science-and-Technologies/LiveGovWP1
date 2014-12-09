@@ -63,28 +63,6 @@
                 android:layout_width="match_parent" />
 
 
-        <ToggleButton
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/harButton"
-            android:checked="false"
-            android:textOff="Start HAR"
-            android:textOn="Stop HAR"
-            android:layout_gravity="center"
-            android:onClick="onHarButtonClick" />
-
-        <Button
-            android:id="@+id/sendSamples"
-            android:layout_height="fill_parent"
-            android:text="@string/sendQueuedGPSSamples"
-            android:checked="false"
-            android:textOff="Start Streaming"
-            android:textOn="Stop Streaming"
-            android:layout_weight="0.23"
-            android:layout_width="fill_parent"
-            android:layout_gravity="center_horizontal"
-            android:onClick="onGpsButtonClick" />
-
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface OS {
     void startConnector();
-    
+
     void stopConnector();
 
     boolean isActive();

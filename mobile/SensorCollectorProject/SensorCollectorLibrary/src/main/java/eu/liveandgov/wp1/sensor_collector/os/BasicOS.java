@@ -113,7 +113,7 @@ public class BasicOS implements OS {
         // Try to add the sample source, if already contained, do nothing more
         if (sampleSources.add(sampleSource))
             // If targets are non-empty sample source is required to be active
-            if (!sampleTargets.isEmpty())
+            if (!isOnlySilentRemaining())
                 sampleSource.activate();
     }
 
@@ -126,7 +126,7 @@ public class BasicOS implements OS {
     public synchronized void addTarget(SampleTarget sampleTarget) {
         logger.info("Adding sample target to OS: " + sampleTarget);
 
-        if (sampleTargets.isEmpty()) {
+        if (isOnlySilentRemaining() && !sampleTarget.isSilent()) {
             if (sampleTargets.add(sampleTarget))
                 for (SampleSource s : sampleSources)
                     s.activate();
@@ -156,7 +156,7 @@ public class BasicOS implements OS {
         logger.info("Removing sample source from OS: " + sampleSource);
 
         if (sampleSources.remove(sampleSource))
-            if (!sampleTargets.isEmpty())
+            if (!isOnlySilentRemaining())
                 sampleSource.deactivate();
     }
 
@@ -170,9 +170,17 @@ public class BasicOS implements OS {
         logger.info("Removing sample target from OS: " + sampleTarget);
 
         if (sampleTargets.remove(sampleTarget))
-            if (sampleTargets.isEmpty())
+            if (isOnlySilentRemaining())
                 for (SampleSource s : sampleSources)
                     s.deactivate();
+    }
+
+    private boolean isOnlySilentRemaining() {
+        for (SampleTarget target : sampleTargets)
+            if (!target.isSilent())
+                return false;
+
+        return true;
     }
 
     /**

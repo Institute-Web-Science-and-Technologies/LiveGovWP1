@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import org.apache.log4j.Logger;
 
@@ -25,6 +26,7 @@ import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
  * <p>Sample source for WiFi state</p>
  * Created by lukashaertel on 05.12.14.
  */
+@Singleton
 public class WifiSource extends RegularSampleSource {
     private static final Logger log = LogPrincipal.get();
 

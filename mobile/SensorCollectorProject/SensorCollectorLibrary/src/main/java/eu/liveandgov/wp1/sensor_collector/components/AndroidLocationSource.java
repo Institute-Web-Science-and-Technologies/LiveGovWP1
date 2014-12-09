@@ -13,6 +13,7 @@ import android.os.Looper;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import org.apache.log4j.Logger;
 
@@ -40,7 +41,7 @@ import roboguice.service.RoboIntentService;
  *
  * @author lukashaertel
  */
-
+@Singleton
 class AndroidLocationSource extends RegularSampleSource implements LocationSource {
     private static final Logger log = LogPrincipal.get();
 

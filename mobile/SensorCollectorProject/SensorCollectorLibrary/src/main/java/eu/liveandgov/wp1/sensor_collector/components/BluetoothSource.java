@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import org.apache.log4j.Logger;
 
@@ -28,6 +29,7 @@ import eu.liveandgov.wp1.sensor_collector.util.MoraConstants;
  * <p>Sample source for bluetooth state</p>
  * Created by lukashaertel on 05.12.14.
  */
+@Singleton
 public class BluetoothSource extends RegularSampleSource {
     private static final Logger log = LogPrincipal.get();
 

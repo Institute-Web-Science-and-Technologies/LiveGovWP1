@@ -5,12 +5,14 @@ import android.os.IBinder;
 import android.os.RemoteException;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
 
+import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.sensor_collector.api.MoraAPI;
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
 import eu.liveandgov.wp1.sensor_collector.api.RecorderConfig;
@@ -18,8 +20,10 @@ import eu.liveandgov.wp1.sensor_collector.api.Trip;
 import eu.liveandgov.wp1.sensor_collector.components.BluetoothSource;
 import eu.liveandgov.wp1.sensor_collector.components.Credentials;
 import eu.liveandgov.wp1.sensor_collector.components.GActSource;
+import eu.liveandgov.wp1.sensor_collector.components.HARSource;
 import eu.liveandgov.wp1.sensor_collector.components.ItemBuffer;
 import eu.liveandgov.wp1.sensor_collector.components.LocationSource;
+import eu.liveandgov.wp1.sensor_collector.components.NotifierLoopBackSource;
 import eu.liveandgov.wp1.sensor_collector.components.SensorSource.*;
 import eu.liveandgov.wp1.sensor_collector.components.StreamerTarget;
 import eu.liveandgov.wp1.sensor_collector.components.TagSource;
@@ -31,6 +35,7 @@ import eu.liveandgov.wp1.sensor_collector.fs.FS;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.os.OS;
 import eu.liveandgov.wp1.sensor_collector.rec.Recorder;
+import eu.liveandgov.wp1.sensor_collector.serial.ItemSerializer;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferExecutor;
 
 /**
@@ -201,6 +206,10 @@ public class MoraService extends BaseMoraService {
         }
     };
 
+    @Inject
+    @Named("eu.liveandgov.wp1.sensor_collector.logfileName")
+    String logfileName;
+
     /**
      * Credentials field holding user and secret
      */
@@ -220,12 +229,6 @@ public class MoraService extends BaseMoraService {
     OS os;
 
     /**
-     * Recorder system for sample snapshots
-     */
-    @Inject
-    Recorder recorder;
-
-    /**
      * The system wrapping the storage of trips
      */
     @Inject
@@ -236,6 +239,10 @@ public class MoraService extends BaseMoraService {
      */
     @Inject
     TransferExecutor transferExecutor;
+
+
+    @Inject
+    ItemSerializer itemSerializer;
 
     /**
      * The destination for any sample source
@@ -251,6 +258,9 @@ public class MoraService extends BaseMoraService {
 
     @Inject
     GActSource gActSource;
+
+    @Inject
+    HARSource harSource;
 
     @Inject
     LocationSource locationSource;
@@ -279,6 +289,9 @@ public class MoraService extends BaseMoraService {
     @Inject
     WifiSource wifiSource;
 
+    @Inject
+    NotifierLoopBackSource notifierLoopBackSource;
+
     // Targets that may be added and removed satisfying Mora API standards
 
     /**
@@ -293,8 +306,16 @@ public class MoraService extends BaseMoraService {
     @Inject
     WriterTarget writerTarget;
 
+    /**
+     * Recorder system for sample snapshots
+     */
+    @Inject
+    Recorder recorder;
+
     @Override
     protected void startup() throws IOException {
+        LogPrincipal.configure(logfileName);
+
         // Load the config
         configurator.loadConfig();
 
@@ -305,8 +326,6 @@ public class MoraService extends BaseMoraService {
         // Add the connectors
         os.addReporter(itemBuffer);
 
-        os.addReporter(recorder);
-
 
         // Add the sensors
         os.addSource(bluetoothSource);
@@ -314,6 +333,9 @@ public class MoraService extends BaseMoraService {
 
         os.addSource(gActSource);
         os.addReporter(gActSource);
+
+        os.addSource(harSource);
+        os.addReporter(harSource);
 
         os.addSource(locationSource);
         os.addReporter(locationSource);
@@ -342,8 +364,17 @@ public class MoraService extends BaseMoraService {
         os.addSource(wifiSource);
         os.addReporter(wifiSource);
 
+        os.addSource(notifierLoopBackSource);
+
         // Add the targets
+        os.addReporter(streamerTarget);
+
         os.addReporter(writerTarget);
+
+        os.addTarget(recorder);
+        os.addReporter(recorder);
+
+
 
         // Sanitize file system
         for (Trip t : fs.listTrips(false))
@@ -351,6 +382,8 @@ public class MoraService extends BaseMoraService {
 
         os.startConnector();
     }
+
+    // TODO Publisher and GPS cache(latter is partly implemented by recorders)
 
     @Override
     protected void shutdown() throws IOException {
@@ -370,5 +403,4 @@ public class MoraService extends BaseMoraService {
     protected IBinder getBinder() {
         return api;
     }
-
 }

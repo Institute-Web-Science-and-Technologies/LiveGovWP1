@@ -23,40 +23,35 @@ import eu.liveandgov.wp1.sensor_collector.os.SampleTarget;
  * Created by lukashaertel on 30.11.2014.
  */
 public class BasicRecorder implements Recorder {
-    /**
-     * Operating system is required to initialize listeners for the sensor types
-     */
-    @Inject
-    OS os;
 
     private Map<RecorderConfig, TimedQueue2<Item>> recorders = Maps.newHashMap();
 
-    /**
-     * Recorder target intercepting all
-     */
-    private final SampleTarget recorderTarget = new SampleTarget() {
-        @Override
-        public void handle(Item item) {
-            // TODO: Use implementation of a timed queue that actually regard the recording configs max limti
-            for (Map.Entry<RecorderConfig, TimedQueue2<Item>> recorder : recorders.entrySet())
-                // Push to recorders queue if this is a desired item type
-                if (recorder.getKey().itemTypes.contains(item.getType())) {
-                    // Offer to queue
-                    recorder.getValue().push(item);
-                    // Resize the recorders queue if exceeding the limit
-                    while (recorder.getValue().items().size() > recorder.getKey().maximum) {
-                        // Resize by iterator and break if empty
-                        Iterator<Item> iterator = recorder.getValue().items().iterator();
-                        if (iterator.hasNext()) {
-                            iterator.next();
-                            iterator.remove();
-                        } else
-                            break;
-                    }
-
+    @Override
+    public void handle(Item item) {
+        // TODO: Use implementation of a timed queue that actually regard the recording configs max limti
+        for (Map.Entry<RecorderConfig, TimedQueue2<Item>> recorder : recorders.entrySet())
+            // Push to recorders queue if this is a desired item type
+            if (recorder.getKey().itemTypes.contains(item.getType())) {
+                // Offer to queue
+                recorder.getValue().push(item);
+                // Resize the recorders queue if exceeding the limit
+                while (recorder.getValue().items().size() > recorder.getKey().maximum) {
+                    // Resize by iterator and break if empty
+                    Iterator<Item> iterator = recorder.getValue().items().iterator();
+                    if (iterator.hasNext()) {
+                        iterator.next();
+                        iterator.remove();
+                    } else
+                        break;
                 }
-        }
-    };
+
+            }
+    }
+
+    @Override
+    public boolean isSilent() {
+        return true;
+    }
 
     @Override
     public void registerRecorder(RecorderConfig config) {
@@ -78,19 +73,11 @@ public class BasicRecorder implements Recorder {
                 if (current.items().size() > config.maximum)
                     break;
             }
-
-        // If first entering, add consumer to OS
-        if (recorders.size() == 1 && before == null)
-            os.addTarget(recorderTarget);
     }
 
     @Override
     public void unregisterRecorder(RecorderConfig config) {
         TimedQueue2<Item> before = recorders.remove(config);
-
-        // If last leaving, remove consumer from OS
-        if (recorders.size() == 0 && before != null)
-            os.removeTarget(recorderTarget);
     }
 
     @Override

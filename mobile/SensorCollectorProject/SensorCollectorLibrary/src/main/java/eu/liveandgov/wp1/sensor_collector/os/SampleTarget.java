@@ -13,4 +13,11 @@ public interface SampleTarget {
      * @param item The item by one of the sources
      */
     void handle(Item item);
+
+    /**
+     * <p>False if adding this target will trigger sample recording activation</p>
+     *
+     * @return Returns true if this sample target will not activate sampling
+     */
+    boolean isSilent();
 }

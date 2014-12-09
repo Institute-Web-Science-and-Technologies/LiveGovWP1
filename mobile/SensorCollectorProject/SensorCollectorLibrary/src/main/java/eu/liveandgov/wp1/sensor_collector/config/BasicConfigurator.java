@@ -50,23 +50,23 @@ public class BasicConfigurator implements Configurator {
 
     @Override
     public void initListener(ConfigListener listener, boolean initialize) {
-        if (listeners.add(listener) && initialize && currentConfig != null)
-            listener.updated(null, currentConfig);
+        if (listeners.add(listener) && initialize)
+            listener.updated(null, getConfig());
     }
 
     @Override
     public MoraConfig getConfig() {
-        return currentConfig;
+        return currentConfig == null ? configDefault : currentConfig;
     }
 
     @Override
     public void setConfig(MoraConfig config) {
-        if (!Objects.equal(currentConfig, config)) {
-            MoraConfig was = currentConfig;
+        if (!Objects.equal(getConfig(), config)) {
+            MoraConfig was = getConfig();
             currentConfig = config;
 
             for (ConfigListener listener : listeners)
-                listener.updated(was, currentConfig);
+                listener.updated(was, getConfig());
         }
     }
 
