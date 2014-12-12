@@ -23,7 +23,7 @@ import eu.liveandgov.wp1.data.Callback;
  *
  * @author lukashaertel
  */
-public class ThreadedMoraAPI implements MoraAPI {
+public class MoraAPIHull implements MoraAPI {
     private final MoraAPI actual;
 
     private final ScheduledExecutorService scheduledExecutorService;
@@ -34,7 +34,7 @@ public class ThreadedMoraAPI implements MoraAPI {
      * @param actual                   The implementation
      * @param scheduledExecutorService The executor service
      */
-    public ThreadedMoraAPI(MoraAPI actual, ScheduledExecutorService scheduledExecutorService) {
+    public MoraAPIHull(MoraAPI actual, ScheduledExecutorService scheduledExecutorService) {
         this.actual = actual;
         this.scheduledExecutorService = scheduledExecutorService;
     }
@@ -49,57 +49,78 @@ public class ThreadedMoraAPI implements MoraAPI {
     }
 
     @Override
-    public void setConfig(final MoraConfig c) {
+    public void setConfig(MoraConfig c) {
+        try {
+            actual.setConfig(c);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setConfig(final MoraConfig c, final Runnable runnable) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    actual.setConfig(c);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+                setConfig(c);
+                runnable.run();
             }
         });
     }
 
     @Override
     public void resetConfig() {
+        try {
+            actual.resetConfig();
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void resetConfig(final Runnable runnable) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    actual.resetConfig();
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+                resetConfig();
+                runnable.run();
             }
         });
     }
 
     @Override
     public void registerRecorder(final RecorderConfig c) {
+        try {
+            actual.registerRecorder(c);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void registerRecorder(final RecorderConfig c, final Runnable runnable) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    actual.registerRecorder(c);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+                registerRecorder(c);
+                runnable.run();
             }
         });
     }
 
     @Override
     public void unregisterRecorder(final RecorderConfig c) {
+
+        try {
+            actual.unregisterRecorder(c);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void unregisterRecorder(final RecorderConfig c, final Runnable runnable) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    actual.unregisterRecorder(c);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+                unregisterRecorder(c);
+                runnable.run();
             }
         });
     }
@@ -142,42 +163,57 @@ public class ThreadedMoraAPI implements MoraAPI {
 
     @Override
     public void annotate(final String userTag) {
+        try {
+            actual.annotate(userTag);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void annotate(final String userTag, final Runnable runnable) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    actual.annotate(userTag);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+                annotate(userTag);
+                runnable.run();
             }
         });
     }
 
     @Override
     public void startRecording() {
+        try {
+            actual.startRecording();
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void startRecording(final Runnable runnable) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    actual.startRecording();
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+                startRecording();
+                runnable.run();
             }
         });
     }
 
     @Override
     public void stopRecording() {
+        try {
+            actual.stopRecording();
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void stopRecording(final Runnable runnable) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    actual.stopRecording();
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+                stopRecording();
+                runnable.run();
             }
         });
     }
@@ -203,28 +239,38 @@ public class ThreadedMoraAPI implements MoraAPI {
 
     @Override
     public void startStreaming() {
+        try {
+            actual.startStreaming();
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void startStreaming(final Runnable runnable) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    actual.startStreaming();
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+                startStreaming();
+                runnable.run();
             }
         });
     }
 
     @Override
     public void stopStreaming() {
+        try {
+            actual.stopStreaming();
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void stopStreaming(final Runnable runnable) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    actual.stopStreaming();
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+                stopStreaming();
+                runnable.run();
             }
         });
     }
@@ -285,14 +331,19 @@ public class ThreadedMoraAPI implements MoraAPI {
 
     @Override
     public void deleteTrip(final Trip trip) {
+        try {
+            actual.deleteTrip(trip);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteTrip(final Trip trip, final Runnable runnable) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    actual.deleteTrip(trip);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+                deleteTrip(trip);
+                runnable.run();
             }
         });
     }
