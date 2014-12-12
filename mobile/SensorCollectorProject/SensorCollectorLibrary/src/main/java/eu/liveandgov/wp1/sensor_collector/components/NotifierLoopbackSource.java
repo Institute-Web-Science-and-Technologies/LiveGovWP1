@@ -13,6 +13,7 @@ import eu.liveandgov.wp1.sensor_collector.os.SampleSource;
 
 /**
  * <p>
+ * This is not a sample source but behaves as a listener for source activation and deactivation
  * </p>
  * <p>
  * Created on 09.12.2014.

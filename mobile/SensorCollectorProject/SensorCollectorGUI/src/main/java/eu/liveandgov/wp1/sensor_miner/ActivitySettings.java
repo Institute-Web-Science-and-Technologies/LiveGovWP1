@@ -7,8 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
-
 public class ActivitySettings extends Activity {
 
     @Override
@@ -24,8 +22,8 @@ public class ActivitySettings extends Activity {
         SharedPreferences settings = getSharedPreferences(getString(R.string.spn), 0);
 
         // Get configured value
-        final String uploadAddressValue = settings.getString(getString(R.string.prf_upload_address), SensorCollectionOptions.DEFAULT_UPLOAD);
-        final String streamingAddressValue = settings.getString(getString(R.string.prf_streaming_address), SensorCollectionOptions.DEFAULT_STREAMING);
+        final String uploadAddressValue = settings.getString(getString(R.string.prf_upload_address), "");
+        final String streamingAddressValue = settings.getString(getString(R.string.prf_streaming_address), "");
 
         // Assign into view
         uploadAddress.setText(uploadAddressValue);
@@ -58,11 +56,11 @@ public class ActivitySettings extends Activity {
 
         // Calculate new configuration value
         final String uploadAddressValue =
-                uploadAddress.getText().length() == 0 || uploadAddress.getText().equals(SensorCollectionOptions.DEFAULT_UPLOAD)
+                uploadAddress.getText().length() == 0 || uploadAddress.getText().equals("")
                         ? null
                         : uploadAddress.getText().toString();
         final String streamingAddressValue =
-                streamingAddress.getText().length() == 0 || uploadAddress.getText().equals(SensorCollectionOptions.DEFAULT_STREAMING)
+                streamingAddress.getText().length() == 0 || uploadAddress.getText().equals("")
                         ? null
                         : streamingAddress.getText().toString();
 

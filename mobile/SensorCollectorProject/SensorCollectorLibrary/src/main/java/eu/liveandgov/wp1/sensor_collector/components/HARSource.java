@@ -1,5 +1,7 @@
 package eu.liveandgov.wp1.sensor_collector.components;
 
+import android.os.Bundle;
+
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -114,4 +116,11 @@ public class HARSource extends RegularSampleSource {
             return true;
         }
     };
+
+    @Override
+    public Bundle getReport() {
+        Bundle report = super.getReport();
+        report.putString("lastActivity", lastActivity);
+        return report;
+    }
 }

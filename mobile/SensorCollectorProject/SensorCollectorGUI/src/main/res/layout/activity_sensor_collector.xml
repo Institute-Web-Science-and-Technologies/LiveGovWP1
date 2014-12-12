@@ -34,7 +34,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:indeterminate="false" />
+                android:indeterminate="false"
+                android:visibility="invisible" />
         </RelativeLayout>
 
         <Button
@@ -50,7 +51,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/transferProgress"
             android:max="100"
-            android:indeterminate="true" />
+            android:indeterminate="false" />
 
             <ToggleButton
                 android:id="@+id/streamButton"
@@ -143,7 +144,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/activity"
-            android:id="@+id/ActivityText"
+            android:id="@+id/activityText"
             android:layout_gravity="center" />
 
         <TextView

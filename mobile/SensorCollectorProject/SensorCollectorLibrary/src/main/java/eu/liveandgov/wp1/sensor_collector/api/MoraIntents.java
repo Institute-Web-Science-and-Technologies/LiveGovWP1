@@ -10,4 +10,8 @@ package eu.liveandgov.wp1.sensor_collector.api;
  * @author lukashaertel
  */
 public class MoraIntents {
+    /**
+     * <p>This intent is broadcast when the status of the Mora Service has changed</p>
+     */
+    public static final String STATUS_UPDATED = "eu.liveandgov.wp1.sensor_collector.api.STATUS_UPDATED";
 }

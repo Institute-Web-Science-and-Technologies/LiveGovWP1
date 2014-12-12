@@ -5,11 +5,13 @@ import android.os.IBinder;
 
 import org.apache.log4j.Logger;
 
+import eu.liveandgov.wp1.sensor_collector.api.MoraIntents;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import roboguice.service.RoboService;
 
 /**
- * Created by Pazuzu on 07.11.2014.
+ * <p>Wraps basic functionality that would obfuscate the logic</p>
+ * Created by lukashaertel on 07.11.2014.
  */
 public abstract class BaseMoraService extends RoboService {
     /**
@@ -94,5 +96,12 @@ public abstract class BaseMoraService extends RoboService {
                 stopSelf();
 
         return true;
+    }
+
+    /**
+     * <p>Should only be called if the return values of API calls changed</p>
+     */
+    protected void sendStatusUpdate() {
+        sendBroadcast(new Intent(MoraIntents.STATUS_UPDATED));
     }
 }

@@ -12,7 +12,6 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.util.List;
 
-import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.sensor_collector.api.MoraAPI;
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
 import eu.liveandgov.wp1.sensor_collector.api.RecorderConfig;
@@ -24,7 +23,11 @@ import eu.liveandgov.wp1.sensor_collector.components.HARSource;
 import eu.liveandgov.wp1.sensor_collector.components.ItemBuffer;
 import eu.liveandgov.wp1.sensor_collector.components.LocationSource;
 import eu.liveandgov.wp1.sensor_collector.components.NotifierLoopBackSource;
-import eu.liveandgov.wp1.sensor_collector.components.SensorSource.*;
+import eu.liveandgov.wp1.sensor_collector.components.SensorSource.AccelerometerSource;
+import eu.liveandgov.wp1.sensor_collector.components.SensorSource.GravitySource;
+import eu.liveandgov.wp1.sensor_collector.components.SensorSource.LinearAccelerationSource;
+import eu.liveandgov.wp1.sensor_collector.components.SensorSource.MagnetometerSource;
+import eu.liveandgov.wp1.sensor_collector.components.SensorSource.RotationSource;
 import eu.liveandgov.wp1.sensor_collector.components.StreamerTarget;
 import eu.liveandgov.wp1.sensor_collector.components.TagSource;
 import eu.liveandgov.wp1.sensor_collector.components.TelephonySource;
@@ -35,7 +38,6 @@ import eu.liveandgov.wp1.sensor_collector.fs.FS;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.os.OS;
 import eu.liveandgov.wp1.sensor_collector.rec.Recorder;
-import eu.liveandgov.wp1.sensor_collector.serial.ItemSerializer;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferExecutor;
 
 /**
@@ -67,21 +69,29 @@ public class MoraService extends BaseMoraService {
         @Override
         public void setConfig(MoraConfig config) {
             configurator.setConfig(config);
+
+            sendStatusUpdate();
         }
 
         @Override
         public void resetConfig() {
             configurator.resetConfig();
+
+            sendStatusUpdate();
         }
 
         @Override
         public void registerRecorder(RecorderConfig config) {
             recorder.registerRecorder(config);
+
+            sendStatusUpdate();
         }
 
         @Override
         public void unregisterRecorder(RecorderConfig config) {
             recorder.unregisterRecorder(config);
+
+            sendStatusUpdate();
         }
 
         @Override
@@ -117,6 +127,8 @@ public class MoraService extends BaseMoraService {
 
             // Set recording flag
             recording = true;
+
+            sendStatusUpdate();
         }
 
         @Override
@@ -139,6 +151,8 @@ public class MoraService extends BaseMoraService {
 
             // Unset trip
             activeTrip = null;
+
+            sendStatusUpdate();
         }
 
         @Override
@@ -157,6 +171,8 @@ public class MoraService extends BaseMoraService {
 
             // Set streaming flag
             streaming = true;
+
+            sendStatusUpdate();
         }
 
         @Override
@@ -170,6 +186,8 @@ public class MoraService extends BaseMoraService {
 
             // Remove streamer dependency
             os.removeTarget(streamerTarget);
+
+            sendStatusUpdate();
         }
 
         @Override
@@ -197,6 +215,8 @@ public class MoraService extends BaseMoraService {
         public void deleteTrip(Trip trip) throws RemoteException {
             // Delete the trip
             fs.deleteTrip(trip);
+
+            sendStatusUpdate();
         }
 
         @Override
@@ -240,9 +260,6 @@ public class MoraService extends BaseMoraService {
     @Inject
     TransferExecutor transferExecutor;
 
-
-    @Inject
-    ItemSerializer itemSerializer;
 
     /**
      * The destination for any sample source
@@ -319,10 +336,6 @@ public class MoraService extends BaseMoraService {
         // Load the config
         configurator.loadConfig();
 
-        // DEBUG ONLY
-        configurator.resetConfig();
-
-
         // Add the connectors
         os.addReporter(itemBuffer);
 
@@ -373,7 +386,6 @@ public class MoraService extends BaseMoraService {
 
         os.addTarget(recorder);
         os.addReporter(recorder);
-
 
 
         // Sanitize file system

@@ -1,5 +1,6 @@
 package eu.liveandgov.wp1.sensor_collector.api;
 
+
 /**
  * <p>
  * </p>
@@ -10,4 +11,9 @@ package eu.liveandgov.wp1.sensor_collector.api;
  * @author lukashaertel
  */
 public class Runnables {
+    public static final Runnable NO_OP_RUNNABLE = new Runnable() {
+        @Override
+        public void run() {
+        }
+    };
 }

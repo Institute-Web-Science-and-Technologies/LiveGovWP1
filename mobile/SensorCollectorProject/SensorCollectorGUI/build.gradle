@@ -7,7 +7,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.14.0'
+        classpath 'com.android.tools.build:gradle:1.0.0'
     }
 }
 
@@ -24,7 +24,7 @@ repositories {
 
 android {
     compileSdkVersion 21
-    buildToolsVersion '21.1'
+    buildToolsVersion '21.1.1'
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 21
@@ -42,17 +42,21 @@ android {
     }
     buildTypes {
         debug {
-            runProguard true
+            minifyEnabled true
             proguardFile 'proguard.cfg'
         }
         release {
-            runProguard true
+            minifyEnabled true
             proguardFile 'proguard.cfg'
         }
     }
 }
 
 dependencies {
+    compile 'org.roboguice:roboguice:3.0'
+    provided 'org.roboguice:roboblender:3.0'
+    compile 'com.google.guava:guava:18.0'
+
     compile 'com.android.support:appcompat-v7:21.0.0'
     compile 'com.android.support:support-v4:21.0.0'
     compile project(':SensorCollectorLibrary')
@@ -64,5 +68,13 @@ idea {
     module {
         downloadJavadoc = true
         downloadSources = true
+    }
+}
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-AguiceAnnotationDatabasePackageName=eu.liveandgov.wp1.sensor_collector.ui"
+        }
     }
 }

@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 
+import com.google.inject.Inject;
+
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -24,25 +26,31 @@ import eu.liveandgov.wp1.data.Callback;
  * @author lukashaertel
  */
 public class MoraAPIHull implements MoraAPI {
-    private final MoraAPI actual;
 
-    private final ScheduledExecutorService scheduledExecutorService;
+    @Inject
+    ScheduledExecutorService scheduledExecutorService;
 
-    /**
-     * <p>Constructs the threaded MORA API on an actual implementation and an executor</p>
-     *
-     * @param actual                   The implementation
-     * @param scheduledExecutorService The executor service
-     */
-    public MoraAPIHull(MoraAPI actual, ScheduledExecutorService scheduledExecutorService) {
-        this.actual = actual;
-        this.scheduledExecutorService = scheduledExecutorService;
+    private MoraAPI implementation;
+
+    public MoraAPI getImplementation() {
+        return implementation;
+    }
+
+    public void setImplementation(MoraAPI implementation) {
+        this.implementation = implementation;
+    }
+
+    private void assertHasImplementation() {
+        if (implementation == null)
+            throw new IllegalStateException("Implementation not set");
     }
 
     @Override
     public MoraConfig getConfig() {
+        assertHasImplementation();
+
         try {
-            return actual.getConfig();
+            return implementation.getConfig();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -50,8 +58,10 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public void setConfig(MoraConfig c) {
+        assertHasImplementation();
+
         try {
-            actual.setConfig(c);
+            implementation.setConfig(c);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -69,8 +79,10 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public void resetConfig() {
+        assertHasImplementation();
+
         try {
-            actual.resetConfig();
+            implementation.resetConfig();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -88,8 +100,10 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public void registerRecorder(final RecorderConfig c) {
+        assertHasImplementation();
+
         try {
-            actual.registerRecorder(c);
+            implementation.registerRecorder(c);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -107,9 +121,10 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public void unregisterRecorder(final RecorderConfig c) {
+        assertHasImplementation();
 
         try {
-            actual.unregisterRecorder(c);
+            implementation.unregisterRecorder(c);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -127,14 +142,16 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public List<RecorderConfig> getRecorders() {
+        assertHasImplementation();
+
         try {
-            return actual.getRecorders();
+            return implementation.getRecorders();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void getRecorders(final Callback<List<RecorderConfig>> callback) {
+    public void getRecorders(final Callback<? super List<RecorderConfig>> callback) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -145,14 +162,16 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public List<String> getRecorderItems(RecorderConfig c) {
+        assertHasImplementation();
+
         try {
-            return actual.getRecorderItems(c);
+            return implementation.getRecorderItems(c);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void getRecorderItems(final RecorderConfig c, final Callback<List<String>> callback) {
+    public void getRecorderItems(final RecorderConfig c, final Callback<? super List<String>> callback) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -163,8 +182,10 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public void annotate(final String userTag) {
+        assertHasImplementation();
+
         try {
-            actual.annotate(userTag);
+            implementation.annotate(userTag);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -182,8 +203,10 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public void startRecording() {
+        assertHasImplementation();
+
         try {
-            actual.startRecording();
+            implementation.startRecording();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -201,8 +224,10 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public void stopRecording() {
+        assertHasImplementation();
+
         try {
-            actual.stopRecording();
+            implementation.stopRecording();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -220,14 +245,16 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public boolean isRecording() {
+        assertHasImplementation();
+
         try {
-            return actual.isRecording();
+            return implementation.isRecording();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void isRecording(final Callback<Boolean> callback) {
+    public void isRecording(final Callback<? super Boolean> callback) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -239,8 +266,10 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public void startStreaming() {
+        assertHasImplementation();
+
         try {
-            actual.startStreaming();
+            implementation.startStreaming();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -258,8 +287,10 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public void stopStreaming() {
+        assertHasImplementation();
+
         try {
-            actual.stopStreaming();
+            implementation.stopStreaming();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -277,14 +308,16 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public boolean isStreaming() {
+        assertHasImplementation();
+
         try {
-            return actual.isStreaming();
+            return implementation.isStreaming();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void isStreaming(final Callback<Boolean> callback) {
+    public void isStreaming(final Callback<? super Boolean> callback) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -295,14 +328,16 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public List<Trip> getTrips() {
+        assertHasImplementation();
+
         try {
-            return actual.getTrips();
+            return implementation.getTrips();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void getTrips(final Callback<List<Trip>> callback) {
+    public void getTrips(final Callback<? super List<Trip>> callback) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -313,14 +348,16 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public boolean transferTrip(Trip trip) {
+        assertHasImplementation();
+
         try {
-            return actual.transferTrip(trip);
+            return implementation.transferTrip(trip);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void transferTrip(final Trip trip, final Callback<Boolean> callback) {
+    public void transferTrip(final Trip trip, final Callback<? super Boolean> callback) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -331,8 +368,10 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public void deleteTrip(final Trip trip) {
+        assertHasImplementation();
+
         try {
-            actual.deleteTrip(trip);
+            implementation.deleteTrip(trip);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -350,14 +389,16 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public List<Bundle> getReports() {
+        assertHasImplementation();
+
         try {
-            return actual.getReports();
+            return implementation.getReports();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void getReports(final Callback<List<Bundle>> callback) {
+    public void getReports(final Callback<? super List<Bundle>> callback) {
         scheduledExecutorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -368,6 +409,6 @@ public class MoraAPIHull implements MoraAPI {
 
     @Override
     public IBinder asBinder() {
-        return actual.asBinder();
+        return implementation.asBinder();
     }
 }
