@@ -2,6 +2,7 @@ package eu.liveandgov.wp1.sensor_collector;
 
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Handler;
 
 import com.google.common.base.Charsets;
 import com.google.inject.AbstractModule;
@@ -15,8 +16,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
-import eu.liveandgov.wp1.sensor_collector.components.LinkedItemBuffer;
 import eu.liveandgov.wp1.sensor_collector.components.ItemBuffer;
+import eu.liveandgov.wp1.sensor_collector.components.LinkedItemBuffer;
 import eu.liveandgov.wp1.sensor_collector.config.BasicConfigurator;
 import eu.liveandgov.wp1.sensor_collector.config.Configurator;
 import eu.liveandgov.wp1.sensor_collector.fs.FS;
@@ -29,6 +30,8 @@ import eu.liveandgov.wp1.sensor_collector.serial.ItemSerializer;
 import eu.liveandgov.wp1.sensor_collector.serial.JSONSerializer;
 import eu.liveandgov.wp1.sensor_collector.transfer.PostTransferExecutor;
 import eu.liveandgov.wp1.sensor_collector.transfer.TransferExecutor;
+import eu.liveandgov.wp1.sensor_collector.util.ThreadHandlerProvider;
+import eu.liveandgov.wp1.sensor_collector.util.Threaded;
 
 /**
  * <p>
@@ -67,8 +70,7 @@ public class MoraModule extends AbstractModule {
                 .toInstance(Charsets.UTF_8);
 
         // Make executor and configure accordingly
-        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(3);
-
+        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(2);
         // If feature is available, enable core thread timeout with five seconds
         if (Build.VERSION.SDK_INT >= 9) {
             scheduledThreadPoolExecutor.setKeepAliveTime(5, TimeUnit.SECONDS);
@@ -77,6 +79,11 @@ public class MoraModule extends AbstractModule {
 
         bind(ScheduledExecutorService.class)
                 .toInstance(scheduledThreadPoolExecutor);
+
+        // Bind the handler to the handler provider, allowing better scheduling
+        bind(Handler.class)
+                .annotatedWith(Threaded.class)
+                .toProvider(ThreadHandlerProvider.class);
     }
 
     /**
@@ -100,10 +107,10 @@ public class MoraModule extends AbstractModule {
                         "tcp://liveandgov.uni-koblenz.de:5555", // Streaming
                         5000, // GPS
                         true, // Velocity of GPS
-                        25 * 1000, // Acceleration
+                        25, // Acceleration
                         null, // Linear acceleration
                         null, // Gravity
-                        25 * 1000, // Magnetometer
+                        50, // Magnetometer
                         null, // Rotation
                         null, // WiFi
                         null, // Bluetooth
@@ -189,13 +196,13 @@ public class MoraModule extends AbstractModule {
         // Configure the connectors
         bindConstant()
                 .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.components.itemBufferLimit"))
-                .to(1024);
+                .to(4096);
         bindConstant()
                 .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.components.itemBufferTimeout"))
-                .to(100L);
+                .to(1L);
         bindConstant()
                 .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.components.itemBufferTimeoutUnit"))
-                .to(TimeUnit.MILLISECONDS);
+                .to(TimeUnit.SECONDS);
         bind(ItemBuffer.class)
                 .to(LinkedItemBuffer.class);
     }
@@ -251,6 +258,10 @@ public class MoraModule extends AbstractModule {
         long motionSensorCorrection = Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1
                 ? (long) (System.currentTimeMillis() - (System.nanoTime() / 1E6))
                 : 0;
+
+        bindConstant()
+                .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.components.dropRate"))
+                .to(.90);
 
         bindConstant()
                 .annotatedWith(Names.named("eu.liveandgov.wp1.sensor_collector.components.motionSensorCorrection"))

@@ -11,7 +11,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.inject.Inject;
+
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import eu.liveandgov.wp1.data.Callback;
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
@@ -34,6 +39,9 @@ import roboguice.inject.InjectView;
  */
 @ContentView(R.layout.activity_sensor_collector)
 public class ActivitySensorCollector extends BaseMoraActivity {
+    @Inject
+    ScheduledExecutorService scheduledExecutorService;
+
     @InjectView(R.id.recordingToggleButton)
     ToggleButton recordingToggleButton;
 
@@ -55,6 +63,20 @@ public class ActivitySensorCollector extends BaseMoraActivity {
     @InjectView(R.id.streamButton)
     ToggleButton streamButton;
 
+    private ScheduledFuture<?> reportsTask;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        reportsTask = scheduledExecutorService.scheduleAtFixedRate(reportsRunnable, 0L, 2L, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void onPause() {
+        reportsTask.cancel(true);
+        super.onPause();
+    }
+
     @Override
     protected void updateStatus() {
         // Set button states
@@ -63,28 +85,41 @@ public class ActivitySensorCollector extends BaseMoraActivity {
 
         // Set recording progress bar state
         recordingProgressBar.setVisibility(api.isRecording() || api.isStreaming() ? View.VISIBLE : View.INVISIBLE);
-
-        // Compose message
-        StringBuilder b = new StringBuilder();
-        for (Bundle r : api.getReports()) {
-            // Append reporter
-            if (r.containsKey(Reporter.SPECIAL_KEY_ORIGINATOR))
-                b.append(r.get(Reporter.SPECIAL_KEY_ORIGINATOR)).append("\r\n");
-            else
-                b.append("Unknown reporter\r\n");
-
-            // Append keys
-            for (String k : r.keySet())
-                if (!Reporter.SPECIAL_KEY_ORIGINATOR.equals(k)) {
-                    b.append(k).append(": ");
-                    MoraStrings.appendDeep(b, r.get(k));
-                    b.append("\r\n");
-                }
-            b.append("\r\n");
-        }
-
-        logTextView.setText(b);
     }
+
+    private Runnable reportsRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (api.getImplementation() == null)
+                return;
+
+            // Compose message
+            final StringBuilder b = new StringBuilder();
+            for (Bundle r : api.getReports()) {
+                // Append reporter
+                if (r.containsKey(Reporter.SPECIAL_KEY_ORIGINATOR))
+                    b.append(r.get(Reporter.SPECIAL_KEY_ORIGINATOR)).append("\r\n");
+                else
+                    b.append("Unknown reporter\r\n");
+
+                // Append keys
+                for (String k : r.keySet())
+                    if (!Reporter.SPECIAL_KEY_ORIGINATOR.equals(k)) {
+                        b.append(k).append(": ");
+                        MoraStrings.appendDeep(b, r.get(k));
+                        b.append("\r\n");
+                    }
+                b.append("\r\n");
+            }
+
+            logTextView.post(new Runnable() {
+                @Override
+                public void run() {
+                    logTextView.setText(b);
+                }
+            });
+        }
+    };
 
     public void onRecordingToggleButtonClick(View view) {
         if (api.isRecording())

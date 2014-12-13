@@ -3,9 +3,8 @@ package eu.liveandgov.wp1.sensor_collector.components;
 import android.os.Bundle;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-
-import org.apache.log4j.Logger;
 
 import eu.liveandgov.wp1.HARPipeline;
 import eu.liveandgov.wp1.data.Item;
@@ -14,11 +13,7 @@ import eu.liveandgov.wp1.data.impl.Acceleration;
 import eu.liveandgov.wp1.data.impl.Activity;
 import eu.liveandgov.wp1.pipeline.Consumer;
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
-import eu.liveandgov.wp1.sensor_collector.components.Credentials;
-import eu.liveandgov.wp1.sensor_collector.components.ItemBuffer;
-import eu.liveandgov.wp1.sensor_collector.components.RegularSampleSource;
 import eu.liveandgov.wp1.sensor_collector.config.Configurator;
-import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.os.OS;
 import eu.liveandgov.wp1.sensor_collector.os.SampleTarget;
 
@@ -34,11 +29,8 @@ import eu.liveandgov.wp1.sensor_collector.os.SampleTarget;
  * @author lukashaertel
  * @author hartmann
  */
+@Singleton
 public class HARSource extends RegularSampleSource {
-    /**
-     * Logger for the transfer executor
-     */
-    private static final Logger log = LogPrincipal.get();
 
     @Inject
     OS os;
@@ -107,7 +99,10 @@ public class HARSource extends RegularSampleSource {
         public void handle(Item item) {
             if (item instanceof Acceleration) {
                 Acceleration acceleration = (Acceleration) item;
-                harPipeline.push(acceleration);
+
+                synchronized (this) {
+                    harPipeline.push(acceleration);
+                }
             }
         }
 

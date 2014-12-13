@@ -38,12 +38,20 @@ public abstract class BaseMoraActivity extends RoboActivity {
     };
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Start the service
+        Intent mora = new Intent(this, MoraService.class);
+        startService(mora);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
-        Log.d("MORA", "Starting and binding the mora service");
+        // Bind to service
         Intent mora = new Intent(this, MoraService.class);
-        startService(mora);
         bindService(mora, api, 0);
 
         // Start listening for status updates
@@ -52,14 +60,13 @@ public abstract class BaseMoraActivity extends RoboActivity {
 
     @Override
     public void onPause() {
+        super.onPause();
+
         // Stop listening for status updates
         unregisterReceiver(statusUpdatedReceiver);
 
         unbindService(api);
         Log.d("MORA", "Unbinding the mora service");
-
-
-        super.onPause();
     }
 
     @Override

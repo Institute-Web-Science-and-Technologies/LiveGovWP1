@@ -8,9 +8,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Looper;
 
-import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -20,7 +18,6 @@ import org.apache.log4j.Logger;
 import java.util.HashMap;
 
 import eu.liveandgov.wp1.data.impl.GPS;
-import eu.liveandgov.wp1.data.impl.GoogleActivity;
 import eu.liveandgov.wp1.data.impl.Velocity;
 import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
 import eu.liveandgov.wp1.sensor_collector.config.Configurator;

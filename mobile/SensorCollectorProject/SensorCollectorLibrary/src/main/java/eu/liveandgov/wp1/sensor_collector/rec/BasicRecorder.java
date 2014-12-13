@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import java.util.Iterator;
 import java.util.List;
@@ -16,12 +16,11 @@ import java.util.Set;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.helper.TimedQueue2;
 import eu.liveandgov.wp1.sensor_collector.api.RecorderConfig;
-import eu.liveandgov.wp1.sensor_collector.os.OS;
-import eu.liveandgov.wp1.sensor_collector.os.SampleTarget;
 
 /**
  * Created by lukashaertel on 30.11.2014.
  */
+@Singleton
 public class BasicRecorder implements Recorder {
 
     private Map<RecorderConfig, TimedQueue2<Item>> recorders = Maps.newHashMap();

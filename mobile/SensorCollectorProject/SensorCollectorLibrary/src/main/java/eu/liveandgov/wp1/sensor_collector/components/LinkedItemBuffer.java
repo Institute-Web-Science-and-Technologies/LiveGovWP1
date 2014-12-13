@@ -2,12 +2,11 @@ package eu.liveandgov.wp1.sensor_collector.components;
 
 import android.os.Bundle;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +34,7 @@ public class LinkedItemBuffer implements ItemBuffer, Reporter {
     /**
      * The store for the items
      */
-    private final LinkedBlockingQueue<Item> queue = new LinkedBlockingQueue<Item>();
+    private final LinkedBlockingQueue<Item> queue = Queues.newLinkedBlockingQueue();
 
     /**
      * Maintain a number of offer faults
@@ -43,14 +42,20 @@ public class LinkedItemBuffer implements ItemBuffer, Reporter {
     private long offerFaults = 0;
 
     /**
-     * Maintain a number of total items
+     * Maintain a number of total offered items
      */
-    private long totalItems = 0;
+    private long offerTotal = 0;
+
+    /**
+     * Maintain a number of total polled items
+     */
+    private long pollTotal = 0;
 
     @Override
     public void offer(Item item) {
         queue.offer(item);
-        totalItems++;
+        offerTotal++;
+
         while (queue.size() > itemBufferLimit) {
             queue.poll();
             offerFaults++;
@@ -61,7 +66,12 @@ public class LinkedItemBuffer implements ItemBuffer, Reporter {
     public Item poll() {
         // Return the polled item
         try {
-            return queue.poll(itemBufferTimeout, itemBufferTimeoutUnit);
+            Item result = queue.poll(itemBufferTimeout, itemBufferTimeoutUnit);
+
+            if (result != null)
+                pollTotal++;
+
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return null;
@@ -77,8 +87,9 @@ public class LinkedItemBuffer implements ItemBuffer, Reporter {
         report.putInt("limit", itemBufferLimit);
         report.putLong("timeout", itemBufferTimeout);
         report.putSerializable("timeoutUnit", itemBufferTimeoutUnit);
-        report.putLong("totalItems", totalItems);
         report.putLong("offerFaults", offerFaults);
+        report.putLong("offerTotal", offerTotal);
+        report.putLong("pollTotal", pollTotal);
         return report;
     }
 }

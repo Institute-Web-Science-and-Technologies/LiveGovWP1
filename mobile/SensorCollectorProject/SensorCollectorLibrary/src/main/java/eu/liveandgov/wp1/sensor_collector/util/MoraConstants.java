@@ -2,7 +2,6 @@ package eu.liveandgov.wp1.sensor_collector.util;
 
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
-import android.location.LocationListener;
 import android.location.LocationProvider;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.SignalStrength;

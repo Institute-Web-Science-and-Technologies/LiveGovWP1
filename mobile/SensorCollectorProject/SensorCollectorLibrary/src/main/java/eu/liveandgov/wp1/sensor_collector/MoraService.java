@@ -22,7 +22,7 @@ import eu.liveandgov.wp1.sensor_collector.components.GActSource;
 import eu.liveandgov.wp1.sensor_collector.components.HARSource;
 import eu.liveandgov.wp1.sensor_collector.components.ItemBuffer;
 import eu.liveandgov.wp1.sensor_collector.components.LocationSource;
-import eu.liveandgov.wp1.sensor_collector.components.NotifierLoopBackSource;
+import eu.liveandgov.wp1.sensor_collector.components.NotifierSource;
 import eu.liveandgov.wp1.sensor_collector.components.SensorSource.AccelerometerSource;
 import eu.liveandgov.wp1.sensor_collector.components.SensorSource.GravitySource;
 import eu.liveandgov.wp1.sensor_collector.components.SensorSource.LinearAccelerationSource;
@@ -122,12 +122,16 @@ public class MoraService extends BaseMoraService {
             // Assign the trips sink to the writer
             writerTarget.setSink(fs.writeTrip(activeTrip));
 
+            // Status update after new trip
+            sendStatusUpdate();
+
             // Activate the writer dependency
             os.addTarget(writerTarget);
 
             // Set recording flag
             recording = true;
 
+            // Status update after state change
             sendStatusUpdate();
         }
 
@@ -139,6 +143,9 @@ public class MoraService extends BaseMoraService {
 
             // Clear recording flag
             recording = false;
+
+            // Status update after state change
+            sendStatusUpdate();
 
             // Deactivate writer dependency
             os.removeTarget(writerTarget);
@@ -152,6 +159,7 @@ public class MoraService extends BaseMoraService {
             // Unset trip
             activeTrip = null;
 
+            // Status update after trip renamed
             sendStatusUpdate();
         }
 
@@ -172,6 +180,7 @@ public class MoraService extends BaseMoraService {
             // Set streaming flag
             streaming = true;
 
+            // Status update after state change
             sendStatusUpdate();
         }
 
@@ -181,13 +190,15 @@ public class MoraService extends BaseMoraService {
             if (!streaming)
                 return;
 
-            // Clear streaming flag
-            streaming = false;
-
             // Remove streamer dependency
             os.removeTarget(streamerTarget);
 
+            // Clear streaming flag
+            streaming = false;
+
+            // Status update after state change
             sendStatusUpdate();
+
         }
 
         @Override
@@ -307,7 +318,7 @@ public class MoraService extends BaseMoraService {
     WifiSource wifiSource;
 
     @Inject
-    NotifierLoopBackSource notifierLoopBackSource;
+    NotifierSource notifierSource;
 
     // Targets that may be added and removed satisfying Mora API standards
 
@@ -335,6 +346,7 @@ public class MoraService extends BaseMoraService {
 
         // Load the config
         configurator.loadConfig();
+        configurator.resetConfig();
 
         // Add the connectors
         os.addReporter(itemBuffer);
@@ -377,7 +389,7 @@ public class MoraService extends BaseMoraService {
         os.addSource(wifiSource);
         os.addReporter(wifiSource);
 
-        os.addSource(notifierLoopBackSource);
+        os.addSource(notifierSource);
 
         // Add the targets
         os.addReporter(streamerTarget);

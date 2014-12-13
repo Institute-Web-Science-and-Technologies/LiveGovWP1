@@ -9,6 +9,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import org.apache.log4j.Logger;
+
+import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.os.SampleSource;
 
 /**
@@ -22,7 +25,9 @@ import eu.liveandgov.wp1.sensor_collector.os.SampleSource;
  * @author lukashaertel
  */
 @Singleton
-public class NotifierLoopBackSource implements SampleSource {
+public class NotifierSource implements SampleSource {
+    private final Logger log = LogPrincipal.get();
+
     @Inject
     Context context;
 
@@ -57,7 +62,7 @@ public class NotifierLoopBackSource implements SampleSource {
 
     boolean active;
 
-    public NotifierLoopBackSource() {
+    public NotifierSource() {
         notifierId = Float.floatToIntBits((float) Math.random());
         active = false;
     }

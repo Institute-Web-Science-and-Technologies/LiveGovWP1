@@ -34,7 +34,8 @@
 
         <service
             android:name=".MoraService"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":service" />
 
         <service
             android:name=".components.AndroidLocationSource$AndroidLocationSourceReceiver"

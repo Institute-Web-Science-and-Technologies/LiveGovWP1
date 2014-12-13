@@ -2,6 +2,7 @@ package eu.liveandgov.wp1.sensor_collector.os;
 
 import android.os.Bundle;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -47,7 +48,12 @@ public class BasicOS implements OS {
     /**
      * The set of sample targets
      */
-    private Set<SampleTarget> sampleTargets = Sets.newConcurrentHashSet();
+    private Set<SampleTarget> sampleActiveTargets = Sets.newConcurrentHashSet();
+
+    /**
+     * The set of sample targets
+     */
+    private Set<SampleTarget> sampleSilentTargets = Sets.newConcurrentHashSet();
 
     /**
      * The set of all reportes
@@ -58,28 +64,34 @@ public class BasicOS implements OS {
 
     @Override
     public void startConnector() {
-        // If already connected, return
-        if (connector != null) {
-            logger.warn("Repetitive call to start connector, maybe inconsistent state transitions");
-            return;
-        }
+        logger.info("Starting connector");
 
         // Start runnable and store handle
         connector = scheduledExecutorService.schedule(new Runnable() {
             @Override
             public void run() {
-                // While connector is running
-                while (connector != null && !connector.isCancelled()) {
-                    // Poll an item
-                    Item item = itemBuffer.poll();
+                try {
+                    logger.info("Started the connector");
+                    // While connector is running
+                    while (true) {
+                        // Poll an item
+                        Item item = itemBuffer.poll();
 
-                    // If no item could be polled during the timeout, skip this round
-                    if (item == null)
-                        continue;
+                        // If no item could be polled during the timeout, skip this round
+                        if (item == null)
+                            continue;
 
-                    // Offer item to all targets
-                    for (SampleTarget t : sampleTargets)
-                        t.handle(item);
+                        // Offer item to all targets
+                        for (SampleTarget t : Iterables.concat(sampleActiveTargets, sampleSilentTargets))
+                            t.handle(item);
+
+                        if (connector != null && connector.isCancelled())
+                            break;
+                    }
+
+                    logger.info("Connector gracefully terminated");
+                } catch (Exception e) {
+                    logger.error("Connector terminated with an exception", e);
                 }
             }
         }, 0L, TimeUnit.SECONDS);
@@ -87,18 +99,14 @@ public class BasicOS implements OS {
 
     @Override
     public void stopConnector() {
-        if (connector == null) {
-            logger.warn("Repetitive call to stop connector, maybe inconsistent state transitions");
-            return;
-        }
-
         connector.cancel(false);
-        connector = null;
+
+        logger.info("Stopped connector");
     }
 
     @Override
     public boolean isActive() {
-        return !sampleTargets.isEmpty();
+        return !sampleActiveTargets.isEmpty();
     }
 
     /**
@@ -113,7 +121,7 @@ public class BasicOS implements OS {
         // Try to add the sample source, if already contained, do nothing more
         if (sampleSources.add(sampleSource))
             // If targets are non-empty sample source is required to be active
-            if (!isOnlySilentRemaining())
+            if (!sampleActiveTargets.isEmpty())
                 sampleSource.activate();
     }
 
@@ -126,12 +134,12 @@ public class BasicOS implements OS {
     public synchronized void addTarget(SampleTarget sampleTarget) {
         logger.info("Adding sample target to OS: " + sampleTarget);
 
-        if (isOnlySilentRemaining() && !sampleTarget.isSilent()) {
-            if (sampleTargets.add(sampleTarget))
+        if (sampleTarget.isSilent())
+            sampleSilentTargets.add(sampleTarget);
+        else if (sampleActiveTargets.add(sampleTarget))
+            if (sampleActiveTargets.size() == 1)
                 for (SampleSource s : sampleSources)
                     s.activate();
-        } else
-            sampleTargets.add(sampleTarget);
     }
 
     /**
@@ -156,7 +164,7 @@ public class BasicOS implements OS {
         logger.info("Removing sample source from OS: " + sampleSource);
 
         if (sampleSources.remove(sampleSource))
-            if (!isOnlySilentRemaining())
+            if (!sampleActiveTargets.isEmpty())
                 sampleSource.deactivate();
     }
 
@@ -169,19 +177,14 @@ public class BasicOS implements OS {
     public synchronized void removeTarget(SampleTarget sampleTarget) {
         logger.info("Removing sample target from OS: " + sampleTarget);
 
-        if (sampleTargets.remove(sampleTarget))
-            if (isOnlySilentRemaining())
+        if (sampleTarget.isSilent())
+            sampleSilentTargets.remove(sampleTarget);
+        else if (sampleActiveTargets.remove(sampleTarget))
+            if (sampleActiveTargets.isEmpty())
                 for (SampleSource s : sampleSources)
                     s.deactivate();
     }
 
-    private boolean isOnlySilentRemaining() {
-        for (SampleTarget target : sampleTargets)
-            if (!target.isSilent())
-                return false;
-
-        return true;
-    }
 
     /**
      * <p>Removes a reporter from the OS</p>

@@ -45,7 +45,7 @@ public class WriterTarget implements SampleTarget, Reporter {
         try {
             sink.writeLines(ImmutableList.of(form));
         } catch (IOException e) {
-            logger.error("Error writing sample " + item, e);
+            logger.error("Exception writing sample " + item, e);
         }
     }
 

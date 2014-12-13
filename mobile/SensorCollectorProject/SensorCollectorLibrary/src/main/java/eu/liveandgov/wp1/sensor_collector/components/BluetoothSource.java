@@ -24,6 +24,7 @@ import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
 import eu.liveandgov.wp1.sensor_collector.config.Configurator;
 import eu.liveandgov.wp1.sensor_collector.logging.LogPrincipal;
 import eu.liveandgov.wp1.sensor_collector.util.MoraConstants;
+import eu.liveandgov.wp1.sensor_collector.util.Threaded;
 
 /**
  * <p>Sample source for bluetooth state</p>
@@ -53,6 +54,7 @@ public class BluetoothSource extends RegularSampleSource {
      * Message handler
      */
     @Inject
+    @Threaded
     Handler handler;
 
     /**
@@ -204,6 +206,4 @@ public class BluetoothSource extends RegularSampleSource {
             }
         }
     };
-
-
 }

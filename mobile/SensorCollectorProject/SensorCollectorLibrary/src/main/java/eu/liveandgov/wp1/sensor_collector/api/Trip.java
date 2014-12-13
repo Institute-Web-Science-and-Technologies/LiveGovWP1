@@ -15,6 +15,7 @@ import java.io.Serializable;
  * <p>
  * Created on 08.09.2014.
  * </p>
+ *
  * @author lukashaertel
  */
 public class Trip implements Parcelable, Comparable<Trip>, Serializable {

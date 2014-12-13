@@ -2,7 +2,6 @@ package eu.liveandgov.wp1.sensor_collector.components;
 
 import android.content.Context;
 import android.location.LocationManager;
-import android.os.Looper;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;

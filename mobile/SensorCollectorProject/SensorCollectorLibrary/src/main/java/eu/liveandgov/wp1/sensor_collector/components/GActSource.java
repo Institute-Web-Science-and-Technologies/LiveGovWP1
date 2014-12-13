@@ -96,7 +96,7 @@ public class GActSource extends RegularSampleSource {
             return false;
         }
 
-        return false;
+        return true;
     }
 
     @Override

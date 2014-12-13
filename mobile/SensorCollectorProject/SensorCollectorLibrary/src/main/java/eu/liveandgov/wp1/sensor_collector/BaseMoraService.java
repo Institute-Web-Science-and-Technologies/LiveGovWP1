@@ -76,8 +76,10 @@ public abstract class BaseMoraService extends RoboService {
 
     @Override
     public IBinder onBind(Intent intent) {
-        if (connections++ == 0)
+        if (connections++ == 0) {
+            logger.info("Activating provision");
             activateProvision();
+        }
 
         // Return the API binder
         return getBinder();
@@ -85,15 +87,23 @@ public abstract class BaseMoraService extends RoboService {
 
     @Override
     public void onRebind(Intent intent) {
-        if (connections++ == 0)
+        if (connections++ == 0) {
+            logger.info("Activating provision");
             activateProvision();
+        }
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        if (connections-- == 1)
-            if (!activateStandAlone())
+        if (connections-- == 1) {
+            if (activateStandAlone()) {
+                logger.info("Activating standalone");
+            } else {
+                logger.info("Stopping self");
                 stopSelf();
+            }
+
+        }
 
         return true;
     }
