@@ -4,18 +4,26 @@
     <string name="app_name">SensorMiner</string>
     <string name="action_settings">Settings</string>
 
-    <!-- Shared Preferences Store -->
-    <string name="spn">SensorCollectorPreferences</string>
-    <string name="prf_upload_address">upload_address</string>
-    <string name="prf_streaming_address">streaming_address</string>
+    <string name="user">User name</string>
+    <string name="secretLength">Length of secret</string>
+    <string name="upload">Upload address</string>
+    <string name="uploadCompressed">Upload compressed</string>
+    <string name="streaming">Streaming address</string>
+    <string name="gps">GPS interval in seconds</string>
+    <string name="velocity">Record GPS velocity</string>
+    <string name="acceleration">ACC interval in ms</string>
+    <string name="linearAcceleration">LAC interval in ms</string>
+    <string name="gravity">GRA interval in ms</string>
+    <string name="magnetometer">MAG interval in ms</string>
+    <string name="rotation">ROT interval in ms</string>
+    <string name="wifi">WIFI interval in ms</string>
+    <string name="bluetooth">BLT interval in ms</string>
+    <string name="gsm">GSM interval in ms</string>
+    <string name="googleActivity">GACT interval in ms</string>
+    <string name="har">ACT interval in ms</string>
 
     <!-- Values for the Settings activity -->
-    <string name="streaming_address">Streaming address</string>
     <string name="title_activity_activity_settings">Settings</string>
-    <string name="upload_address">Upload address</string>
-    <string name="streaming_port">Streaming Port</string>
-    <string name="resets_to_default">Resets to default</string>
-    <string name="user_secret">User Secret</string>
     <string name="activity">ACTIVITY</string>
     <string name="set">Set</string>
     <string name="id">ID</string>
@@ -24,5 +32,6 @@
     <string name="deleteAllSamples">Delete All Samples</string>
     <string name="sendQueuedGPSSamples">Send queued GPS Samples</string>
     <string name="transferSamples">Transfer samples</string>
+
 
 </resources>

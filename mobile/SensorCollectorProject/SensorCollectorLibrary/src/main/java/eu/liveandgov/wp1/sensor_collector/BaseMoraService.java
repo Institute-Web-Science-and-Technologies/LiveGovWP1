@@ -48,6 +48,7 @@ public abstract class BaseMoraService extends RoboService {
         // User may implement
     }
 
+
     @Override
     public void onCreate() {
         super.onCreate();

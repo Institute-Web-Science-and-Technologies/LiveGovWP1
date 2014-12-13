@@ -105,52 +105,18 @@
                 android:text="@string/send" />
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/idTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/id"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
         <RelativeLayout
             android:id="@+id/idRelativeLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
 
-            <EditText
-                android:id="@+id/idText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@+id/idButton"
-                android:ems="10"
-                android:clickable="true"
-                android:enabled="true"
-                android:focusable="true">
-            </EditText>
-
-            <Button
-                android:id="@+id/idButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:onClick="onIdButtonClick"
-                android:text="@string/set" />
         </RelativeLayout>
 
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/activity"
-            android:id="@+id/activityText"
-            android:layout_gravity="center" />
-
-        <TextView
             android:id="@+id/logTextView"
             android:layout_width="match_parent"
-            android:layout_height="1500dp"
+            android:layout_height="2500dp"
             android:focusable="true"
             android:scrollbars="vertical"
             android:singleLine="false"

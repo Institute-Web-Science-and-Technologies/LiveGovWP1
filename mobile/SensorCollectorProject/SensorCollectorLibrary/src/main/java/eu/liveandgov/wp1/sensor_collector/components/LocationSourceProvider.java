@@ -50,6 +50,8 @@ public class LocationSourceProvider implements Provider<LocationSource> {
     @Inject
     ItemBuffer itemBuffer;
 
+    LocationSource value = null;
+
     /**
      * Acquires the location source
      *
@@ -57,18 +59,21 @@ public class LocationSourceProvider implements Provider<LocationSource> {
      */
     @Override
     public LocationSource get() {
+        if (value != null)
+            return value;
+
         // Check if play services are available
         int code = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
 
         // If so, return the play services provider
         if (code == ConnectionResult.SUCCESS)
-            return new PlayServicesLocationSource(configurator, credentials, itemBuffer, context);
+            return value = new PlayServicesLocationSource(configurator, credentials, itemBuffer, context);
 
         // Else, log failure
         log.info("Google location services is not available, status: "
                 + MoraConstants.toConnectionResultString(code) + ", falling back to android");
 
         // Return Android provider
-        return new AndroidLocationSource(configurator, credentials, itemBuffer, locationManager, context);
+        return value = new AndroidLocationSource(configurator, credentials, itemBuffer, locationManager, context);
     }
 }

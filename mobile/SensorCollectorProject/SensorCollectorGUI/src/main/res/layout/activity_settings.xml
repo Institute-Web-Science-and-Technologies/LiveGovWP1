@@ -1,56 +1,192 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/upload_address_title"
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:text="@string/upload_address"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:orientation="vertical">
+        <!--
 
-    <EditText
-        android:id="@+id/upload_address"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:inputType="textUri"
-        android:hint="@string/resets_to_default" />
+        public String user;
+        public int secretLength;
+        public String upload;
+        public boolean uploadCompressed;
+        public String streaming;
+        public Integer gps;
+        public boolean velocity;
+        public Integer acceleration;
+        public Integer linearAcceleration;
+        public Integer gravity;
+        public Integer magnetometer;
+        public Integer rotation;
+        public Integer wifi;
+        public Integer bluetooth;
+        public Integer gsm;
+        public Integer googleActivity;
+        public boolean har;
+        -->
 
-    <TextView
-        android:id="@+id/streaming_address_title"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:text="@string/streaming_address"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        <TextView
+            android:id="@+id/userLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User name"
+            android:layout_gravity="center_horizontal" />
 
-    <EditText
-        android:id="@+id/streaming_address"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:inputType="textUri"
-        android:hint="@string/resets_to_default" />
+        <EditText
+            android:id="@+id/user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Names" />
 
-    <TextView
-        android:id="@+id/user_secret_label"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:text="@string/user_secret"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        <TextView
+            android:id="@+id/secretLengthLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Secret length"
+            android:layout_gravity="center_horizontal" />
 
-    <EditText
-        android:id="@+id/userSecret"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:inputType="none"
-        android:editable="false" />
+        <EditText
+            android:id="@+id/secretLength"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="number" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/uploadLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upload address"
+            android:layout_gravity="center_horizontal" />
+
+        <EditText
+            android:id="@+id/upload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textUri"/>
+
+        <CheckBox
+            android:id="@+id/uploadCompressed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Upload compressed" />
+
+        <TextView
+            android:id="@+id/streamingLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Streaming address"
+            android:layout_gravity="center_horizontal" />
+
+        <EditText
+            android:id="@+id/streaming"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textUri"/>
+
+        <CheckBox
+            android:id="@+id/gps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Record GPS" />
+
+        <CheckBox
+            android:id="@+id/velocity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Record GPS velocity" />
+
+        <CheckBox
+            android:id="@+id/acceleration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Record accelerometer" />
+
+        <CheckBox
+            android:id="@+id/linearAcceleration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Record linear acceleration" />
+
+        <CheckBox
+            android:id="@+id/gravity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Record gravity" />
+
+        <CheckBox
+            android:id="@+id/magnetometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Record magnetometer" />
+
+        <CheckBox
+            android:id="@+id/rotation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Record rotation" />
+
+        <CheckBox
+            android:id="@+id/wifi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Record WiFi" />
+
+        <CheckBox
+            android:id="@+id/bluetooth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Record Bluetooth" />
+
+        <CheckBox
+            android:id="@+id/gsm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Record GSM" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Record Google Activity"
+            android:id="@+id/googleActivity"
+            android:checked="false" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Record Activity"
+            android:id="@+id/har"
+            android:checked="false" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save settings"
+            android:id="@+id/saveSettings"
+            android:onClick="saveSettings" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reset settings"
+            android:id="@+id/resetSettings"
+            android:onClick="resetSettings" />
+    </LinearLayout>
+</ScrollView>

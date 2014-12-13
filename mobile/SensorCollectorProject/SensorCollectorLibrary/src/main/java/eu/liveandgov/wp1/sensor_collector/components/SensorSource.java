@@ -94,6 +94,8 @@ public abstract class SensorSource extends RegularSampleSource {
      */
     private long dropped;
 
+    private float[] lastVector;
+
 
     /**
      * Constructs the sensor source, configurator should be injected
@@ -106,6 +108,7 @@ public abstract class SensorSource extends RegularSampleSource {
         this.sensorType = sensorType;
 
         dropped = 0;
+        lastVector = new float[0];
     }
 
     @Override
@@ -153,6 +156,7 @@ public abstract class SensorSource extends RegularSampleSource {
         report.putString("sensor", getSensor().getName());
         report.putInt("accuracy", getAccuracy());
         report.putLong("dropped", getDropped());
+        report.putFloatArray("lastVectory", lastVector);
         return report;
     }
 
@@ -170,22 +174,22 @@ public abstract class SensorSource extends RegularSampleSource {
 
             switch (sensorEvent.sensor.getType()) {
                 case Sensor.TYPE_ACCELEROMETER:
-                    offerItem(new Acceleration(timestamp, credentials.user, values));
+                    offerItem(new Acceleration(timestamp, credentials.user, lastVector = values));
                     break;
                 case Sensor.TYPE_GRAVITY:
-                    offerItem(new Gravity(timestamp, credentials.user, values));
+                    offerItem(new Gravity(timestamp, credentials.user, lastVector = values));
                     break;
                 case Sensor.TYPE_GYROSCOPE:
-                    offerItem(new Gyroscope(timestamp, credentials.user, values));
+                    offerItem(new Gyroscope(timestamp, credentials.user, lastVector = values));
                     break;
                 case Sensor.TYPE_LINEAR_ACCELERATION:
-                    offerItem(new LinearAcceleration(timestamp, credentials.user, values));
+                    offerItem(new LinearAcceleration(timestamp, credentials.user, lastVector = values));
                     break;
                 case Sensor.TYPE_MAGNETIC_FIELD:
-                    offerItem(new MagneticField(timestamp, credentials.user, values));
+                    offerItem(new MagneticField(timestamp, credentials.user, lastVector = values));
                     break;
                 case Sensor.TYPE_ROTATION_VECTOR:
-                    offerItem(new Rotation(timestamp, credentials.user, values));
+                    offerItem(new Rotation(timestamp, credentials.user, lastVector = values));
                     break;
 
                 default:

@@ -57,7 +57,7 @@ public abstract class RegularSampleSource implements SampleSource, Reporter {
                 if (!isActive())
                     return;
 
-                if (Objects.equal(getDelay(was), getDelay(config))) {
+                if (!Objects.equal(getDelay(was), getDelay(config))) {
                     deactivate();
                     activate();
                 }

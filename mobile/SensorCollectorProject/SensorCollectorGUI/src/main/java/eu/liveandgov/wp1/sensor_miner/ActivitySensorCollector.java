@@ -57,9 +57,6 @@ public class ActivitySensorCollector extends BaseMoraActivity {
     @InjectView(R.id.logTextView)
     TextView logTextView;
 
-    @InjectView(R.id.idText)
-    EditText idText;
-
     @InjectView(R.id.streamButton)
     ToggleButton streamButton;
 
@@ -68,7 +65,7 @@ public class ActivitySensorCollector extends BaseMoraActivity {
     @Override
     public void onResume() {
         super.onResume();
-        reportsTask = scheduledExecutorService.scheduleAtFixedRate(reportsRunnable, 0L, 2L, TimeUnit.SECONDS);
+        reportsTask = scheduledExecutorService.scheduleAtFixedRate(reportsRunnable, 0L, 1L, TimeUnit.SECONDS);
     }
 
     @Override
@@ -159,16 +156,6 @@ public class ActivitySensorCollector extends BaseMoraActivity {
         api.annotate(annotation);
 
         Toast.makeText(this, "Adding annotation: " + annotation, Toast.LENGTH_SHORT).show();
-    }
-
-    public void onIdButtonClick(View view) {
-        String id = idText.getText().toString();
-
-        MoraConfig config = api.getConfig();
-        config.user = id;
-        api.setConfig(config);
-
-        Toast.makeText(this, "User name set: " + id, Toast.LENGTH_SHORT).show();
     }
 
     public void onDeleteButtonClick(View view) {

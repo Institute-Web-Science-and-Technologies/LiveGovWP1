@@ -346,7 +346,6 @@ public class MoraService extends BaseMoraService {
 
         // Load the config
         configurator.loadConfig();
-        configurator.resetConfig();
 
         // Add the connectors
         os.addReporter(itemBuffer);

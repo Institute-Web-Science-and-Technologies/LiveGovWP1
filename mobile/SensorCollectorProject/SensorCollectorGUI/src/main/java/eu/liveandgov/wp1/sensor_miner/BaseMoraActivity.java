@@ -38,20 +38,16 @@ public abstract class BaseMoraActivity extends RoboActivity {
     };
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Prevent keyboard automatically popping up
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         // Start the service
         Intent mora = new Intent(this, MoraService.class);
         startService(mora);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // Bind to service
-        Intent mora = new Intent(this, MoraService.class);
         bindService(mora, api, 0);
 
         // Start listening for status updates
@@ -59,23 +55,13 @@ public abstract class BaseMoraActivity extends RoboActivity {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    protected void onDestroy() {
 
         // Stop listening for status updates
         unregisterReceiver(statusUpdatedReceiver);
-
         unbindService(api);
-        Log.d("MORA", "Unbinding the mora service");
-    }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Prevent keyboard automatically popping up
-        getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        super.onDestroy();
     }
 
     protected abstract void updateStatus();
