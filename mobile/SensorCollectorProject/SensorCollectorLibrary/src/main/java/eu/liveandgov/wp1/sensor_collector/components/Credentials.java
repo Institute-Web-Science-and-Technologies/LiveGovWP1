@@ -9,7 +9,9 @@ import eu.liveandgov.wp1.sensor_collector.config.Configurator;
 import eu.liveandgov.wp1.sensor_collector.util.MoraStrings;
 
 /**
- * TODO Fill in the blank
+ * <p>
+ * Holds user credentials
+ * </p>
  * Created by lukashaertel on 17.11.2014.
  */
 @Singleton

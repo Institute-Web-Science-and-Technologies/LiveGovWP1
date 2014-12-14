@@ -4,189 +4,644 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
 
+
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <!--
 
-        public String user;
-        public int secretLength;
-        public String upload;
-        public boolean uploadCompressed;
-        public String streaming;
-        public Integer gps;
-        public boolean velocity;
-        public Integer acceleration;
-        public Integer linearAcceleration;
-        public Integer gravity;
-        public Integer magnetometer;
-        public Integer rotation;
-        public Integer wifi;
-        public Integer bluetooth;
-        public Integer gsm;
-        public Integer googleActivity;
-        public boolean har;
-        -->
+        <Button
+            android:id="@+id/saveSettings"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:onClick="saveSettings"
+            android:text="Save" />
+
+        <Button
+            android:id="@+id/resetSettings"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:onClick="resetSettings"
+            android:text="Reset" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/settingsGroupMargin"
+            android:text="Credentials"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
 
         <TextView
             android:id="@+id/userLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="User name"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center"
+            android:text="Name" />
 
         <EditText
             android:id="@+id/user"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Names" />
+            android:inputType="textPersonName" />
+
 
         <TextView
-            android:id="@+id/secretLengthLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Secret length"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/settingsGroupMargin"
+            android:text="Upstream"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <EditText
-            android:id="@+id/secretLength"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number" />
 
         <TextView
             android:id="@+id/uploadLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Upload address"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center"
+            android:text="Upload" />
 
         <EditText
             android:id="@+id/upload"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textUri"/>
+            android:inputType="textUri" />
+
 
         <CheckBox
             android:id="@+id/uploadCompressed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_column="1"
             android:checked="false"
-            android:text="Upload compressed" />
+            android:text="Compressed"
+            android:layout_gravity="center_horizontal" />
 
         <TextView
             android:id="@+id/streamingLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Streaming address"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center"
+            android:text="Stream" />
 
         <EditText
             android:id="@+id/streaming"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textUri"/>
+            android:inputType="textUri" />
 
-        <CheckBox
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/settingsGroupMargin"
+            android:text="Location"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Unit in seconds" />
+
+
+        <TextView
+            android:id="@+id/gpsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="GPS" />
+
+        <RadioGroup
             android:id="@+id/gps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="Record GPS" />
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/gpsOff"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="Off" />
+
+            <RadioButton
+                android:id="@+id/gps5s"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="5" />
+
+            <RadioButton
+                android:id="@+id/gps30s"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="30" />
+
+            <RadioButton
+                android:id="@+id/gps60s"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="60" />
+        </RadioGroup>
+
 
         <CheckBox
             android:id="@+id/velocity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_column="1"
             android:checked="false"
-            android:text="Record GPS velocity" />
+            android:text="Record GPS velocity"
+            android:layout_gravity="center_horizontal" />
 
-        <CheckBox
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/settingsGroupMargin"
+            android:text="Movement"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+
+            android:text="Unit in milliseconds" />
+
+
+        <TextView
+            android:id="@+id/accelerationLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="ACC" />
+
+        <RadioGroup
             android:id="@+id/acceleration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="Record accelerometer" />
+            android:layout_gravity="center"
+            android:orientation="horizontal">
 
-        <CheckBox
+            <RadioButton
+                android:id="@+id/accelerationOff"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="Off" />
+
+            <RadioButton
+                android:id="@+id/acceleration10Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="10" />
+
+            <RadioButton
+                android:id="@+id/acceleration25Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="25" />
+
+            <RadioButton
+                android:id="@+id/acceleration100Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="100" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/linearAccelerationLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:singleLine="false"
+            android:text="LAC" />
+
+        <RadioGroup
             android:id="@+id/linearAcceleration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="Record linear acceleration" />
+            android:layout_gravity="center"
+            android:orientation="horizontal">
 
-        <CheckBox
+            <RadioButton
+                android:id="@+id/linearAccelerationOff"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="Off" />
+
+            <RadioButton
+                android:id="@+id/linearAcceleration10Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="10" />
+
+            <RadioButton
+                android:id="@+id/linearAcceleration25Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="25" />
+
+            <RadioButton
+                android:id="@+id/linearAcceleration100Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="100" />
+        </RadioGroup>
+
+
+        <TextView
+            android:id="@+id/gravityLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:singleLine="false"
+            android:text="GRA" />
+
+        <RadioGroup
             android:id="@+id/gravity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="Record gravity" />
+            android:layout_gravity="center"
+            android:orientation="horizontal">
 
-        <CheckBox
+            <RadioButton
+                android:id="@+id/gravityOff"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="Off" />
+
+            <RadioButton
+                android:id="@+id/gravity10Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="10" />
+
+            <RadioButton
+                android:id="@+id/gravity25Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="25" />
+
+            <RadioButton
+                android:id="@+id/gravity100Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="100" />
+        </RadioGroup>
+
+
+        <TextView
+            android:id="@+id/magnetometerLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:singleLine="false"
+            android:text="MAG" />
+
+        <RadioGroup
             android:id="@+id/magnetometer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="Record magnetometer" />
+            android:layout_gravity="center"
+            android:orientation="horizontal">
 
-        <CheckBox
+            <RadioButton
+                android:id="@+id/magnetometerOff"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="Off" />
+
+            <RadioButton
+                android:id="@+id/magnetometer10Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="10" />
+
+            <RadioButton
+                android:id="@+id/magnetometer25Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="25" />
+
+            <RadioButton
+                android:id="@+id/magnetometer100Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="100" />
+        </RadioGroup>
+
+
+        <TextView
+            android:id="@+id/rotationLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:singleLine="false"
+            android:text="ROT" />
+
+        <RadioGroup
             android:id="@+id/rotation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="Record rotation" />
+            android:layout_gravity="center"
+            android:orientation="horizontal">
 
-        <CheckBox
+            <RadioButton
+                android:id="@+id/rotationOff"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="Off" />
+
+            <RadioButton
+                android:id="@+id/rotation10Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="10" />
+
+            <RadioButton
+                android:id="@+id/rotation25Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="25" />
+
+            <RadioButton
+                android:id="@+id/rotation100Ms"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="100" />
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/settingsGroupMargin"
+            android:text="Network"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Unit in seconds" />
+
+
+        <TextView
+            android:id="@+id/wifiLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:singleLine="false"
+            android:text="WIFI" />
+
+        <RadioGroup
             android:id="@+id/wifi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="Record WiFi" />
+            android:layout_gravity="center"
+            android:orientation="horizontal">
 
-        <CheckBox
+            <RadioButton
+                android:id="@+id/wifiOff"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="Off" />
+
+            <RadioButton
+                android:id="@+id/wifi5S"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="5" />
+
+            <RadioButton
+                android:id="@+id/wifi30S"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="30" />
+
+            <RadioButton
+                android:id="@+id/wifi60S"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="60" />
+        </RadioGroup>
+
+
+        <TextView
+            android:id="@+id/bluetoothLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:singleLine="false"
+            android:text="BLT" />
+
+        <RadioGroup
             android:id="@+id/bluetooth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="Record Bluetooth" />
+            android:layout_gravity="center"
+            android:orientation="horizontal">
 
-        <CheckBox
+            <RadioButton
+                android:id="@+id/bluetoothOff"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="Off" />
+
+            <RadioButton
+                android:id="@+id/bluetooth5S"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="5" />
+
+            <RadioButton
+                android:id="@+id/bluetooth30S"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="30" />
+
+            <RadioButton
+                android:id="@+id/bluetooth60S"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="60" />
+        </RadioGroup>
+
+
+        <TextView
+            android:id="@+id/gsmLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:singleLine="false"
+            android:text="GSM" />
+
+        <RadioGroup
             android:id="@+id/gsm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="Record GSM" />
+            android:layout_gravity="center"
+            android:orientation="horizontal">
 
-        <CheckBox
+            <RadioButton
+                android:id="@+id/gsmOff"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="Off" />
+
+            <RadioButton
+                android:id="@+id/gsm5S"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="5" />
+
+            <RadioButton
+                android:id="@+id/gsm30S"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="30" />
+
+            <RadioButton
+                android:id="@+id/gsm60S"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="60" />
+        </RadioGroup>
+
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Record Google Activity"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/settingsGroupMargin"
+            android:text="Activity"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+
+            android:text="Unit in seconds" />
+
+        <TextView
+            android:id="@+id/googleActivityLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:singleLine="false"
+            android:text="GACT" />
+
+        <RadioGroup
             android:id="@+id/googleActivity"
-            android:checked="false" />
-
-        <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Record Activity"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/googleActivityOff"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="Off" />
+
+            <RadioButton
+                android:id="@+id/googleActivity1S"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="1" />
+
+            <RadioButton
+                android:id="@+id/googleActivity5S"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="5" />
+
+            <RadioButton
+                android:id="@+id/googleActivity10S"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="10" />
+        </RadioGroup>
+
+
+        <TextView
+            android:id="@+id/harLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:singleLine="false"
+            android:text="ACT" />
+
+        <RadioGroup
             android:id="@+id/har"
-            android:checked="false" />
-
-        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Save settings"
-            android:id="@+id/saveSettings"
-            android:onClick="saveSettings" />
+            android:layout_gravity="center"
+            android:orientation="horizontal">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Reset settings"
-            android:id="@+id/resetSettings"
-            android:onClick="resetSettings" />
+            <RadioButton
+                android:id="@+id/harOff"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="Off" />
+
+            <RadioButton
+                android:id="@+id/harOn"
+                style="@style/RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="On" />
+        </RadioGroup>
     </LinearLayout>
 </ScrollView>
