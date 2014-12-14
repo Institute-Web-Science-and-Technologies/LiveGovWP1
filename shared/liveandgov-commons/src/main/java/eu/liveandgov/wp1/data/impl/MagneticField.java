@@ -3,7 +3,7 @@ package eu.liveandgov.wp1.data.impl;
 import eu.liveandgov.wp1.data.DataCommons;
 
 /**
- * <p>Motion instance corresponding to the magnetic fiedl sensor of a device</p>
+ * <p>Motion instance corresponding to the magnetic field sensor of a device</p>
  * Created by Lukas Härtel on 11.02.14.
  */
 public class MagneticField extends Motion {

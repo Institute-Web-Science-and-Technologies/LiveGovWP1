@@ -103,9 +103,8 @@ public class Bluetooth extends AbstractItem {
             if (deviceMinorClass != null ? !deviceMinorClass.equals(that.deviceMinorClass) : that.deviceMinorClass != null)
                 return false;
             if (name != null ? !name.equals(that.name) : that.name != null) return false;
-            if (rssi != null ? !rssi.equals(that.rssi) : that.rssi != null) return false;
+            return !(rssi != null ? !rssi.equals(that.rssi) : that.rssi != null);
 
-            return true;
         }
 
         @Override
@@ -162,9 +161,8 @@ public class Bluetooth extends AbstractItem {
 
         Bluetooth bluetooth = (Bluetooth) o;
 
-        if (!Arrays.equals(items, bluetooth.items)) return false;
+        return Arrays.equals(items, bluetooth.items);
 
-        return true;
     }
 
     @Override

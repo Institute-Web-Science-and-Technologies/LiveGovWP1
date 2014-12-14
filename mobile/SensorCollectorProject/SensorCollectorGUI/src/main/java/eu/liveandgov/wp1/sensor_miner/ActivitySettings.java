@@ -1,85 +1,141 @@
 package eu.liveandgov.wp1.sensor_miner;
 
-import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
-import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
-public class ActivitySettings extends Activity {
+import java.util.concurrent.TimeUnit;
+
+import eu.liveandgov.wp1.sensor_collector.api.MoraConfig;
+import roboguice.inject.ContentView;
+import roboguice.inject.InjectView;
+
+@ContentView(R.layout.activity_settings)
+public class ActivitySettings extends BaseMoraActivity {
+    @InjectView(R.id.user)
+    EditText user;
+
+    @InjectView(R.id.upload)
+    EditText upload;
+
+    @InjectView(R.id.uploadCompressed)
+    CheckBox uploadCompressed;
+
+    @InjectView(R.id.streaming)
+    EditText streaming;
+
+    @InjectView(R.id.gps)
+    RadioGroup gps;
+
+
+    @InjectView(R.id.velocity)
+    CheckBox velocity;
+
+    @InjectView(R.id.acceleration)
+    RadioGroup acceleration;
+
+    @InjectView(R.id.linearAcceleration)
+    RadioGroup linearAcceleration;
+
+    @InjectView(R.id.gravity)
+    RadioGroup gravity;
+
+    @InjectView(R.id.magnetometer)
+    RadioGroup magnetometer;
+
+    @InjectView(R.id.rotation)
+    RadioGroup rotation;
+
+    @InjectView(R.id.wifi)
+    RadioGroup wifi;
+
+    @InjectView(R.id.bluetooth)
+    RadioGroup bluetooth;
+
+    @InjectView(R.id.gsm)
+    RadioGroup gsm;
+
+    @InjectView(R.id.googleActivity)
+    RadioGroup googleActivity;
+
+    @InjectView(R.id.har)
+    RadioGroup har;
+
+    @Inject
+    @Named("eu.liveandgov.wp1.sensor_collector.config.configDefault")
+    MoraConfig configDefault;
+
+    @Override
+    protected void updateStatus() {
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
 
-        // Get target textview for streaming address settings
-        final TextView uploadAddress = (TextView) findViewById(R.id.upload_address);
-        final TextView streamingAddress = (TextView) findViewById(R.id.streaming_address);
-
-        // Open settings
-        SharedPreferences settings = getSharedPreferences(getString(R.string.spn), 0);
-
-        // Get configured value
-        final String uploadAddressValue = settings.getString(getString(R.string.prf_upload_address), SensorCollectionOptions.DEFAULT_UPLOAD);
-        final String streamingAddressValue = settings.getString(getString(R.string.prf_streaming_address), SensorCollectionOptions.DEFAULT_STREAMING);
-
-        // Assign into view
-        uploadAddress.setText(uploadAddressValue);
-        streamingAddress.setText(streamingAddressValue);
+        api.initConnected(new Runnable() {
+            @Override
+            public void run() {
+                MoraConfig config = api.getConfig();
+                setTo(config);
+            }
+        });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        final TextView userSecret = (TextView) findViewById(R.id.userSecret);
-
-        SharedPreferences settings = getSharedPreferences(getString(R.string.spn), 0);
-
-        final String userSecretValue = settings.getString("secret", "n.a.");
-
-        userSecret.setText(userSecretValue);
+    private void setTo(MoraConfig config) {
+        user.setText(config.user);
+        upload.setText(config.upload);
+        uploadCompressed.setChecked(config.uploadCompressed);
+        streaming.setText(config.streaming);
+        assignInteger(gps, config.gps, TimeUnit.SECONDS);
+        velocity.setChecked(config.velocity);
+        assignInteger(acceleration, config.acceleration, TimeUnit.MILLISECONDS);
+        assignInteger(linearAcceleration, config.linearAcceleration, TimeUnit.MILLISECONDS);
+        assignInteger(gravity, config.gravity, TimeUnit.MILLISECONDS);
+        assignInteger(magnetometer, config.magnetometer, TimeUnit.MILLISECONDS);
+        assignInteger(rotation, config.rotation, TimeUnit.MILLISECONDS);
+        assignInteger(wifi, config.wifi, TimeUnit.SECONDS);
+        assignInteger(bluetooth, config.bluetooth, TimeUnit.SECONDS);
+        assignInteger(gsm, config.gsm, TimeUnit.SECONDS);
+        assignInteger(googleActivity, config.googleActivity, TimeUnit.SECONDS);
+        assignBoolean(har, config.har);
     }
 
-    @Override
-    protected void onPause() {
+    public void saveSettings(View view) {
+        MoraConfig config = new MoraConfig(
+                user.getText().toString(),
+                5, // TODO I DON'T WANT TO INCLUDE THIS IN SETTINGS, REMOVE
+                upload.getText().toString(),
+                uploadCompressed.isChecked(),
+                streaming.getText().toString(),
+                evaluateInteger(gps, TimeUnit.SECONDS),
+                velocity.isChecked(),
+                evaluateInteger(acceleration, TimeUnit.MILLISECONDS),
+                evaluateInteger(linearAcceleration, TimeUnit.MILLISECONDS),
+                evaluateInteger(gravity, TimeUnit.MILLISECONDS),
+                evaluateInteger(magnetometer, TimeUnit.MILLISECONDS),
+                evaluateInteger(rotation, TimeUnit.MILLISECONDS),
+                evaluateInteger(wifi, TimeUnit.SECONDS),
+                evaluateInteger(bluetooth, TimeUnit.SECONDS),
+                evaluateInteger(gsm, TimeUnit.SECONDS),
+                evaluateInteger(googleActivity, TimeUnit.SECONDS),
+                evaluateBoolean(har)
+        );
 
-        // Open settings for editing
-        SharedPreferences settings = getSharedPreferences(getString(R.string.spn), 0);
-        SharedPreferences.Editor edit = settings.edit();
+        api.setConfig(config);
+    }
 
-        // Get source textview for streaming address settings
-        final TextView uploadAddress = (TextView) findViewById(R.id.upload_address);
-        final TextView streamingAddress = (TextView) findViewById(R.id.streaming_address);
-
-        // Calculate new configuration value
-        final String uploadAddressValue =
-                uploadAddress.getText().length() == 0 || uploadAddress.getText().equals(SensorCollectionOptions.DEFAULT_UPLOAD)
-                        ? null
-                        : uploadAddress.getText().toString();
-        final String streamingAddressValue =
-                streamingAddress.getText().length() == 0 || uploadAddress.getText().equals(SensorCollectionOptions.DEFAULT_STREAMING)
-                        ? null
-                        : streamingAddress.getText().toString();
-
-        // Store in settings and commit
-        if (uploadAddressValue == null)
-            edit.remove(getString(R.string.prf_upload_address));
-        else
-            edit.putString(getString(R.string.prf_upload_address), uploadAddressValue);
-
-        if (streamingAddressValue == null)
-            edit.remove(getString(R.string.prf_streaming_address));
-        else
-            edit.putString(getString(R.string.prf_streaming_address), streamingAddressValue);
-
-        edit.apply();
-
-        super.onPause();
+    public void resetSettings(View view) {
+        setTo(configDefault);
     }
 
     @Override
@@ -100,6 +156,87 @@ public class ActivitySettings extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private Integer evaluateInteger(RadioGroup radioGroup, TimeUnit unit) {
+        RadioButton radioButton = (RadioButton) findViewById(radioGroup.getCheckedRadioButtonId());
+        String caption = radioButton.getText().toString();
+        if ("Off".equals(caption))
+            return null;
+        else
+            return (int) TimeUnit.MILLISECONDS.convert(Integer.valueOf(caption), unit);
+    }
+
+    private void assignInteger(RadioGroup radioGroup, Integer value, TimeUnit unit) {
+        if (value == null) {
+            for (int i = 0; i < radioGroup.getChildCount(); i++) {
+                View child = radioGroup.getChildAt(i);
+                if (child instanceof RadioButton) {
+                    RadioButton radioButton = (RadioButton) child;
+
+                    if ("Off".equals(radioButton.getText().toString()))
+                        radioButton.setChecked(true);
+                    return;
+                }
+            }
+        } else {
+            RadioButton selected = null;
+            int cmd = Integer.MAX_VALUE;
+
+            for (int i = 0; i < radioGroup.getChildCount(); i++) {
+                View child = radioGroup.getChildAt(i);
+                if (child instanceof RadioButton) {
+                    RadioButton radioButton = (RadioButton) child;
+
+                    if (!"Off".equals(radioButton.getText().toString())) {
+                        int p = (int) TimeUnit.MILLISECONDS.convert(Integer.valueOf(radioButton.getText().toString()), unit);
+                        if (Math.abs(value - p) < cmd) {
+                            selected = radioButton;
+                            cmd = Math.abs(value - p);
+                        }
+                    }
+                }
+            }
+
+            if (selected == null)
+                assignInteger(radioGroup, null, unit);
+            else
+                selected.setChecked(true);
+        }
+    }
+
+    private boolean evaluateBoolean(RadioGroup radioGroup) {
+        RadioButton radioButton = (RadioButton) findViewById(radioGroup.getCheckedRadioButtonId());
+        String caption = radioButton.getText().toString();
+        return !"Off".equals(caption);
+    }
+
+    private void assignBoolean(RadioGroup radioGroup, boolean value) {
+        if (value) {
+            for (int i = 0; i < radioGroup.getChildCount(); i++) {
+                View child = radioGroup.getChildAt(i);
+                if (child instanceof RadioButton) {
+                    RadioButton radioButton = (RadioButton) child;
+
+                    if (!"Off".equals(radioButton.getText().toString())) {
+                        radioButton.setChecked(true);
+                        return;
+                    }
+                }
+            }
+        } else {
+            for (int i = 0; i < radioGroup.getChildCount(); i++) {
+                View child = radioGroup.getChildAt(i);
+                if (child instanceof RadioButton) {
+                    RadioButton radioButton = (RadioButton) child;
+
+                    if ("Off".equals(radioButton.getText().toString())) {
+                        radioButton.setChecked(true);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
 }

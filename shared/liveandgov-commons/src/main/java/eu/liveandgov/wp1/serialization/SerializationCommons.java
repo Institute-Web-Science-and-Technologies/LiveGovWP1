@@ -1,7 +1,6 @@
 package eu.liveandgov.wp1.serialization;
 
 import eu.liveandgov.wp1.util.LocalBuilder;
-import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.Locale;
 import java.util.Scanner;
@@ -68,7 +67,7 @@ public class SerializationCommons {
      * @param target The target to write to
      * @param c      The character to escape
      */
-    private static final void unicodeEscape(StringBuilder target, char c) {
+    private static void unicodeEscape(StringBuilder target, char c) {
         target.append("\\u");
         target.append(String.format(Locale.ENGLISH, "%04x", (int) c));
     }
@@ -79,18 +78,18 @@ public class SerializationCommons {
      * @param string The string to escape
      * @return Returns the escaped string builder
      */
-    public static final CharSequence escape(String string) {
+    public static CharSequence escape(String string) {
         if (string == null) return "";
 
         // Acquire the pair of builder and writer thereon
-        final StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+        StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
 
         stringBuilder.append('\"');
 
         // Use manual escaping to pipe the escaped string into the string builder
         final int l = string.length();
         for (int i = 0; i < l; i++) {
-            final char c = string.charAt(i);
+            char c = string.charAt(i);
             switch (c) {
                 // Catch special escape characters
                 case '\"':
@@ -134,13 +133,62 @@ public class SerializationCommons {
      * @param string The string to unescape
      * @return Returns the unescaped string
      */
-    public static final String unescape(String string) {
+    public static String unescape(String string) {
         string = string.trim();
 
         if (string.length() < 2) return null;
 
-        return StringEscapeUtils.unescapeJava(string.substring(1, string.length() - 1));
+        // Acquire the pair of builder and writer thereon
+        StringBuilder stringBuilder = LocalBuilder.acquireBuilder();
+
+        // Use manual escaping to pipe the escaped string into the string builder
+        final int l = string.length();
+        for (int i = 1; i < l - 1; i++) {
+            char c = string.charAt(i);
+            // Test if at escape symbol
+            if (c == '\\') {
+                // If so, skip to the escape code
+                i++;
+                c = string.charAt(i);
+                // Decide on the escape code
+                switch (c) {
+                    case '\"':
+                        stringBuilder.append("\"");
+                        break;
+                    case '\\':
+                        stringBuilder.append("\\");
+                        break;
+                    case 'b':
+                        stringBuilder.append("\b");
+                        break;
+                    case 'n':
+                        stringBuilder.append("\n");
+                        break;
+                    case 't':
+                        stringBuilder.append("\t");
+                        break;
+                    case 'f':
+                        stringBuilder.append("\f");
+                        break;
+                    case 'r':
+                        stringBuilder.append("\r");
+                        break;
+                    case 'u':
+                        stringBuilder.append((char) (int) Integer.valueOf(string.substring(i, i + 4)));
+                        i += 4;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Cannot unescape string, unknown escape symbol: " + c);
+                }
+
+            } else
+                // If not, just append
+                stringBuilder.append(c);
+        }
+
+        return stringBuilder.toString();
     }
+
 
     /**
      * Appends one escaped string to the string builder

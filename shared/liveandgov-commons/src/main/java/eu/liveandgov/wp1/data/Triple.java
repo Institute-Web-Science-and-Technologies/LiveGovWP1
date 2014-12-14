@@ -61,9 +61,8 @@ public final class Triple<T, U, V> implements Comparable<Triple<T, U, V>> {
 
         if (center != null ? !center.equals(triple.center) : triple.center != null) return false;
         if (left != null ? !left.equals(triple.left) : triple.left != null) return false;
-        if (right != null ? !right.equals(triple.right) : triple.right != null) return false;
+        return !(right != null ? !right.equals(triple.right) : triple.right != null);
 
-        return true;
     }
 
     @Override
@@ -80,19 +79,25 @@ public final class Triple<T, U, V> implements Comparable<Triple<T, U, V>> {
         if (o == null) return -1;
 
         if (left instanceof Comparable) {
-            final int pl = ((Comparable) left).compareTo(o.left);
+            @SuppressWarnings("unchecked")
+            Comparable<Object> cleft = (Comparable<Object>) left;
+            final int pl = cleft.compareTo(o.left);
 
             if (pl != 0) return pl;
         }
 
         if (center instanceof Comparable) {
-            final int pc = ((Comparable) center).compareTo(o.center);
+            @SuppressWarnings("unchecked")
+            Comparable<Object> ccenter = (Comparable<Object>) center;
+            final int pc = ccenter.compareTo(o.center);
 
             if (pc != 0) return pc;
         }
 
         if (right instanceof Comparable) {
-            final int pr = ((Comparable) right).compareTo(o.right);
+            @SuppressWarnings("unchecked")
+            Comparable<Object> cright = (Comparable<Object>) right;
+            final int pr = cright.compareTo(o.right);
 
             if (pr != 0) return pr;
         }

@@ -38,9 +38,8 @@ public class Activity extends AbstractItem {
 
         Activity activity1 = (Activity) o;
 
-        if (activity != null ? !activity.equals(activity1.activity) : activity1.activity != null) return false;
+        return !(activity != null ? !activity.equals(activity1.activity) : activity1.activity != null);
 
-        return true;
     }
 
     @Override

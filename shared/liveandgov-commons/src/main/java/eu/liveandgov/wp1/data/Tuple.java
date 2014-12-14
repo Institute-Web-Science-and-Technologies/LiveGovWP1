@@ -50,9 +50,8 @@ public final class Tuple<T, U> implements Comparable<Tuple<T, U>> {
         Tuple tuple = (Tuple) o;
 
         if (left != null ? !left.equals(tuple.left) : tuple.left != null) return false;
-        if (right != null ? !right.equals(tuple.right) : tuple.right != null) return false;
+        return !(right != null ? !right.equals(tuple.right) : tuple.right != null);
 
-        return true;
     }
 
     @Override
@@ -68,13 +67,17 @@ public final class Tuple<T, U> implements Comparable<Tuple<T, U>> {
         if (o == null) return -1;
 
         if (left instanceof Comparable) {
-            final int pl = ((Comparable) left).compareTo(o.left);
+            @SuppressWarnings("unchecked")
+            Comparable<Object> cleft = (Comparable<Object>)o.left;
+            final int pl = cleft.compareTo(o.left);
 
             if (pl != 0) return pl;
         }
 
         if (right instanceof Comparable) {
-            final int pr = ((Comparable) right).compareTo(o.right);
+            @SuppressWarnings("unchecked")
+            Comparable<Object> cright = (Comparable<Object>)o.right;
+            final int pr = cright.compareTo(o.right);
 
             if (pr != 0) return pr;
         }

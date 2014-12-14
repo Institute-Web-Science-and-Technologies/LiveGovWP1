@@ -22,12 +22,12 @@ public class GoogleActivity extends AbstractItem {
     public final int confidence;
 
     /**
-     * Creates
+     * Creates a new instance with the given values
      *
-     * @param timestamp
-     * @param device
-     * @param activity
-     * @param confidence
+     * @param timestamp  Time of the item
+     * @param device     Device of the item
+     * @param activity   The name of the activity recognized by Google Play Services
+     * @param confidence The confidence of the recognized activity in percent
      */
     public GoogleActivity(long timestamp, String device, String activity, int confidence) {
         super(timestamp, device);
@@ -49,9 +49,8 @@ public class GoogleActivity extends AbstractItem {
         GoogleActivity that = (GoogleActivity) o;
 
         if (confidence != that.confidence) return false;
-        if (activity != null ? !activity.equals(that.activity) : that.activity != null) return false;
+        return !(activity != null ? !activity.equals(that.activity) : that.activity != null);
 
-        return true;
     }
 
     @Override

@@ -37,10 +37,10 @@ public class ZMQServer extends Pipeline<String, String> implements Stoppable {
      * on a regular basis. For this eu.liveandgov.wp1.pipeline element, a socket is created with the given ZMQ mode, which in turn is
      * bound to a given address. Sends are executed on the calling pipeline elements thread.
      *
-     * @param scheduledExecutorService
-     * @param interval
-     * @param mode
-     * @param boundAddress
+     * @param scheduledExecutorService The executor connecting and disconnecting the ZMQ stream and responding to data
+     * @param interval The interval at which to handle incoming data
+     * @param mode The ZMQ mode
+     * @param boundAddress The address to bind
      */
     public ZMQServer(final ScheduledExecutorService scheduledExecutorService, final long interval, final int mode, final String boundAddress) {
         this.scheduledExecutorService = scheduledExecutorService;
