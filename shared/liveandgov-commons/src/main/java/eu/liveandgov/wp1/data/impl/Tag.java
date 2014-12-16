@@ -39,9 +39,8 @@ public class Tag extends AbstractItem {
 
         Tag tag1 = (Tag) o;
 
-        if (tag != null ? !tag.equals(tag1.tag) : tag1.tag != null) return false;
+        return !(tag != null ? !tag.equals(tag1.tag) : tag1.tag != null);
 
-        return true;
     }
 
     @Override

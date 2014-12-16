@@ -1,6 +1,5 @@
 package eu.liveandgov.wp1.tests;
 
-import com.google.common.base.Strings;
 import eu.liveandgov.wp1.data.Item;
 import eu.liveandgov.wp1.serialization.impl.ItemSerialization;
 

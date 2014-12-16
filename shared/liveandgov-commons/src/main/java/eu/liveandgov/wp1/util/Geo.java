@@ -1,6 +1,7 @@
 package eu.liveandgov.wp1.util;
 
 /**
+ * <p>Utilities for geographical data</p>
  * Created by Lukas Härtel on 18.03.14.
  */
 public class Geo {

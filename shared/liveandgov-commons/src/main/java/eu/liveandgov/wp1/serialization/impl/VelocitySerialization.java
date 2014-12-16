@@ -1,11 +1,8 @@
 package eu.liveandgov.wp1.serialization.impl;
 
-import eu.liveandgov.wp1.data.DataCommons;
 import eu.liveandgov.wp1.data.impl.*;
 import eu.liveandgov.wp1.serialization.SerializationCommons;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 /**

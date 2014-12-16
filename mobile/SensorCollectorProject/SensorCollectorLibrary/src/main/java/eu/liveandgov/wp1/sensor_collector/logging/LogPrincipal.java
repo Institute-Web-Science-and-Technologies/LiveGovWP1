@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import java.io.File;
 
 import de.mindpipe.android.logging.log4j.LogConfigurator;
-import eu.liveandgov.wp1.sensor_collector.configuration.SensorCollectionOptions;
 
 /**
  * <p>Log principal; helper for log configuration and acquisition</p>
@@ -65,12 +64,12 @@ public class LogPrincipal {
     }
 
 
-    public static void configure() {
+    public static void configure(String logfileName) {
         // Basic configuration
         LogConfigurator logConfigurator = new LogConfigurator();
 
         // Configure
-        logConfigurator.setFileName(Environment.getExternalStorageDirectory() + File.separator + SensorCollectionOptions.LOGFILE_NAME + ".log");
+        logConfigurator.setFileName(Environment.getExternalStorageDirectory() + File.separator + logfileName + ".log");
         logConfigurator.setRootLevel(Level.ALL);
         logConfigurator.configure();
     }

@@ -27,9 +27,8 @@ public class Velocity extends AbstractItem {
 
         Velocity velocity1 = (Velocity) o;
 
-        if (Float.compare(velocity1.velocity, velocity) != 0) return false;
+        return Float.compare(velocity1.velocity, velocity) == 0;
 
-        return true;
     }
 
     @Override
